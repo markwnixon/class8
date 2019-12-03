@@ -1,0 +1,868 @@
+{% extends 'A_layout_portal.html' %}
+
+{% block body %}
+<form action="{{ url_for ('Dealer') }}" method="post">
+<div class="table-responsive">
+<div class="row">
+
+<div class="col-sm-{{leftsize}}">
+
+  {% if leftscreen == 0 %}
+
+    <div class="row">
+        <div class="col-sm-4" align="left">
+        Text version of file:<br>
+
+        <embed src="{{doctxt}}" width="300px" height="550px"/>
+
+
+        </div>
+        <div class="col-sm-8" align="right">
+        Looking for: {{docref}}<br>
+
+        <embed src="{{docref}}" width="500px" height="550px"/>
+        </div>
+    </div>
+
+    <input type = "hidden" name ="datatable1" value= "{{dlist[0]}}">
+    <input type = "hidden" name ="datatable2" value= "{{dlist[1]}}">
+    <input type = "hidden" name ="datatable3" value= "{{dlist[2]}}">
+    <input type = "hidden" name ="datatable4" value= "{{dlist[3]}}">
+
+{% elif leftscreen == 2 %}
+
+    {% include 'includes/_calendarH.html' %}
+    <input type = "hidden" name ="datatable1" value= "{{dlist[0]}}">
+    <input type = "hidden" name ="datatable2" value= "{{dlist[1]}}">
+    <input type = "hidden" name ="datatable3" value= "{{dlist[2]}}">
+    <input type = "hidden" name ="datatable4" value= "{{dlist[3]}}">
+
+  {% else %}
+
+  {% set atc = "font-weight-bold text-center" %}
+  {% set atl = "font-weight-bold text-left" %}
+  {% set atr = "font-weight-bold text-right" %}
+
+
+  {% if dlist[0] == 'on' %}
+
+
+
+
+  <div class="row">
+    <div class="col-sm-12" align="center"> <b>Jays Auto Order Data:</b> &nbsp {% include 'includes/_tablespanelH.html' %} </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+        <table id="dtHorizontalVerticalExample1" class="table table-striped table-bordered table-sm w-auto" cellspacing="0"
+  width="100%">
+            <thead>
+                <tr class="{{atc}}" style="font-weight:bold; background-color:lavenderblush" >
+                <th class="{{atc}}">JO</th>
+                <th class="{{atc}}">Pid</th>
+                <th class="{{atc}}">Company</th>
+                <th class="{{atc}}">Chk</th>
+                <th class="{{atc}}">Aid</th>
+                <th class="{{atc}}">Make</th>
+                <th class="{{atc}}">Model</th>
+                <th class="{{atc}}">Year</th>
+                <th class="{{atc}}">VIN</th>
+                <th class="{{atc}}">Cost</th>
+                <th class="{{atc}}">Sale</th>
+                <th class="{{atc}}">BuyerFee</th>
+                <th class="{{atc}}">DocFee</th>
+                <th class="{{atc}}">Tow$</th>
+                <th class="{{atc}}">Repair$</th>
+                <th class="{{atc}}">Other</th>
+                <th class="{{atc}}">OthCost</th>
+                <th class="{{atc}}">Status</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for data in data1 %}
+            <tr {% if data.Status == 'Paid' %}
+                class="green-text"
+                {% elif data.Status == 'Invoiced' %}
+                class="amber-text"
+                {% elif data.Status == 'DockRed' %}
+                class="purple=text"
+                {% elif data.Status == 'Matched' %}
+                class="blue-text"
+                {% endif %}>
+
+                <td class="{{atc}}">{{ data.Jo }}</td>
+                <td class="{{atc}}">{{ data.Pid }}</td>
+                <td class="{{atc}}">{{ data.Company }}</td>
+                <td class="{{atc}}"><input class="align-middle" type="checkbox" name="cars{{data.id}}" value="{{data.id}}"></td>
+                <td class="{{atc}}">{{ data.Aid }}</td>
+                <td class="{{atc}}">{{ data.Make }}</td>
+                <td class="{{atc}}">{{ data.Model }}</td>
+                <td class="{{atc}}" >{{ data.Year }}</td>
+                <td class="{{atc}}" >{{ data.Vin }}</td>
+                <td class="{{atc}}" >{{ data.Cost }}</td>
+                <td class="{{atc}}" >{{ data.Sale }}</td>
+                <td class="{{atc}}" >{{ data.Bfee}}</td>
+                <td class="{{atc}}" >{{ data.DocumentFee}}</td>
+                <td class="{{atc}}" >{{ data.Tow }}</td>
+                <td class="{{atc}}" >{{ data.Repair }}</td>
+                <td class="{{atc}}" >{{ data.Oitem }}</td>
+                <td class="{{atc}}">{{ data.Ocost }}</td>
+                <td class="{{atc}}">{{ data.Status }}</td>
+
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% if dlist[1] == 'on' %}
+<div class="row">
+    <div class="col-sm-12" align="center"> <b>Automobile Data:</b>
+        {% if dlist[0]!= 'on' %}
+        &nbsp {% include 'includes/_tablespanelH.html' %}
+    {% endif %}</div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+       {% set atc1="font-weight-bold text-center" %}
+        <table id="dtHorizontalVerticalExample2" class="table table-striped table-bordered table-sm w-auto" cellspacing="0"
+  width="100%">
+            <thead>
+            <tr style="background-color:lavenderblush">
+
+                <th class="{{atc1}}" align="center">JO</th>
+                <th class="{{atc1}}" align="center">OrderId</th>
+                <th class="{{atc1}}">Tow</th>
+                <th class="{{atc1}}" align="center">Chk</th>
+                <th class="{{atc1}}">Date</th>
+                <th class="{{atc1}}" align="center">Year</th>
+                <th class="{{atc1}}" align="center">Make</th>
+                <th class="{{atc1}}" align="center">Model</th>
+                <th class="{{atc1}}" align="center">Color</th>
+                <th class="{{atc1}}" align="center">VIN</th>
+                <th class="{{atc1}}" align="center">Title</th>
+                <th class="{{atc1}}" align="center">State</th>
+                <th class="{{atc1}}" align="center">Weight</th>
+                <th class="{{atc1}}" align="center">Value</th>
+                <th class="{{atc1}}" align="center">TowComp</th>
+
+                <th class="{{atc1}}" align="center">Status</th>
+                <th class="{{atc1}}" align="center">Pickup</th>
+                <th class="{{atc1}}" align="center">From</th>
+
+                <th class="{{atc1}}" align="center">ToLoc</th>
+
+                <th class="{{atc1}}" align="center">TowCostAll</th>
+                <th class="{{atc1}}" align="center">Ncars</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for data in data2 %}
+
+                {% if data.Status=='Matched' %}
+                    {% set atc1="text-primary font-weight-bold text-center" %}
+                {% elif data.Status=='New' %}
+                    {% set atc1="amber font-weight-bold text-center" %}
+                {% else %}
+                    {% set atc1="font-weight-bold text-center" %}
+                {% endif %}
+
+            <tr>
+                <td class="{{atc1}}" >{{data.Jo}}</td>
+                <td class="{{atc1}}" >{{data.Orderid}}</td>
+                <td class="{{atc1}}" >{{ data.TowCostEa }}</td>
+                <td class="{{atc1}}" ><input class="align-middle" type="checkbox" name="auto{{data.id}}" value="{{data.id}}"></td>
+                <td class="{{atc1}}" >{{ data.Date2 }}</td>
+                <td class="{{atc1}}" >{{ data.Year }}</td>
+                <td class="{{atc1}}" >{{ data.Make}}</td>
+                <td class="{{atc1}}" >{{ data.Model }}</td>
+                <td class="{{atc1}}" >{{ data.Color }}</td>
+                <td class="{{atc1}}" >{{ data.VIN }}</td>
+                <td class="{{atc1}}" >{{ data.Title }}</td>
+                <td class="{{atc1}}" >{{ data.State }}</td>
+                <td class="{{atc1}}" >{{ data.EmpWeight }}</td>
+                <td class="{{atc1}}" >{{ data.Value }}</td>
+                <td class="{{atc1}}" >{% if data.TowCompany %}{{ data.TowCompany[0:12] }} {% endif %}</td>
+
+                <td class="{{atc1}}" > {{ data.Status }}</td>
+                <td class="{{atc1}}" >{{ data.Date1 }}</td>
+                <td class="{{atc1}}" >{{ data.Pufrom }}</td>
+                <td class="{{atc1}}" >{{ data.Delto }}</td>
+                <td class="{{atc1}}" >{{ data.TowCost }}</td>
+                <td class="{{atc1}}" >{{ data.Ncars }}</td>
+
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endif %}
+{% if dlist[2] %}
+<div class="row">
+    <div class="col-sm-12" align="center"> <b>Entity Data:</b>
+        {% if dlist[0]!= 'on' and dlist[1]!= 'on' %}
+        &nbsp {% include 'includes/_tablespanelH.html' %}
+    {% endif %}</div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+
+        <table id="dtHorizontalVerticalExample3" class="table table-striped table-bordered w-auto" cellspacing="0"
+  width="100%">
+            <thead>
+            <tr style="background-color:lavenderblush">
+                <th class="{{atc}}">ID</th>
+                <th class="{{atc}}">Chk</th>
+                <th class="{{atc}}">Role</th>
+                <th class="{{atl}}">Company</th>
+                <th class="{{atl}}">Addr1</th>
+                <th class="{{atl}}">Addr2</th>
+                <th class="{{atl}}">Phone</th>
+                <th class="{{atl}}">Email</th>
+                <th class="{{atl}}">Last</th>
+                <th class="{{atl}}">First</th>
+            </tr>
+            </thead>
+        <tbody>
+            {% for data in data3 %}
+            <tr>
+                <td class="{{atc}}">{{ data.id }}</td>
+                <td class="{{atc}}"><input class="align-middle" type="checkbox" name="peep{{data.id}}" value="{{data.id}}"></td>
+                <td class="{{atc}}">{{ data.Ptype}}</td>
+                <td class="{{atl}}">{{ data.Company }}</td>
+                <td class="{{atl}}">{{ data.Addr1 }}</td>
+                <td class="{{atl}}">{{ data.Addr2 }}</td>
+                <td class="{{atl}}">{{ data.Telephone }}</td>
+                <td class="{{atl}}">{{ data.Email }}</td>
+                <td class="{{atl}}">{{ data.Last }}</td>
+                <td class="{{atl}}">{{ data.First }}</td>
+
+            </tr>
+            {% endfor %}
+            </tbody>
+                    </table>
+
+    </div>
+</div>
+{% endif %}
+
+{% if dlist[0]!= 'on' and dlist[1]!= 'on' and dlist[2]!= 'on' %}
+<div class="row">
+    <div class="col-sm-12" align="center">
+     {% include 'includes/_tablespanelH.html' %}
+    </div>
+</div>
+{% endif %}
+
+
+{% endif %}
+    </div>
+
+
+
+
+<div class="col-sm-{{rightsize}}">
+       <div class="row" align="center">
+           <div class="col-sm-12"  style="font-weight:bold">Control Panel</div>
+       </div>
+       <div class="row" align="center">
+           <div class="col-sm-12">
+
+                <table>
+               <tr class="small text-danger"><td>Messages</td></tr>
+                {% for e in err[0:2] %}
+                <tr><td>{{e}}</td></tr>
+                {% endfor %}
+               </table>
+               <input type = "hidden" name="passmodlink" value="{{modlink}}">
+
+
+           </div>
+       </div>
+       <div class="row" align="center">
+           <div class="col-sm-12">
+
+            {% if cars > 0 and modlink==1 %}
+
+              {% include 'includes/_button_upd_ret.html' %}
+
+            {% elif peep>0 and modlink==1 %}
+
+              {% include 'includes/_button_upd_ret.html' %}
+
+            {% elif peep>0 and modlink==2 %}
+
+              {% include 'includes/_button_upd_ret.html' %}
+
+            {% elif (auto>0 and modlink==1) or modlink==10 %}
+
+               {% include 'includes/_button_upd_ret.html' %}
+
+            {% elif leftscreen == 2 %}
+
+               {% include 'includes/_button_cal.html' %}
+
+            {% elif inco>0 %}
+                <table>
+                    <tr><td colspan="3"><div class="input-group-text">Modify Payment Received {{modata.SubJo}}</div></td>
+                    </tr>
+                    <tr>
+                       <td><button type="submit" class="btn btn-secondary" name="recUpdate">Update</button></td>
+                       <td><button type="submit" class="btn btn-success" name="emailInvo">Email</button></td>
+                       <td><button type="submit" class="btn btn-secondary" name="Return">Return</button></td>
+                   </tr>
+                </table>
+                <input type = "hidden" name="inco" value="{{inco}}">
+
+           {% elif invo>0 %}
+                <table>
+                    <tr><td colspan="3"><div class="input-group-text">Modify Invoice Data for JO {{modata.Jo}}</div></td>
+                    </tr>
+                    <tr>
+                       <td><button type="submit" class="btn btn-primary" name="invoUpdate">Update</button></td>
+                       <td><button type="submit" class="btn btn-success" name="emailInvo">Email</button></td>
+                       <td><button type="submit" class="btn btn-secondary" name="Return">Return</button></td>
+                   </tr>
+                </table>
+
+            {% elif modlink != 4 and modlink != 10 %}
+
+               {% include 'includes/_controlpanelH.html' %}
+
+
+
+
+            {% else %}
+
+
+            <table class="table table-condensed table-hover">
+            <tbody>
+            <tr>
+               <td colspan="2">
+                    <button type="submit" class="btn btn-primary btn-sm" name="ThisJob">Create Job</button>
+                    <button type="submit" class="btn btn-secondary btn-sm" name="Return">Return</button>
+                </td>
+             </tr>
+            <tr>
+               <td colspan="2">
+               <input type = "hidden" name="modlink" value="{{modlink}}">
+               <select class="form-control" type="text" name="FileSel" onchange="this.form.submit()">
+               <option value='1'>Choose Source Document for New Job</option>
+               {% for data in fdata %}
+                  <option {% if filesel == data %} selected {% endif %}  value={{data}}> {{data}} </option>
+               {% endfor %}</select>
+               </td>
+            </tr>
+            <tr>
+               <td><div class="input-group-text">Job Start Date:</div></td>
+               <td><input class="form-control" type="date" name="dstart" value="{{jobdate}}"></td>
+            </tr>
+                <tr>
+                    <td><div class="input-group-text">Choose Customer:</div></td>
+                    <td><select class="form-control" type="text" name="thiscompany">
+                      <option selected value='1'>Choose Later</option>
+                      {% for data in data3 %}
+                      <option value="{{data.Company}}"> {{data.Company}} </option>
+                      {% endfor %}</select>
+                    </td>
+                </tr>
+                 <tr>
+                        <td> <div class="input-group-text" align="right">Year:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="modelyear" value="{{modata.Year}}"></td>
+                    </tr>
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Make:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="make" value="{{modata.Make}}"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Model:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="model" value="{{modata.Model}}"></td>
+                    </tr>
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Color:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="color" value="{{modata.Color}}"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">VIN:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="vin" value="{{modata.Vin}}"></td>
+                    </tr>
+
+                    <tr>
+                        <td> <div class="input-group-text">Cost:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Cost}}" name="cost"></td>
+                    </tr>
+
+                    <tr>
+                        <td> <div class="input-group-text">Sale:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Sale}}" name="sale"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">BuyerFee:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Bfee}}" name="bfee"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Documents Fee:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.DocumentFee}}" name="dfee"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Tow Charges:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Tow}}" name="tow"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Repair Charges:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Repair}}" name="repair"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Other Label:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Oitem}}" name="oitem"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Other Charges:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Ocost}}" name="ocost"></td>
+                    </tr>
+                <tr>
+                    <td colspan="2">
+                        <button type="submit" class="btn btn-primary btn-sm" name="ThisJob">Create Job</button>
+                        <button type="submit" class="btn btn-secondary btn-sm" name="Return">Return</button>
+                    </td>
+                </tr>
+
+                </tbody></table>
+
+
+           {% endif %}
+
+           </div>
+       </div>
+
+
+       <div class="row">
+           <div class="col-sm-12">
+                {% if invo > 0 %}
+                <table class="table table-condensed table-hover">
+                    <tbody>
+                    <tr><td><div class="input-group-text">Invoice Date:</div></td><td><input class="form-control" type="date" value={{invodate}} name="invodate"></td></tr>
+                    {% for data in idata %}
+                    <tr><td><div class="input-group-text">Item:</div></td><td><div class="input-group-text">{{data.Service}}</div></td></tr>
+                    <tr><td><div class="input-group-text">Quantity:</div></td><td><input class="form-control" type="text" value={{data.Qty}} name="qty{{data.id}}"></td></tr>
+                    <tr><td><div class="input-group-text">Cost Each:</div></td><td><input class="form-control" type="text" value={{data.Ea}} name="cost{{data.id}}"></td></tr>
+                        <tr><td><div class="input-group-text">Description:</div></td><td><textarea class="form-control" type="text" name="desc{{data.id}}" rows="2">{{data.Description}}</textarea></td></tr>
+                    {% endfor %}
+                </tbody></table>
+                <input type = "hidden" name ="invooder" value= {{invooder}}>
+                <input type = "hidden" name ="invo" value= {{invo}}>
+                <input type = "hidden" name ="cars" value= {{cars}}>
+                <input type = "hidden" name ="cache" value= {{cache}}>
+
+                {% endif %}
+               {% if inco > 0 %}
+                <table class="table table-condensed table-hover">
+                    <tbody>
+                    <tr>
+                        <td> <div class="input-group-text">Amount:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value={{modata.Amount}} name="recamount"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Customer Ref#:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Ref}}" name="custref"></td>
+                    </tr>
+                    <tr>
+                        <td><div class="input-group-text">Description:</div></td>
+                        <td><textarea class="form-control" type="text" name="desc" rows="2">{{modata.Description}}</textarea></td></tr>
+                    <tr>
+                        <td> <div class="input-group-text">Date:</div></td>
+                        <td colspan="2"><input class="form-control" type="date" name="recdate" value="{{modata.Date}}"></td>
+                    </tr>
+                </tbody></table>
+                <input type = "hidden" name ="invooder" value= {{invooder}}>
+                <input type = "hidden" name ="invo" value= {{invo}}>
+                <input type = "hidden" name ="odor" value= {{odor}}>
+                <input type = "hidden" name ="cache" value= {{cache}}>
+                <input type = "hidden" name ="inco" value= {{inco}}>
+                {% endif %}
+
+
+
+
+                {% if cars > 0 and modlink == 1 %}
+                <table class="table table-condensed table-hover">
+                    <tbody>
+                <tr>
+               <td colspan="2">
+               <select class="form-control" type="text" name="FileSel" onchange="this.form.submit()">
+               <option value='1'>Choose Source Document for New Job</option>
+               {% for data in fdata %}
+                  <option {% if filesel == data %} selected {% endif %}  value={{data}}> {{data}} </option>
+               {% endfor %}</select>
+               </td>
+                </tr>
+                <tr>
+               <td><div class="input-group-text">Job Start Date:</div></td>
+               <td><input class="form-control" type="date" name="dstart" value="{{jobdate}}"></td>
+                </tr>
+                <tr>
+               <td><div class="input-group-text">Choose Customer:</div></td>
+               <td><select class="form-control" type="text" name="thiscompany">
+                      <option selected value='1'>Choose Later</option>
+                      {% for data in data3 %}
+                      <option value="{{data.Company}}" {% if modata.Company == data.Company %} selected {% endif %}> {{data.Company}} </option>
+                      {% endfor %}</select>
+               </td>
+                </tr>
+                    <tr>
+                        <td> <div class="input-group-text" align="right">Year:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="modelyear" value="{{modata.Year}}"></td>
+                    </tr>
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Make:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="make" value="{{modata.Make}}"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Model:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="model" value="{{modata.Model}}"></td>
+                    </tr>
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Color:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="color" value="{{modata.Color}}"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">VIN:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="vin" value="{{modata.Vin}}"></td>
+                    </tr>
+
+                    <tr>
+                        <td> <div class="input-group-text">Cost:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Cost}}" name="cost"></td>
+                    </tr>
+
+                    <tr>
+                        <td> <div class="input-group-text">Sale:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Sale}}" name="sale"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">BuyerFee:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Bfee}}" name="bfee"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Documents Fee:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.DocumentFee}}" name="dfee"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Tow Charges:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Tow}}" name="tow"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Repair Charges:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Repair}}" name="repair"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Other Label:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Oitem}}" name="oitem"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Other Charges:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Ocost}}" name="ocost"></td>
+                    </tr>
+
+                    </tbody></table>
+                    <input type = "hidden" name ="cars" value= {{cars}}>
+
+                    {% endif %}
+
+
+
+
+                {% if peep > 0 and modlink > 0 %}
+
+                <table class="table table-condensed table-hover">
+                <tbody>
+                    <tr>
+                        <td> <div class="input-group-text" align="right">Company:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="company" value="{{modata.Company}}"></td>
+                    </tr>
+                    <tr>
+                    <td> <div class="input-group-text">Role:</div></td>
+                    <td colspan="2">
+                      <select class="form-control" type="text" name="role">
+                      <option value="Jays" {% if modata.Ptype == 'Jays' %} selected {% endif %}> Jays Auto </option>
+                      <option value="TowCo" {% if modata.Ptype == 'TowCo' %} selected {% endif %}> Tow Company </option>
+                      </select>
+                    </td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text" align="right">First Name:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="fname" value="{{modata.First}}"></td>
+                    </tr>
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Mid Name(s):</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="mnames" value="{{modata.Middle}}"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Last Name:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="lname" value="{{modata.Last}}"></td>
+                    </tr>
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Address Line1:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="addr1" value="{{modata.Addr1}}"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Address Line2:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="addr2" value="{{modata.Addr2}}"></td>
+                    </tr>
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Address Line3:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="addr3" value="{{modata.Addr3}}"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">ID Type:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="idtype" value="{{modata.Idtype}}"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">ID Number:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="tid" value="{{modata.Idnumber}}"></td>
+                    </tr>
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Telephone:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="tel" value="{{modata.Telephone}}"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Email:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="email" value="{{modata.Email}}"></td>
+                    </tr>
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Associate 1:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="assoc1" value="{{modata.Associate1}}"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Associate 2:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="assoc2" value="{{modata.Associate2}}"></td>
+                    </tr>
+                    <tr>
+                        {% if modata.Date1 %}{% set jobdate=modata.Date1 %}{% endif %}
+                        <td> <div class="input-group-text">Date:</div></td>
+                        <td colspan="2"><input class="form-control" type="date" name="date1" value="{{jobdate}}"></td>
+                    </tr>
+                </tbody></table>
+                <input type = "hidden" name ="peep" value= {{peep}}>
+
+                {% endif %}
+
+
+
+                {% if (auto > 0 and modlink > 0) or modlink==10 %}
+
+                <table class="table table-condensed table-hover">
+                <tbody>
+                <tr>
+                  <td colspan="2">
+                  <select class="form-control" type="text" name="FileSel"    onchange="this.form.submit()">
+                  <option value='1'>Choose Source Document for New Job</option>
+                  {% for data in fdata %}
+                  <option {% if filesel == data %} selected {% endif %}  value="{{data}}"> {{displdata[loop.index0]}} </option>
+                  {% endfor %}</select>
+                  </td>
+                   </tr>
+                    <tr>
+                        <td> <div class="input-group-text" align="right">Order ID:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="orderid" value="{{modata.Orderid}}"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text" align="right">Year:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="modelyear" value="{{modata.Year}}"></td>
+                    </tr>
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Make:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="make" value="{{modata.Make}}"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Model:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="model" value="{{modata.Model}}"></td>
+                    </tr>
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Color:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="color" value="{{modata.Color}}"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">VIN:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="vin" value="{{modata.VIN}}"></td>
+                    </tr>
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Title No.:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="title" value="{{modata.Title}}"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">State:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="state" value="{{modata.State}}"></td>
+                    </tr>
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Empty Weight:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="empweight" value="{{modata.EmpWeight}}"></td>
+                    </tr>
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Car Value:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="cvalue" value="{{modata.Value}}"></td>
+                    </tr>
+                    <tr>
+                    <td> <div class="input-group-text">Tow Company:</div></td>
+                    <td colspan="2">
+                      <select class="form-control" type="text" name="towcompany">
+                      <option value='1'> Add New </option>
+                      {% for data in pdata1 %}
+                      <option value="{{data.Company}}" {% if modata.TowCompany == data.Company %} selected {% endif %}> {{data.Company}} </option>
+                      {% endfor %}
+                      </select>
+                    </td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Tow Company (if New):</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="newtowcompany" value=""></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Tow Cost Package:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="towcost" value="{{modata.TowCost}}"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Number Cars:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="ncars" value="{{modata.Ncars}}"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Tow Cost Each:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="towcostea" value="{{modata.TowCostEa}}"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Pickup Date:</div></td>
+                        <td colspan="2"><input class="form-control" type="date" name="date1" value="{{modata.Date1}}"></td>
+                    </tr>
+                    <tr>
+                       <td> <div class="input-group-text">Pickup From:</div></td>
+                       <td colspan="2">
+                        <input class="form-control" type="text" name="pufrom" value="{{modata.Pufrom}}">
+                       </td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Delivery Date:</div></td>
+                        <td colspan="2"><input class="form-control" type="date" name="date2" value={{modata.Date2}}></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Deliver To:</div></td>
+                        <td colspan="2">
+                        <input class="form-control" type="text" name="delto" value="{{modata.Delto}}">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Dispatched By:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="dispatched" value="{{modata.Dispatched}}"></td>
+                    </tr>
+
+
+                </tbody></table>
+                <input type = "hidden" name ="auto" value= {{auto}}>
+
+                {% endif %}
+
+<br><br><br><br><br><br><br><br>
+                <div class="card" style="width: 18rem;">
+               <table>
+                   <tr align="center">
+                        <td>Debug information</td>
+                   </tr>
+
+                    <tr align="left"><td>cars {{cars}}</td></tr>
+                    <tr align="left"><td>auto {{auto}}</td></tr>
+                    <tr align="left"><td>peep {{peep}}</td></tr>
+                    <tr align="left"><td>modlink {{modlink}}</td></tr>
+                    <tr align="left"><td>invo {{invo}}</td></tr>
+                    <tr align="left"><td>invooder {{invooder}}</td></tr>
+                    <tr align="left"><td>cache {{cache}}</td></tr>
+                    <tr align="left"><td>reach {{reach}}</td></tr>
+                    <tr align="left"><td>leftsize {{leftsize}}</td></tr>
+                    <tr align="left"><td>leftscreen {{leftscreen}}</td></tr>
+                   <tr align="left"><td>dlist1 {{dlist[0]}}</td></tr>
+                   <tr align="left"><td>dlist2 {{dlist[1]}}</td></tr>
+                   <tr align="left"><td>dlist3 {{dlist[2]}}</td></tr>
+                    <tr align="left"><td>2nd letter: N, I, R</td></tr>
+                    <tr align="left"><td>N:Not Invoiced</td></tr>
+                    <tr align="left"><td>I:Invoice created/sent</td></tr>
+                    <tr align="left"><td>R:Funds received</td></tr>
+               </table>
+               </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+           </div></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+</div>
+</div>
+<input type = "hidden" name ="cache" value= {{peep}}>
+<input type = "hidden" name ="cache" value= {{cache}}>
+<input type = "hidden" name ="invooder" value= {{invooder}}>
+<input type = "hidden" name="modlink" value="{{modlink}}">
+<input type="hidden" value="{{limitptype}}" name="limitptype">
+</form>
+
+{% endblock %}

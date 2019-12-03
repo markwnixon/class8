@@ -1,0 +1,50 @@
+<div class="card">
+  <div class="card-header">
+  Create, Modify, and Delete Compliance Items
+  </div>
+  <div class="card-body" align="center">
+    <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="NewJ"
+      data-toggle="tooltip" title="Create a New Account">Add New<br>Item</button>
+
+    <button type="submit" class="btn btn-group-small btn-mdb-color my-small-btn" name="Vmod"
+      data-toggle="tooltip" title="Modify Form Data associated with an Account">Modify<br>Item</button>
+
+    <button type="submit" class="btn btn-group-small btn-mdb-color my-small-btn" name="ViewO"
+      data-toggle="tooltip" title="Modify Form Data associated with an Account">View<br>Source</button>
+
+
+    <button type="submit" class="btn btn-group-small btn-mdb-color my-small-btn" name="Assemble"
+      data-toggle="tooltip" title="Modify Form Data associated with an Account">Assemble<br>Items</button>
+
+    <button type="submit" class="btn btn-group-small btn-danger my-small-btn" name="Delete"
+      data-toggle="tooltip" title="Select an Account to be DELETED">DELETE<br>Item</button>
+
+
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+  Choose a Category and Create Compliance Reports
+  </div>
+  <div class="card-body" align="center">
+    <select class="form-control" type="text" name="actype" onchange="this.form.submit()">
+       <option value='Choose Compliance Subject' {% if actype == 'Choose Compliance Subject' %} selected {% endif %}>Choose Compliance Subject</option>
+       {% for aitem in acdata %}
+       <option {% if actype == aitem %} selected {% endif %}  value="{{aitem}}"> {{aitem}} </option>
+       {% endfor %}
+    </select>
+
+    <button type="submit" class="btn btn-group-small btn-blue my-small-btn" name="Return"
+    data-toggle="tooltip" title="Return and Reset Values"> Return<br>To Tables</button>
+
+    <button type="submit" class="btn btn-group-small btn-blue my-small-btn" name="depositmake"
+      data-toggle="tooltip" title="Create a deposit slip and a bank deposit that will match the bank statement"> Driver<br>Logs</button>
+
+    <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="recdeposit"
+        data-toggle="tooltip" title="Record this Deposit as Created"> Vehicle <br> Reports </button>
+
+    <button type="submit" class="btn btn-group-small btn-red my-small-btn" name="unrecord"
+        data-toggle="tooltip" title="Unrecord A Deposit (Using SubJO and Ref of the Selection)">Drug<br>Screenings</button>
+  </div>
+</div>

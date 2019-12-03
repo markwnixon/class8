@@ -1,0 +1,436 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+{% if jtype == 'complete' %}
+    <div class="table-responsive">
+    <div class="row"><div class="col-sm-12"><h3> &nbsp </h3></div></div>
+    <div class="row"><div class="col-sm-1"></div><div class="col-sm-11"><h3> Your information has been entered successfully. </h3></div></div>
+{% else %}
+<form action="{{ url_for ('NewJob') }}" method="post">
+<div class="table-responsive">
+    {% if jtype == 'NextSteps' %}
+    
+    <div class="table-responsive">
+    <div class="row"><div class="col-sm-12"><h3> &nbsp </h3></div></div>
+    <div class="row"><div class="col-sm-1"></div><div class="col-sm-11"><h3> Your information has been entered successfully. </h3></div></div>
+    <div class="row"><div class="col-sm-1"></div><div class="col-sm-11"><h3> Choose your next step: </h3></div></div>
+    <div class="row">
+        <div class="col-sm-1"></div>
+        <div class="col-sm-3">
+            <input class="btn btn-outline-secondary" type="submit" name="emailquote" value="Email VOCCs for Quote">
+        </div>
+        <div class="col-sm-3">
+            <input class="btn btn-outline-secondary" type="submit" name="commolist" value="Create Commodity List">
+        </div>
+        <div class="col-sm-3">
+            <input class="btn btn-outline-secondary" type="submit" name="gotoocean" value="Go To Status Page">
+        </div>
+        <div class="col-sm-2"><input value={{nextjo}} type="hidden" name="nextjo"></div>
+    </div>
+        
+    {% endif %}
+    
+
+            {% if jtype == 'Unk' %}
+            <div class="row"><div class="col-sm-12"><h3> &nbsp </h3></div></div>
+            <div class="row"><div class="col-sm-1"></div><div class="col-sm-11"><h3> Choose Job Type: </h3></div></div>
+            <div class="row">            
+                <div class="col-sm-1"></div>               
+                <div class="col-sm-10">
+                    <div class="card-deck">   
+                    
+                    <div class="card" style="width: 14rem; ">
+                    <img class="card-img-top" style="height:8rem;" src="tmp/felpics/trucking.jpg" alt="trucking.jpg">
+                    <div class="card-body">
+                    <h3 class="card-title"><input class="btn btn-outline-secondary" type="submit" name="truck" value="Trucking"></h3>
+                    <p class="card-text">Primary work is to move cargo between two regional locations or a regional location and a port.  This job can be import, export or delivery between points.  No international docs or handling.</p>
+                        </div></div>
+                        
+                    <div class="card" style="width: 14rem; ">
+                    <img class="card-img-top" style="height:8rem;" src="tmp/felpics/ocean.jpg" alt="ocean.jpg">
+                    <div class="card-body">
+                    <h3 class="card-title"><input class="btn btn-outline-secondary" type="submit" name="ocean" value="Ocean Shipping"></h3>
+                    <p class="card-text">Primary work is to move cargo overseas.  Part of job may include trucking to port or moving, but this job will require all the documentation associated with international shipping.</p>
+                        </div></div>
+                        
+                    <div class="card" style="width: 14rem; ">
+                    <img class="card-img-top" style="height:8rem;" src="tmp/felpics/moving3.png" alt="move.jpg">
+                    <div class="card-body">
+                    <h3 class="card-title"><input class="btn btn-outline-secondary" type="submit" name="move" value="Moving"></h3>
+                    <p class="card-text">Primary work is to move people or offices from one location to the next, or to make a local delivery that involves packing or unpacking.</p>
+                        </div></div>
+                        
+                    <div class="card" style="width: 14rem; ">
+                    <img class="card-img-top" style="height:8rem;" src="tmp/felpics/store.jpg" alt="store.jpg">
+                    <div class="card-body">
+                    <h3 class="card-title"><input class="btn btn-outline-secondary" type="submit" name="store" value="Storage"></h3>
+                    <p class="card-text">This work is associated with storing the belongings of a company or person inside the warehouse. This job type will send out automatic invoices for storage.</p>
+                        </div></div>
+                    </div>
+                </div>               
+                <div class="col-sm-1"></div>      
+            </div>
+    
+    
+    
+                {% endif %}
+                {% if jtype in 'SMOT' %}
+                    {% if jtype == 'S' %}
+                     <div class="row"><div class="col-sm-12" align="center"><h4> Enter Data for New Storage Job with JO: {{nextjo}} </h4></div></div>
+                    {% endif %}
+                    {% if jtype == 'M' %}
+                     <div class="row"><div class="col-sm-12" align="center"><h4> Enter Data for New Moving Job with JO: {{nextjo}} </h4></div></div>
+                    {% endif %}
+                    {% if jtype == 'O' %}
+                     <div class="row"><div class="col-sm-12" align="center"><h4> Enter Data for New Overseas Shipping Job with JO: {{nextjo}} </h4></div></div>
+                    {% endif %}
+                    {% if jtype == 'T' %}
+                     <div class="row"><div class="col-sm-12" align="center"><h4> Enter Data for New Trucking Job with JO: {{nextjo}} </h4></div></div>
+                    {% endif %}
+
+
+    
+                <div class="row">
+                    <div class="col-sm-1"><input value={{nextjo}} type="hidden" name="nextjo"> </div>
+                    <div class="col-sm-5">
+                    <table class="table table-condensed table-hover">
+                    <tbody>
+                    <tr>
+                        <td colspan="3" align="center">
+                        {% if jtype == 'O' %} 
+                            Exporter/Importer Information 
+                        {% else %}
+                            Customer Information
+                        {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text" align="right">Company:</div></td> 
+                        <td colspan="2"><input class="form-control" type="text" name="company"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text" align="right">First Name:</div></td> 
+                        <td colspan="2"><input class="form-control" type="text" name="fname"></td>
+                    </tr>       
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Mid Name(s):</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="mnames" value=""></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Last Name:</div></td> 
+                        <td colspan="2"><input class="form-control" type="text" name="lname" value=""></td>
+                    </tr>       
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Address Line1:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="addr1" value=""></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Address Line2:</div></td> 
+                        <td colspan="2"><input class="form-control" type="text" name="addr2" value=""></td>
+                    </tr>       
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Address Line3:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="addr3" value=""></td>
+                    </tr>
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Telephone:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="tel" value=""></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Email:</div></td> 
+                        <td colspan="2"><input class="form-control" type="text" name="email" value=""></td>
+                    </tr>
+                        
+                    
+                    <tr>
+                        <td colspan="3" align="center"><input value={{jtype}} type="hidden" name="jtype"></td>
+                    </tr>
+                        
+                    {% if jtype == 'T' %}
+                        
+                    <tr>
+                    <td  align="right">  <div class="input-group-text">Booking:</div></td> <td><input class="form-control input-sm" type="text" name="book" value=""></td>
+                    </tr>
+                    <tr>
+                    <td  align="right">  <div class="input-group-text">Container No.:</div></td> <td><input class="form-control input-sm" type="text" name="container" value=""></td>
+                    </tr>     
+                    <tr>
+                    <td  align="right"> <div class="input-group-text">Size/Type:</div> </td> <td><input class="form-control input-sm" type="text" name="type" value= ""></td>
+                    </tr>
+
+                    <tr>
+                    <td  align="right"> <div class="input-group-text">Shipper:</div></td> <td><input class="form-control input-sm" type="text" name="shipper" value=""></td>
+                    </tr>
+
+                    <tr>
+                    <td  align="right"> <div class="input-group-text">Location:</div></td> <td><input class="form-control input-sm" type="text" name="location" value=""></td>
+                    </tr>
+                    
+                    {% endif %}
+                    </tbody></table>
+                    </div>
+                    
+                    {% endif %}
+                    
+                    
+                    
+                    {% if jtype == 'S' %}
+                    
+                    <div class="col-sm-5">
+                    <table class="table table-condensed table-hover">
+                    <tbody>                     
+                    <tr><td colspan="2" align="center"><f2>Service Information</f2></td></tr>    
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Description:</div></td>
+                        <td><textarea class="form-control" name="desc" rows="3"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Fee per Period:</div></td> 
+                        <td><input class="form-control" type="text" name="amount" value=""></td>
+                    </tr>
+                    
+                    <tr><td colspan="2" align="center"><f2>Automatic Invoice Data</f2></td></tr>    
+                    <tr>
+                        <td> <div class="input-group-text">Frequency:</div></td>
+                        <td>                       
+                        <select class="form-control" type="text" name="freq">
+                        <option  value="Monthly"> Monthly </option>
+                        <option  value="Once">  One-Time </option>
+                        </select>
+                        </td>
+                        
+                        
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Day Of:</div></td> 
+                        <td><input class="form-control" type="text" name="daygo" value=""></td>
+                    </tr>
+                    
+                    <tr>
+                       <td colspan="2"> <input type="submit" value="Submit"> </td>
+                    </tr>
+                    
+                    </tbody></table></div>
+
+                    {% endif %}
+                
+
+                    {% if jtype == 'M' %}
+                    
+                    <div class="col-sm-5">
+                    <table class="table table-condensed table-hover">
+                    <tbody>                     
+                    <tr><td colspan="2" align="center"><f2>Service Information</f2></td></tr>    
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Description:</div></td>
+                        <td><textarea class="form-control" name="desc" rows="1"></textarea></td>
+                    </tr>
+                        
+                        
+                    <tr>
+                        <td> <div class="input-group-text">Action Date:</div></td>
+                        <td colspan="2"><input class="form-control" type="date" value={{today}} name="apptdate"></td>                                                    
+                    </tr>
+                        
+                        
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Appointment Time:</div></td>
+                        <td colspan="2"><input class="form-control" type="time" value={{now}} name="appttime"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Fee for Service:</div></td> 
+                        <td><input class="form-control" type="text" name="amount" value=""></td>
+                    </tr>
+                    <tr><td colspan="2" align="center"><f2>Moving To/Delivery Address</f2></td></tr>
+                    
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Address Line1:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="maddr1" value=""></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Address Line2:</div></td> 
+                        <td colspan="2"><input class="form-control" type="text" name="maddr2" value=""></td>
+                    </tr>       
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Address Line3:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="maddr3" value=""></td>
+                    </tr>
+
+
+                        
+                    
+                    <tr>
+                       <td colspan="2"> <input type="submit" value="Submit"> </td>
+                    </tr>
+                    
+                    </tbody></table></div>
+                
+                {% endif %}           
+                                                        
+
+                {% if jtype == 'O' %}
+                    
+                    <div class="col-sm-5">
+                    <table class="table table-condensed table-hover">
+                    <tbody>                     
+                    <tr><td colspan="2" align="center"><f2>Service Information</f2></td></tr>
+                        
+                    <tr>
+                        <td> <div class="input-group-text">Type of Move:</div></td>
+                        <td>                       
+                        <select class="form-control" type="text" name="movetype">
+                        <option  value="Ocean"> Ocean </option>
+                        <option  value="Air">  Air </option>
+                        </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Direction:</div></td>
+                        <td>                       
+                        <select class="form-control" type="text" name="direction">
+                        <option  value="Import"> Import </option>
+                        <option  value="Export"> Export </option>
+                        </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Basic Commodity:</div></td>
+                        <td>                       
+                        <select class="form-control" type="text" name="commodity">
+                        <option  value="AutoPlus"> Auto(s) Plus HHG</option>
+                        <option  value="AutoOnly"> Auto(s) Only </option>
+                        <option  value="HHG"> Household Goods Only </option>
+                        </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Port of Destination</div></td> 
+                        <td colspan="2"><input class="form-control" type="text" name="pod"></td>
+                    </tr> 
+                    <tr>
+                        <td> <div class="input-group-text">Port of Loading</div></td> 
+                        <td colspan="2"><input class="form-control" type="text" name="pol"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Point of Origin</div></td> 
+                        <td colspan="2"><input class="form-control" type="text" name="origin"></td>
+                    </tr> 
+                    <tr>
+                        <td> <div class="input-group-text">On/About Date:</div></td>
+                        <td colspan="2"><input class="form-control" type="date" value={{today}} name="apptdate"></td>                                   
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Containerized:</div></td>
+                        <td>                       
+                        <select class="form-control" type="text" name="containertype">
+                        <option  value="None"> None </option>
+                        <option  value="20FT STD"> 20 STD </option>
+                        <option  value="40FT HC"> 40 HC </option>
+                        <option  value="40FT STD"> 40 STD </option>
+                        <option  value="40FT HC"> 40 HC </option>
+                        <option  value="45FT STD"> 45 STD </option>
+                        <option  value="45FT HC"> 45 HC </option>
+                        <option  value="LCL"> LCL </option>
+                        <option  value="RORO"> RORO </option>
+                        </select>
+                        </td>
+                    </tr>
+                    
+                        
+                    
+                    <tr>
+                       <td colspan="2"> <input type="submit" value="Submit"> </td>
+                    </tr>
+                    
+                    </tbody></table></div>
+                
+                    {% endif %}
+    
+    
+                    {% if jtype == 'T' %}
+                    
+                    <div class="col-sm-5">
+                    <table class="table table-condensed table-hover">
+                    <tbody>                     
+                    <tr><td colspan="2" align="center"><f2>Service Information</f2></td></tr>    
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Description:</div></td>
+                        <td><textarea class="form-control" name="desc" rows="1"></textarea></td>
+                    </tr>
+                        
+                        
+                    <tr>
+                        <td> <div class="input-group-text">Action Date:</div></td>
+                        <td colspan="2"><input class="form-control" type="date" value={{today}} name="apptdate"></td>                                                    
+                    </tr>
+                        
+                        
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Appointment Time:</div></td>
+                        <td colspan="2"><input class="form-control" type="time" value={{now}} name="appttime"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Fee for Service:</div></td> 
+                        <td><input class="form-control" type="text" name="amount" value=""></td>
+                    </tr>
+                    <tr><td colspan="2" align="center"><f2>Load At:</f2></td></tr>
+                    
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Company:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="lcompany" value=""></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Address Line1:</div></td> 
+                        <td colspan="2"><input class="form-control" type="text" name="laddr1" value=""></td>
+                    </tr>       
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Address Line2:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="laddr2" value=""></td>
+                    </tr>
+                        <tr><td colspan="2" align="center"><f2>Deliver To:</f2></td></tr>
+                    
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Company:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="dcompany" value=""></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Address Line1:</div></td> 
+                        <td colspan="2"><input class="form-control" type="text" name="daddr1" value=""></td>
+                    </tr>       
+                    <tr>
+                        <td align="right"> <div class="input-group-text">Address Line2:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" name="daddr2" value=""></td>
+                    </tr>
+
+
+
+
+            
+                    <tr>
+                    <td align="right"> <div class="input-group-text">Bill No.:</div></td> <td ><input class="form-control input-sm" type="text" name="bol" value=""></td>
+                    </tr>
+
+                    <tr>
+                    <td align="right">  <div class="input-group-text">Seal:</div></td> <td><input class="form-control input-sm" type="text" name="seal" value=""></td>
+                    </tr>
+                        
+                    
+                    <tr>
+                       <td colspan="2"> <input type="submit" value="Submit"> </td>
+                    </tr>
+                    
+                    </tbody></table></div>
+                
+                {% endif %} 
+    
+    
+    
+                            
+                
+                   
+                
+</div></div>
+</form>
+{% endif %}
+{% endblock %} 

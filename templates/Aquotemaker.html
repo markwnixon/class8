@@ -1,0 +1,182 @@
+{% extends 'A_layout_portal.html' %}
+
+{% block body %}
+<form action="{{ url_for ('QuoteMaker') }}" method="post">
+<div class="table-responsive">
+<div class="row">
+
+{% set etype = 'Quote' %}
+<div class="col-sm-4" align="center">
+    {% include 'includes/emailprep.html' %}
+</div>
+
+<div class="col-sm-4" align="left">
+<br>
+{% if expdata %}
+    <div class="card">
+      <div class="card-header">
+        Experienced-Based Cost Rates
+      </div>
+    <div class="card-body">
+        <table class="table table-condensed table-hover">
+            <tbody>
+          <tr>
+              <td><b>Driver Rate</b></td><td><b>Fuel Rate</b></td><td><b>MD Toll Rate</b></td><td><b>Insur Rate</b></td><td><b>R&M Rate</b></td><td><b>LicFeeReg Rate</b></td><td><b>G&A Rate</b></td>
+          </tr>
+              <td>$/hr</td><td>$/mile</td><td>$/entry</td><td>$/hr</td><td>$/mile</td><td>$/mile</td><td>%</td>
+         </tr>
+          <tr>
+              <td>{{ expdata[0] }}</td><td>{{ expdata[1] }}</td><td>{{ expdata[2] }}</td><td>{{ expdata[3] }}</td><td>{{ expdata[4] }}</td><td>{{ expdata[5] }}</td><td>{{ expdata[6] }}</td>
+         </tr>
+        </tbody>
+    </table>
+    </div></div>
+{% endif %}
+<br>
+{% if timedata %}
+    <div class="card">
+      <div class="card-header">
+        Time and Distance Calculations for Load Quote
+      </div>
+    <div class="card-body">
+    <table class="table table-condensed table-hover">
+            <tbody>
+          <tr>
+              <td> </td><td><b>Round Trip</b></td><td><b>Port</b></td><td><b>Load</b></td><td><b>Glide</b></td><td><b>Total</b></td>
+          </tr>
+          <tr>
+              <td>Time (hours)</td><td>{{ timedata[0] }}</td><td>{{ timedata[1] }}</td><td>{{ timedata[2] }}</td><td>{{ timedata[3] }}</td><td>{{ timedata[4] }}</td>
+         </tr><tr>
+              <td>Dist (miles)</td><td>{{ distdata[0] }}</td><td>{{ distdata[1] }}</td><td>{{ distdata[2] }}</td><td>{{ distdata[3] }}</td><td>{{ distdata[4] }}</td>
+         </tr>
+        </tbody>
+    </table>
+     </div></div>
+{% endif %}
+<br>
+{% if costdata %}
+        <div class="card">
+      <div class="card-header">
+        Cost Component Calculations for Load Quote
+      </div>
+    <div class="card-body">
+    <table class="table table-condensed table-hover">
+            <tbody>
+          <tr>
+              <td><b>Driver Cost</b></td><td><b>Fuel Cost</b></td><td><b>Toll Cost</b></td><td><b>Insurance</b></td><td><b>R&M Cost</b></td><td><b>LicFeeReg Cost</b></td><td><b>G&A Cost</b></td>
+          </tr>
+              <td>{{ costdata[0] }}</td><td>{{ costdata[1] }}</td><td>{{ costdata[2] }}</td><td>{{ costdata[3] }}</td><td>{{ costdata[4] }}</td><td>{{ costdata[5] }}</td><td>{{ costdata[6] }}</td>
+         </tr>
+         <tr>
+        </tbody>
+    </table> </div></div>
+{% endif %}
+<br>
+{% if biddata %}
+        <div class="card">
+      <div class="card-header">
+        Total Cost and Bids
+      </div>
+    <div class="card-body">
+    <table class="table table-condensed table-hover">
+        <tbody>
+          <tr>
+              <td><b>Total Cost</b></td><td><b>Bid (1.2Cost)</b></td><td><b>Bid(Old)</b></td><td><b>CMA Bid + Fuel</b></td>
+          </tr>
+          <td><b>{{ costdata[8] }}</b></td><td>{{ biddata[0] }}</td><td>{{ biddata[1] }}</td><td>{{ biddata[2] }}</td>
+         </tr>
+         <tr>
+        </tbody>
+    </table> </div></div>
+{% endif %}
+{% if dirdata %}
+        <div class="card">
+      <div class="card-header">
+       Detailed Directions
+      </div>
+    <div class="card-body">
+    <table class="table table-condensed table-hover">
+        <tbody>
+        {% for dirline in dirdata %}
+            {% if 'Toll' in dirline %}
+             {% set atc1="amber" %}
+            {% else %}
+            {% set atc1 = "white" %}
+            {% endif %}
+          <tr>
+            <td class="{{atc1}}">{{ dirline | safe }}</td>
+         </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div></div>
+{% endif %}
+</div>
+
+<div class="col-sm-4" align="center">
+<br>
+    <div class="card">
+      <div class="card-header">
+        Enter Data for Quote
+      </div>
+    <div class="card-body">
+    <table class="table table-condensed table-hover">
+        <tbody>
+          <tr>
+              <td> <div class="input-group-text">To Location</div></td>
+              <td colspan="2"><textarea class="form-control" type="text" name="locto" rows="2">{{locto}}</textarea></td>
+         </tr>
+          <tr>
+              <td> <div class="input-group-text">From Location</div></td>
+              <td colspan="2"><textarea class="form-control" type="text" name="locfrom" rows="2">{{locfrom}}</textarea></td>
+         </tr>
+          <tr>
+              <td> <div class="input-group-text">Bid/Override</div></td>
+              <td colspan="2"><textarea class="form-control" type="text" name="bidthis" rows="1">{{bidthis}}</textarea></td>
+         </tr>
+         <tr>
+         <td colspan = '2'>
+             <button type="submit" class="btn btn-elegant btn-sm" name="GetQuote">Get<br>Quote</button>
+             <button type="submit" class="btn btn-elegant btn-sm" name="Update">Update<br>Bid</button>
+             <button type="submit" class="btn btn-green btn-sm" name="Email">Email<br>Quote</button>
+             <button type="submit" class="btn btn-blue btn-sm" name="PassOn">Pass On<br>Quote</button>
+         </td>
+         </tr>
+        </tbody>
+    </table>
+    </div></div>
+
+{% if qdata %}
+    <div class="card">
+      <div class="card-header">
+       Quotes Email Box
+      </div>
+    <div class="card-body">
+    <table class="table table-condensed table-hover">
+        <tbody>
+          <tr>
+              <td>  <select type="text" name="emselect" class="form-control" onchange="this.form.submit()">
+                     {% for qd in qdata %}
+                         {% set showthis = qd.Title %}
+                         {% if showthis|length > 35 %}
+                            {% set showthis = showthis[0:35] %}
+                         {% endif %}
+                        <option {% if qd.id == thisid %} selected {% endif %} value={{ qd.id }}>{{ qd.Date }} : {{ showthis }}</option>
+                     {% endfor %}
+                    </select>
+              </td>
+         </tr>
+        <tr><td>
+            {% for qd in qdata %}
+                {% if qd.id == thisid %}
+                    <textarea class="form-control" type="text" name="eoutput" rows="5">{{qd.Body | safe}}</textarea>
+                {% endif %}
+            {% endfor %}
+        </td></tr>
+        </tbody>
+    </table>
+    </div></div>
+{% endif %}
+
+</form>
+{% endblock %}

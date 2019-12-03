@@ -1,0 +1,164 @@
+{% extends 'A_layout_portal.html' %}
+
+{% block body %}
+<form action="{{ url_for ('General') }}" method="post">
+<div class="table-responsive">
+<div class="row">
+
+
+<div class="col-sm-{{leftsize}}">
+
+{% if leftscreen == 0 %}
+
+    <div class="row">
+        <div class="col-sm-4" class="{{atc}}">
+        Text version of file {{doctxt}}:<br>
+
+        <embed src="{{doctxt}}" width="300px" height="550px"/>
+
+
+        </div>
+        <div class="col-sm-8" align="right">
+        Looking for: {{docref}}<br>
+
+        <embed src="{{docref}}" width="600px" height="800px"/>
+        </div>
+    </div>
+{% else %}
+
+  <div class="row">
+    <div class="col-sm-12" align="center" style="font-weight:bold"> General Data </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+      {% set atc = "font-weight-bold text-center" %}
+      {% set atl = "font-weight-bold text-left" %}
+      {% set atr = "font-weight-bold text-right" %}
+        <table id="dtHorizontalVerticalExample1" class="table table-striped table-bordered w-auto" cellspacing="0" width="100%">
+            <thead>
+           <tr align="center" style="font-weight:bold; background-color:linen" >
+                <th class="{{atc}}">Ck</th>
+                <th class="{{atc}}">Id</th>
+                <th class="{{atl}}">Subject</th>
+                <th class="{{atl}}">Category</th>
+                <th class="{{atl}}">Textinfo</th>
+                <th class="{{atl}}">Path</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for data in data1 %}
+            <tr>
+                <td align="center"><input class="align-middle" type="checkbox" name="oder{{data.id}}" value="{{data.id}}"></td>
+                <td class="{{atc}}">{{ data.id }}</td>
+                <td class="{{atl}}">{{ data.Subject }}</td>
+                <td class="{{atl}}">{{ data.Category }}</td>
+                <td class="{{atl}}">{{ data.Textinfo[0:100] }}</td>
+                <td class="{{atl}}">{{ data.Path }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endif %}
+
+</div>
+
+
+
+
+
+<div class="col-sm-{{rightsize}}">
+       <div class="row" align="center">
+           <div class="col-sm-12"  style="font-weight:bold">Control Panel</div>
+       </div>
+       <div class="row" align="center">
+           <div class="col-sm-12">
+
+            <table>
+               <tr class="small text-danger"><td>Messages</td></tr>
+                {% for e in err %}
+                <tr><td>{{e}}</td></tr>
+                {% endfor %}
+            </table>
+            <br>
+
+           </div>
+       </div>
+       <div class="row">
+           <div class="col-sm-12">
+
+            {% if modlink != 1 and modlink != 10 %}
+               {% include 'includes/_controlpanelG.html' %}
+            {% endif %}
+
+            {% if modlink == 10 %}
+               {% include 'includes/_button_upd_ret_del.html' %}
+
+                <table class="table table-condensed table-hover">
+                    <tbody>
+                    <tr>
+                        <td colspan="2">
+                            <input type = "hidden" name="modlink" value="{{modlink}}">
+                            <select class="form-control" type="text" name="FileSel" onchange="this.form.submit()">
+                            <option value='1'>Choose Source Document for New Job</option>
+                            {% for data in fdata %}
+                            <option {% if filesel == data %} selected {% endif %}  value="{{data}}"> {{data}} </option>
+                            {% endfor %}
+                            </select>
+                        </td>
+                        </tr>
+             {% elif modlink == 1 %}
+               {% include 'includes/_button_upd_ret.html' %}
+                <table class="table table-condensed table-hover">
+                    <tbody>
+             {% endif %}
+
+             {% if modlink == 10 or modlink ==1 %}
+                    <tr>
+                        <td> <div class="input-group-text">Subject:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Subject}}" name="subject"></td>
+                    </tr>
+
+                    <tr>
+                        <td> <div class="input-group-text">Add Keywords:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Category}}" name="category"></td>
+                    </tr>
+                    {% if modlink == 10 %}
+                    <tr>
+                        <td> <div class="input-group-text">Textinfo:</div></td>
+                        <td colspan="2"><textarea class="form-control" type="text" name="longs" rows="9">{{longs}}</textarea></td>
+                    </tr>
+                    {% endif %}
+                    {% if modlink == 1 %}
+                    <tr>
+                        <td> <div class="input-group-text">Textinfo:</div></td>
+                        <td colspan="2"><textarea class="form-control" type="text" name="longs" rows="9">{{modata.Textinfo}}</textarea></td>
+                    </tr>
+                    {% endif %}
+
+                    </tbody></table>
+                    <input type = "hidden" name ="oder" value= {{oder}}>
+                {% endif %}
+
+
+
+
+           </div></div>
+
+
+
+</div>
+
+
+
+</div>
+</div>
+{{modlink}}
+<input type = "hidden" name ="oder" value= "{{oder}}">
+<input type = "hidden" name ="modlink" value= "{{modlink}}">
+<input type = "hidden" name ="FileSel" value= "{{filesel}}">
+</form>
+
+{% endblock %}

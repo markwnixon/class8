@@ -1,0 +1,33 @@
+<div class="card">
+  <div class="card-header">
+  Choose the Account to Review or Reconcile
+  </div>
+  <div class="card-body" align="center">
+    <select class="form-control" type="text" name="acname" onchange="this.form.submit()">
+       {% for data in acdata %}
+       <option {% if acctinfo[6] == data.Name %} selected {% endif %}  value="{{data.Name}}"> {{data.Co}}:&nbsp&nbsp  {{data.Name}} </option>
+       {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-group-small btn-mdb-color my-small-btn" name="Return"
+        data-toggle="tooltip" title="Update Actual Balance"> Update<br>Tables</button>
+    <button type="submit" class="btn btn-group-small btn-blue my-small-btn" name="recothese"
+      data-toggle="tooltip" title="Add items selected to pre-RECONCILED"> Reconcile<br>Selected</button>
+    <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="finalize"
+        data-toggle="tooltip" title="Complete and Permanently Reconcile Statement"> Record All<br>Reconciled</button>
+      <button type="submit" class="btn btn-group-small btn-red my-small-btn" name="undothese"
+        data-toggle="tooltip" title="Unrecord Reconcile Selected Items">Undo<br>Selected</button>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    Choose what Records to View
+  </div>
+  <div class="card-body">
+          <select class="form-control align-text-botton" type="text" name="thismuch" onchange="this.form.submit()">
+              <option {% if thismuch == '1' %} selected {% endif %} value='1'>Only Unreconciled Transactions</option>
+              <option {% if thismuch == '2' %} selected {% endif %} value='2'>Last 45 Days</option>
+              <option {% if thismuch == '3' %} selected {% endif %} value='3'>Last 60 Days</option>
+              <option {% if thismuch == '4' %} selected {% endif %} value='4'>All Records</option>
+          </select>
+</div>
+</div>

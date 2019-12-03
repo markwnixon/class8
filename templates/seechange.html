@@ -1,0 +1,117 @@
+{% extends 'layout_portal.html' %}
+
+{% block body %}
+{% set link = 'tmp/' + data.Orders_Signed %}
+
+<div class="table-responsive">
+<table class="grid" cellspacing="0">
+
+<tr align="center" style="font-weight:bold">
+<td colspan="12">See and Correct Orders</td>
+</tr>
+<tr><td colspan="12"><hr/></td></tr>
+
+<tr>
+<td colspan="6" class="align-top">
+<img src="tmp/load607317_order607317_sig.jpg" alt="image here"  width="600">
+</td>
+
+<td colspan="6" class="align-top">
+<form action="{{ url_for ('SeeCorrect') }}" method="post">
+
+<table class="table table-striped table-bordered table-condensed table-hover">
+<tr align="center" style="font-weight:bold">
+<td>JO</td>
+<td>Load</td>
+<td>Order</td>
+</tr><tr>
+<td align="center" >{{ data.Jo }}</td>
+<td align="center" >{{ data.Load}}</td>
+<td align="center" >{{ data.Order }}</td>
+</tr><tr>
+<td align="center" ><input class="col-12" type ="text" name="jo" value="{{data.Jo}}"></td>
+<td align="center" ><input class="col-12" type ="text" name="load" value="{{data.Load}}"></td>
+<td align="center" ><input class="col-12" type ="text" name="o_order" value="{{data.Order}}"></td>
+
+</tr><tr align="center" style="font-weight:bold">
+<td>Company</td>
+<td>Booking</td>
+<td>BOL</td>
+</tr><tr>
+<td align="center" >{{ data.Company }}</td>
+<td align="center" >{{ data.Booking }}</td>
+<td align="center" >{{ data.BOL }}</td>
+</tr><tr>
+<td align="center" ><input class="col-12" type ="text" name="o_company" value="{{data.Company}}"></td>
+<td align="center" ><input class="col-12" type ="text" name="o_book" value="{{data.Booking}}"></td>
+<td align="center" ><input class="col-12" type ="text" name="o_bol" value="{{data.BOL}}"></td>
+
+</tr><tr align="center" style="font-weight:bold">
+<td>Date</td>
+<td>Time</td>
+<td>Container</td>
+</tr><tr>
+<td align="center" >{{ data.Date }}</td>
+<td align="center" >{{ data.Time }}</td>
+<td align="center" >{{ data.Container }}</td>
+</tr><tr>
+<td align="center" ><input class="col-12" type ="text" name="o_date" value="{{data.Date}}"></td>
+<td align="center" ><input class="col-12" type ="text" name="o_time" value="{{data.Time}}"></td>
+<td align="center" ><input class="col-12" type ="text" name="o_cotainer" value="{{data.Container}}"></td>
+
+</tr><tr align="center" style="font-weight:bold">
+<td>Chassis</td>
+<td>Detention</td>
+<td>Storage</td>
+</tr><tr>
+<td align="center" >{{ data.Chassis }}</td>
+<td align="center" >{{ data.Detention }}</td>
+<td align="center" >{{ data.Storage }}</td>
+</tr><tr>
+<td align="center" ><input class="col-8" type ="text" name="chassis" value="{{data.Chassis}}"></td>
+<td align="center" ><input class="col-8" type ="text" name="detention" value="{{data.Detention}}"></td>
+<td align="center" ><input class="col-8" type ="text" name="storage" value="{{data.Storage}}"></td>
+
+</tr><tr align="center" style="font-weight:bold">
+<td>Line Haul Amount</td>
+<td>Status</td>
+<td>ID</td>
+</tr><tr>
+<td align="center" >{{ data.Amount }}</td>
+<td align="center" >{{ data.Status }}</td>
+<td align="center" ><input type ="hidden" name="o_CID" value="{{data.id}}">{{ data.id }}</td>
+</tr><tr>
+<td align="center" ><input class="col-12" type ="text" name="amount" value="{{data.Amount}}"></td>
+<td align="center" ><input class="col-12" type ="text" name="o_status" value="{{data.Status}}"></td>
+<td align="center" ><input type ="hidden" name="inow" value="{{inow}}">Index:{{ inow }} of {{imax}}</td>
+</tr><tr>
+<td align="center" colspan="3"><input class="col-11" type ="submit" name="UP" value="Update"></td>
+</tr><tr>
+<td align="center" colspan="3"><input class="col-11" type ="submit" name="NI" value="Next Item"></td>
+</tr>
+
+
+</form>
+
+
+<tr>
+<td align="center" colspan="3">{{data.Path}}</td>
+</tr><tr>
+<td align="center" colspan="3">{{data.Orders_Signed}}</td>
+</tr><tr>
+<td align="center" colspan="3">{{link}}</td>
+
+</tr>
+</table>
+</td></tr>
+
+</table>
+
+
+
+
+
+</div>
+
+{% endblock %}
+

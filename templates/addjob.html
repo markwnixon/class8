@@ -1,0 +1,215 @@
+{% extends 'layout_portal.html' %}
+
+
+
+{% block body %}
+<div class="table-responsive">
+  <div class="row">
+  {% for i in range(12) %}
+      <div class="col-sm-1" align="left">|</div>
+  {% endfor %}
+  </div>
+  <div class="row">
+  {% for i in range(12) %}
+      <div class="col-sm-1" align="right">|</div>
+  {% endfor %}
+  </div>
+
+  <div class="row">
+        <div class="col-sm-12" align="center" style="font-weight:bold">
+               <h4>Add a New Job</h4>
+        </div>            
+  </div>
+
+<div class="row">
+    <div class="col-sm-4">  
+        <table>
+        <tbody>
+        <tr>
+            <td> <div class="input-group-text">Job Type:</div></td> 
+            <td><select type="text" name="jtype" class="form-control">
+                <option {% if jtype == "Truck" %} selected {% endif %} value="Truck"></option>
+                <option {% if jtype == "Ocean" %} selected {% endif %} value="Ocean"></option>
+                <option {% if jtype == "Move" %} selected {% endif %} value="Move"></option>
+                <option {% if jtype == "Store" %} selected {% endif %} value="Store"></option>
+                </select>
+            </td>
+        </tr>
+            
+        <tr>
+            <td align="right"> <div class="input-group-text">Customer:</div></td> <td><input class="form-control" type="text" name="company" value="{{ data.Shipper}}"></td>
+        </tr>
+            
+            
+         <tr>
+            <td align="right"> <div class="input-group-text">Description:</div></td> <td><input class="form-control" type="text" name="description" value="{{ data.Description }}"></td>
+        </tr>
+
+        <tr>
+        <td align="right"> <div class="input-group-text">Booking</div></td> <td><input class="form-control input-sm" type="text" name="book" value="{{ data.Booking }}"></td>
+        </tr>
+            
+        <tr> <td colspan="2">&nbsp</td></tr>
+
+        <tr>
+        <td align="right"> <div class="input-group-text">Load At:</div></td>
+        <td>
+        <select type="text" name="company" class="form-control">
+            {% for data in pdata: %}
+                <option {% if data.Name == odata.Company %} selected {% endif %} value="{{ data.Name }}"> {{ data.Name }} </option>
+            {% endfor %}
+        </select>
+        </td>
+        </tr>
+            
+        <tr>
+        <td  align="right">  <div class="input-group-text">Pickup:</div></td> <td><input class="form-control input-sm" type="text" name="pickup" value="{{ odata.Pickup }}"></td>
+        </tr>
+            
+        <tr><td colspan="2">&nbsp</td></tr>
+            
+        <tr>
+        <td> <div class="input-group-text">Dlvr To:</div> </td>
+        <td>
+        <select type="text" name="company2" class="form-control">
+            {% for data in pdata: %}
+                <option {% if data.Name == odata.Company2 %} selected {% endif %} value="{{ data.Name }}"> {{ data.Name }} </option>
+            {% endfor %}
+        </select>
+        </td>
+        </tr>
+            
+        <tr><td colspan="2">&nbsp</td></tr>
+                 
+        <tr>
+        <td  align="right">  <div class="input-group-text">Container:</div></td> <td><input class="form-control input-sm" type="text" name="container" value="{{ odata.Container }}"></td>
+        </tr>
+
+        <tr>
+        <td  align="right">  <div class="input-group-text">Booking:</div></td> <td><input class="form-control input-sm" type="text" name="book" value="{{ odata.Booking }}"></td>
+        </tr>
+
+
+            
+        <tr>
+        <td align="right"> <div class="input-group-text">Bill No.:</div></td> <td ><input class="form-control input-sm" type="text" name="bol" value="{{ odata.BOL}}"></td>
+        </tr>
+
+        <tr>
+        <td align="right">  <div class="input-group-text">Seal:</div></td> <td><input class="form-control input-sm" type="text" name="seal" value="{{ odata.Seal }}"></td>
+        </tr>
+    
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+        </tbody>
+        </table>
+        </div>
+      
+        <div class="col-sm-4">
+        <table>
+        <tbody> 
+        <tr>
+        <td  align="right">  <div class="input-group-text">Date:</div></td>
+        <td><input  class="form-control input-xsm"  type="text" name="date" value="{{ odata.Date }}"></td>
+        </tr>
+            
+        <tr>
+        <td align="right">  <div class="input-group-text">Time:</div>  </td>  <td><input  class="form-control input-sm" type="text" name="time" value="{{ odata.Time }}"></td>
+        </tr>
+
+        <tr>
+        <td align="right"> <div class="input-group-text">FEL JO:</div></td> <td><input class="form-control input-sm" type="text" name="jo" value="{{ odata.Jo }}"></td>
+        </tr>
+
+        <tr>
+        <td align="right"> <div class="input-group-text">Order/Book:</div></td> <td><input class="form-control input-sm" type="text" name="order" value="{{ odata.Order }}"></td>
+        </tr>
+
+        <tr> <td colspan="2">&nbsp</td></tr>    
+            
+        <tr>
+        <td align="right"> <div class="input-group-text">Load Addr1:</div></td> <td><input class="form-control input-sm" type="text" name="laddr1" value="{{ cdata1.Addr1 }}"></td>
+        </tr>   
+            
+        <tr>
+        <td align="right"> <div class="input-group-text">Load Addr2:</div></td> <td><input class="form-control input-sm" type="text" name="laddr2" value="{{ cdata1.Addr2 }}"></td>
+        </tr>
+            
+        <tr> <td colspan="2">&nbsp</td></tr>
+    
+        <tr>
+        <td  align="right"><div class="input-group-text">Dlvr Addr1:</div></td> <td ><input class="form-control input-sm" type="text" name="daddr1" value="{{ cdata2.Addr1 }}"></td>
+        </tr>
+            
+        <tr>   
+        <td  align="right"> <div class="input-group-text">Dlvr Addr2:</div></td> <td><input class="form-control input-sm" type="text" name="daddr2" value="{{ cdata2.Addr2 }}"></td>
+        </tr>
+            
+        <tr> <td colspan="2">&nbsp</td></tr>
+
+
+        <tr>
+        <td  align="right"> <div class="input-group-text">Size/Type:</div> </td> <td><input class="form-control input-sm" type="text" name="type" value= "{{odata.Type}}"></td>
+        </tr>
+
+        <tr>
+        <td  align="right"> <div class="input-group-text">Shipper:</div></td> <td><input class="form-control input-sm" type="text" name="shipper" value="{{ odata.Shipper}}"></td>
+        </tr>
+
+        <tr>
+        <td  align="right"> <div class="input-group-text">Location:</div></td> <td><input class="form-control input-sm" type="text" name="location" value="{{ odata.Location }}"></td>
+        </tr>
+     
+        </tbody></table></div>
+      
+      
+        <div class="col-sm-4" align="left">
+            
+        <table>
+        <tr>
+        <td><button type="submit" class="but btn-primary btn-xs" name="UP">Update</button></td>
+        <td><button type="submit" class="but btn-primary btn-xs" name="VIEW">View</button></td>
+        <td><button type="submit" class="but btn-danger btn-xs" name="EMAIL">Email</button></td>
+        <td><button type="submit" class="but btn-danger btn-xs" name="PRNT">Print</button></td>
+        <td><button type="submit" class="but btn-secondary btn-xs" name="RET">Return</button></td>
+        </tr>
+        <tr>
+        </table>
+            
+        
+        {% if pval==1 %}
+            
+        <embed src="tmp/vmanifest/{{odata.Order}}.pdf" width="400px" height="800px"/>
+            
+        {% else %}
+            
+        <img src="tmp/felpics/{{tdata.Path}}" class="rounded mx-auto d-block" alt="{{tdata.Path}}" height="100px">
+            
+        {%endif%}
+        
+
+    
+        </div>
+      
+      
+      
+      
+      
+      
+      
+      </div>
+      </div>
+    </div>
+
+{% endblock %}

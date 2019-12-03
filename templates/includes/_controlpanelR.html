@@ -1,0 +1,80 @@
+
+<table class="table table-striped table-condensed table-hover">
+                <tr align="center">
+                    <td><button type="submit" class="btn btn-group-small btn-indigo my-med-btn" name="mtick">Missing <br>Tickets</button></td>
+
+                    <td> <button type="submit" class="btn btn-group-small btn-unique my-med-btn" name="jaystuff">Jay<br>Financial</button></td>
+
+                    <td> <button type="submit" class="btn btn-group-small btn-unique my-med-btn" name="income">Category<br>Income</button></td>
+
+                </tr>
+
+
+                <tr><td colspan='3'>&nbsp</td></tr>
+    <tr><td colspan='4'>{% include 'includes/_jobdetail.html' %}
+                <tr align="center">
+                  <td>
+                  <button type="submit" class="btn btn-group-small btn-blue my-med-btn" name="DT">Deposit<br>Ticket</button>
+                  </td>
+                <td>
+                <button type="submit" class="btn btn-group-small btn-green my-med-btn" name="PL">Profit<br>Loss</button>
+                    </td>
+                 <td>
+                <button type="submit" class="btn btn-group-small btn-green my-med-btn" name="Assemble">Balance<br>Sheet</button>
+                     </td>
+                <td>
+                <button class="btn btn-group-small btn-green my-med-btn" type ="submit" name="Return">Equity<br>Exchanges</button></td>
+                </tr>
+
+    <tr><td colspan='4'>&nbsp</td></tr>
+    <tr><td colspan='4'>{% include 'includes/_custtype.html' %}</td></tr>
+    <tr align="center">
+    <td>
+        <button type="submit" class="btn btn-group-small btn-green my-med-btn" name="customer">Customer<br>Reports</button>
+    </td>
+    <td colspan='2'>
+    <select class="form-control align-text-botton" type="text" name="thiscompany">
+        <option value='1'>Choose Customer</option>
+        {% for data in customerlist %}
+        <option {% if data == thiscomp %}selected{% endif %}
+            value="{{data}}"> {{data}} </option>
+        {% endfor %}
+    </select>
+    </td>
+    </tr>
+    <tr><td colspan='3'>{% include 'includes/_custcust.html' %}</td></tr>
+</table>
+<table>
+        <tr>
+                <td><div class="input-group-text">From Date</div></td>
+                <td><input class="form-control" type="date" name="start" value="{{sdate}}"></td>
+        </tr>
+        <tr>
+                <td><div class="input-group-text">To Date</div></td>
+                <td><input class="form-control" type="date" name="finish" value="{{fdate}}"></td>
+        </tr>
+</table>
+<table class="table table-striped table-condensed table-hover">
+<tr align="center">
+    <td><button type="submit" class="btn btn-group-small btn-indigo my-small-btn" name="jan" onchange="this.form.submit()">Jan</button></td>
+    <td><button type="submit" class="btn btn-group-small btn-indigo my-small-btn" name="feb" onchange="this.form.submit()">Feb</button></td>
+    <td><button type="submit" class="btn btn-group-small btn-indigo my-small-btn" name="mar" onchange="this.form.submit()">Mar</button></td>
+    <td><button type="submit" class="btn btn-group-small btn-indigo my-small-btn" name="apr" onchange="this.form.submit()">Apr</button></td>
+    <td><button type="submit" class="btn btn-group-small btn-indigo my-small-btn" name="may" onchange="this.form.submit()">May</button></td>
+    <td><button type="submit" class="btn btn-group-small btn-indigo my-small-btn" name="jun" onchange="this.form.submit()">Jun</button></td>
+</tr>
+<tr align="center">
+    <td><button type="submit" class="btn btn-group-small btn-indigo my-small-btn" name="jul" onchange="this.form.submit()">Jul</button></td>
+    <td><button type="submit" class="btn btn-group-small btn-indigo my-small-btn" name="aug" onchange="this.form.submit()">Aug</button></td>
+    <td><button type="submit" class="btn btn-group-small btn-indigo my-small-btn" name="sep" onchange="this.form.submit()">Sep</button></td>
+    <td><button type="submit" class="btn btn-group-small btn-indigo my-small-btn" name="oct" onchange="this.form.submit()">Oct</button></td>
+    <td><button type="submit" class="btn btn-group-small btn-indigo my-small-btn" name="nov" onchange="this.form.submit()">Nov</button></td>
+    <td><button type="submit" class="btn btn-group-small btn-indigo my-small-btn" name="dec" onchange="this.form.submit()">Dec</button></td>
+</tr>
+<tr>
+    <td colspan='5' align='right'>Default is Current Year 2019, Check for Prior Year 2018:</td>
+    <td colspan='1'>
+    <input class="align-middle" {% if fyear==2018 %} checked {% endif %} type="checkbox" name="focusyear" value="2018">
+    </td>
+</tr>
+</table>

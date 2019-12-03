@@ -1,0 +1,52 @@
+{% set weekstop = [6, 13, 20, 27, 34, 41, 48, 55, 62, 69, 76, 83, 90, 97, 104, 111] %}
+        {% set dweeks = nweeks[0] + nweeks[1] %}   
+        <div class="row">
+            <div class="col-sm-12" align="center">
+                <table class="table table-condensed ">
+                    <tr>
+                        {% for i in range(dweeks*7) %}
+                            {% set name = caldays[i] %}
+                            {% if name[0]=='X' %} 
+                                <td align="center">
+                                <h6><b><u><div class='text-primary'>{{name[1:]}}</div></u></b></h6>
+                            {% else %}
+                                <td align="center"> 
+                                    <h6><b> <u> {{name}}</u> </b></h6>  
+                            {% endif %}
+                            
+                            {% for j in range(4) %}
+                                {% set k=4*i+j %}
+                                {% set ilist=daylist[k] %}
+                                {% if ilist %}
+                                    {% set pod = ilist[5] %}
+                                    {% set ltwo = ilist[6] %}
+                                    {% set status = ilist[7] %}
+                                    
+                                    {% if status=='Invoiced' %}
+                                      {% set color = 'amber' %}
+                                    {% elif status=='Paid'%}
+                                      {% set color = 'green' %}
+                                    {% else %}
+                                     {% set color='primary' %}
+                                    {% endif %}
+                                   
+                                    <button type="button" class="btn btn-group-small btn-green my-calsmall-btn" data-toggle="modal" data-target="#centralModalInfo{{ilist[6]}}">
+                                        {{pod[0:8]}}&nbsp{{ltwo[6:8]}}<br>{{ilist[2]}}
+                                    </button><br> 
+                                    
+                                    {% include 'includes/_modal_O.html' %}
+                                   
+                                  {% endif %}
+                                {% endfor %}
+                                    
+                                    
+ 
+
+                            </td>                
+                            {% if i in weekstop %} 
+                                 </tr>  <tr>
+                            {% endif %}       
+                        {% endfor %}
+                </table>      
+            </div>
+        </div>

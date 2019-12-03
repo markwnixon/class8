@@ -1,0 +1,25 @@
+{% extends 'A_layout_portal.html' %}
+
+{% block body %}
+<form action="{{ url_for ('AutoScanner') }}" method="post">
+<div class="table-responsive">
+<div class="row" align='center'>
+  <div class="col-sm-6">
+    <table class="table table-condensed table-hover">
+        <tbody>
+          <tr>
+              <td> <div class="input-group-text">List VINS:</div></td>
+              <td colspan="2"><textarea class="form-control" type="text" name="vinlist" rows="5">{{vinlist}}</textarea></td>
+         </tr>
+         <tr>
+         <td><button type="submit" class="btn btn-elegant btn-sm" name="Update">Run VINs</button></td><td></td>
+         </tr>
+        </tbody>
+    </table>
+</div>
+<div class="col-sm-6"></div>
+
+
+</div></div>
+</form>
+{% endblock %}

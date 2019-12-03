@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+{% if esent == 1 %}
+<form action="{{ url_for ('EmailView') }}" method="post">
+<div class="table-responsive">
+    <div class="row"><div class="col-sm-12"><h5> &nbsp </h5></div></div>
+    <div class="row">
+        <div class="col-sm-1"></div><div class="col-sm-11"><h5> For job order {{JO}} </h5></div></div>
+
+    {% for data in vcdata %}
+    <div class="row">
+        <div class="col-sm-1"></div>
+        <div class="col-sm-6">
+            To Company: {{data.Name}} <br>
+            Booking Agent Email: {{data.B_Email}}
+        </div>
+        <div class="col-sm-5">
+            <div class="form-check">
+                <input type="checkbox" value=1 class="form-check-input" name="{{data.Name}}">
+                <label class="form-check-label" for="{{data.Name}}">Send Email to {{data.B_First}} at {{data.Name}}</label>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    <div class="row"><div class="col-sm-12"><hr></div></div>
+    <div class="row">
+        <div class="col-sm-1"></div>
+        <div class="col-sm-6">
+            Hello [Agent Name], <br>
+            Would you please provide me a quote for the following export?<br>
+            <pre>{{texttable}}</pre>
+        </div>
+        <div class="col-sm-5">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
+</div>
+<input value={{JO}} type="hidden" name="jo">
+</form>
+{% else %}
+<div class="table-responsive">
+    <div class="row"><div class="col-sm-12"><h5> &nbsp </h5></div></div>
+    <div class="row"><div class="col-sm-1"></div><div class="col-sm-11"><h5> Your email has been sent.</h5></div></div>
+{% endif %}
+{% endblock %}

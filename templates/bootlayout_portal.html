@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Hampton Park Blvd Command Center</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- Bootstrap core CSS -->
+  <link href="tmp/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Material Design Bootstrap -->
+  <link href="tmp/css/mdb.min.css" rel="stylesheet">
+  <!-- Your custom styles (optional) -->
+  <link href="tmp/css/style.css" rel="stylesheet">
+    
+<!-- MDBootstrap Datatables  -->
+<link href="css/addons/datatables.min.css" rel="stylesheet">
+<style>
+
+table tr td{
+   font-size: 10px;
+   height: 10px;
+   padding:1px !important;
+}
+
+    
+</style>
+
+</head>
+    
+<body>        
+{% include 'includes/_navbar6.html' %}
+<div class="container-fluid">
+{% include 'includes/_messages.html' %}
+{% block body %}{% endblock %}
+</div>
+
+ <!-- SCRIPTS -->
+  <!-- JQuery -->
+  <script type="text/javascript" src="tmp/js/jquery-3.3.1.min.js"></script>
+  <!-- Bootstrap tooltips -->
+  <script type="text/javascript" src="tmp/js/popper.min.js"></script>
+  <!-- Bootstrap core JavaScript -->
+  <script type="text/javascript" src="tmp/js/bootstrap.min.js"></script>
+  <!-- MDB core JavaScript -->
+  <script type="text/javascript" src="tmp/js/mdb.min.js"></script>
+    
+<!-- MDBootstrap Datatables  -->
+ <script type="text/javascript" src="tmp/js/addons/datatables.min.js"></script>
+    
+<script>
+$(document).ready(function () {
+$('#dtHorizontalVerticalExample').DataTable({
+"scrollX": true,
+"scrollY": 200,
+});
+$('.dataTables_length').addClass('bs-select');
+});
+</script>
+    
+</body>
+
+
+
+</html>

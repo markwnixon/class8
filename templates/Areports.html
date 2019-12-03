@@ -1,0 +1,85 @@
+{% extends 'A_layout_portal.html' %}
+
+{% block body %}
+<form action="{{ url_for ('Reports') }}" method="post">
+<div class="table-responsive">
+<div class="row">
+    
+<div class="col-sm-{{leftsize}}">
+    
+{% if leftscreen == 0 %}
+    
+    <div class="row">
+        <div class="col-sm-4" align="left">
+        Text version of file {{doctxt}}:<br>
+            
+        <embed src="{{doctxt}}" width="300px" height="550px"/>
+  
+        </div>
+        <div class="col-sm-8" align="left">
+        Looking for: {{docref}}<br>
+            
+        <embed src="{{docref}}" width="500px" height="550px"/>
+        </div>
+    </div>
+{% else %}
+
+  <div class="row">
+    <div class="col-sm-12" align="center" style="font-weight:bold"> Reports Data </div>
+  </div>   
+  <div class="row">
+    <div class="col-sm-12">
+        No Tables in This Section
+    </div>
+</div>    
+     
+{% endif %}    
+        
+</div>    
+    
+    
+    
+    
+    
+<div class="col-sm-{{rightsize}}">
+       <div class="row" align="center">
+           <div class="col-sm-12"  style="font-weight:bold">Control Panel</div>
+       </div>
+       <div class="row" align="center">
+           <div class="col-sm-12">
+            
+            <table>
+               <tr class="small text-danger"><td>Messages</td></tr>
+                {% for e in err %}
+                <tr><td>{{e}}</td></tr> 
+                {% endfor %}
+            </table>
+            <br>
+                        
+           </div>
+       </div>
+       <div class="row">
+           <div class="col-sm-12">
+             
+            {% if modlink != 1 and modlink != 10 %}    
+               {% include 'includes/_controlpanelR.html' %}
+            {% endif %}
+               
+ 
+                   
+           </div></div>
+     
+      
+    
+</div>   
+    
+
+</div>
+</div>
+<input type="hidden" value="{{cache}}" name="cache">
+</form>
+    
+{% endblock %}
+
+
+

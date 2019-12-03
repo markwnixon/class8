@@ -1,0 +1,24 @@
+<table class="table table-striped table-bordered table-sm w-auto" cellspacing="0"
+  width="100%">
+            <thead>
+            <tr align="center" style="font-weight:bold">
+                <th align="center" colspan='20'><b>Services Available for Adding to Invoice</b></th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            <tr>
+                {% for data in sdata %}
+                <td align="left"><input type="checkbox" name="serv{{data.id}}" value="{{data.id}}">
+                <td align="left">{{ data.Service[0:15] }}</td>
+                <td align="left">{{ data.Price}}</td>
+                <td>&nbsp &nbsp</td>
+                
+                    {% if loop.index == 5 or loop.index == 10 or loop.index==15 or loop.index==20 or loop.index==25 %}
+                        </tr><tr>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+            
+            </tbody>
+</table>

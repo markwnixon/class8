@@ -1,0 +1,8 @@
+<div class="custom-control custom-checkbox custom-control-inline">
+  <input type="checkbox" class="custom-control-input" id="dL1" {% if clist[0]=='on' %} checked {% endif %} name="dt1" onchange="this.form.submit()">
+  <label class="custom-control-label" for="dL1">Auto Customers</label>
+</div>
+<div class="custom-control custom-checkbox custom-control-inline">
+  <input type="checkbox" class="custom-control-input" id="dL2" {% if clist[1]=='on' %} checked {% endif %} name="dt2" onchange="this.form.submit()">
+  <label class="custom-control-label" for="dL2">Trucking Customers</label>
+</div>

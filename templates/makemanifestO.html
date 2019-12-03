@@ -1,0 +1,241 @@
+{% extends 'A_layout_portal.html' %}
+
+{% block body %}
+<div class="table-responsive">
+  <div class="row">
+  {% for i in range(12) %}
+      <div class="col-sm-1" align="left">|</div>
+  {% endfor %}
+  </div>
+  <div class="row">
+  {% for i in range(12) %}
+      <div class="col-sm-1" align="right">|</div>
+  {% endfor %}
+  </div>
+
+  <div class="row">
+        <div class="col-sm-8" align="center" style="font-weight:bold">
+            From Overseas Calendar : Driver Manifest Data
+        </div>
+        <div class="col-sm-4" align="center" style="font-weight:bold">
+            Document Previewer
+        </div>            
+  </div>
+    
+  <div class="form-group">
+  <form action="{{ url_for ('MakeManifest') }}" method="post">
+          
+  <div class="row"> 
+        <div class="col-sm-4">  
+        <table>
+        <tbody>
+        <tr>
+            <td> <div class="input-group-text">Driver:</div></td> 
+            <td><select type="text" name="driver" class="form-control">
+                {% for data in alltdata: %}
+                <option {% if data.Name == odata.Driver %} selected {% endif %} value="{{data.Name}}">{{data.Name}}</option>
+                {% endfor %}
+                </select>
+            </td>
+        </tr>
+            
+        <tr>
+            <td align="right"> <div class="input-group-text">Drv Email:</div></td> <td><input class="form-control" type="text" name="drv_email" value="{{ tdata.Email}}"></td>
+        </tr>
+            
+         
+        <td> <div class="input-group-text">Truck:</div></td> 
+            <td><select type="text" name="truck" class="form-control">
+                {% for data in allvdata: %}
+                <option {% if data.Unit == tdata.Truck %} selected {% endif %} value="{{data.Unit}}">{{data.Unit}}</option>
+                {% endfor %}
+                </select>
+            </td>
+
+        <tr>
+        <td align="right"> <div class="input-group-text">Tag:</div></td> <td><input class="form-control input-sm" type="text" name="tag" value="{{ tdata.Tag }}"></td>
+        </tr>
+            
+        <tr>
+        <td align="right"> <div class="input-group-text">Commodity:</div></td> <td><input class="form-control input-sm" type="text" name="description" value="{{ description }}"></td>
+        </tr>
+            
+        <tr>
+        <td align="right"> <div class="input-group-text">Packing:</div></td> <td><input class="form-control input-sm" type="text" name="location" value="{{ location }}"></td>
+        </tr>
+            
+        <tr> <td colspan="2">&nbsp</td></tr>
+
+        <tr>
+        <td align="right"> <div class="input-group-text">Load At:</div></td>
+        <td>
+        <select type="text" name="company" class="form-control">
+            {% for data in pdata: %}
+                <option {% if data.Company == odata.Origin %} selected {% endif %} value="{{ data.Company }}"> {{ data.Company }} </option>
+            {% endfor %}
+        </select>
+        </td>
+        </tr>
+            
+        <tr>
+        <td  align="right">  <div class="input-group-text">Pickup:</div></td> <td><input class="form-control input-sm" type="text" name="pickup" value="{{ odata.Pickup }}"></td>
+        </tr>
+            
+        <tr><td colspan="2">&nbsp</td></tr>
+            
+        <tr>
+        <td> <div class="input-group-text">Dlvr To:</div> </td>
+        <td>
+        <select type="text" name="company2" class="form-control">
+            {% for data in pdata: %}
+                <option {% if data.Company == odata.Pol %} selected {% endif %} value="{{ data.Company }}"> {{ data.Company }} </option>
+            {% endfor %}
+        </select>
+        </td>
+        </tr>
+            
+        <tr><td colspan="2">&nbsp</td></tr>
+                 
+        <tr>
+        <td  align="right">  <div class="input-group-text">Container:</div></td> <td><input class="form-control input-sm" type="text" name="container" value="{{ odata.Container }}"></td>
+        </tr>
+
+        <tr>
+        <td  align="right">  <div class="input-group-text">Booking:</div></td> <td><input class="form-control input-sm" type="text" name="book" value="{{ odata.Booking }}"></td>
+        </tr>
+
+
+            
+        <tr>
+        <td align="right"> <div class="input-group-text">Bill No.:</div></td> <td ><input class="form-control input-sm" type="text" name="bol" value="{{ bol }}"></td>
+        </tr>
+
+        <tr>
+        <td align="right">  <div class="input-group-text">Seal:</div></td> <td><input class="form-control input-sm" type="text" name="seal" value="{{ odata.Seal }}"></td>
+        </tr>
+    
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+        </tbody>
+        </table>
+        </div>
+      
+        <div class="col-sm-4">
+        <table>
+        <tbody>
+            
+        <tr>
+        <td align="right"> <div class="input-group-text">FEL JO:</div></td> <td><input class="form-control input-sm" type="text" name="jo" value="{{ odata.Jo }}"></td>
+        </tr>
+
+        <tr>
+        <td align="right"> <div class="input-group-text">Order/Book:</div></td> <td><input class="form-control input-sm" type="text" name="order" value="{{ odata.Booking }}"></td>
+        </tr>
+            
+        <tr>
+        <td  align="right">  <div class="input-group-text">PU Date:</div></td>
+        <td><input  class="form-control input-xsm"  type="date" name="date" value="{{ odata.PuDate }}"></td>
+        </tr>
+            
+        <tr>
+        <td align="right">  <div class="input-group-text">PU Time:</div>  </td>  <td><input  class="form-control input-sm" type="time" name="time" value="{{ time }}"></td>
+        </tr>
+            
+        <tr>
+        <td  align="right">  <div class="input-group-text">Del Date:</div></td>
+        <td><input  class="form-control input-xsm"  type="date" name="date2" value="{{ odata.RetDate }}"></td>
+        </tr>
+            
+        <tr>
+        <td align="right">  <div class="input-group-text">Del Time:</div>  </td>  <td><input  class="form-control input-sm" type="time" name="time2" value="{{ time2 }}"></td>
+        </tr>
+
+
+
+        <tr> <td colspan="2">&nbsp</td></tr>    
+            
+        <tr>
+        <td align="right"> <div class="input-group-text">Load Addr1:</div></td> <td><input class="form-control input-sm" type="text" name="laddr1" value="{{ cdata1.Addr1 }}"></td>
+        </tr>   
+            
+        <tr>
+        <td align="right"> <div class="input-group-text">Load Addr2:</div></td> <td><input class="form-control input-sm" type="text" name="laddr2" value="{{ cdata1.Addr2 }}"></td>
+        </tr>
+            
+        <tr> <td colspan="2">&nbsp</td></tr>
+    
+        <tr>
+        <td  align="right"><div class="input-group-text">Dlvr Addr1:</div></td> <td ><input class="form-control input-sm" type="text" name="daddr1" value="{{ cdata2.Addr1 }}"></td>
+        </tr>
+            
+        <tr>   
+        <td  align="right"> <div class="input-group-text">Dlvr Addr2:</div></td> <td><input class="form-control input-sm" type="text" name="daddr2" value="{{ cdata2.Addr2 }}"></td>
+        </tr>
+            
+        <tr> <td colspan="2">&nbsp</td></tr>
+
+
+        <tr>
+        <td  align="right"> <div class="input-group-text">Size/Type:</div> </td> <td><input class="form-control input-sm" type="text" name="type" value= "{{odata.ContainerType}}"></td>
+        </tr>
+
+        <tr>
+        <td  align="right"> <div class="input-group-text">Shipper:</div></td> <td><input class="form-control input-sm" type="text" name="shipper" value="{{ odata.Exporter}}"></td>
+        </tr>
+
+     
+        </tbody></table></div>
+      
+      
+        <div class="col-sm-4" align="left">
+            
+        <table>
+        <tr>
+        <td><button type="submit" class="but btn-primary btn-sm" name="UP">Update</button></td>
+        <td><button type="submit" class="but btn-primary btn-sm" name="VIEW">View</button></td>
+        <td><button type="submit" class="but btn-danger btn-sm" name="EMAIL">Email</button></td>
+        <td><button type="submit" class="but btn-danger btn-sm" name="PRNT">Print</button></td>         <td><button type="submit" class="but btn-primary btn-sm" name="RETO">Return</button></td>
+        <td><button type="submit" class="but btn-secondary btn-sm" name="OVIEW">OView</button></td>
+        </tr>
+        <tr>
+        </table>
+            
+        
+        {% if pval==1 %}
+        Viewing {{docref}}
+            
+        <embed src={{docref}} width="400px" height="800px" alt="{{odata.Order}}"/>
+            
+        {% else %}
+            
+        <img src="tmp/felpics/{{tdata.Path}}" class="rounded mx-auto d-block" alt="{{tdata.Path}}" height="100px">
+            
+        {%endif%}
+        
+
+    
+        </div>
+      
+        <input type = "hidden" name ="jtype" value= {{jtype}}>jtype={{jtype}}
+        </form>
+      
+      
+      
+      
+      </div>
+      </div>
+    </div>
+
+{% endblock %}
+

@@ -1,0 +1,19 @@
+<table class="table table-striped table-bordered table-sm w-auto" cellspacing="0"
+  width="100%">
+            <thead>
+            <tr align="center" style="font-weight:bold">
+                <th align="center">Service</th>
+                <th align="center">$Each</th>
+                <th align="right">Chk</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for data in sdata %}
+            <tr>
+                <td align="center">{{ data.Service[0:15] }}</td>
+                <td align="center">{{ data.Price}}</td>
+                <td align="right"><input type="checkbox" name="serv{{data.id}}" value="{{data.id}}">
+            </tr>
+            {% endfor %}
+            </tbody>
+</table>

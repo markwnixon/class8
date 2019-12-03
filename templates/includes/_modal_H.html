@@ -1,0 +1,130 @@
+<!-- Central Modal Medium Info -->
+                                    <div class="modal fade" id="centralModalInfo{{towid}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-notify modal-info" role="document">
+                                    <!--Content-->
+                                    <div class="modal-content">
+                                    <!--Header-->
+                                    <div class="modal-header">
+                                    <p class="heading lead">{{com}}&nbsp${{amt}} for {{ncars}} car(s)</p>
+
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true" class="white-text">&times;</span>
+                                    </button>
+                                    </div>
+ 
+                                    <!--Body-->
+                                    <div class="modal-body">
+                                        <div class="text-center">
+                                            <i class="fa fa-check fa-4x mb-1 animated rotateIn"></i>
+                                            <table class="table table-bordered table-sm" cellspacing="0" width="100%">
+                                                <thead>
+                                                <tr style="font-weight:bold">
+                                                    <th>JO</th><th>Tow Company</th><th>Tow Cost</th><th>Cost Each</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td>{{ilist[6]}}</td><td>{{ilist[1]}}</td><td>{{ilist[2]}}</td><td>{{ilist[7]}}</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                                 <table class="table table-bordered table-sm" cellspacing="0" width="100%">
+                                                <thead>
+                                                <tr style="font-weight:bold">
+                                                    <th>Year</th><th>Make</th><th>Model</th><th>VIN</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for car in carlist %}
+                                                <tr>
+                                                    <td>{{car[0]}}</td><td>{{car[1]}}</td><td>{{car[2]}}</td><td>{{car[3]}}</td>
+                                                </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+
+                                
+                                            
+                                            <table class="table table-bordered table-sm" cellspacing="0" width="100%">
+                                            <tr><td>ChalkBoard</td></tr>
+                                                {% for c in cb%}
+                                                <tr><td align='left'>{{c}}</td></tr>
+                                                {% endfor %}
+                                            </table>
+
+                                        </div>
+                                    </div>
+
+                                    <!--Footer-->
+                                    <div class="modal-footer justify-content-center">
+                                    <button type="button" class="btn btn-outline-info waves-effect" data-toggle="modal" data-target="#modalContactForm{{ilist[0]}}">
+                                        ChalkBoard
+                                    </button>
+                                                                                             
+                                        
+                                        
+                                    <form action="{{ url_for ('Billing') }}" method="post"><input type ="submit" name="incoming" value="Pay Bill" class="btn btn-outline-info waves-effect"><input type = "hidden" name ="towid" value= "{{ ilist[0] }}">
+                                    </form>
+                                    
+                                    <a type="button" class="btn btn-outline-secondary-modal waves-effect" data-dismiss="modal">Done</a>
+                                    </div>
+                                    </div>
+                                    <!--/.Content-->
+                                    </div>
+                                    </div>
+                                    
+                                    <!--Modal: Contact form-->
+<div class="modal fade" id="modalContactForm{{ilist[0]}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog cascading-modal" role="document">
+        <!--Content-->
+        <div class="modal-content">
+
+            <!--Header-->
+            <div class="modal-header light-blue darken-3 white-text">
+                <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="title"><i class="fa fa-pencil"></i> Add/Modify Container for {{ilist[1]}}</h4>
+            </div>
+            <!--Body-->
+            <div class="modal-body mb-0">
+                <div class="md-form form-sm">
+                    <i class="fa fa-envelope prefix"></i>
+                    <input type="text" name="cin{{ilist[0]}}" id="cind{{ilist[0]}}" class="form-control">
+                    <label for="cind{{ilist[0]}}">Container{{ilist[0]}}</label>
+                </div>
+                
+                <select class="form-control" type="text" name="csel{{ilist[0]}}">
+                <option value='1'>Containers Out:</option>
+                {% for c in newc %}
+                  <option value={{c}}> {{c}} </option>
+                {% endfor %}</select>
+                <br>
+                <select class="form-control" type="text" name="dsel{{ilist[0]}}">
+                <option value='1'>Driver:</option>
+                {% for t in alltdata %}
+                  <option value='{{t.Name}}'> {{t.Name}} </option>
+                {% endfor %}</select>
+                <br>
+                <select class="form-control" type="text" name="tsel{{ilist[0]}}">
+                <option value='1'>Truck:</option>
+                {% for t in tdata %}
+                  <option value='{{t.Unit}}'> {{t.Unit}} {{t.Plate}} </option>
+                {% endfor %}</select>
+                
+                <div class="md-form form-sm">
+                    <i class="fa fa-envelope prefix"></i>
+                    <input type="text" name="note{{ilist[0]}}" id="noted{{ilist[0]}}" class="form-control">
+                    <label for="noted{{ilist[0]}}">Add a Note...</label>
+                </div>
+
+
+                <div class="text-center mt-1-half">
+                    <button class="btn btn-info mb-2" name="calupdate">Update <i class="fa fa-send ml-1"></i></button>
+                </div>
+
+            </div>
+        </div>
+        <!--/.Content-->
+    </div>
+</div>

@@ -1,0 +1,33 @@
+{% set emailin1=emaildata[2] %}
+{% set emailin2=emaildata[3] %}
+{% set emailcc1=emaildata[4] %}
+{% set emailcc2=emaildata[5] %}
+{% set etitle = emaildata[0] %}
+{% set ebody = emaildata[1] %}
+
+<br>
+<div class="card">
+  <div class="card-header">
+    Enter Email Associated with this {{ etype }}
+  </div>
+<div class="card-body">
+<div class="input-group-text">E-Title:</div>
+<input class="form-control" type="text" value="{{etitle}}" name="edat0">
+
+<div class="input-group-text">E-Body:</div>
+<textarea class="form-control" type="text" name="edat1" rows="5">{{ebody | safe}}</textarea>
+
+<div class="input-group-text">Email To1:</div>
+<input class="form-control" type="text" value="{{emailin1}}" name="edat2">
+
+<div class="input-group-text">Email To2:</div>
+<input class="form-control" type="text" value="{{emailin2}}" name="edat3">
+
+<div class="input-group-text">Email CC1:</div>
+<input class="form-control" type="text" value="{{emailcc1}}" name="edat4">
+
+<div class="input-group-text">Email CC2:</div>
+<input class="form-control" type="text" value="{{emailcc2}}" name="edat5">
+
+</div>
+</div>

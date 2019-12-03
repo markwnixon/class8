@@ -1,0 +1,33 @@
+
+
+<div class="card">
+  <div class="card-header">
+  Modify and Delete Payments Received on Jobs
+  </div>
+  <div class="card-body" align="center">
+    <button type="submit" class="btn btn-group-small btn-mdb-color my-small-btn" name="Qmod"
+      data-toggle="tooltip" title="Modify form data of the payment received">Modify<br>Pay Recd</button>
+      <button type="submit" class="btn btn-group-small btn-mdb-color my-small-btn" name="View"
+        data-toggle="tooltip" title="View a RECORDED Deposit that has already been made.  Select a single item only.">View A<br>Deposit</button>
+    <button type="submit" class="btn btn-group-small btn-danger my-small-btn" name="Delete"
+      data-toggle="tooltip" title="Select an item to be DELETED">DELETE<br>Item</button>
+      <button type="submit" class="btn btn-group-small btn-blue my-small-btn" name="Return"
+          data-toggle="tooltip" title="Return and Reset Values"> Return<br>To Tables</button>
+  </div>
+</div>
+
+
+
+<div class="card">
+  <div class="card-header">
+    Choose what Records to View
+  </div>
+  <div class="card-body">
+          <select class="form-control align-text-botton" type="text" name="thismuch" onchange="this.form.submit()">
+              <option {% if thismuch == '1' %} selected {% endif %} value='1'>Only Undeposited Funds</option>
+              <option {% if thismuch == '2' %} selected {% endif %} value='2'>Last 45 Days</option>
+              <option {% if thismuch == '3' %} selected {% endif %} value='3'>Last 60 Days</option>
+              <option {% if thismuch == '4' %} selected {% endif %} value='4'>All Records</option>
+          </select>
+</div>
+</div>

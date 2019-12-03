@@ -1,0 +1,124 @@
+{% set weekstop = [6, 13, 20, 27, 34, 41, 48, 55, 62, 69, 76, 83, 90, 97, 104, 111] %}
+        {% set dweeks = nweeks[0] + nweeks[1] %}   
+        <div class="row">
+            <div class="col-sm-12" align="center">
+                <table class="table table-condensed ">
+                    <tr>
+                        {% for i in range(dweeks*7) %}
+                            {% set name = caldays[i] %}
+                            {% if name[0]=='X' %} 
+                                <td align="center">
+                                <h6><b><u><div class='text-primary'>{{name[1:]}}</div></u></b></h6>
+                            {% else %}
+                                <td align="center"> 
+                                    <h6><b> <u> {{name}}</u> </b></h6>  
+                            {% endif %}
+                            {% set cnt= [0] %}
+                            {% for j in range(12) %}
+                                {% set k=12*i+j %}
+                                {% set ilist=daylist[k] %}
+                                {% set jlist=shlst[k] %}
+                                {% set typ = jlist[1] %}
+                                {% if ilist %}
+                                  
+                                    
+                                  {% if typ=='O'%}
+                                    {% if cnt.append(cnt.pop() + 1) %}{% endif %}
+                                    {% set pod = ilist[5] %}
+                                    {% set ltwo = ilist[6] %}
+                                    {% set status = ilist[7] %}
+                                    {% set book = ilist[2] %}
+                                    {% if 'Paid' in status %}
+                                        {% set color = 'light' %} 
+                                    {% elif 'Invo' in status %}
+                                        {% set color = 'light-blue' %}    
+                                    {% else %}
+                                        {% set color = 'blue' %}
+                                    {% endif %}
+                                    <button type="button" class="btn btn-group-small btn-{{color}} my-small-btn" data-toggle="modal" data-target="#centralModalInfo{{ilist[6]}}">
+                                        {{jlist[0]}} {{pod[0:3]}} <br> {{book[-4:]}}
+                                    </button>
+                                    
+                                    {% include 'includes/_modal_O.html' %}
+                                  {% endif %}
+                                    
+                                  {% if typ=='T'%}
+                                    {% if cnt.append(cnt.pop() + 1) %}{% endif %}
+                                    {% set thiscom = ilist[8] %}
+                                    {% set ltwo = ilist[5] %}
+                                    {% set status = ilist[7] %}
+                                    {% set order = ilist[0] %}
+                                    {% if 'Paid' in status %}
+                                        {% set color = 'light' %} 
+                                    {% elif 'Invo' in status %}
+                                        {% set color = 'unique' %}    
+                                    {% else %}
+                                        {% set color = 'red' %}
+                                    {% endif %}
+                                    <button type="button" class="btn btn-group-small btn-{{color}} my-small-btn" data-toggle="modal" data-target="#centralModalInfo{{ilist[9]}}">
+                                        {{jlist[0]}} {{thiscom[0:3]}} <br> {{ilist[20]}}
+                                    </button>
+                                    {% include 'includes/_modal_T.html' %}
+                                  {% endif %}
+                                    
+                                  {% if typ=='H'%}
+                                    {% if cnt.append(cnt.pop() + 1) %}{% endif %}
+                                    {% set towid = ilist[9] %}
+                                    {% set com = ilist[1] %}
+                                    {% set amt = ilist[2] %}
+                                    {% set status = ilist[3] %}
+                                    {% set carlist = ilist[4] %}
+                                    {% set cb = ilist[5] %}
+                                    {% set ncars = ilist[8] %}
+                                    {% if 'Unmatched' in status %}
+                                        {% set color = 'amber' %}    
+                                    {% else %}
+                                        {% set color = 'green' %}
+                                    {% endif %}
+                                    <button type="button" class="btn btn-group-small btn-{{color}} my-small-btn" data-toggle="modal" data-target="#centralModalInfo{{towid}}">
+                                        {{com[0:6]}}<br>{{jlist[0]}} 
+                                    </button>
+                                    {% include 'includes/_modal_H.html' %}
+                                  {% endif %}
+                                    
+                                  {% if typ=='M'%}
+                                    {% if cnt.append(cnt.pop() + 1) %}{% endif %}
+                                    {% set thiscom = ilist[2] %}
+                                    {% set ltwo = ilist[1] %}
+                                    {% set status = ilist[13] %}
+                                    
+                                    {% if 'Paid' in status %}
+                                        {% set color = 'light' %} 
+                                    {% elif 'Invo' in status %}
+                                        {% set color = 'secondary' %}    
+                                    {% else %}
+                                        {% set color = 'purple' %}
+                                    {% endif %}
+                                    <button type="button" class="btn btn-group-small btn-{{color}} my-small-btn" data-toggle="modal" data-target="#centralModalInfo{{ilist[0]}}">
+                                        {{jlist[0]}} {{thiscom[0:3]}} 
+                                    </button>
+                                    {% include 'includes/_modal_M.html' %}
+                                  {% endif %}
+                                    
+                                    
+                                    
+                                    {% if cnt[0]==3 %}<br>{% endif %}
+                                    {% if cnt[0]==6 %}<br>{% endif %}
+                                    {% if cnt[0]==9 %}<br>{% endif %}                                  
+
+                                    
+                                {% endif %}
+
+                            {% endfor %}
+                                    
+                                    
+ 
+
+                            </td>                
+                            {% if i in weekstop %} 
+                                 </tr>  <tr>
+                            {% endif %}       
+                        {% endfor %}
+                </table>      
+            </div>
+        </div>

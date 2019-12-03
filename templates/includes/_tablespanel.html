@@ -1,0 +1,23 @@
+<table class="table table-striped table-bordered table-sm w-auto" cellspacing="0"
+  width="100%">
+            <thead>
+            <tr align="center" style="font-weight:bold">
+                <th align="center">Tables to Show</th>
+                <th align="right">Chk</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td align="center">Horizon Sales Data</td>
+                <td align="center"><input type="checkbox" {% if dlist[0] %} checked {% endif %} name="datatable1"></td>
+            </tr>
+            <tr>
+                <td align="center">Automobile Data</td>
+                <td align="center"><input type="checkbox" {% if dlist[1] %} checked {% endif %} name="datatable2"></td>
+            </tr>
+            <tr>
+                <td align="center">Horizon Entity Data</td>
+                <td align="center"><input type="checkbox" {% if dlist[2] %} checked {% endif %} name="datatable3"></td>
+            </tr>
+            </tbody>
+</table>

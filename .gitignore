@@ -1,0 +1,10 @@
+/templates/companysite
+/tmp
+*.pyc
+runmain.py
+/processing
+/.idea
+/__pycache__
+*.pyc
+CCC_system_setup.py
+

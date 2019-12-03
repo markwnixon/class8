@@ -1,0 +1,112 @@
+{% extends 'layout_portal.html' %}
+
+{% block body %}
+
+<form action="{{ url_for ('Oinvoice') }}" method="post">
+<div class="table-responsive">
+<table class="grid" cellspacing="0">
+
+<tr align="center" style="font-weight:bold">
+<td colspan="12">Invoice - Order Release Guide </td>
+</tr>
+<tr><td colspan="12"><hr/></td></tr>
+
+
+{% set cnt = [0] %}
+{% for data in data1 %}
+    {% set a = cnt[0]|string %}
+
+<tr>
+<td colspan="12">
+Set {{cnt[0]}} : <b>Order</b>
+
+<table class="table table-striped table-bordered table-condensed table-hover">
+<tr align="center" style="font-weight:bold">
+<td>JO</td>
+<td>Load</td>
+<td>Order</td>
+<td>Company</td>
+<td>Booking</td>
+<td>BOL</td>
+<td>Date</td>
+<td>Time</td>
+<td>Container</td>
+<td>Amount</td>
+<td>Chassis</td>
+<td>Detention</td>
+<td>Storage</td>
+<td>Status</td>
+<td>Release</td>
+</tr>
+
+
+<tr >
+<td>{{ data.Jo }}</td>
+<td align="center" >{{ data.Load}}</td>
+<td align="center" >{{ data.Order }}</td>
+<td align="center" >{{ data.Company }}</td>
+<td align="center" >{{ data.Booking }}</td>
+<td align="center" >{{ data.BOL }}</td>
+<td align="center" >{{ data.Date }}</td>
+<td align="center" >{{ data.Time }}</td>
+<td align="center" >{{ data.Container }}</td>
+<td align="center" >{{ data.Amount }}</td>
+<td align="center" >{{ data.Chassis }}</td>
+<td align="center" >{{ data.Detention }}</td>
+<td align="center" >{{ data.Storage }}</td>
+<td align="center" >{{ data.Status }}</td>
+<td align="center" >{{ data.Release }}</td>
+</tr>
+
+<tr>
+<td colspan="8"  align="center" > Make Modifications to data for invoice and then Update with or without Release: </td>
+<td align="center" ><input class="col-12" type ="text" name="container{{ a }}" value="{{data.Container}}"></td>
+<td align="center" ><input class="col-12" type ="text" name="amount{{ a }}" value="{{data.Amount}}"></td>
+<td align="center" ><input class="col-8" type ="text" name="chassis{{ a }}" value="{{data.Chassis}}"></td>
+<td align="center" ><input class="col-8" type ="text" name="detention{{ a }}" value="{{data.Detention}}"></td>
+<td align="center" ><input class="col-8" type ="text" name="storage{{ a }}" value="{{data.Storage}}"></td>
+<td align="center" ><input class="col-11" type ="submit" name="UNR{{ a }}" value="Update No Release"></td>
+<td align="center" ><input class="col-11" type ="submit" name="UR{{ a }}" value="Update & Release"></td>
+<td align="center" ><input type ="hidden" name="CID{{ a }}" value="{{data.id}}"></td>
+</tr>
+
+
+</table></td></tr>
+
+<tr>
+<td colspan="12">
+Set {{cnt[0]}} : <b>Proof</b>
+<table class="table table-striped table-bordered table-condensed table-hover">
+<tr align="center" style="font-weight:bold">
+<td>Order</td>
+<td>Company</td>
+<td>Booking</td>
+<td>BOL</td>
+<td>Container</td>
+<td>Date</td>
+<td>Time</td>
+</tr>
+    
+    {% set list=data2[cnt[0]] %}
+<tr >
+<td align="center" >{{ list[0] }}</td>
+<td align="center" >{{ list[1] }}</td>
+<td align="center" >{{ list[2] }}</td>
+<td align="center" >{{ list[3] }}</td>
+<td align="center" >{{ list[4] }}</td>
+<td align="center" >{{ list[5] }}</td>
+<td align="center" >{{ list[6] }}</td>
+    {% if cnt.append(cnt.pop() + 1) %}{% endif %}
+</tr>     
+</table></td></tr> <tr><td colspan="12"><hr/></td></tr>
+
+
+
+{% endfor %}
+
+</table>
+<input type ="hidden" name="numitems" value="{{cnt[0]}}">The count is {{cnt[0]}}
+</div>
+</form>
+{% endblock %}
+

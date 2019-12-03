@@ -1,0 +1,86 @@
+
+<table>
+<tbody>
+<tr>
+    <td> <div class="input-group-text">Driver:</div></td>
+    <td><select type="text" name="driver" class="form-control">
+        {% for data in alltdata: %}
+        <option {% if data.Name == drvdata.Name %} selected {% endif %} value="{{data.Name}}">{{data.Name}}</option>
+        {% endfor %}
+        </select>
+    </td>
+</tr>
+
+<tr>
+    <td align="right"> <div class="input-group-text">Drv Email:</div></td> <td><input class="form-control" type="text" name="drv_email" value="{{ drvdata.Email}}"></td>
+</tr>
+
+
+<td> <div class="input-group-text">Truck Unit:</div></td>
+    <td><select type="text" name="truck" class="form-control">
+        {% for data in allvdata: %}
+        <option {% if data.Unit == tdata.Unit %} selected {% endif %} value="{{data.Unit}}">{{data.Unit}}</option>
+        {% endfor %}
+        </select>
+    </td>
+
+<tr>
+<td align="right"> <div class="input-group-text">Tag:</div></td> <td><input class="form-control input-sm" type="text" name="tag" value="{{ tdata.Plate }}"></td>
+</tr>
+
+<tr>
+<td align="right"> <div class="input-group-text">Commodity:</div></td> <td><input class="form-control input-sm" type="text" name="commodity" value="{{ modata.Commodity }}"></td>
+</tr>
+
+<tr>
+<td align="right"> <div class="input-group-text">Packing:</div></td> <td><input class="form-control input-sm" type="text" name="packing" value="{{ modata.Packing }}"></td>
+</tr>
+
+<tr> <td colspan="2">&nbsp</td></tr>
+
+<tr>
+<td  align="right">  <div class="input-group-text">Pickup No.:</div></td> <td><input class="form-control input-sm" type="text" name="pickup" value="{{ modata.Pickup }}"></td>
+</tr>
+
+<tr><td colspan="2">&nbsp</td></tr>
+
+<tr>
+<td align="right">  <div class="input-group-text">Seal:</div></td> <td><input class="form-control input-sm" type="text" name="seal" value="{{ modata.Seal }}"></td>
+</tr>
+
+<tr><td colspan="2">&nbsp</td></tr>
+
+<tr>
+<td  align="right">  <div class="input-group-text">PU Date:</div></td>
+<td><input  class="form-control input-xsm"  type="date" name="date1" value="{{ modata.Date }}"></td>
+</tr>
+
+<tr>
+<td align="right">  <div class="input-group-text">PU Time:</div>  </td>  <td><input  class="form-control input-sm" type="time" name="time1" value="{{ modata.Time }}"></td>
+</tr>
+
+<tr>
+<td  align="right">  <div class="input-group-text">Del Date:</div></td>
+<td><input  class="form-control input-xsm"  type="date" name="date2" value="{{ modata.Date2 }}"></td>
+</tr>
+
+<tr>
+<td align="right">  <div class="input-group-text">Del Time:</div>  </td>  <td><input  class="form-control input-sm" type="time" name="time2" value="{{ modata.Time2 }}"></td>
+</tr>
+
+<tr><td colspan="2">&nbsp</td></tr>
+
+<tr>
+    <td><div class="input-group-text">Special Instructions:</div></td>
+    <td><textarea class="form-control" type="text" name="desc" rows="4">{{modata.Description}}</textarea></td></tr>
+<tr>
+
+
+</tbody>
+</table>
+<p class="small">
+<button type="submit" class="btn btn-elegant btn-sm" name="Update">Update</button>
+
+<button type="submit" class="btn btn-blue btn-sm" name="Return">Return</button>
+
+</p>

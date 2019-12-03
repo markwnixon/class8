@@ -1,0 +1,105 @@
+ <!-- Central Modal Medium Info -->
+                                    <div class="modal fade" id="centralModalInfo{{ilist[0]}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-notify modal-info" role="document">
+                                    <!--Content-->
+                                    <div class="modal-content">
+                                    <!--Header-->
+                                    <div class="modal-header">
+                                    <p class="heading lead">{{co}}&nbsp ${{ilist[2]}}</p>
+
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true" class="white-text">&times;</span>
+                                    </button>
+                                    </div>
+
+                                    <!--Body-->
+                                    <div class="modal-body">
+                                        <div class="text-center">
+                                            <i class="fa fa-check fa-4x mb-1 animated rotateIn"></i>
+                                            <table class="table table-bordered table-sm" cellspacing="0" width="100%">
+                                                <thead>
+                                                <tr style="font-weight:bold">
+                                                    <th>Type</th><th>Expensed Acct</th><th>Paid From</th><th>Status</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td>{{ilist[5]}}</td><td>{{ilist[6]}}</td><td>{{ilist[3]}}</td><td>{{ilist[4]}}</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+
+                                            <div class="md-form form-sm">
+                                                <i class="fa fa-envelope prefix"></i>
+                                                    <input type="text" name="ckref{{ilist[0]}}" id="ckrefd{{ilist[0]}}" class="form-control">
+                                                    <label for="ckrefd{{ilist[0]}}">Add Check Reference..</label>
+                                            </div>
+                                        {% if status == 'Unpaid' %}
+                                        <button type ="submit" name="PayB2" value="{{ilist[0]}}" class="btn btn-outline-info waves-effect">Pay Bill</button>
+                                        <button type ="submit" name="paynmake" value="{{ilist[0]}}" class="btn btn-outline-info waves-effect">Pay & Make Check</button>
+                                        {% else %}
+                                        <button type ="submit" name="UnPay" value="{{ilist[0]}}" class="btn btn-outline-info waves-effect">Un-Pay Bill</button>
+                                        {% endif %}
+
+
+                                            {% set comments = ilist[7] %}
+
+                                            <table class="table table-bordered table-sm" cellspacing="0" width="100%">
+                                            <tr><td>ChalkBoard</td></tr>
+                                                {% for c in comments%}
+                                                <tr><td align='left'>{{c}}</td></tr>
+                                                {% endfor %}
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <!--Footer-->
+                                    <div class="modal-footer justify-content-center">
+                                    <button type="button" class="btn btn-outline-info waves-effect" data-toggle="modal" data-target="#modalContactForm{{ilist[0]}}">
+                                        ChalkBoard
+                                    </button>
+
+
+
+                                    <a type="button" class="btn btn-outline-secondary-modal waves-effect" data-dismiss="modal">Done</a>
+                                    </div>
+                                    </div>
+                                    <!--/.Content-->
+                                    </div>
+                                    </div>
+
+                                    <!--Modal: Contact form-->
+<div class="modal fade" id="modalContactForm{{ilist[0]}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog cascading-modal" role="document">
+        <!--Content-->
+        <div class="modal-content">
+
+            <!--Header-->
+            <div class="modal-header light-blue darken-3 white-text">
+                <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="title"><i class="fa fa-pencil"></i> Add a Note for Bill {{ilist[1]}}</h4>
+            </div>
+            <!--Body-->
+            <div class="modal-body mb-0">
+
+
+                <div class="md-form form-sm">
+                    <i class="fa fa-envelope prefix"></i>
+                    <input type="text" name="note{{ilist[0]}}" id="noted{{ilist[0]}}" class="form-control">
+                    <label for="noted{{ilist[0]}}">Add a Note...</label>
+                </div>
+
+
+                <div class="text-center mt-1-half">
+                    <button class="btn btn-info mb-2" name="calupdate">Update <i class="fa fa-send ml-1"></i></button>
+                </div>
+
+
+
+            </div>
+        </div>
+        <!--/.Content-->
+    </div>
+</div>

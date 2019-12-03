@@ -1,0 +1,50 @@
+{% extends 'A_layout_portal.html' %}
+
+{% block body %}
+<form action="{{ url_for ('CalendarBig') }}" method="post">
+<div class="table-responsive">
+<div class="row">
+    
+    <div class="col-sm-12">    
+    
+        {% include 'includes/_calendar_BIG.html' %}
+                                                 
+    </div>    
+</div> 
+<div class="row">
+    <div class="col-sm-12">
+            <div class="row" align="center">
+                 <div class="col-sm-12"  style="font-weight:bold">Control Panel</div>
+            </div>
+            <div class="row" align="center">
+                 <div class="col-sm-12">
+            
+                    <table>
+                        <tr class="small text-danger"><td>Messages</td></tr>
+                            {% for e in err %}
+                            <tr><td>{{e}}</td></tr> 
+                            {% endfor %}
+                    </table>
+                    <input type = "hidden" name="passmodlink" value="{{modlink}}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                  
+               {% include 'includes/_button_cal.html' %}
+               
+                </div>
+            </div>
+    
+    </div>
+    
+    
+
+</div>
+
+<input type = "hidden" name ="FileSel" value= "{{filesel}}">
+</form>   
+{% endblock %}
+
+
+
