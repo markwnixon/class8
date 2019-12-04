@@ -25,19 +25,20 @@ year = str(today.year)
 day = str(today.day)
 month = str(today.month)
 
-from CCC_system_setup import companydata, statpath, addpath, scac
+from CCC_system_setup import companydata, statpath, addpath, mycompany
 cmpdata = companydata()
-
+scac = mycompany()
 
 @app.route('/')
 def index():
-    return render_template(f'companysite/{scac}/about.html',cmpdata=cmpdata)
+    srcpath = statpath('')
+    return render_template(f'companysite/{scac}/about.html',srcpath=srcpath, cmpdata=cmpdata, scac=scac)
 
 @app.route('/About')
 def About():
     lang = 'English'
     srcpath = statpath('')
-    return render_template(f'companysite/{scac}/about.html',srcpath=srcpath,cmpdata=cmpdata, scac=scac,lang=lang)
+    return render_template(f'companysite/{scac}/about.html',srcpath=srcpath,cmpdata=cmpdata, scac=scac, lang=lang)
 
 @app.route('/Whatapp', methods=['GET', 'POST'])
 def Whatapp():
@@ -577,7 +578,7 @@ def login():
             error = 'Username not found'
             return render_template('login.html', error=error, cmpdata=cmpdata)
 
-    return render_template('login.html',cmpdata=cmpdata)
+    return render_template('login.html',cmpdata=cmpdata, scac=scac)
 
 # Logout
 @app.route('/logout')

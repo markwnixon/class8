@@ -5,11 +5,12 @@ from CCC_system_setup import apikeys
 from CCC_system_setup import myoslist, addpath, tpath, companydata, usernames, passwords, scac, imap_url, accessorials
 from viewfuncs import d2s, d1s
 import imaplib, email
+import base64
+
 import datetime
 from models import Quotes
 from send_mimemail import send_mimemail
 
-print(apikeys)
 API_KEY_GEO = apikeys['gkey']
 API_KEY_DIS = apikeys['dkey']
 cdata = companydata()
@@ -18,14 +19,12 @@ def get_body(msg):
     if msg.is_multipart():
         return get_body(msg.get_payload(0))
     else:
-
         return msg.get_payload(None,True)
 
 def search(key,value,con):
     result,data=con.search(None,key,'"{}"'.format(value))
     return data
 
-#(_, data) = CONN.search(None, '(SENTSINCE {0})'.format(date)), '(FROM {0})'.format("someone@yahoo.com") )
 def search_from_date(key,value,con,datefrom):
     result,data=con.search( None, '(SENTSINCE {0})'.format(datefrom) , key, '"{}"'.format(value) )
     return data
@@ -44,19 +43,12 @@ def get_date(data):
                 part = response_part[1].decode('utf-8')
                 msg = email.message_from_string(part)
                 date=msg['Date']
-                date = date[4:17]
-                date = date.strip()
-                print('the date here is:',date)
-                date=date.split('-',1)[0]
-                date=date.split('+',1)[0]
-                date=date.strip()
-                n=datetime.datetime.strptime(date , "%d %b %Y")
-                newdate=datetime.date(n.year,n.month,n.day)
             except:
-                newdate=None
-    return newdate
+                date=None
+    return date
 
 def get_subject(data):
+    subject = 'none'
     for response_part in data:
         if isinstance(response_part, tuple):
             part = response_part[1].decode('utf-8')
@@ -76,6 +68,29 @@ def get_from(data):
             except:
                 return 'Nonefound'
 
+def get_msgs():
+    username = usernames['quot']
+    password = passwords['quot']
+    dayback = 100
+    #datefrom = (datetime.date.today() - datetime.timedelta(dayback)).strftime("%d-%b-%Y")
+    con = imaplib.IMAP4_SSL(imap_url)
+    con.login(username, password)
+    con.select('INBOX')
+    result, data = con.search(None,'ALL')
+    msgs = get_emails(data, con)
+    return msgs
+
+
+def compact(body):
+    newbody = ''
+    blines = body.splitlines()
+    for line in blines:
+        if len(line.strip())>1:
+            newbody = newbody + line +'\n'
+    return newbody
+
+
+
 def add_quote_emails():
     username = usernames['quot']
     password = passwords['quot']
@@ -84,20 +99,27 @@ def add_quote_emails():
     con = imaplib.IMAP4_SSL(imap_url)
     con.login(username, password)
     con.select('INBOX')
-    msgs = get_emails(search_from_date('TO', usernames['quot'], con, datefrom), con)
+    result, data = con.search(None,'ALL')
+    msgs = get_emails(data, con)
+    #msgs = get_emails(search_from_date('TO', usernames['quot'], con, datefrom), con)
+
     for j, msg in enumerate(msgs):
         raw = email.message_from_bytes(msg[0][1])
         body = get_body(raw)
+        getdate = get_date(msg)
+        date = getdate[4:16]
+        date = date.strip()
+        n = datetime.datetime.strptime(date, "%d %b %Y")
+        newdate = datetime.date(n.year, n.month, n.day)
         try:
             body = body.decode('utf-8')
         except:
-            body = 'None'
+            print('decode failed')
+            body = 'Decode failed\n' + str(body)
+        body = compact(body)
         if len(body) > 500:
             body = body[0:500]
-        try:
-            getdate = get_date(msg)
-        except:
-            getdate = datetime.date.today()
+
         try:
             thisfrom = get_from(msg)
             if len(thisfrom) > 45:
@@ -111,9 +133,10 @@ def add_quote_emails():
                 subject = subject[0:90]
         except:
             subject = 'Could not obtain'
-        qdat = Quotes.query.filter((Quotes.Title == subject) & (Quotes.From==thisfrom) & (Quotes.Date==getdate)).first()
+
+        qdat = Quotes.query.filter((Quotes.Title == subject) & (Quotes.From==thisfrom) & (Quotes.Date==newdate)).first()
         if qdat is None:
-            input = Quotes(Date=getdate,From=thisfrom,Title=subject,Body=body,Response=None,Amount=None,Status='0')
+            input = Quotes(Date=newdate,From=thisfrom,Title=subject,Body=body,Response=None,Amount=None,Status='0')
             db.session.add(input)
             db.session.commit()
 
@@ -150,7 +173,7 @@ def direct_resolver(json):
     return di, du, ht, la, lo
 
 def route_resolver(json):
-    print(json)
+    ##print(json)
     final = json['rows']
     final = final[0]
     next = final['elements']
@@ -200,7 +223,7 @@ def maketable():
     bdata = '<br><br>\n'
     bdata = bdata + '<table>\n'
     for key,value in accessorials.items():
-        print(key, value[0], value[1])
+        ##print(key, value[0], value[1])
         bdata = bdata + f'<tr><td>{key}</td><td>{value[0]}</td><td>${value[1]}</td></tr>\n'
     bdata = bdata + '</table><br><br>'
     bdata = bdata + '<em>Please do not hesitate to call or email the First Eagle quote team<br>301-516-3000<br>Ask for Mark or Nadav<br></em>'
@@ -215,7 +238,7 @@ def sendquote(bidthis):
     ebody = request.values.get('edat1')
     if ebody is None:
         customer = 'NAY'
-        ebody = f'Hello {customer}, \n\n{cdata[0]} is pleased to offer a quote for this load of <b>${bidthis}</b>.\nThis price is inclusive of tolls, fuel, and 2 hrs of load time.  Additional accessorial charges may apply and are priced according the following table:\n\n'
+        ebody = f'Hello {customer}, \n\n<br><br>{cdata[0]} is pleased to offer a quote of <b>${bidthis}</b> for this load to {locto}.\nThe quote is inclusive of tolls, fuel, and 2 hrs of load time.  Additional accessorial charges may apply and are priced according the following table:\n\n'
     emailin1 = request.values.get('edat2')
     emailin2 = request.values.get('edat3')
     emailcc1 = request.values.get('edat4')
@@ -224,10 +247,10 @@ def sendquote(bidthis):
     emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2]
     # Add the accessorial table and signature to the email body:
     send_mimemail(emaildata,'quot')
-    print(etitle)
-    print(ebody)
-    print(emailin1)
-    print(emailcc1)
+    #print(etitle)
+    #print(ebody)
+    #print(emailin1)
+    #print(emailcc1)
     return emaildata
 
 
@@ -237,13 +260,13 @@ def get_address_details(address):
     url = 'https://maps.googleapis.com/maps/api/geocode/json?'
     url = url + 'address='+ address.replace(" ","+")
     url = url + f'&key={API_KEY_GEO}'
-    print(url)
+    #print(url)
     response = get(url)
     data  = address_resolver(response.json())
     data['address'] = address
     lat = data['latitude']
     lon = data['longitude']
-    print(lat,lon)
+    #print(lat,lon)
     return data
 
 def get_distance(start,end):
@@ -251,9 +274,9 @@ def get_distance(start,end):
     end = end.replace(" ", "+")
     url = f'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={start}&destinations={end}'
     url = url + f'&key={API_KEY_DIS}'
-    print(url)
+    #print(url)
     response = get(url)
-    print(response)
+    #print(response)
     data = route_resolver(response.json())
     return data
 
@@ -265,7 +288,7 @@ def get_directions(start,end):
     end = end.replace(" ", "+")
     url = f'https://maps.googleapis.com/maps/api/directions/json?origin={start}&destination={end}'
     url = url + f'&key={API_KEY_DIS}'
-    print(url)
+    #print(url)
     response = get(url)
     dis, dus, hts, las, los  = direct_resolver(response.json())
 
@@ -353,8 +376,11 @@ def isoQuote():
 
         if qbox is not None and qdata is not None:
             if passon is None:
-                qdat=Quotes.query.get(qbox)
-                thisid = qdat.id
+                try:
+                    qdat=Quotes.query.get(qbox)
+                    thisid = qdat.id
+                except:
+                    thisid = 0
             else:
                 qdat = qdata[0]
                 thisid = qdat.id
@@ -376,7 +402,7 @@ def isoQuote():
 
         ####################################  Directions Section  ######################################
         miles, hours, lats, lons, dirdata, tot_dist, tot_dura = get_directions(locfrom,locto)
-        print(f'Total distance {d1s(tot_dist)} miles and total duration {d1s(tot_dura)} hours')
+        #print(f'Total distance {d1s(tot_dist)} miles and total duration {d1s(tot_dura)} hours')
 
         #Calculate road tolls
         tollroadlist = ['I-76','NJ Tpke']
@@ -430,7 +456,7 @@ def isoQuote():
                         tollcode = tollcodes[kx]
                         legtolls[jx] = 24.00
                         legcodes[jx] = tollcode
-            #print(lat,lons[jx],stat1, stat2, stat3, stat4, tollcode)
+            ##print(lat,lons[jx],stat1, stat2, stat3, stat4, tollcode)
 
         tot_tolls = 0.00
         ex_drv = 27.41
@@ -460,12 +486,12 @@ def isoQuote():
             tot_tolls += legtolls[lx]
             aline = aline.replace('<div style="font-size:0.9em">Toll road</div>','')
             aline = aline.strip()
-            print(aline)
-            print(f'Dist:{d1s(miles[lx])}, Time:{d1s(hours[lx])}, ')
+            #print(aline)
+            #print(f'Dist:{d1s(miles[lx])}, Time:{d1s(hours[lx])}, ')
             if legtolls[lx] < .000001:
-                newdirdata.append(f'{d1s(miles[lx])} MI {d1s(hours[lx])} HRS {aline}')
+                newdirdata.append(f'{d1s(miles[lx])} MI {d2s(hours[lx])} HRS {aline}')
             else:
-                newdirdata.append(f'{d1s(miles[lx])} MI {d1s(hours[lx])} HRS {aline} Tolls:${d2s(legtolls[lx])}, TollCode:{legcodes[lx]}')
+                newdirdata.append(f'{d1s(miles[lx])} MI {d2s(hours[lx])} HRS {aline} Tolls:${d2s(legtolls[lx])}, TollCode:{legcodes[lx]}')
 
         # Cost Analysis:
         cost_drv = tottime * ex_drv
@@ -488,13 +514,16 @@ def isoQuote():
         if updatego is not None or (updatego is None and updatebid is None) or passon is not None:
             bidthis = d2s(bid)
 
+
+
         if emailgo is None:
             #Set the email data:
             etitle = f'{cdata[0]} Quote to {locto} from {locfrom}'
-            customer = 'NAY'
-            if updatego is None:
+            if qdat is not None:
+                customer = friendly(qdat.From)
+            else:
                 customer = friendly(emailto)
-            ebody = f'Hello {customer}, \n\n{cdata[0]} is pleased to offer a quote for this load of <b>${bidthis}</b>.\nThis price is inclusive of tolls, fuel, and 2 hrs of load time.  Additional accessorial charges may apply and are priced according the following table:\n\n'
+            ebody = f'Hello {customer}, \n\n<br><br>{cdata[0]} is pleased to offer a quote of <b>${bidthis}</b> for this load to {locto}.\nThe quote is inclusive of tolls, fuel, and 2 hrs of load time.  Additional accessorial charges may apply and are priced according the following table:\n\n'
             emailin1 = request.values.get('edat2')
             if updatego is None:
                 emailin1 = emailonly(emailto)
