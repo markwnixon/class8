@@ -7,7 +7,7 @@ import math
 import datetime
 import shutil
 from viewfuncs import dollar
-from CCC_system_setup import addpath
+from CCC_system_setup import addpath, scac
 
 
 def writechecks(bdat, pdat, cache, sbdata, links):
@@ -216,7 +216,7 @@ def writechecks(bdat, pdat, cache, sbdata, links):
 
     c.drawString(30, 660, amount_text)
 
-    image = addpath('tmp/sensitive/Norma350.jpg')
+    image = addpath(f'tmp/{scac}/pics/Norma350.jpg')
     c.drawImage(image, 374, 587, width=200, height=40)
 
     c.setFont('Helvetica', 12, leading=None)
