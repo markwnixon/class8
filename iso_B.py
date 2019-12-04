@@ -7,7 +7,7 @@ import calendar
 import re
 import os
 import shutil
-from CCC_system_setup import myoslist, addpath, addtxt
+from CCC_system_setup import myoslist, addpath, addtxt, scac
 
 
 def isoB(indat):
@@ -815,7 +815,7 @@ def isoB(indat):
                 docold = bill_path+'/'+filesel
                 month_name = datetime.datetime.strptime(sdate, "%Y-%m-%d").strftime('%B')
                 newfile = thiscomp+'_'+month_name+'.pdf'
-                docref = 'tmp/data/vbills/'+newfile
+                docref = f'tmp/{scac}/data/vbills/'+newfile
                 try:
                     shutil.move(addpath(docold), addpath(docref))
                     shutil.move(addtxt(docold), addtxt(docref))
@@ -1032,7 +1032,7 @@ def isoB(indat):
                     cache = cache+1
                     bdat.Cache = cache
                     cknum = 'Ck'+str(bdat.id)+'_R_'+bdat.Ref
-                    docref = 'tmp/data/vchecks/'+cknum+'c'+str(cache)+'.pdf'
+                    docref = f'tmp/{scac}/data/vchecks/'+cknum+'c'+str(cache)+'.pdf'
                     pamount = bdat.pAmount
                     if pamount == '0.00':
                         bdat.pAmount = bdat.bAmount
@@ -1142,7 +1142,7 @@ def isoB(indat):
     acdata = Accounts.query.filter((Accounts.Type == 'Bank') | (Accounts.Type == 'CC')).all()
     bdata = Bills.query.order_by(Bills.bDate).all()
     if docref is not None:
-        docref = docref.replace('tmp/vbills', 'tmp/data/vbills')
+        docref = docref.replace('tmp/vbills', f'tmp/{scac}/data/vbills')
     if doctxt is not None:
-        doctxt = doctxt.replace('tmp/vbills', 'tmp/data/vbills')
+        doctxt = doctxt.replace('tmp/vbills', f'tmp/{scac}/data/vbills')
     return bdata, cdata, bill, peep, err, modata, adata, acdata, expdata, modlink, caldays, daylist, weeksum, nweeks, addjobselect, jobdata, modal, dlist, fdata, today, cdat, pb, critday, vdata, leftscreen, docref, doctxt, leftsize, cache, filesel
