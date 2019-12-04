@@ -17,7 +17,7 @@ def isoB(indat):
         from viewfuncs import tabdata, tabdataR, popjo, jovec, timedata, nonone, nononef, nons, numcheck, newjo, init_billing_zero, init_billing_blank
         from viewfuncs import sdiff, calendar7_weeks, txtfile, numcheckvec, d2s
         username = session['username'].capitalize()
-        bill_path = 'tmp/processing/bills'
+        bill_path = 'processing/bills'
         bill, peep, cache, modata, modlink, fdata, adata, cdat, pb, passdata, vdata, caldays, daylist, weeksum, nweeks = init_billing_zero()
         filesel, docref, search11, search12, search13, search14, search21, search22, bType, bClass = init_billing_blank()
         billhold = 0
