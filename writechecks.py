@@ -16,8 +16,8 @@ def writechecks(bdat, pdat, cache, sbdata, links):
     nbills = 1
 
     cknum = 'Ck'+str(bdat.id)+'_R_'+bdat.Ref
-    file1 = addpath('tmp/data/vchecks/'+cknum+'.pdf')
-    file2 = addpath('tmp/data/vchecks/'+cknum+'c'+str(cache)+'.pdf')
+    file1 = addpath(f'tmp/{scac}/data/vchecks/'+cknum+'.pdf')
+    file2 = addpath(f'tmp/{scac}/data/vchecks/'+cknum+'c'+str(cache)+'.pdf')
 
     if links == 0:
         amt = bdat.pAmount
