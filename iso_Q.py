@@ -107,10 +107,13 @@ def add_quote_emails():
         raw = email.message_from_bytes(msg[0][1])
         body = get_body(raw)
         getdate = get_date(msg)
-        date = getdate[4:16]
-        date = date.strip()
-        n = datetime.datetime.strptime(date, "%d %b %Y")
-        newdate = datetime.date(n.year, n.month, n.day)
+        if getdate is not None:
+            date = getdate[4:16]
+            date = date.strip()
+            n = datetime.datetime.strptime(date, "%d %b %Y")
+            newdate = datetime.date(n.year, n.month, n.day)
+        else:
+            newdate = datetime.date.today()
         try:
             body = body.decode('utf-8')
         except:
