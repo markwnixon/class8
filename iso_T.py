@@ -627,13 +627,10 @@ def isoT():
             pid = modata.Bid
             pdata1 = People.query.get(pid)
             jtype='Trucking'
-            tdata=Vehicles.query.filter(Vehicles.Unit==truck).first()
             print('drv',modata.Driver)
             drvdata=Drivers.query.filter(Drivers.Name==modata.Driver).first()
             if drvdata is None:
-                drvdata = Drivers.query.filter(Drivers.Name == 'Jay Alameh').first()
-
-            print('drv2',drvdata.Name)
+                drvdata = Drivers.query.filter(Drivers.id > 1).first()
             cache = int(modata.Detention)
             time1=modata.Time
             time2=modata.Time2
@@ -641,6 +638,8 @@ def isoT():
             packing=request.values.get('packing')
             bol=request.values.get('bol')
             tdata=Vehicles.query.filter(Vehicles.Unit==truck).first()
+            if tdata is None:
+                tdata = Vehicles.query.filter(Vehicles.id > 1).first()
             docref=makemanifestT(modata, pdata1, None, None, tdata, drvdata, cache, jtype, time1, time2, commodity, packing, bol)
 
         # Need this comment
