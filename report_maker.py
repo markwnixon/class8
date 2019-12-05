@@ -9,7 +9,7 @@ from viewfuncs import nonone, nononef, nononestr, dollar, avg, comporname, fulln
 import csv
 import math
 import datetime
-from CCC_system_setup import myoslist, addpath, addtxt, bankdata
+from CCC_system_setup import myoslist, addpath, addtxt, bankdata, scac
 from report_background import invobackground, ticketbackground, custbackground
 from page_merger import pagemerger,pagemergermp
 from report_headers import jayheaders, ticketheaders, custheaders, plheaders
@@ -24,11 +24,11 @@ def reportmaker(type,thiscomp):
     cache = request.values.get('cache')
     cache=nonone(cache)
 
-    file2=addpath('tmp/data/vreport/background.pdf')
-    file3=addpath('tmp/data/vreport/headers.pdf')
-    file4=addpath('tmp/data/vreport/contents.pdf')
+    file2=addpath(f'tmp/{scac}/data/vreport/background.pdf')
+    file3=addpath(f'tmp/{scac}/data/vreport/headers.pdf')
+    file4=addpath(f'tmp/{scac}/data/vreport/contents.pdf')
     note, bank, us, lab, logoi = bankdata('FC')
-    file1=addpath('tmp/data/vreport/pagestart.pdf')
+    file1=addpath(f'tmp/{scac}/data/vreport/pagestart.pdf')
 
     c=canvas.Canvas(file1, pagesize=letter)
     c.setLineWidth(1)
@@ -101,7 +101,7 @@ def reportmaker(type,thiscomp):
             stamp=1
         else:
             stamp=0
-        file2=addpath('tmp/data/vreport/oslmdepositslip.pdf')
+        file2=addpath(f'tmp/{scac}/data/vreport/oslmdepositslip.pdf')
         print('thiscomp=',thiscomp)
         itemlist=depositcalcs(thiscomp)
         # We are creating a deposit for review so get the account to deposit into
@@ -112,7 +112,7 @@ def reportmaker(type,thiscomp):
         cache,docref=pagemerger([file4,file2,file1],cache)
 
         if stamp == 1:
-            savefile = addpath('tmp/data/vdeposits/' + depojo + '.pdf')
+            savefile = addpath(f'tmp/{scac}/data/vdeposits/' + depojo + '.pdf')
             shutil.copyfile(docref, savefile)
 
     return cache,docref

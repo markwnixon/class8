@@ -7,7 +7,7 @@ import re
 import os
 import shutil
 import subprocess
-from CCC_system_setup import myoslist,addpath,addtxt,tpath
+from CCC_system_setup import myoslist,addpath,addtxt,tpath, scac
 
 def isoMautoscanner():
 
@@ -31,7 +31,7 @@ def isoMautoscanner():
         vins = request.values.get('vinlist')
         if vins is not None:
             vinlist=vins.split()
-            txt_file=addpath('tmp/data/processing/vins.txt')
+            txt_file=addpath(f'tmp/{scac}/data/processing/vins.txt')
             with open(txt_file,'a+') as f:
                 for vin in vinlist:
                     vin=vin.strip()

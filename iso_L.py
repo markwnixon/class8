@@ -7,6 +7,7 @@ import calendar
 import re
 import os
 import subprocess
+from CCC_system_setup import scac
 
 #Create a Bill of Lading
 def make_T_manifest_edit(oder):
@@ -268,7 +269,7 @@ def make_T_manifest_edit(oder):
                 import makemanifest2
                 makemanifest2.main(odata, pdata1, pdata2, pdata3, tdata, cache, jtype, time, time2, location, description, bol)
 
-                docref='tmp/data/vmanifest/Manifest'+odata.Jo+'c'+str(cache)+'.pdf'
+                docref=f'tmp/{scac}/data/vmanifest/Manifest'+odata.Jo+'c'+str(cache)+'.pdf'
 
                 odata.Path=docref
                 odata.Storage=cache
@@ -286,7 +287,7 @@ def make_T_manifest_edit(oder):
                 import makemanifest2
                 makemanifest2.main(odata, pdata1, pdata2, pdata3, tdata, cache, jtype, time, time2, description, location, bol)
 
-                docref='tmp/data/vmanifest/Manifest'+odata.Jo+'c'+str(cache)+'.pdf'
+                docref=f'tmp/{scac}/data/vmanifest/Manifest'+odata.Jo+'c'+str(cache)+'.pdf'
 
                 odata.Apath=docref
                 odata.Cache=cache
@@ -304,7 +305,7 @@ def make_T_manifest_edit(oder):
                 import makemanifest2
                 makemanifest2.main(odata, pdata1, pdata2, pdata3, tdata, cache, jtype, time, time2, description, location, bol)
 
-                docref='tmp/data/vmanifest/Manifest'+odata.Jo+'c'+str(cache)+'.pdf'
+                docref=f'tmp/{scac}/data/vmanifest/Manifest'+odata.Jo+'c'+str(cache)+'.pdf'
 
                 odata.Path=docref
                 odata.Cache=cache
@@ -313,10 +314,10 @@ def make_T_manifest_edit(oder):
 
             #Just for viewing we want to see the source document
             if manviewo is not None and jtype=='Trucking':
-                docref='tmp/data/vorders/'+odata.Original
+                docref=f'tmp/{scac}/data/vorders/'+odata.Original
 
             if manviewo is not None and jtype=='Overseas':
-                docref='tmp/data/vdockr/'+odata.Dpath
+                docref=f'tmp/{scac}/data/vdockr/'+odata.Dpath
 
         if manemail is not None:
             import mimemail_pdfmaker1

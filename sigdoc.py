@@ -10,7 +10,7 @@ import csv
 import math
 import datetime
 from page_merger import pagemergerx
-from CCC_system_setup import addpath
+from CCC_system_setup import addpath, scac
 
 def repackage(npages,file6,docref):
     import numpy as np
@@ -25,7 +25,7 @@ def repackage(npages,file6,docref):
 
     newpages = []
     for f in range(1, npages+1):
-        newpages.append(addpath('tmp/data/vreport/'+str(f)+'.pdf'))
+        newpages.append(addpath(f'tmp/{scac}/data/vreport/'+str(f)+'.pdf'))
     pdfcommand = ['pdfunite']
     for page in newpages:
         pdfcommand.append(page)
@@ -56,8 +56,8 @@ def sigdoc(stampdata, docin, docref):
     file1 = addpath(docin)
     reader = PdfFileReader(open(file1, 'rb'))
     npages = reader.getNumPages()
-    ck = subprocess.check_output(['pdfseparate', file1, addpath('tmp/data/vreport/%d.pdf')])
-    file6 = addpath('tmp/data/vreport/report6.pdf')
+    ck = subprocess.check_output(['pdfseparate', file1, addpath(f'tmp/{scac}/data/vreport/%d.pdf')])
+    file6 = addpath(f'tmp/{scac}/data/vreport/report6.pdf')
 
 
 
@@ -73,7 +73,7 @@ def sigdoc(stampdata, docin, docref):
 
     if sigpage > 0:
         # Want to create a signature/date doc page
-        file2 = addpath('tmp/data/processing/t1.pdf')
+        file2 = addpath(f'tmp/{scac}/data/processing/t1.pdf')
         c = canvas.Canvas(file2, pagesize=letter)
         c.setLineWidth(1)
         sigpage=sigpage-1
@@ -82,9 +82,9 @@ def sigdoc(stampdata, docin, docref):
         c.showPage()
         c.save()
         cache = 1
-        sigpagefile = addpath('tmp/data/vreport/'+str(sigpage+1)+'.pdf')
+        sigpagefile = addpath(f'tmp/{scac}/data/vreport/'+str(sigpage+1)+'.pdf')
         cache, docrefx = pagemergerx([file1, file2], sigpage, cache)
-        file3 = addpath('tmp/data/vreport/report1.pdf')
+        file3 = addpath(f'tmp/{scac}/data/vreport/report1.pdf')
         os.remove(sigpagefile)
         os.rename(file3, sigpagefile)
         repackage(npages,file6,docin)
@@ -92,7 +92,7 @@ def sigdoc(stampdata, docin, docref):
     if datepage > 0:
         # Want to create a signature/date doc page
         datepage=datepage-1
-        file2 = addpath('tmp/data/processing/t1.pdf')
+        file2 = addpath(f'tmp/{scac}/data/processing/t1.pdf')
         c = canvas.Canvas(file2, pagesize=letter)
         c.setLineWidth(1)
         c.setFont('Helvetica', 12, leading=None)
@@ -100,17 +100,17 @@ def sigdoc(stampdata, docin, docref):
         c.showPage()
         c.save()
         cache = 1
-        datepagefile = addpath('tmp/data/vreport/'+str(datepage+1)+'.pdf')
+        datepagefile = addpath(f'tmp/{scac}/data/vreport/'+str(datepage+1)+'.pdf')
         cache, docrefx = pagemergerx([file1, file2], datepage, cache)
-        file3 = addpath('tmp/data/vreport/report1.pdf')
+        file3 = addpath(f'tmp/{scac}/data/vreport/report1.pdf')
         os.remove(datepagefile)
         os.rename(file3, datepagefile)
         repackage(npages,file6,docin)
 
     if xpage>0:
         xpage = xpage-1
-        xpagefile = addpath('tmp/data/vreport/'+str(xpage+1)+'.pdf')
-        file2 = addpath('tmp/data/processing/t2.pdf')
+        xpagefile = addpath(f'tmp/{scac}/data/vreport/'+str(xpage+1)+'.pdf')
+        file2 = addpath(f'tmp/{scac}/data/processing/t2.pdf')
         c = canvas.Canvas(file2, pagesize=letter)
         c.setLineWidth(1)
         xbox = addpath("tmp/pics/x100.png")
@@ -119,7 +119,7 @@ def sigdoc(stampdata, docin, docref):
         c.save()
         cache=5
         cache, docrefx = pagemergerx([file1, file2], xpage, cache)
-        file5 = addpath('tmp/data/vreport/report5.pdf')
+        file5 = addpath(f'tmp/{scac}/data/vreport/report5.pdf')
         os.remove(xpagefile)
         os.rename(file5, xpagefile)
         repackage(npages,file6,docin)

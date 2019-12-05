@@ -18,17 +18,17 @@ import fnmatch
 from collections import Counter
 import datetime
 from PyPDF2 import PdfFileReader
-from CCC_system_setup import addpath
+from CCC_system_setup import addpath, scac
 
 
 def mail_efile(odat, emailin):
 
-    wk = addpath('tmp/data/vdockr/')
+    wk = addpath(f'tmp/{scac}/data/vdockr/')
 
     booking = odat.Booking
     container = odat.Container
     jo = odat.Jo
-    sfile = addpath('tmp/data/vdockr/'+odat.Dpath)
+    sfile = addpath(f'tmp/{scac}/data/vdockr/'+odat.Dpath)
     tfile = odat.Dpath
     shutil.copy(sfile, tfile)
 

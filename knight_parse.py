@@ -15,7 +15,7 @@ import datetime
 import re
 import calendar
 from viewfuncs import d2s, dropupdate
-from CCC_system_setup import addpath, addpath2
+from CCC_system_setup import addpath, addpath2, scac
 
 def knight_parse():
 
@@ -31,7 +31,7 @@ def knight_parse():
 
     data=addpath('processing/pdf_bin/knight')
     done=addpath('processing/pdforder/')
-    viewloc=addpath('tmp/data/vorders/')
+    viewloc=addpath(f'tmp/{scac}/data/vorders/')
 
     #Using new format here the left item is what we are looking for (keyword) and right side is the Label
     hitems=['Order:Order', 'BOL:BOL', 'Booking:Booking', 'Pick Up:Pickup', 'Delivery:Delivery']

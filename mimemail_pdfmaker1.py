@@ -18,11 +18,11 @@ def main(odata, cdata1, cdata2, tdata):
     from collections import Counter
     import datetime
     from PyPDF2 import PdfFileReader
-    from CCC_system_setup import addpath, emailvals
+    from CCC_system_setup import addpath, emailvals, scac
 
     prefix='processing/to_email/'
     done='originals_processed/emailed/'
-    wk='tmp/data/vmanifest/'
+    wk=f'tmp/{scac}/data/vmanifest/'
 
     jo=str(odata.Jo)
     order=str(odata.Order)

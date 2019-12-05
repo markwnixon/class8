@@ -7,7 +7,7 @@ import re
 import os
 import shutil
 import subprocess
-from CCC_system_setup import myoslist,addpath,addtxt
+from CCC_system_setup import myoslist,addpath,addtxt,scac
 
 def isoG():
 
@@ -95,9 +95,9 @@ def isoG():
                 for a in avec:
                     gdat=General.query.get(a)
                     dot=gdat.Path
-                    docref='tmp/data/vgeneral/' + dot
+                    docref=f'tmp/{scac}/data/vgeneral/' + dot
                     scommand.append(docref)
-                scommand.append('tmp/data/vunknown/assembledoutput.pdf')
+                scommand.append(f'tmp/{scac}/data/vunknown/assembledoutput.pdf')
                 tes=subprocess.check_output(scommand)
 # ____________________________________________________________________________________________________________________B.Search.General
 
@@ -115,7 +115,7 @@ def isoG():
                 if modata.Path is not None:
                     dot=modata.Path
                     txt=dot.split('.',1)[0]+'.txt'
-                    docref='tmp/data/vgeneral/' + dot
+                    docref=f'tmp/{scac}/data/vgeneral/' + dot
                     doctxt=docref.replace('.pdf','.txt').replace('.jpg','.txt').replace('.jpeg','.txt')
                     leftscreen=0
                     leftsize=10
@@ -137,7 +137,7 @@ def isoG():
                     err=[' ', ' ', 'There is no document available for this selection', ' ',  ' ']
                     if modata.Path is not None:
                         dot=modata.Path
-                        docref='tmp/data/vgeneral/' + dot
+                        docref=f'tmp/{scac}/data/vgeneral/' + dot
                         doctxt=docref.replace('.pdf','.txt').replace('.jpg','.txt').replace('.jpeg','.txt')
 
 
@@ -159,7 +159,7 @@ def isoG():
                 modata=General.query.get(oder)
                 if modata.Path is not None:
                     dot=modata.Path
-                    docref='tmp/data/vgeneral/' + dot
+                    docref=f'tmp/{scac}/data/vgeneral/' + dot
 
                 othdoc=General.query.filter((General.Path==dot) & (General.Path != modata.id)).first()
                 if othdoc is None:
@@ -179,22 +179,22 @@ def isoG():
 # ____________________________________________________________________________________________________________________B.Newjob.General
         if newjob is not None:
             err=['Select Source Document from List']
-            fdata = myoslist('tmp/data/vunknown')
+            fdata = myoslist(f'tmp/{scac}/data/vunknown')
             fdata.sort()
             modlink=10
             leftsize=8
             leftscreen=0
-            docref='tmp/data/vunknown/NewJob.pdf'
+            docref=f'tmp/{scac}/data/vunknown/NewJob.pdf'
 
         if newjob is None and update is None and modlink==10:
             filesel=request.values.get('FileSel')
             filetxt=filesel.replace('.pdf','.txt').replace('.jpg','.txt').replace('.jpeg','.txt')
-            fdata = myoslist('tmp/data/vunknown')
+            fdata = myoslist(f'tmp/{scac}/data/vunknown')
             fdata.sort()
             leftsize=8
             leftscreen=0
-            docref='tmp/data/vunknown/'+filesel
-            doctxt='tmp/data/vunknown/'+filetxt
+            docref=f'tmp/{scac}/data/vunknown/'+filesel
+            doctxt=f'tmp/{scac}/data/vunknown/'+filetxt
 
             try:
                 longs = open(addpath(doctxt)).read()
@@ -207,7 +207,7 @@ def isoG():
             modlink=0
             filesel=request.values.get('FileSel')
             if filesel != '1':
-                dockill1='tmp/data/vunknown/'+filesel
+                dockill1=f'tmp/{scac}/data/vunknown/'+filesel
                 try:
                     os.remove(addpath(dockill1))
                 except:
@@ -224,8 +224,8 @@ def isoG():
             filesel=request.values.get('FileSel')
 
             if filesel != '1':
-                docold='tmp/data/vunknown/'+filesel
-                docref='tmp/data/vgeneral/'+filesel
+                docold=f'tmp/{scac}/data/vunknown/'+filesel
+                docref=f'tmp/{scac}/data/vgeneral/'+filesel
                 try:
                     shutil.move(addpath(docold),addpath(docref))
                 except:

@@ -4,6 +4,7 @@ from flask import session, request
 import datetime
 import calendar
 from viewfuncs import nonone, nononef, dollar, nodollar
+from CCC_system_setup import scac
 
 start= datetime.date(2019, 1, 1)
 end= datetime.date(2019, 1, 31)
@@ -269,7 +270,7 @@ import math
 # All dates must begin in datetime format and will be converted to strings as required
 
 
-file1='tmp/data/jay.pdf'
+file1=f'tmp/{scac}/data/jay.pdf'
 today = datetime.datetime.today().strftime('%m/%d/%Y')
 invodate = datetime.date.today().strftime('%m/%d/%Y')
 

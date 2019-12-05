@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import os
 import shutil
 import subprocess
-from CCC_system_setup import addpath
+from CCC_system_setup import addpath, scac
 from viewfuncs import d2s
 from iso_Bank import banktotals
 
@@ -27,10 +27,10 @@ def save_Original(jo, imagelist):
     # imagelist is the list with all image filenames
     for image in imagelist:
         iname = image.lower()
-        filename = addpath('tmp/data/processing/whatsapp/')+image
+        filename = addpath(f'tmp/{scac}/data/processing/whatsapp/')+image
         outfile = jo + '.pdf'
         if 'pdf' in iname:
-            shutil.move(filename, addpath('tmp/data/vorders/'+outfile))
+            shutil.move(filename, addpath(f'tmp/{scac}/data/vorders/'+outfile))
         elif 'jpg' or 'png' in iname:
             if 'jpg' in iname:
                 ext = 'jpeg'
@@ -49,7 +49,7 @@ def save_Original(jo, imagelist):
             print('w,h = ', width, height, w, h)
             pdf.add_page()
             pdf.image(filename, 0, 0)
-            pdf.output(addpath('tmp/data/vorders/'+outfile), "F")
+            pdf.output(addpath(f'tmp/{scac}/data/vorders/'+outfile), "F")
             os.remove(filename)
     return outfile
 
@@ -58,7 +58,7 @@ def getjo(sessionph):
 
     fileph = sessionph[-7:]
     try:
-        fname = f'tmp/data/processing/seq_{fileph}.txt'
+        fname = f'tmp/{scac}/data/processing/seq_{fileph}.txt'
         file1 = open(addpath(fname))
         text = file1.readline()
         text = text.split()
@@ -76,7 +76,7 @@ def getjo(sessionph):
 def putjo(seq, jo, sessionph):
 
     fileph = sessionph[-7:]
-    fname = f'tmp/data/processing/seq_{fileph}.txt'
+    fname = f'tmp/{scac}/data/processing/seq_{fileph}.txt'
     print(fileph,fname)
     file1 = open(addpath(fname), 'w+')
     file1.write(seq+' '+jo)
@@ -86,7 +86,7 @@ def putjo(seq, jo, sessionph):
 def appendline(list, sessionph):
 
     fileph = sessionph[-7:]
-    fname = f'tmp/data/processing/seq_{fileph}.txt'
+    fname = f'tmp/{scac}/data/processing/seq_{fileph}.txt'
     file1 = open(addpath(fname), 'a')
     for item in list:
         file1.write('\n'+item)
@@ -96,7 +96,7 @@ def appendline(list, sessionph):
 def gettext(sessionph):
 
     fileph = sessionph[-7:]
-    fname = f'tmp/data/processing/seq_{fileph}.txt'
+    fname = f'tmp/{scac}/data/processing/seq_{fileph}.txt'
     file1 = open(addpath(fname))
     text = file1.readlines()
     file1.close()
@@ -119,7 +119,7 @@ def test_neg_response(c):
 def end_sequence(sessionph):
     try:
         fileph = sessionph[-7:]
-        fname = f'tmp/data/processing/seq_{fileph}.txt'
+        fname = f'tmp/{scac}/data/processing/seq_{fileph}.txt'
         os.remove(addpath(fname))
     except IOError:
         print('File already removed')
@@ -130,7 +130,7 @@ def test_session_quit(c, sessionph):
     if ll == 4 and c == 'quit':
         try:
             fileph = sessionph[-7:]
-            fname = f'tmp/data/processing/seq_{fileph}.txt'
+            fname = f'tmp/{scac}/data/processing/seq_{fileph}.txt'
             os.remove(addpath(fname))
         except IOError:
             print('File already removed')
@@ -551,8 +551,8 @@ def get_manifest(msg,sequence,sessionph,jo):
        docref = makemanifestT(odat, pdat1, pdat2, pdat3, tdat, drvdat, cache, jtype, tm1, tm2, com, pak, bol)
 
        basename = 'Man_' + jo + '.pdf'
-       shutil.copy(addpath(docref), addpath('tmp/data/' + basename))
-       newmsg = newmsg + f'tmp/data/{basename}'
+       shutil.copy(addpath(docref), addpath(f'tmp/{scac}/data/' + basename))
+       newmsg = newmsg + f'tmp/{scac}/data/{basename}'
        newmsg = newmsg + '\n\nAmend depart time or *Quit* sequence'
 
        return newmsg
@@ -727,8 +727,8 @@ def get_invoice(msg,sequence,sessionph):
        docref = T_invoice(odat, ldata, pdat1, pdat2, pdat3, cache, today, 0)
 
        basename = 'Inv_' + jo + '.pdf'
-       shutil.copy(docref, addpath('tmp/data/' + basename))
-       newmsg = newmsg + f'tmp/data/{basename}'
+       shutil.copy(docref, addpath(f'tmp/{scac}/data/' + basename))
+       newmsg = newmsg + f'tmp/{scac}/data/{basename}'
 
        return newmsg
 
@@ -922,8 +922,8 @@ def get_quote(msg,sequence,sessionph):
            docref = T_quote(odat, ldata, pdat1, pdat2, pdat3, cache, today)
 
            basename = 'Quo_' + jo + '.pdf'
-           shutil.copy(docref, addpath('tmp/data/' + basename))
-           newmsg = newmsg + f'tmp/data/{basename}'
+           shutil.copy(docref, addpath(f'tmp/{scac}/data/' + basename))
+           newmsg = newmsg + f'tmp/{scac}/data/{basename}'
 
            return newmsg
 
@@ -1511,7 +1511,7 @@ def msg_analysis(msg, sessionph, medialist):
     elif vintest == 1:
 
         print('Got to vintest', vinlist)
-        txt_file = addpath('tmp/data/processing/vins.txt')
+        txt_file = addpath(f'tmp/{scac}/data/processing/vins.txt')
         print(txt_file)
 
         try:

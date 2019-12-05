@@ -223,7 +223,7 @@ def isoB(indat):
                         cache = cache+1
                         newfile = modata.Company+'_'+month_name+str(bill)+'c'+str(cache)+'.pdf'
                         docold = bill_path+'/'+filesel
-                        docref = 'tmp/data/vbills/'+newfile
+                        docref = f'tmp/{scac}/data/vbills/'+newfile
                         try:
                             shutil.move(addpath(docold), addpath(docref))
                             shutil.move(addtxt(docold), addtxt(docref))

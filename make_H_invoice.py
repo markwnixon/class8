@@ -12,11 +12,11 @@ def main(odata, ldata, pdata1, cache, invodate, payment):
     import math
     import datetime
     import shutil
-    from CCC_system_setup import bankdata
+    from CCC_system_setup import bankdata, scac
 
     joborder = odata.Jo
-    file1 = 'tmp/data/vinvoice/INV'+joborder+'.pdf'
-    file2 = 'tmp/data/vinvoice/INV'+joborder+'c'+str(cache)+'.pdf'
+    file1 = f'tmp/{scac}/data/vinvoice/INV'+joborder+'.pdf'
+    file2 = f'tmp/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache)+'.pdf'
     today = datetime.datetime.today().strftime('%m/%d/%Y')
     type = joborder[1]
     if invodate is None or invodate == 0:

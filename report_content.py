@@ -12,7 +12,7 @@ import datetime
 from runmain import db
 from models import JO, OverSeas, Orders, People, Invoices, Income, Interchange, Bills
 import subprocess
-from CCC_system_setup import myoslist,addpath,addtxt
+from CCC_system_setup import myoslist,addpath,addtxt, scac
 
 #This function defines all the report parameters normally used
 def reportsettings(squeeze):
@@ -172,7 +172,7 @@ def depositcontents(file4,itemlist,cache,nextjo,acctin,stamp):
         pdfcommand=['pdfunite']
         for page in pages:
             pdfcommand.append(page)
-        multioutput=addpath('tmp/data/vreport/multioutput'+str(cache)+'.pdf')
+        multioutput=addpath(f'tmp/{scac}/data/vreport/multioutput'+str(cache)+'.pdf')
         pdfcommand.append(multioutput)
         tes=subprocess.check_output(pdfcommand)
     else:
@@ -236,7 +236,7 @@ def incomecontents(file4,itemlist,cache):
         pdfcommand=['pdfunite']
         for page in pages:
             pdfcommand.append(page)
-        multioutput=addpath('tmp/data/vreport/multioutput'+str(cache)+'.pdf')
+        multioutput=addpath(f'tmp/{scac}/data/vreport/multioutput'+str(cache)+'.pdf')
         pdfcommand.append(multioutput)
         tes=subprocess.check_output(pdfcommand)
     else:
@@ -637,7 +637,7 @@ def jaycontents(file4,paiditems,servicelist,itemlist,bitemlist,total,btotal,nett
         pdfcommand=['pdfunite']
         for page in pages:
             pdfcommand.append(page)
-        multioutput=addpath('tmp/data/vreport/multioutput'+str(cache)+'.pdf')
+        multioutput=addpath(f'tmp/{scac}/data/vreport/multioutput'+str(cache)+'.pdf')
         pdfcommand.append(multioutput)
         tes=subprocess.check_output(pdfcommand)
     else:
@@ -766,7 +766,7 @@ def custcontents(file4,itemlist,headerlist,pstops,cache):
         pdfcommand=['pdfunite']
         for page in pages:
             pdfcommand.append(page)
-        multioutput=addpath('tmp/data/vreport/multioutput'+str(cache)+'.pdf')
+        multioutput=addpath(f'tmp/{scac}/data/vreport/multioutput'+str(cache)+'.pdf')
         pdfcommand.append(multioutput)
         tes=subprocess.check_output(pdfcommand)
     else:
@@ -1062,7 +1062,7 @@ def plcontents(file4,itemlist,blist,cache):
         pdfcommand=['pdfunite']
         for page in pages:
             pdfcommand.append(page)
-        multioutput=addpath('tmp/data/vreport/multioutput'+str(cache)+'.pdf')
+        multioutput=addpath(f'tmp/{scac}/data/vreport/multioutput'+str(cache)+'.pdf')
         pdfcommand.append(multioutput)
         tes=subprocess.check_output(pdfcommand)
     else:

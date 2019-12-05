@@ -10,6 +10,7 @@ import json
 import subprocess
 from report_maker import reportmaker
 from viewfuncs import d2s
+from CCC_system_setup import scac
 
 def dataget_Bank(thismuch,bankacct):
     # 0=order,#1=proofs,#2=interchange,#3=people/services
@@ -252,7 +253,7 @@ def isoBank():
             if oder>0:
                 modata=Income.query.get(oder)
                 depojo = modata.SubJo
-                docref = 'tmp/data/vdeposits/' + depojo + '.pdf'
+                docref = f'tmp/{scac}/data/vdeposits/' + depojo + '.pdf'
                 leftscreen = 0
 
 
