@@ -13,11 +13,11 @@ def main(odata, ldata, pdata1, invojo, involine, paidline, refline, balline, inv
     import datetime
     import shutil
     from viewfuncs import sdiff, sadd, dollar, nodollar, nononef
-    from CCC_system_setup import myoslist, addpath, bankdata
+    from CCC_system_setup import myoslist, addpath, bankdata, scac
 
     joborder = invojo
-    file1 = addpath('tmp/data/vinvoice/INV'+joborder+'.pdf')
-    file2 = addpath('tmp/data/vinvoice/INV'+joborder+'c'+str(cache)+'.pdf')
+    file1 = addpath(f'tmp/{scac}/data/vinvoice/INV'+joborder+'.pdf')
+    file2 = addpath(f'tmp/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache)+'.pdf')
     type = joborder[1]
 
     #today = datetime.datetime.today().strftime('%m/%d/%Y')

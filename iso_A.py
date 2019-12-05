@@ -8,11 +8,8 @@ import math
 from decimal import Decimal
 
 import datetime
-import calendar
 import os
-import subprocess
-import shutil
-#from systemdepfunc import addpath
+
 
 from twilio.twiml.messaging_response import MessagingResponse
 from messager import msg_analysis
@@ -25,9 +22,8 @@ year = str(today.year)
 day = str(today.day)
 month = str(today.month)
 
-from CCC_system_setup import companydata, statpath, addpath, mycompany
+from CCC_system_setup import companydata, statpath, addpath, scac
 cmpdata = companydata()
-scac = mycompany()
 
 @app.route('/')
 def index():

@@ -7,7 +7,7 @@ import re
 import os
 import shutil
 import subprocess
-from CCC_system_setup import addpath
+from CCC_system_setup import addpath, scac
 
 today=datetime.date.today()
 
@@ -112,8 +112,8 @@ def txtfile(infile):
 
 def doctransfer(d1,d2,filesel):
     if filesel != '1':
-        docold='tmp/processing/'+d1+'/'+filesel
-        docref='tmp/data/'+d2+'/'+filesel
+        docold=f'tmp/{scac}/processing/'+d1+'/'+filesel
+        docref=f'tmp/{scac}/data/'+d2+'/'+filesel
         oldtxt=docold.split('.',1)[0]+'.txt'
         doctxt=docref.split('.',1)[0]+'.txt'
         try:
@@ -1199,9 +1199,9 @@ def global_inv(odata,odervec):
         import make_T_invoice
         make_T_invoice.main(myo,ldata,pdata1,pdata2,pdata3,cache,today,0)
         if cache>1:
-            docref='tmp/data/vinvoice/INV'+myo.Jo+'c'+str(cache)+'.pdf'
+            docref=f'tmp/{scac}/data/vinvoice/INV'+myo.Jo+'c'+str(cache)+'.pdf'
         else:
-            docref='tmp/data/vinvoice/INV'+myo.Jo+'.pdf'
+            docref=f'tmp/{scac}/data/vinvoice/INV'+myo.Jo+'.pdf'
         myo.Path=docref
         myo.Storage=cache
         db.session.commit()
@@ -1226,10 +1226,10 @@ def global_inv(odata,odervec):
         grandtotal=grandtotal+float(idat.Total)
         # put together the file paperwork
 
-    file1='tmp/data/vinvoice/P_' + 'test.pdf'
+    file1=f'tmp/{scac}/data/vinvoice/P_' + 'test.pdf'
     cache2 = int(odat.Detention)
     cache2=cache2+1
-    docref='tmp/data/vinvoice/P_c'+str(cache2)+'_' + order + '.pdf'
+    docref=f'tmp/{scac}/data/vinvoice/P_c'+str(cache2)+'_' + order + '.pdf'
 
     for j, i in enumerate(odervec):
         odat=Orders.query.get(i)

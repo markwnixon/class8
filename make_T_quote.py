@@ -8,7 +8,7 @@ import csv
 import math
 import datetime
 import shutil
-from CCC_system_setup import addpath, bankdata
+from CCC_system_setup import addpath, bankdata, scac
 
 def T_quote(odata, ldata, pdata1, pdata2, pdata3, cache, invodate):
 
@@ -19,8 +19,8 @@ def T_quote(odata, ldata, pdata1, pdata2, pdata3, cache, invodate):
 # All dates must begin in datetime format and will be converted to strings as required
 
     joborder = odata.Jo
-    file1 = addpath('tmp/data/vquote/Quote_'+joborder+'.pdf')
-    file2 = addpath('tmp/data/vquote/Quote_'+joborder+'c'+str(cache)+'.pdf')
+    file1 = addpath(f'tmp/{scac}/data/vquote/Quote_'+joborder+'.pdf')
+    file2 = addpath(f'tmp/{scac}/data/vquote/Quote_'+joborder+'c'+str(cache)+'.pdf')
     today = datetime.datetime.today().strftime('%m/%d/%Y')
     type = joborder[1]
     if invodate is None or invodate == 0:

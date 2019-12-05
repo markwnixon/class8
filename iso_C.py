@@ -8,7 +8,7 @@ import os
 import shutil
 import subprocess
 import ntpath
-from CCC_system_setup import myoslist,addpath,addtxt
+from CCC_system_setup import myoslist,addpath,addtxt, scac
 
 def isoC():
 
@@ -117,9 +117,9 @@ def isoC():
                 for a in avec:
                     gdat=Compliance.query.get(a)
                     dot=gdat.File1
-                    docref='tmp/data/vcompliance/' + dot
+                    docref=f'tmp/{scac}/data/vcompliance/' + dot
                     scommand.append(docref)
-                scommand.append('tmp/data/vunknown/assembledoutput.pdf')
+                scommand.append(f'tmp/{scac}/data/vunknown/assembledoutput.pdf')
                 tes=subprocess.check_output(scommand)
 # ____________________________________________________________________________________________________________________B.Search.Compliance
 
@@ -137,7 +137,7 @@ def isoC():
                 if modata.File1 is not None:
                     dot=modata.File1
                     txt=dot.split('.',1)[0]+'.txt'
-                    docref='tmp/data/vcompliance/' + dot
+                    docref=f'tmp/{scac}/data/vcompliance/' + dot
                     doctxt=docref.replace('.pdf','.txt').replace('.jpg','.txt').replace('.jpeg','.txt')
                     leftscreen=0
                     leftsize=10
@@ -159,7 +159,7 @@ def isoC():
                     err=[' ', ' ', 'There is no document available for this selection', ' ',  ' ']
                     if modata.File1 is not None:
                         dot=modata.File1
-                        docref='tmp/data/vcompliance/' + dot
+                        docref=f'tmp/{scac}/data/vcompliance/' + dot
                         doctxt=docref.replace('.pdf','.txt').replace('.jpg','.txt').replace('.jpeg','.txt')
 
 
@@ -181,7 +181,7 @@ def isoC():
                 modata=Compliance.query.get(oder)
                 if modata.File1 is not None:
                     dot=modata.File1
-                    docref='tmp/data/vcompliance/' + dot
+                    docref=f'tmp/{scac}/data/vcompliance/' + dot
 
                 othdoc=Compliance.query.filter((Compliance.File1==dot) & (Compliance.File1 != modata.id)).first()
                 if othdoc is None:
@@ -202,22 +202,22 @@ def isoC():
 # ____________________________________________________________________________________________________________________B.Newjob.Compliance
         if newjob is not None:
             err=['Select Source Document from List']
-            fdata = myoslist('tmp/data/vunknown')
+            fdata = myoslist(f'tmp/{scac}/data/vunknown')
             fdata.sort()
             modlink=10
             leftsize=8
             leftscreen=0
-            docref='tmp/data/vunknown/NewJob.pdf'
+            docref=f'tmp/{scac}/data/vunknown/NewJob.pdf'
 
         if newjob is None and update is None and modlink==10:
             filesel=request.values.get('FileSel')
             filetxt=filesel.replace('.pdf','.txt').replace('.jpg','.txt').replace('.jpeg','.txt')
-            fdata = myoslist('tmp/data/vunknown')
+            fdata = myoslist(f'tmp/{scac}/data/vunknown')
             fdata.sort()
             leftsize=8
             leftscreen=0
-            docref='tmp/data/vunknown/'+filesel
-            doctxt='tmp/data/vunknown/'+filetxt
+            docref=f'tmp/{scac}/data/vunknown/'+filesel
+            doctxt=f'tmp/{scac}/data/vunknown/'+filetxt
 
             try:
                 longs = open(addpath(doctxt)).read()
@@ -230,7 +230,7 @@ def isoC():
             modlink=0
             filesel=request.values.get('FileSel')
             if filesel != '1':
-                dockill1='tmp/data/vunknown/'+filesel
+                dockill1=f'tmp/{scac}/data/vunknown/'+filesel
                 try:
                     os.remove(addpath(dockill1))
                 except:
@@ -247,8 +247,8 @@ def isoC():
             filesel=request.values.get('FileSel')
 
             if filesel != '1':
-                docold='tmp/data/vunknown/'+filesel
-                docref='tmp/data/vcompliance/'+filesel
+                docold=f'tmp/{scac}/data/vunknown/'+filesel
+                docref=f'tmp/{scac}/data/vcompliance/'+filesel
                 try:
                     shutil.move(addpath(docold),addpath(docref))
                 except:

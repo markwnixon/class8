@@ -6,7 +6,7 @@ import datetime
 import calendar
 import re
 import os
-from CCC_system_setup import myoslist, addpath
+from CCC_system_setup import myoslist, addpath, scac
 
 def isoM():
 
@@ -326,7 +326,7 @@ def isoM():
                 if ofile is None:
                     err[2]='No original order data'
                 else:
-                    docref1 = 'tmp/data/vorders/' + odata1.Original
+                    docref1 = f'tmp/{scac}/data/vorders/' + odata1.Original
                 docref3 = odata1.Path
                 if docref3 is None:
                     err[4]='No Invoice data'
@@ -341,7 +341,7 @@ def isoM():
                 cache2 = int(odata1.Detention)
                 cache2=cache2+1
                 #sandiwich it all together
-                docref='tmp/data/vorders/P_c'+str(cache2)+'_' + odata1.Original
+                docref=f'tmp/{scac}/data/vorders/P_c'+str(cache2)+'_' + odata1.Original
                 tes=subprocess.check_output(['pdfunite', docref1, docref3, docref])
                 odata1.Detention=cache2
                 db.session.commit()
@@ -366,10 +366,10 @@ def isoM():
                 grandtotal=grandtotal+float(idat.Total)
                 # put together the file paperwork
 
-            file1='tmp/data/vinvoice/P_' + 'test.pdf'
+            file1=f'tmp/{scac}/data/vinvoice/P_' + 'test.pdf'
             cache2 = int(odat.Detention)
             cache2=cache2+1
-            docref='tmp/data/vinvoice/P_c'+str(cache2)+'_' + order + '.pdf'
+            docref=f'tmp/{scac}/data/vinvoice/P_c'+str(cache2)+'_' + order + '.pdf'
 
             for j, i in enumerate(odervec):
                 odat=Moving.query.get(i)
@@ -459,15 +459,15 @@ def isoM():
                         dot=dot.replace('_sig','')
                         modata.Original=dot
                         db.session.commit()
-                    docref='tmp/data/vorders/' + dot
+                    docref=f'tmp/{scac}/data/vorders/' + dot
             if poof>0:
                 modata=Proofs.query.get(poof)
                 if modata.Original is not None:
-                    docref='tmp/data/vproofs/' + modata.Original
+                    docref=f'tmp/{scac}/data/vproofs/' + modata.Original
             if tick>0:
                 modata=Interchange.query.get(tick)
                 if modata.Original is not None:
-                    docref='tmp/data/vinterchange/' + modata.Original
+                    docref=f'tmp/{scac}/data/vinterchange/' + modata.Original
             if (oder>0 or poof>0 or tick>0) and modata.Original is not None:
                     if len(modata.Original)>5:
                         leftscreen=0
@@ -519,7 +519,7 @@ def isoM():
                     if modata.Original is not None:
                         if len(modata.Original)>5:
                              leftscreen=0
-                             docref='tmp/data/vorders/' + modata.Original
+                             docref=f'tmp/{scac}/data/vorders/' + modata.Original
                              err=['All is well', ' ', ' ', ' ',  ' ']
 
             if poof>0:
@@ -529,7 +529,7 @@ def isoM():
                     if modata.Original is not None:
                         if len(modata.Original)>5:
                              leftscreen=0
-                             docref='tmp/data/vproofs/' + modata.Original
+                             docref=f'tmp/{scac}/data/vproofs/' + modata.Original
                              err=['All is well', ' ', ' ', ' ',  ' ']
             if tick>0:
                 modata=Interchange.query.get(tick)
@@ -538,7 +538,7 @@ def isoM():
                     if modata.Original is not None:
                         if len(modata.Original)>5:
                              leftscreen=0
-                             docref='tmp/data/vinterchange/' + modata.Original
+                             docref=f'tmp/{scac}/data/vinterchange/' + modata.Original
                              err=['All is well', ' ', ' ', ' ',  ' ']
 
             if serv>0:
@@ -634,9 +634,9 @@ def isoM():
                                 SEALS='',SCALE_WT='',CARGO_WT='',Time=None,Status='Unmatched',Original='',Path='',TYPE='Empty Out',Jo='',Company='')
             db.session.add(input)
             db.session.commit()
-            fdata = myoslist('tmp/data/vunknown')
+            fdata = myoslist(f'tmp/{scac}/data/vunknown')
             fdata.sort()
-            docref='tmp/data/vunknown/NewJob.pdf'
+            docref=f'tmp/{scac}/data/vunknown/NewJob.pdf'
             modata= Interchange.query.filter( Interchange.CONTAINER == 'New' ).first()
             tick=modata.id
             err=[' ', ' ', 'Enter Data for New Interchange Ticket', ' ',  ' ']
@@ -746,10 +746,10 @@ def isoM():
 
 
                 if cache>1:
-                    docref='tmp/data/vinvoice/INV'+invojo+'c'+str(cache)+'.pdf'
+                    docref=f'tmp/{scac}/data/vinvoice/INV'+invojo+'c'+str(cache)+'.pdf'
                     # Store for future use
                 else:
-                    docref='tmp/data/vinvoice/INV'+invojo+'.pdf'
+                    docref=f'tmp/{scac}/data/vinvoice/INV'+invojo+'.pdf'
 
                 odat.Cache=cache
                 idat=Invoices.query.filter(Invoices.Jo==invojo).first()
@@ -827,22 +827,22 @@ def isoM():
 # ____________________________________________________________________________________________________________________B.Newjob.Moving
         if newjob is not None:
             err=['Select Source Document from List']
-            fdata = myoslist('tmp/data/vunknown')
+            fdata = myoslist(f'tmp/{scac}/data/vunknown')
             fdata.sort()
             cdata = People.query.filter(People.Ptype=='Moving').order_by(People.Company).all()
             modlink=4
             leftsize=8
             leftscreen=0
-            docref='tmp/data/vunknown/NewJob.pdf'
+            docref=f'tmp/{scac}/data/vunknown/NewJob.pdf'
 
         if newjob is None and modlink==4:
             filesel=request.values.get('FileSel')
-            fdata = myoslist('tmp/data/vunknown')
+            fdata = myoslist(f'tmp/{scac}/data/vunknown')
             fdata.sort()
             cdata = People.query.filter(People.Ptype=='Moving').order_by(People.Company).all()
             leftsize=8
             leftscreen=0
-            docref='tmp/data/vunknown/'+filesel
+            docref=f'tmp/{scac}/data/vunknown/'+filesel
             doctxt=docref.split('.',1)[0]+'.txt'
 
 
@@ -854,8 +854,8 @@ def isoM():
             #Create the new database entry for the source document
             filesel=request.values.get('FileSel')
             if filesel != '1':
-                docold='tmp/data/vunknown/'+filesel
-                docref='tmp/data/vorders/'+filesel
+                docold=f'tmp/{scac}/data/vunknown/'+filesel
+                docref=f'tmp/{scac}/data/vorders/'+filesel
                 try:
                     shutil.move(addpath(docold),addpath(docref))
                 except:
@@ -1031,7 +1031,7 @@ def isoM():
     alltdata=Drivers.query.all()
     tdata=FELVehicles.query.all()
     rightsize=12-leftsize
-    fdata = myoslist('tmp/data/vunknown')
+    fdata = myoslist(f'tmp/{scac}/data/vunknown')
     fdata.sort()
     sdata2= Services.query.order_by(Services.Price).all()
     pfdata=People.query.filter((People.Ptype=='Exporter') | (People.Ptype=='Trucking') | (People.Ptype=='Storage') | (People.Ptype=='Moving')).order_by(People.Company).all()

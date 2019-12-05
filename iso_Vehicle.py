@@ -2,13 +2,7 @@ from runmain import db
 from models import Trucklog, users, JO, Gledger
 from flask import session, logging, request
 import datetime
-import calendar
-import re
-import os
-import shutil
-import json
-import subprocess
-from report_maker import reportmaker
+from CCC_system_setup import scac
 
 def dataget_Trucklog(thismuch):
     # 0=order,#1=proofs,#2=interchange,#3=people/services
@@ -145,7 +139,7 @@ def isoTruck():
         if viewo is not None and numchecked == 1:
             if oder>0:
                 modata=Trucklog.query.get(oder)
-                docref = 'tmp/data/vmaint/' + str(modata.id) + '.pdf'
+                docref = f'tmp/{scac}/data/vmaint/' + str(modata.id) + '.pdf'
                 leftscreen = 0
 
 

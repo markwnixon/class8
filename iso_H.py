@@ -2,15 +2,9 @@ from runmain import db
 from models import Vehicles, Dealer, General, Invoices, JO, Income, Bills, Accounts, Autos, People, Interchange, Drivers, ChalkBoard, Proofs, Services
 from flask import render_template, flash, redirect, url_for, session, logging, request
 
-import math
-from decimal import Decimal
 import datetime
-import calendar
-import os
-import subprocess
 import shutil
-import re
-from CCC_system_setup import myoslist, addpath
+from CCC_system_setup import myoslist, addpath, scac
 
 def isoH():
 
@@ -198,8 +192,8 @@ def isoH():
                         oldtxt=''
                     modata= Autos.query.filter(Autos.Status=='New').first()
                     auto=modata.id
-                    docref='tmp/data/vdispatch/DISP'+str(auto)+'.pdf'
-                    doctxt='tmp/data/vdispatch/DISP'+str(auto)+'.txt'
+                    docref=f'tmp/{scac}/data/vdispatch/DISP'+str(auto)+'.pdf'
+                    doctxt=f'tmp/{scac}/data/vdispatch/DISP'+str(auto)+'.txt'
                     try:
                         shutil.move(addpath(oldref),addpath(docref))
                     except:
@@ -321,9 +315,9 @@ def isoH():
             make_H_invoice.main(hdata1,idata,pdat,cache,invodate,0)
 
             if cache>0:
-                docref='tmp/data/vinvoice/INV'+hdata1.Jo+'c'+str(cache)+'.pdf'
+                docref=f'tmp/{scac}/data/vinvoice/INV'+hdata1.Jo+'c'+str(cache)+'.pdf'
             else:
-                docref='tmp/data/vinvoice/INV'+hdata1.Jo+'.pdf'
+                docref=f'tmp/{scac}/data/vinvoice/INV'+hdata1.Jo+'.pdf'
             hdata1.Ipath=docref
             hdata1.Cache=cache
             db.session.commit()
@@ -394,7 +388,7 @@ def isoH():
                     if modata.Apath is not None:
                         if len(modata.Apath)>5:
                              leftscreen=0
-                             docref='tmp/data/vcarbuy/' + modata.Apath
+                             docref=f'tmp/{scac}/data/vcarbuy/' + modata.Apath
                              err=['All is well', ' ', ' ', ' ',  ' ']
 
             if peep>0:
@@ -404,7 +398,7 @@ def isoH():
                     if modata.Original is not None:
                         if len(modata.Original)>5:
                              leftscreen=0
-                             docref='tmp/data/vpersons/' + modata.Original
+                             docref=f'tmp/{scac}/data/vpersons/' + modata.Original
                              err=['All is well', ' ', ' ', ' ',  ' ']
             if auto>0:
                 modata=Autos.query.get(auto)
@@ -456,7 +450,7 @@ def isoH():
                     fdata.append(title.Path)
                     displdata.append(title.Category)
                 filesel=request.values.get('FileSel')
-                docref='tmp/data/vgeneral/'+filesel
+                docref=f'tmp/{scac}/data/vgeneral/'+filesel
                 doctxt=docref.split('.',1)[0]+'.txt'
 
 
@@ -465,11 +459,11 @@ def isoH():
                 fdata=[]
                 displdata=[]
                 for title in titledata:
-                    file1='tmp/data/vgeneral/'+title.Path
+                    file1=f'tmp/{scac}/data/vgeneral/'+title.Path
                     fdata.append(title.Path)
                     displdata.append(title.Category)
 
-                docref='tmp/data/vgeneral/'+fdata[0]
+                docref=f'tmp/{scac}/data/vgeneral/'+fdata[0]
                 doctxt=''
                 #We will create a blank line and simply modify that by updating:
                 input= Autos(Jo=None,Hjo=None,Year=None,Make=None,Model=None,Color=None,VIN=None,Title=None,State=None,EmpWeight=None,Dispatched=None,Value=None,TowCompany=None,TowCost=None,TowCostEa=None,Original=None,Status='New',Date1=None, Date2=None, Pufrom=None, Delto=None, Ncars=None, Orderid=None)
@@ -578,10 +572,10 @@ def isoH():
                 make_H_invoice.main(hdat,ldata,pdat,cache,invodate,payment)
 
                 if cache>1:
-                    docref='tmp/data/vinvoice/INV'+invojo+'c'+str(cache)+'.pdf'
+                    docref=f'tmp/{scac}/data/vinvoice/INV'+invojo+'c'+str(cache)+'.pdf'
                     # Store for future use
                 else:
-                    docref='tmp/data/vinvoice/INV'+invojo+'.pdf'
+                    docref=f'tmp/{scac}/data/vinvoice/INV'+invojo+'.pdf'
 
                 hdat.Cache=cache
                 hdat.Status='Paid'
@@ -722,10 +716,10 @@ def isoH():
                     make_H_invoice.main(myo,ldata,pdat,cache,invodate,0)
 
                     if cache>0:
-                        docref='tmp/data/vinvoice/INV'+myo.Jo+'c'+str(cache)+'.pdf'
+                        docref=f'tmp/{scac}/data/vinvoice/INV'+myo.Jo+'c'+str(cache)+'.pdf'
                         # Store for future use
                     else:
-                        docref='tmp/data/vinvoice/INV'+myo.Jo+'.pdf'
+                        docref=f'tmp/{scac}/data/vinvoice/INV'+myo.Jo+'.pdf'
                     myo.Ipath=docref
                     myo.Cache=cache
                     db.session.commit()

@@ -14,16 +14,17 @@ from pagemerger import pagemerger
 from report_headers import jayheaders
 from report_data import jaycalcs,ticketcalcs
 from report_content import jaycontents,ticketcontents
+from CCC_system_setup import scac
 
 def reportmake(type):
 
     cache =  request.values.get('cache')
     cache=nonone(cache)
 
-    file1='tmp/data/vreport/pagestart.pdf'
-    file2='tmp/data/vreport/background.pdf'
-    file3='tmp/data/vreport/headers.pdf'
-    file4='tmp/data/vreport/contents.pdf'
+    file1=f'tmp/{scac}/data/vreport/pagestart.pdf'
+    file2=f'tmp/{scac}/data/vreport/background.pdf'
+    file3=f'tmp/{scac}/data/vreport/headers.pdf'
+    file4=f'tmp/{scac}/data/vreport/contents.pdf'
     today = datetime.datetime.today().strftime('%m/%d/%Y')
     invodate = datetime.date.today().strftime('%m/%d/%Y')
 

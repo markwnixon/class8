@@ -7,7 +7,7 @@ import re
 import os
 import shutil
 import subprocess
-from CCC_system_setup import myoslist, addpath, addtxt, tpath
+from CCC_system_setup import myoslist, addpath, addtxt, tpath, scac
 from viewfuncs import nodollar, numcheckv, nonone
 
 
@@ -37,10 +37,10 @@ def updateinvo(jo, thisdate):
         T_invoice(myo, ldata, pdata1, pdata2, pdata3, cache, thisdate, 0)
 
         if cache > 1:
-            docref = 'tmp/data/vinvoice/INV'+myo.Jo+'c'+str(cache)+'.pdf'
+            docref = f'tmp/{scac}/data/vinvoice/INV'+myo.Jo+'c'+str(cache)+'.pdf'
             # Store for future use
         else:
-            docref = 'tmp/data/vinvoice/INV'+myo.Jo+'.pdf'
+            docref = f'tmp/{scac}/data/vinvoice/INV'+myo.Jo+'.pdf'
 
         for ldatl in ldata:
             ldatl.Pid = pdata1.id
@@ -59,10 +59,10 @@ def updateinvo(jo, thisdate):
         invo, err, leftscreen, leftsize, docref, invodate = invoiceO(invooder, 0)
 
         if cache > 1:
-            docref = 'tmp/data/vinvoice/INV'+jo+'c'+str(cache)+'.pdf'
+            docref = f'tmp/{scac}/data/vinvoice/INV'+jo+'c'+str(cache)+'.pdf'
             # Store for future use
         else:
-            docref = 'tmp/data/vinvoice/INV'+jo+'.pdf'
+            docref = f'tmp/{scac}/data/vinvoice/INV'+jo+'.pdf'
         odat.Cache = cache
         modata = OverSeas.query.get(invooder)
         jo = modata.Jo

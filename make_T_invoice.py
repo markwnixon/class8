@@ -8,7 +8,7 @@ import csv
 import math
 import datetime
 import shutil
-from CCC_system_setup import addpath, bankdata, co
+from CCC_system_setup import addpath, bankdata, scac
 
 def T_invoice(odata, ldata, pdata1, pdata2, pdata3, cache, invodate, payment):
 
@@ -19,8 +19,8 @@ def T_invoice(odata, ldata, pdata1, pdata2, pdata3, cache, invodate, payment):
 # All dates must begin in datetime format and will be converted to strings as required
 
     joborder = odata.Jo
-    file1 = addpath(f'tmp/{co}/data/vinvoice/INV'+joborder+'.pdf')
-    file2 = addpath(f'tmp/{co}/data/vinvoice/INV'+joborder+'c'+str(cache)+'.pdf')
+    file1 = addpath(f'tmp/{scac}/data/vinvoice/INV'+joborder+'.pdf')
+    file2 = addpath(f'tmp/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache)+'.pdf')
     today = datetime.datetime.today().strftime('%m/%d/%Y')
     type = joborder[1]
     if invodate is None or invodate == 0:

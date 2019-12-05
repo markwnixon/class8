@@ -15,7 +15,7 @@ import csv
 import math
 import shutil
 from viewfuncs import d2s, dollar, avg, comporname, fullname, address, nononestr, nonone, nononef, parseline, commaguard, parselinenoupper
-from CCC_system_setup import addpath, bankdata
+from CCC_system_setup import addpath, bankdata, scac
 
 
 def invoiceO(ship, payment):
@@ -112,9 +112,9 @@ def invoiceO(ship, payment):
 
 # _______________________________________________________________________________________________________________
             joborder = myo.Jo
-            file1 = addpath('tmp/data/vinvoice/INV'+joborder+'.pdf')
-            file2 = addpath('tmp/data/vinvoice/INV'+joborder+'c'+str(cache)+'.pdf')
-            file3 = addpath('tmp/data/vinvoice/INV'+joborder+'c'+str(cache-1)+'.pdf')
+            file1 = addpath(f'tmp/{scac}/data/vinvoice/INV'+joborder+'.pdf')
+            file2 = addpath(f'tmp/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache)+'.pdf')
+            file3 = addpath(f'tmp/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache-1)+'.pdf')
             today = datetime.datetime.today().strftime('%m/%d/%Y')
             type = joborder[1]
             myb = Bookings.query.filter(myo.Booking == Bookings.Booking).first()
@@ -424,10 +424,10 @@ def invoiceO(ship, payment):
 
 # _______________________________________________________________________________________________________________
             if cache > 1:
-                docref = 'tmp/data/vinvoice/INV'+myo.Jo+'c'+str(cache)+'.pdf'
+                docref = f'tmp/{scac}/data/vinvoice/INV'+myo.Jo+'c'+str(cache)+'.pdf'
                 # Store for future use
             else:
-                docref = 'tmp/data/vinvoice/INV'+myo.Jo+'.pdf'
+                docref = f'tmp/{scac}/data/vinvoice/INV'+myo.Jo+'.pdf'
 
             if payment == 0:
                 for ldatl in ldata:
@@ -497,9 +497,9 @@ def invoiceM(oder, payment):
             pdata1 = People.query.filter(People.Company == myo.Shipper).first()
 
         joborder = myo.Jo
-        file1 = addpath('tmp/data/vinvoice/INV'+joborder+'c0.pdf')
-        file2 = addpath('tmp/data/vinvoice/INV'+joborder+'c'+str(cache)+'.pdf')
-        file3 = addpath('tmp/data/vinvoice/INV'+joborder+'c'+str(cache-1)+'.pdf')
+        file1 = addpath(f'tmp/{scac}/data/vinvoice/INV'+joborder+'c0.pdf')
+        file2 = addpath(f'tmp/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache)+'.pdf')
+        file3 = addpath(f'tmp/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache-1)+'.pdf')
         today = datetime.datetime.today().strftime('%m/%d/%Y')
         type = joborder[1]
         if invodate is None or invodate == 0:
@@ -794,10 +794,10 @@ def invoiceM(oder, payment):
             print('Could not find', file3, file1)
 
         if cache > 1:
-            docref = 'tmp/data/vinvoice/INV'+myo.Jo+'c'+str(cache)+'.pdf'
+            docref = f'tmp/{scac}/data/vinvoice/INV'+myo.Jo+'c'+str(cache)+'.pdf'
             # Store for future use
         else:
-            docref = 'tmp/data/vinvoice/INV'+myo.Jo+'c0.pdf'
+            docref = f'tmp/{scac}/data/vinvoice/INV'+myo.Jo+'c0.pdf'
 
         if payment == 0:
             for ldatl in ldata:
