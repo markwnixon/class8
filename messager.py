@@ -76,7 +76,7 @@ def getjo(sessionph):
 def putjo(seq, jo, sessionph):
 
     fileph = sessionph[-7:]
-    fname = ff'tmp/{scac}/data/processing/seq_{fileph}.txt'
+    fname = f'tmp/{scac}/data/processing/seq_{fileph}.txt'
     print(fileph,fname)
     file1 = open(addpath(fname), 'w+')
     file1.write(seq+' '+jo)
@@ -86,7 +86,7 @@ def putjo(seq, jo, sessionph):
 def appendline(list, sessionph):
 
     fileph = sessionph[-7:]
-    fname = ff'tmp/{scac}/data/processing/seq_{fileph}.txt'
+    fname = f'tmp/{scac}/data/processing/seq_{fileph}.txt'
     file1 = open(addpath(fname), 'a')
     for item in list:
         file1.write('\n'+item)
@@ -96,7 +96,7 @@ def appendline(list, sessionph):
 def gettext(sessionph):
 
     fileph = sessionph[-7:]
-    fname = ff'tmp/{scac}/data/processing/seq_{fileph}.txt'
+    fname = f'tmp/{scac}/data/processing/seq_{fileph}.txt'
     file1 = open(addpath(fname))
     text = file1.readlines()
     file1.close()
@@ -119,7 +119,7 @@ def test_neg_response(c):
 def end_sequence(sessionph):
     try:
         fileph = sessionph[-7:]
-        fname = ff'tmp/{scac}/data/processing/seq_{fileph}.txt'
+        fname = f'tmp/{scac}/data/processing/seq_{fileph}.txt'
         os.remove(addpath(fname))
     except IOError:
         print('File already removed')
@@ -130,7 +130,7 @@ def test_session_quit(c, sessionph):
     if ll == 4 and c == 'quit':
         try:
             fileph = sessionph[-7:]
-            fname = ff'tmp/{scac}/data/processing/seq_{fileph}.txt'
+            fname = f'tmp/{scac}/data/processing/seq_{fileph}.txt'
             os.remove(addpath(fname))
         except IOError:
             print('File already removed')
@@ -552,7 +552,7 @@ def get_manifest(msg,sequence,sessionph,jo):
 
        basename = 'Man_' + jo + '.pdf'
        shutil.copy(addpath(docref), addpath(f'tmp/{scac}/data/' + basename))
-       newmsg = newmsg + ff'tmp/{scac}/data/{basename}'
+       newmsg = newmsg + f'tmp/{scac}/data/{basename}'
        newmsg = newmsg + '\n\nAmend depart time or *Quit* sequence'
 
        return newmsg
@@ -728,7 +728,7 @@ def get_invoice(msg,sequence,sessionph):
 
        basename = 'Inv_' + jo + '.pdf'
        shutil.copy(docref, addpath(f'tmp/{scac}/data/' + basename))
-       newmsg = newmsg + ff'tmp/{scac}/data/{basename}'
+       newmsg = newmsg + f'tmp/{scac}/data/{basename}'
 
        return newmsg
 
@@ -923,7 +923,7 @@ def get_quote(msg,sequence,sessionph):
 
            basename = 'Quo_' + jo + '.pdf'
            shutil.copy(docref, addpath(f'tmp/{scac}/data/' + basename))
-           newmsg = newmsg + ff'tmp/{scac}/data/{basename}'
+           newmsg = newmsg + f'tmp/{scac}/data/{basename}'
 
            return newmsg
 
