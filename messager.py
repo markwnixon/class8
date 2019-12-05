@@ -58,7 +58,7 @@ def getjo(sessionph):
 
     fileph = sessionph[-7:]
     try:
-        fname = ff'tmp/{scac}/data/processing/seq_{fileph}.txt'
+        fname = f'tmp/{scac}/data/processing/seq_{fileph}.txt'
         file1 = open(addpath(fname))
         text = file1.readline()
         text = text.split()
