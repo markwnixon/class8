@@ -5,7 +5,7 @@ from CCC_system_setup import apikeys
 from CCC_system_setup import myoslist, addpath, tpath, companydata, usernames, passwords, scac, imap_url, accessorials
 from viewfuncs import d2s, d1s
 import imaplib, email
-import base64
+import math
 
 import datetime
 from models import Quotes
@@ -14,6 +14,10 @@ from send_mimemail import send_mimemail
 API_KEY_GEO = apikeys['gkey']
 API_KEY_DIS = apikeys['dkey']
 cdata = companydata()
+
+
+def roundup(x):
+    return int(math.ceil(x / 10.0)) * 10
 
 def get_body(msg):
     if msg.is_multipart():
@@ -89,6 +93,40 @@ def compact(body):
             newbody = newbody + line +'\n'
     return newbody
 
+def hard_decode(raw):
+    raw = str(raw)
+    rawl = raw.splitlines()
+    appendit = 0
+    ebody=''
+    efrom=''
+    edate=''
+    for line in rawl:
+        test = line[0:5]
+        if 'Subj' in test:
+            subject = line.split('Subject:')[1]
+            subject = subject.replace('Fwd:','')
+            subject = subject.strip()
+            print(f'Subject:{subject}')
+        if 'From' in test and 'firsteagle' not in line:
+            efrom = line.split('From:')[1]
+            efrom = efrom.strip()
+            print(f'From:{efrom}')
+        if 'Date' in test:
+            edate = line.split('Date:')[1]
+            edate = edate.strip()
+            print(f'Date:{edate}')
+        if 'Content-Type:' in line and 'plain' in line:
+            print(f'BodyStart:{line}')
+            appendit = 1
+        if 'Content-Type:' in line and 'html' in line:
+            print(f'BodyStop:{line}')
+            appendit = 0
+        if appendit == 1:
+            line = line.strip()
+            if len(line)>0:
+                ebody=ebody+line+'\n'
+    #print(f'ebody={ebody}')
+    return subject,efrom,edate,ebody
 
 
 def add_quote_emails():
@@ -106,7 +144,16 @@ def add_quote_emails():
     for j, msg in enumerate(msgs):
         raw = email.message_from_bytes(msg[0][1])
         body = get_body(raw)
-        getdate = get_date(msg)
+        try:
+            body = body.decode('utf-8')
+            getdate = get_date(msg)
+            thisfrom = get_from(msg)
+            subject = get_subject(msg)
+            print(f'For email {j}: Status OK')
+        except:
+            print(f'For email {j}: Decode failed')
+            subject, thisfrom, getdate, body = hard_decode(raw)
+
         if getdate is not None:
             date = getdate[4:16]
             date = date.strip()
@@ -114,28 +161,17 @@ def add_quote_emails():
             newdate = datetime.date(n.year, n.month, n.day)
         else:
             newdate = datetime.date.today()
-        try:
-            body = body.decode('utf-8')
-        except:
-            print('decode failed')
-            body = 'Decode failed\n' + str(body)
+
         body = compact(body)
         if len(body) > 500:
             body = body[0:500]
 
-        try:
-            thisfrom = get_from(msg)
-            if len(thisfrom) > 45:
-                thisfrom = thisfrom[0:45]
-        except:
-            thisfrom = 'None'
+        if len(thisfrom) > 45:
+            thisfrom = thisfrom[0:45]
 
-        try:
-            subject = get_subject(msg)
-            if len(subject) > 90:
-                subject = subject[0:90]
-        except:
-            subject = 'Could not obtain'
+        if len(subject) > 90:
+            subject = subject[0:90]
+
 
         qdat = Quotes.query.filter((Quotes.Title == subject) & (Quotes.From==thisfrom) & (Quotes.Date==newdate)).first()
         if qdat is None:
@@ -513,9 +549,11 @@ def isoQuote():
         bid = cost_total * 1.2
         cma_bid = bid/1.13
         std_bid = 250. + 2.1*totmiles
-        biddata = [d2s(bid),d2s(std_bid),d2s(cma_bid)]
+
+
+        biddata = [d2s(roundup(bid)),d2s(roundup(std_bid)),d2s(roundup(cma_bid))]
         if updatego is not None or (updatego is None and updatebid is None) or passon is not None:
-            bidthis = d2s(bid)
+            bidthis = d2s(roundup(bid))
 
 
 
