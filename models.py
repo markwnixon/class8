@@ -381,15 +381,17 @@ class Quotes(db.Model):
     Body = db.Column('Body', db.String(500))
     Response = db.Column('Response', db.String(500))
     Amount = db.Column('Amount', db.String(45))
+    Location = db.Column('Location', db.String(45))
     Status = db.Column('Status', db.String(45))
 
-    def __init__(self, Date, From, Title, Body, Response, Amount, Status):
+    def __init__(self, Date, From, Title, Body, Response, Amount, Location, Status):
         self.Date = Date
         self.From = From
         self.Title = Title
         self.Body = Body
         self.Response = Response
         self.Amount = Amount
+        self.Location = Location
         self.Status = Status
 
 class Drivers(db.Model):
