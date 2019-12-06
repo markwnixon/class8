@@ -412,8 +412,13 @@ def isoQuote():
             if locto is None:
                 locto = '505 Hampton Park Blvd, Capitol Heights, MD  20743'
         else:
-            locto = get_place(qdat.Body)
-            emailto = qdat.From
+            qdat = Quotes.query.get(qbox)
+            if qdat is not None:
+                locto = get_place(qdat.Body)
+                emailto = qdat.From
+            else:
+                locto = '505 Hampton Park Blvd, Capitol Heights, MD  20743'
+                emailto = 'Unknown'
 
         if passon is not None:
             qdat = Quotes.query.get(qbox)
