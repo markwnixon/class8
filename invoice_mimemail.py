@@ -14,6 +14,9 @@ import os
 from CCC_system_setup import addpath
 from CCC_system_setup import websites, passwords, companydata, scac
 from CCC_system_setup import usernames as em
+import datetime
+today = datetime.datetime.today()
+#today = today.date()
 
 def invoice_mimemail(invo,order,docref,npack):
 
@@ -30,10 +33,9 @@ def invoice_mimemail(invo,order,docref,npack):
     if npack==3:
         newfile='Invoice_Package_Order_'+order
     elif npack==2:
-        insert=etitle.replace('First Eagle Logistics','').replace(':','').replace(' ','_')
-        insert=insert.strip()
-        print(insert)
-        newfile='Summary_'+insert
+        newfile=f'Summary_Invoice_{today}'
+        newfile = newfile.replace(' ','_').replace('-','').replace(':','')
+        newfile = newfile.split('.')[0]
     else:
         newfile='Invoice_Order_'+order
 

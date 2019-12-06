@@ -104,7 +104,7 @@
                 {% set b = status[1] %}
 
                 {% if b=='4' %}
-                    {% set atc2="green font-weight-bold" %}
+                    {% set atc2="green text-white font-weight-bold" %}
                 {% elif b=='3' %}
                     {% set atc2="amber font-weight-bold" %}
                 {% elif b=='2' %}
@@ -115,12 +115,8 @@
                     {% set atc2="white font-weight-bold" %}
                 {% endif %}
 
-                {% if status=='23' or status=='24' or status =='33' or status == '34' %}
+                {% if a=='4' %}
                     {% set atc1="green text-white font-weight-bold" %}
-                    {% set atc2="green text-white font-weight-bold" %}
-                {% elif status=='A0'%}
-                    {% set atc1="yellow font-weight-bold" %}
-                    {% set atc2="yellow font-weight-bold" %}
                 {% elif a=='3' %}
                     {% set atc1="amber font-weight-bold" %}
                 {% elif a=='2' %}
@@ -130,6 +126,7 @@
                 {% else %}
                     {% set atc1="white font-weight-bold" %}
                 {% endif %}
+
 
             <tr >
                 <td align="center" class="{{atc1}}">{{ data.Jo }}</td>

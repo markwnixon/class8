@@ -553,9 +553,6 @@ def isoT():
             # Create invoice code for order
             status = odata1.Status
             newstatus = stat_update(status, '1', 1)
-            if odata1.Container is not None:
-                if '53DV' in odata1.Container:
-                    newstatus = '31'
             odata1.Status = newstatus
             myp = Proofs.query.filter(Proofs.Order == odata1.Order).first()
             if myp is not None:
@@ -646,7 +643,7 @@ def isoT():
         if unpay is not None:
             odat = Orders.query.get(oder)
             status = odat.Status
-            newstatus = stat_update(status, '2', 1)
+            newstatus = stat_update(status, '3', 1)
             odat.Status = newstatus
             db.session.commit()
             idata = Invoices.query.filter(Invoices.Jo == odat.Jo).all()
@@ -886,7 +883,7 @@ def isoT():
                 etitle = etitle+' '+odat.Jo
                 filegather.append(addpath(odat.Path))
                 status = odat.Status
-                newstatus = stat_update(status, '2', 1)
+                newstatus = stat_update(status, '1', 1)
                 odat.Status = newstatus
                 db.session.commit()
 
@@ -954,7 +951,7 @@ def isoT():
                     from gledger_write import gledger_write
                     gledger_write('income', jo, acctdb, 0)
                     status = odat.Status
-                    newstatus = stat_update(status, '3', 1)
+                    newstatus = stat_update(status, '4', 1)
                     odat.Status = newstatus
                     db.session.commit()
                 modlink = 0
@@ -971,7 +968,7 @@ def isoT():
                 from gledger_write import gledger_write
                 gledger_write('income',jo,acctdb,0)
                 status = odat.Status
-                newstatus = stat_update(status, '3', 1)
+                newstatus = stat_update(status, '4', 1)
                 odat.Status = newstatus
                 db.session.commit()
                 modlink = 0
@@ -996,7 +993,7 @@ def isoT():
             jo = odat.Jo
             order = odat.Order
             status = odat.Status
-            newstatus = stat_update(status, '4', 1)
+            newstatus = stat_update(status, '3', 1)
             odat.Status = newstatus
             db.session.commit()
 
@@ -1431,7 +1428,11 @@ def isoT():
                 odat.Storage = cache
                 idat = Invoices.query.filter(Invoices.Jo == invojo).first()
                 incdat.Original = docref
-                odat.Status = stat_update(odat.Status, '3', 1)
+                status = odat.Status
+                p1 = status[0]
+                if p1 == '2' or p1 == '3':
+                    p1 = '4'
+                odat.Status = f'{p1}4'
                 myp = Proofs.query.filter(Proofs.Order == odat.Order).first()
                 if myp is not None:
                     myp.Status = 'Paid'
