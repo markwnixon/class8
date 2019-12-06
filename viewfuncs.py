@@ -1143,6 +1143,13 @@ def chassismatch(odat):
             ticket2.Company=odat.Shipper
             ticket1.Jo=odat.Jo
             ticket2.Jo=odat.Jo
+            #Now check to see if a no-charge chassis was used...
+            chas1 = ticket1.CHASSIS
+            chas2 = ticket2.CHASSIS
+            if chas1 == 'GBL' or chas2 == 'GBL':
+                chassisdays = 0
+                odat.BOL = 'GBL Chassis'
+                odat.Chassis = 'GBL'
             odat.Container=ticket1.CONTAINER
             odat.Date=d1
             odat.Date2=d2
