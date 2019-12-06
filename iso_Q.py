@@ -175,7 +175,7 @@ def add_quote_emails():
 
         qdat = Quotes.query.filter((Quotes.Title == subject) & (Quotes.From==thisfrom) & (Quotes.Date==newdate)).first()
         if qdat is None:
-            input = Quotes(Date=newdate,From=thisfrom,Title=subject,Body=body,Response=None,Amount=None,Status='0')
+            input = Quotes(Date=newdate,From=thisfrom,Title=subject,Body=body,Response=None,Amount=None,Location=None,Status='0')
             db.session.add(input)
             db.session.commit()
 
