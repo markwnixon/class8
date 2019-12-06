@@ -45,9 +45,9 @@ def invoice_mimemail(invo,order,docref,npack):
     shutil.copy(addpath(docref),newfile)
 
     #emailto = "export@firsteaglelogistics.com"
-    emailfrom = em['zinfo']
-    username = em['zinfo']
-    password = passwords['zinfo']
+    emailfrom = em['invo']
+    username = em['invo']
+    password = passwords['invo']
 
     msg = MIMEMultipart()
     msg["From"] = emailfrom
