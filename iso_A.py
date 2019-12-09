@@ -16,14 +16,64 @@ from messager import msg_analysis
 import requests
 import mimetypes
 from urllib.parse import urlparse
+import img2pdf
 
 today = datetime.datetime.today()
 year = str(today.year)
 day = str(today.day)
 month = str(today.month)
 
-from CCC_system_setup import companydata, statpath, addpath, scac
+from CCC_system_setup import companydata, statpath, addpath, scac, tpath
 cmpdata = companydata()
+
+@app.route('/sendfile1', methods=['GET', 'POST'])
+def send_file1():
+    odat = Orders.query.filter(Orders.Original=='star').first()
+    if odat is not None:
+        oder = odat.id
+        jo = odat.Jo
+    fileob = request.files["file2upload"]
+    name, ext = os.path.splitext(fileob.filename)
+    filename1 = f'Source_{jo}{ext}'
+    filename2 = f'Source_{jo}.pdf'
+    output1 = addpath(tpath('oder', filename1))
+    output2 = addpath(tpath('oder', filename2))
+    fileob.save(output1)
+    if filename1 != filename2:
+        try:
+            with open(output2, "wb") as f:
+                f.write(img2pdf.convert(output1))
+            #os.remove(output1)
+        except:
+            filename2 = filename1
+    odat.Original = filename2
+    db.session.commit()
+    return "successful_upload"
+
+@app.route('/sendfile2', methods=['GET', 'POST'])
+def send_file2():
+    odat = Orders.query.filter(Orders.Proof=='star').first()
+    if odat is not None:
+        oder = odat.id
+        jo = odat.Jo
+    fileob = request.files["file2upload"]
+    name, ext = os.path.splitext(fileob.filename)
+    filename1 = f'Proof_{jo}{ext}'
+    filename2 = f'Proof_{jo}.pdf'
+    output1 = addpath(tpath('oder', filename1))
+    output2 = addpath(tpath('oder', filename2))
+    fileob.save(output1)
+    if filename1 != filename2:
+        try:
+            with open(output2, "wb") as f:
+                f.write(img2pdf.convert(output1))
+            os.remove(output1)
+        except:
+            filename2 = filename1
+    odat.Proof = filename2
+    db.session.commit()
+    return "successful_upload"
+
 
 @app.route('/')
 def index():
@@ -289,14 +339,14 @@ def People_Forms():
         ptype = "exporter"
 
     srcpath = statpath('')
-    return render_template('companysite/OSLM/pforms.html', cmpdata=cmpdata, scac=scac, ptype=ptype, srcpath=srcpath)
+    return render_template(f'companysite/{scac}/pforms.html', cmpdata=cmpdata, scac=scac, ptype=ptype, srcpath=srcpath)
 
 
 @app.route('/Employment')
 def Employment():
     ptype = 'driver'
     srcpath = statpath('')
-    return render_template('employment.html', srcpath=srcpath,cmpdata=cmpdata, scac=scac, ptype=ptype, today=today.date(), phone=cmpdata[7],email=cmpdata[8])
+    return render_template('employment.html', srcpath=srcpath, cmpdata=cmpdata, scac=scac, ptype=ptype, today=today.date(), phone=cmpdata[7],email=cmpdata[8])
 
 
 @app.route('/Emailview', methods=['GET', 'POST'])

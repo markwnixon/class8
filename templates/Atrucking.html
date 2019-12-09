@@ -1,7 +1,7 @@
 {% extends 'A_layout_portal.html' %}
 
 {% block body %}
-<form action="{{ url_for ('Trucking') }}" method="post">
+<form action="{{ url_for ('Trucking') }}" method="post" enctype="multipart/form-data">
 <div class="table-responsive">
 <div class="row">
 
@@ -99,30 +99,33 @@
             <tbody>
             {% for data in data1 %}
 
-                {% set status = data.Status %}
-                {% set a = status[0] %}
-                {% set b = status[1] %}
+                {% set a = data.Hstat  %}
+                {% set b = data.Istat  %}
 
-                {% if b=='4' %}
+                {% if b==4 %}
                     {% set atc2="green text-white font-weight-bold" %}
-                {% elif b=='3' %}
+                {% elif b==3 %}
                     {% set atc2="amber font-weight-bold" %}
-                {% elif b=='2' %}
+                {% elif b==2 %}
                     {% set atc2="purple text-white font-weight-bold" %}
-                {% elif b=='1' %}
+                {% elif b==1 %}
                     {% set atc2="blue text-white font-weight-bold" %}
+                {% elif b==-1 %}
+                    {% set atc2="yellow font-weight-bold" %}
                 {% else %}
                     {% set atc2="white font-weight-bold" %}
                 {% endif %}
 
-                {% if a=='4' %}
+                {% if a==4 %}
                     {% set atc1="green text-white font-weight-bold" %}
-                {% elif a=='3' %}
+                {% elif a==3 %}
                     {% set atc1="amber font-weight-bold" %}
-                {% elif a=='2' %}
+                {% elif a==2 %}
                     {% set atc1="purple text-white font-weight-bold" %}
-                {% elif a=='1' %}
+                {% elif a==1 %}
                     {% set atc1="blue text-white font-weight-bold" %}
+                {% elif a == -1 %}
+                    {% set atc1="yellow font-weight-bold" %}
                 {% else %}
                     {% set atc1="white font-weight-bold" %}
                 {% endif %}
@@ -367,47 +370,24 @@
 
 
 <div class="col-sm-{{rightsize}}">
-       <div class="row" align="center">
-           <div class="col-sm-12"  style="font-weight:bold">Control Panel</div>
-       </div>
-       <div class="row" align="center">
-           <div class="col-sm-12">
-
-            <table>
-               <tr class="small text-danger"><td>Messages</td></tr>
-                {% for e in err %}
-                <tr><td>{{e}}</td></tr>
-                {% endfor %}
-            </table>
-               <input type = "hidden" name="passmodlink" value="{{modlink}}">
-               <input type = "hidden" name="stayslim" value="{{stayslim}}">
-           </div>
-       </div>
        <div class="row">
            <div class="col-sm-12">
-
             {% if (oder > 0 or poof > 0) and modlink==1 %}
-
                 {% include 'includes/_button_upd_ret.html' %}
+
+            {% elif modlink==70 %}
+                <br>
+                {% include 'includes/_uploadsourcedocs.html' %}
 
             {% elif (tick>0 and modlink==1) or modlink==20 or modlink==21 %}
-
                 {% include 'includes/_button_upd_ret.html' %}
                 <button type="submit" class="btn btn-danger btn-sm" name="DELF">DEL-F</button>
-
-
             {% elif serv>0 and modlink==1 %}
-
                  {% include 'includes/_button_upd_ret.html' %}
-
             {% elif peep>0 and (modlink==1 or modlink==4) %}
-
                 {% include 'includes/_button_upd_ret.html' %}
-
             {% elif leftscreen == 2 %}
-
                {% include 'includes/_button_cal.html' %}
-
             {% elif inco>0 %}
                {% set htype = 'Modify Payment Received on' %}
                {% set update = 'recUpdate'%}
@@ -434,13 +414,14 @@
                {% set logonly = 'logInvo'%}
                {% include 'includes/_inco_invo.html' %}
 
-
             {% elif stamp==0 and modlink != 4 and mm1 !=1 %}
-               {% include 'includes/_controlpanelT.html' %}
-               <br>
-               {% include 'includes/_selectpanel.html' %}
+                <br>
+                {% include 'includes/_controlpanelheader.html' %}
+                {% include 'includes/_controlpanelT.html' %}
+                {% include 'includes/_selectpanel.html' %}
+                {% include 'includes/_tutorialpanel.html' %}
 
-               {% elif modlink==4 and peep==0 %}
+            {% elif modlink==4 and peep==0 %}
 
                 <table class="table table-condensed table-hover">
                <tbody>
@@ -1107,7 +1088,6 @@
 <input type = "hidden" name ="thismuch" value= "{{thismuch}}">
 <input type = "hidden" name ="passmanifest" value= "{{mm1}}">
 <input type = "hidden" name ="passoder" value= "{{oder}}">
-{{oder}}
 </form>
 
 {% endblock %}

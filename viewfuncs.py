@@ -7,7 +7,8 @@ import re
 import os
 import shutil
 import subprocess
-from CCC_system_setup import addpath, scac
+import img2pdf
+from CCC_system_setup import addpath, scac, tpath
 
 today=datetime.date.today()
 
@@ -1264,3 +1265,69 @@ def global_inv(odata,odervec):
     db.session.commit()
 
     return docref
+
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def docuploader(dbase):
+    err = []
+
+    if dbase == 'oder':
+        oder = request.values.get('passoder')
+        oder = nonone(oder)
+        print(oder)
+        odat = Orders.query.get(oder)
+        base = odat.Jo
+
+    file = request.files['sourceupload']
+    if file.filename == '':
+        err.append('No source file selected for uploading')
+
+    if file and allowed_file(file.filename):
+        name, ext = os.path.splitext(file.filename)
+        filename1 = f'Source_{base}{ext}'
+        filename2 = f'Source_{base}.pdf'
+        output1 = addpath(tpath(dbase,filename1))
+        output2 = addpath(tpath(dbase,filename2))
+        file.save(output1)
+        if filename1 != filename2:
+            try:
+                with open(output2,"wb") as f:
+                    f.write(img2pdf.convert(output1))
+                os.remove(output1)
+            except:
+                err.append(f'Problem converting {filename1} to pdf')
+                filename2 = filename1
+        err.append(f'Source uploaded as {filename2}')
+        odat.Original = filename2
+        db.session.commit()
+    else:
+        err.append('Allowed file types are txt, pdf, png, jpg, jpeg, gif')
+
+    file = request.files['proofupload']
+    if file.filename == '':
+        err.append('No file selected for uploading')
+
+    if file and allowed_file(file.filename):
+        name, ext = os.path.splitext(file.filename)
+        filename1 = f'Proof_{base}{ext}'
+        filename2 = f'Proof_{base}.pdf'
+        output1 = addpath(tpath('poof',filename1))
+        output2 = addpath(tpath('poof',filename2))
+        file.save(output1)
+        if filename1 != filename2:
+            try:
+                with open(output2,"wb") as f:
+                    f.write(img2pdf.convert(output1))
+                os.remove(output1)
+            except:
+                err.append(f'Problem converting {filename1}to pdf')
+                filename2 = filename1
+        err.append(f'Proof uploaded as {filename2}')
+        odat.Proof = filename2
+        db.session.commit()
+    else:
+        err.append('Allowed file types are txt, pdf, png, jpg, jpeg, gif')
+
+    return err

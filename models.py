@@ -238,7 +238,7 @@ class Orders(db.Model):
     Time2 = db.Column('Time2', db.String(20))
     Time3 = db.Column('Time3', db.String(20))
     Path = db.Column('Path', db.String(50))
-    Original = db.Column('Original', db.String(99))
+    Original = db.Column('Original', db.String(200))
     Description = db.Column('Description', db.String(400))
     Chassis = db.Column('Chassis', db.String(50))
     Detention = db.Column('Detention', db.Integer)
@@ -254,10 +254,13 @@ class Orders(db.Model):
     Commodity = db.Column('Commodity', db.String(50))
     Packing = db.Column('Packing', db.String(50))
     Links = db.Column('Links', db.String(100))
+    Hstat = db.Column('Hstat', db.Integer)
+    Istat = db.Column('Istat', db.Integer)
+    Proof = db.Column('Proof', db.String(200))
 
     def __init__(self, Status, Jo, Load, Order, Company, Location, BOL, Booking, Container, Driver, Pickup,
                  Delivery, Amount, Date, Time, Date2, Time2, Time3, Path, Original, Description, Chassis,
-                 Detention, Storage, Release, Company2, Seal, Shipper, Type, Bid, Lid, Did, Label, Dropblock1, Dropblock2, Commodity, Packing, Links):
+                 Detention, Storage, Release, Company2, Seal, Shipper, Type, Bid, Lid, Did, Label, Dropblock1, Dropblock2, Commodity, Packing, Links, Hstat, Istat, Proof):
         self.Status = Status
         self.Jo = Jo
         self.Load = Load
@@ -295,6 +298,9 @@ class Orders(db.Model):
         self.Commodity = Commodity
         self.Packing = Packing
         self.Links = Links
+        self.Hstat = Hstat
+        self.Istat = Istat
+        self.Proof = Proof
 
 
 class Drops(db.Model):

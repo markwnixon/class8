@@ -27,15 +27,16 @@ def dataget_T(thismuch, dlist):
     pdata = 0
     idata = 0
     if thismuch == '1':
+        stopdate = today-datetime.timedelta(days=60)
         if dlist[0] == 'on':
-            odata = Orders.query.filter(~Orders.Status.contains('3')).all()
+            odata = Orders.query.filter(Orders.Date > stopdate).all()
         if dlist[1] == 'on':
-            pdata = Proofs.query.filter(Proofs.Status != 'Paid').all()
+            pdata = Proofs.query.filter(Proofs.Date > stopdate).all()
         if dlist[2] == 'on':
             idata = Interchange.query.filter(
                 (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
     elif thismuch == '2':
-        stopdate = today-datetime.timedelta(days=45)
+        stopdate = today-datetime.timedelta(days=120)
         if dlist[0] == 'on':
             odata = Orders.query.filter(Orders.Date > stopdate).all()
         if dlist[1] == 'on':
@@ -44,11 +45,18 @@ def dataget_T(thismuch, dlist):
             idata = Interchange.query.filter(
                 (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
     elif thismuch == '3':
-        stopdate = today-datetime.timedelta(days=60)
         if dlist[0] == 'on':
-            odata = Orders.query.filter(Orders.Date > stopdate).all()
+            odata = Orders.query.filter(Orders.Istat<2).all()
         if dlist[1] == 'on':
-            pdata = Proofs.query.filter(Proofs.Date > stopdate).all()
+            pdata = Proofs.query.filter(Proofs.Status != 'Paid').all()
+        if dlist[2] == 'on':
+            idata = Interchange.query.filter(
+                (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
+    elif thismuch == '4':
+        if dlist[0] == 'on':
+            odata = Orders.query.filter(Orders.Istat<4).all()
+        if dlist[1] == 'on':
+            pdata = Proofs.query.filter(Proofs.Status != 'Paid').all()
         if dlist[2] == 'on':
             idata = Interchange.query.filter(
                 (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
@@ -61,6 +69,13 @@ def dataget_T(thismuch, dlist):
             idata = Interchange.query.all()
     return odata, pdata, idata
 
+def erud(err):
+    errup = ''
+    for e in err:
+        if len(e) > 0:
+            errup = errup + e.strip() + '\n'
+    return errup
+
 
 def isoT():
 
@@ -69,7 +84,7 @@ def isoT():
 
         from viewfuncs import parseline, tabdata, tabdataR, popjo, jovec, newjo, timedata, nonone, nononef, init_truck_zero, dropupdate, dropupdate2, dropupdate3
         from viewfuncs import d2s, stat_update, numcheck, numcheckv, sdiff, calendar7_weeks, viewbuttons, get_ints, containersout, numcheckvec
-        from viewfuncs import txtfile, doctransfer, getexpimp
+        from viewfuncs import txtfile, doctransfer, getexpimp, docuploader
         from InterchangeFuncs import InterStrip, InterMatchThis, InterDupThis, PushJobsThis
         from invoice_mimemail import invoice_mimemail
         from invoice_makers import multi_inv
@@ -130,6 +145,10 @@ def isoT():
         mm2 = request.values.get('manifest')
         mquot = request.values.get('MakeQ')
         quotupdate = request.values.get('quotUpdate')
+        uploadS = request.values.get('UploadS')
+        uploadP = request.values.get('UploadP')
+
+
 
         if mm2 is not None:
             mm1 = 1
@@ -157,6 +176,10 @@ def isoT():
             oder = 0
             quot = 0
             mm1 = 0
+
+        if modlink == 70:
+            err = docuploader('oder')
+            modlink = 0
 
 # ____________________________________________________________________________________________________________________E.FormVariables.Trucking
 # ____________________________________________________________________________________________________________________B.DataUpdates.Trucking
@@ -300,10 +323,9 @@ def isoT():
                         shutil.move(addpath(oldtxt), addpath(doctxt))
                     if 1 == 2:  # except:
                         err[4] = 'File has been moved already'
-                status = modata.Status
-                if status[0] == 'A':
-                    newstatus = stat_update(status, '0', 0)
-                    modata.Status = newstatus
+                hstat = modata.Hstat
+                if hstat == -1:
+                    modata.Hstat = 0
                 vals = ['load', 'order', 'bol', 'booking', 'container', 'pickup',
                         'date', 'time', 'date2', 'time2', 'amount', 'ctype']
                 a = list(range(len(vals)))
@@ -551,9 +573,7 @@ def isoT():
             Invoices.query.filter(Invoices.Qty == 0).delete()
             db.session.commit()
             # Create invoice code for order
-            status = odata1.Status
-            newstatus = stat_update(status, '1', 1)
-            odata1.Status = newstatus
+            odata1.Istat = 1
             myp = Proofs.query.filter(Proofs.Order == odata1.Order).first()
             if myp is not None:
                 myp.Status = 'Invoiced'
@@ -577,6 +597,29 @@ def isoT():
         if match is not None or mm1 > 0:
             oder, poof, tick, serv, peep, numchecked = numcheck(5, odata, pdata, idata, sdata, cdata, [
                                                                 'oder', 'poof', 'tick', 'serv', 'peep'])
+
+
+        if uploadS is not None:
+            err = ['No Job Selected for Source Upload']
+            if oder > 0  and numchecked == 1:
+                modlink = 70
+                modata = Orders.query.get(oder)
+                modata.Original = 'star'
+                db.session.commit()
+            else:
+                err.append('Select One Box')
+
+        if uploadP is not None:
+            err = ['No Job Selected for Proof Upload']
+            if oder > 0  and numchecked == 1:
+                modlink = 70
+                modata = Orders.query.get(oder)
+                modata.Proof = 'star'
+                db.session.commit()
+            else:
+                err.append('Select One Box')
+
+
         print('starting with mm1=',mm1)
 
         if mm1 == 1:
@@ -642,9 +685,9 @@ def isoT():
         # Need this comment
         if unpay is not None:
             odat = Orders.query.get(oder)
-            status = odat.Status
-            newstatus = stat_update(status, '3', 1)
-            odat.Status = newstatus
+            odat.Istat = 3
+            if odat.Hstat == 4:
+                odat.Hstat = 3
             db.session.commit()
             idata = Invoices.query.filter(Invoices.Jo == odat.Jo).all()
             for data in idata:
@@ -657,9 +700,7 @@ def isoT():
         # Need this comment
         if uninv is not None:
             odat = Orders.query.get(oder)
-            status = odat.Status
-            newstatus = stat_update(status, '0', 1)
-            odat.Status = newstatus
+            odat.Istat = 0
             odat.Links = None
             db.session.commit()
             Invoices.query.filter(Invoices.Jo == odat.Jo).delete()
@@ -878,13 +919,12 @@ def isoT():
             filegather = ['pdfunite', addpath(file1)]
             cdata = companydata()
             etitle = cdata[2]+' Invoices:'
+            #Prepare for email, but at this point only created invoice
             for i in odervec:
                 odat = Orders.query.get(i)
                 etitle = etitle+' '+odat.Jo
                 filegather.append(addpath(odat.Path))
-                status = odat.Status
-                newstatus = stat_update(status, '1', 1)
-                odat.Status = newstatus
+                odat.Istat = 1
                 db.session.commit()
 
             filegather.append(addpath(docref))
@@ -896,6 +936,7 @@ def isoT():
             invo = 3
 # ____________________________________________________________________________________________________________________E.Package2.Trucking
 # ____________________________________________________________________________________________________________________B.Email.Trucking
+        # With loginvo we are recording invoice in ledger, but manually taking the invoice to customer
         if loginvo is not None:
             odat = Orders.query.get(invooder)
             alink = odat.Links
@@ -903,13 +944,11 @@ def isoT():
                 alist = json.loads(alink)
                 print(alist)
                 for aoder in alist:
-                    odat = Orders.query.get(aoder)
-                    jo = odat.Jo
+                    thisodat = Orders.query.get(aoder)
+                    jo = thisodat.Jo
                     from gledger_write import gledger_write
                     gledger_write('invoice', jo, 0, 0)
-                    status = odat.Status
-                    newstatus = stat_update(status, '2', 1)
-                    odat.Status = newstatus
+                    thisodat.Istat = 2
                     db.session.commit()
                 modlink = 0
                 invo = 0
@@ -922,9 +961,7 @@ def isoT():
                 jo = odat.Jo
                 from gledger_write import gledger_write
                 gledger_write('invoice',jo,0,0)
-                status = odat.Status
-                newstatus = stat_update(status, '2', 1)
-                odat.Status = newstatus
+                odat.Istat = 2
                 db.session.commit()
                 modlink = 0
                 invo = 0
@@ -934,51 +971,22 @@ def isoT():
                 oder = 0
                 mm1 = 0
 
+        # This area for receiving money--cannot mass receive funds off the list
         if logrec is not None:
             odat = Orders.query.get(invooder)
-            #alink = odat.Links
-            #print('alink=',alink)
-            #if alink is not None:
-            if 1 == 2:
-                #alist = json.loads(alink)
-                #print(alist)
-                for aoder in alist:
-                    print('doing',aoder)
-                    odat = Orders.query.get(aoder)
-                    jo = odat.Jo
-                    inc = Income.query.filter(Income.Jo == jo).first()
-                    acctdb = inc.SubJo
-                    from gledger_write import gledger_write
-                    gledger_write('income', jo, acctdb, 0)
-                    status = odat.Status
-                    newstatus = stat_update(status, '4', 1)
-                    odat.Status = newstatus
-                    db.session.commit()
-                modlink = 0
-                invo = 0
-                invooder = 0
-                stamp = 0
-                inco = 0
-                oder = 0
-                mm1 = 0
-            else:
-                jo = odat.Jo
-                inc = Income.query.filter(Income.Jo==jo).first()
-                acctdb = inc.SubJo
-                from gledger_write import gledger_write
-                gledger_write('income',jo,acctdb,0)
-                status = odat.Status
-                newstatus = stat_update(status, '4', 1)
-                odat.Status = newstatus
-                db.session.commit()
-                modlink = 0
-                invo = 0
-                invooder = 0
-                stamp = 0
-                inco = 0
-                oder = 0
-                mm1 = 0
-
+            jo = odat.Jo
+            inc = Income.query.filter(Income.Jo==jo).first()
+            acctdb = inc.SubJo
+            gledger_write('income',jo,acctdb,0)
+            odat.Istat = 4
+            db.session.commit()
+            modlink = 0
+            invo = 0
+            invooder = 0
+            stamp = 0
+            inco = 0
+            oder = 0
+            mm1 = 0
 
         if emailnow is not None or emailinvo is not None:
             stamp = 1
@@ -992,15 +1000,19 @@ def isoT():
                 docref = odat.Path
             jo = odat.Jo
             order = odat.Order
-            status = odat.Status
-            newstatus = stat_update(status, '3', 1)
-            odat.Status = newstatus
-            db.session.commit()
-
+            alink = odat.Links
+            if alink is not None:
+                alist = json.loads(alink)
+                for aoder in alist:
+                    thisodat = Orders.query.get(aoder)
+                    thisodat.Istat = 3
+                    db.session.commit()
+            else:
+                odat.Istat = 3
+                db.session.commit()
             emailin1 = invoice_mimemail(jo, order, docref, invo)
             from gledger_write import gledger_write
             gledger_write('invoice',jo,0,0)
-
             invo = 0
             invooder = 0
             stamp = 0
@@ -1162,22 +1174,13 @@ def isoT():
             modlink = 0
             # Check to see if these are all new jobs ready to be updated to ready status
             odervec = numcheckv(odata)
-            agree = 1
             for i in odervec:
                 odat = Orders.query.get(i)
-                status = odat.Status
-                bit1 = status[0]
-                if bit1 != 'A':
-                    agree = 0
-            if agree == 1:
-                err[0] = 'Multiple A-status converted'
-                for i in odervec:
-                    odat = Orders.query.get(i)
-                    odat.Status = '00'
+                hstat = odat.Hstat
+                if hstat < 0:
+                    odat.Hstat = 0
                     db.session.commit()
-            else:
-                err[0] = 'All status must contain A'
-                err[2] = 'Must check exactly one box to use this option'
+                err[0] = 'Automated inputs accepted'
 
         if (modify is not None or vmod is not None) and numchecked == 0:
             modlink = 0
@@ -1428,11 +1431,9 @@ def isoT():
                 odat.Storage = cache
                 idat = Invoices.query.filter(Invoices.Jo == invojo).first()
                 incdat.Original = docref
-                status = odat.Status
-                p1 = status[0]
-                if p1 == '2' or p1 == '3':
-                    p1 = '4'
-                odat.Status = f'{p1}4'
+                hstat = odat.Hstat
+                if hstat == 2 or hstat == 3:
+                    odat.Hstat = 4
                 myp = Proofs.query.filter(Proofs.Order == odat.Order).first()
                 if myp is not None:
                     myp.Status = 'Paid'
@@ -1917,12 +1918,9 @@ def isoT():
             if oder > 0:
                 err[0] = 'Load Completion Status Updated'
                 myo = Orders.query.get(oder)
-                status = myo.Status
-                bit1 = status[0]
-                bit2 = status[1]
-                if bit1 == '0' or bit1 == '1':
-                    newstatus = stat_update(status, '3', 0)
-                    myo.Status = newstatus
+                hstat = myo.Hstat
+                if hstat == 0 or hstat == 1:
+                    myo.Hstat = 3
                     db.session.commit()
                 else:
                     err[0] = 'Load already has a complete status'
@@ -1938,15 +1936,8 @@ def isoT():
                 agree = 1
                 for i in odervec:
                     odat = Orders.query.get(i)
-                    status = odat.Status
-                    bit1 = status[0]
-                    if bit1 != 'A':
-                        agree = 0
-                if agree == 1:
-                    err[0] = 'Multiple A-status converted'
-                    for i in odervec:
-                        odat = Orders.query.get(i)
-                        odat.Status = '00'
+                    if odat.Hstat == -1:
+                        odat.Hstat = 0
                         db.session.commit()
                         Order_Container_Update(i)
                 else:
@@ -2091,7 +2082,6 @@ def isoT():
     leftsize=8
     rightsize = 12-leftsize
     sdata2 = Services.query.order_by(Services.Service).all()
-    #err = err[0:1]
-    # db.session.close()
+    err = erud(err)
 
     return bklist, lastpr, thismuch, etitle, ebody, emaildata, odata, pdata, idata, sdata, cdata, oder, poof, sdata2, tick, serv, peep, err, modata, caldays, daylist, nweeks, howapp, modlink, leftscreen, docref, 0, leftsize, newc, tdata, drvdata, dlist, rightsize, ldata, invodate, inco, invo, quot, invooder, cache, stamp, alltdata, allvdata, stampdata, fdata, filesel, today, now, doctxt, holdvec, mm1

@@ -1,0 +1,35 @@
+<div class="card">
+    <div class="card-header bg-info text-white">
+        Uploads for Order:{{modata.Order}} Company:{{modata.Shipper}}
+    </div>
+    <div class="card-body">
+      Upload Source Document
+    <dl>
+        <p>
+        <input type="file" name="sourceupload" autocomplete="off">
+        </p>
+    </dl>
+
+    Upload Proof Document
+    <dl>
+        <p>
+        <input type="file" name="proofupload" autocomplete="off">
+        </p>
+    </dl>
+    <p>
+    <input type="submit" value="Upload Now">
+    </p>
+    </div>
+</div>
+<div class="container">
+    <div class="droparea1">Drop Here</div>
+    <div class="tablearea" id="tablearea"></div>
+</div>
+
+<div class="container">
+    <div class="droparea2">Drop Here</div>
+    <div class="tablearea" id="tablearea"></div>
+</div>
+
+<input type = "hidden" name="passmodlink" value="{{modlink}}">
+<input type = "hidden" name="passoder" value="{{oder}}">
