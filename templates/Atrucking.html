@@ -2,78 +2,76 @@
 
 {% block body %}
 <form action="{{ url_for ('Trucking') }}" method="post" enctype="multipart/form-data">
+
 <div class="table-responsive">
-<div class="row">
-
-<div class="col-sm-{{leftsize}}" align="center">
-
-  {% if leftscreen == 0 %}
-
-
     <div class="row">
-        {% if leftsize > 6 or stamp==1 %}
-        <div class="col-sm-5" align="right">
+        <div class="col-sm-{{leftsize}}" align="center">
 
-        {% if emaildata %}
-            {% include 'includes/emailprep.html' %}
-        {% else %}
-            Text version of file {{leftsize}}{{rightsize}}{{mm1}}:<br>
+            {% if leftscreen == 0 %}
+                <div class="row">
+                    {% if leftsize > 6 or stamp==1 %}
+                        <div class="col-sm-5" align="right">
+                            {% if emaildata %}
+                                {% include 'includes/emailprep.html' %}
+                            {% else %}
+                                Text version of file {{leftsize}}{{rightsize}}{{mm1}}:<br>
+                                <embed src="{{doctxt}}" width="300px" height="550px"/>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                     <div class="col-sm-7" align="right">
+                        {% if invo == 1 or quot == 1  and ldata %}
+                            <div class="card">
+                                {% include 'includes/_services_banner.html' %}
+                            </div>
+                        {% else %}
+                            Looking for: {{docref}}<br>
+                        {% endif %}
+                        {% if rightsize == 4 %}
+                            {% set wide = "550px" %}
+                        {% else %}
+                            {% set wide = "650pm" %}
+                        {% endif %}
+                        <embed src="{{docref}}" width={{wide}} height="800px"/>
+                    </div>
+                </div>
 
-            <embed src="{{doctxt}}" width="300px" height="550px"/>
-
-        {% endif %}
-        </div>
-        {% endif %}
-        <div class="col-sm-7" align="right">
-          {% if invo == 1 or quot == 1  and ldata %}
-          <div class="card">
-              {% include 'includes/_services_banner.html' %}
-          </div>
-          {% else %}
-             Looking for: {{docref}}<br>
-         {% endif %}
-         {% if rightsize == 4 %}
-            {% set wide = "550px" %}
-         {% else %}
-            {% set wide = "650pm" %}
-         {% endif %}
-        <embed src="{{docref}}" width={{wide}} height="800px"/>
-        </div>
-    </div>
-    <input type = "hidden" name ="datatable1" value= "{{dlist[0]}}">
-    <input type = "hidden" name ="datatable2" value= "{{dlist[1]}}">
-    <input type = "hidden" name ="datatable3" value= "{{dlist[2]}}">
-    <input type = "hidden" name ="datatable4" value= "{{dlist[3]}}">
+                <input type = "hidden" name ="datatable1" value= "{{dlist[0]}}">
+                <input type = "hidden" name ="datatable2" value= "{{dlist[1]}}">
+                <input type = "hidden" name ="datatable3" value= "{{dlist[2]}}">
+                <input type = "hidden" name ="datatable4" value= "{{dlist[3]}}">
 
 
- {% elif leftscreen == 2 %}
+            {% elif leftscreen == 2 %}
 
-        {% include 'includes/_calendarT.html' %}
-    <input type = "hidden" name ="datatable1" value= "{{dlist[0]}}">
-    <input type = "hidden" name ="datatable2" value= "{{dlist[1]}}">
-    <input type = "hidden" name ="datatable3" value= "{{dlist[2]}}">
-    <input type = "hidden" name ="datatable4" value= "{{dlist[3]}}">
+                {% include 'includes/_calendarT.html' %}
+                <input type = "hidden" name ="datatable1" value= "{{dlist[0]}}">
+                <input type = "hidden" name ="datatable2" value= "{{dlist[1]}}">
+                <input type = "hidden" name ="datatable3" value= "{{dlist[2]}}">
+                <input type = "hidden" name ="datatable4" value= "{{dlist[3]}}">
 
-  {% else %}
+            {% else %}
 
-    {% if stayslim== 0 %}
-        {% set dt1='dtHorizontalVerticalExample1' %}
-        {% set dt2='dtHorizontalVerticalExample2' %}
-        {% set dt3='dtHorizontalVerticalExample3' %}
-        {% set dt4='dtHorizontalVerticalExample4' %}
-        {% set dt6='dtHorizontalVerticalExample6' %}
-    {% else %}
-        {% set dt1='dtH1' %}
-        {% set dt2='dtH2' %}
-        {% set dt3='dtH3' %}
-        {% set dt4='dtH4' %}
-        {% set dt6='dtH5' %}
-    {% endif %}
+                {% if stayslim== 0 %}
+                    {% set dt1='dtHorizontalVerticalExample1' %}
+                    {% set dt2='dtHorizontalVerticalExample2' %}
+                    {% set dt3='dtHorizontalVerticalExample3' %}
+                    {% set dt4='dtHorizontalVerticalExample4' %}
+                    {% set dt6='dtHorizontalVerticalExample6' %}
+                {% else %}
+                    {% set dt1='dtH1' %}
+                    {% set dt2='dtH2' %}
+                    {% set dt3='dtH3' %}
+                    {% set dt4='dtH4' %}
+                    {% set dt6='dtH5' %}
+                {% endif %}
 
-  {% if dlist[0]=='on' %}
-  <div class="row">
-    <div class="col-sm-12" align="center"> <b>Truck Tables:</b> &nbsp {% include 'includes/_tablespanelT.html' %} </div>
-  </div>
+            {% if dlist[0]=='on' %}
+                <div class="row">
+                    <div class="col-sm-12" align="center">
+                        {% include 'includes/_tablespanelT.html' %}
+                    </div>
+                </div>
   <div class="row">
     <div class="col-sm-12">
         <table id="{{dt1}}" class="table  table-striped table-bordered  table-hover w-auto"  width="100%">

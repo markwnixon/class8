@@ -1,16 +1,84 @@
-<div class="custom-control custom-checkbox custom-control-inline">
-  <input type="checkbox" class="custom-control-input" id="defaultInline1" {% if dlist[0]=='on' %} checked {% endif %} name="datatable1" onchange="this.form.submit()">
-  <label class="custom-control-label" for="defaultInline1">Trucking Jobs</label>
-</div>
-<div class="custom-control custom-checkbox custom-control-inline">
-  <input type="checkbox" class="custom-control-input" id="defaultInline2" {% if dlist[1]=='on' %} checked {% endif %} name="datatable2" onchange="this.form.submit()">
-  <label class="custom-control-label" for="defaultInline2">Delivery Proofs</label>
-</div>
-<div class="custom-control custom-checkbox custom-control-inline">
-  <input type="checkbox" class="custom-control-input" id="defaultInline3" {% if dlist[2]=='on' %} checked {% endif %} name="datatable3" onchange="this.form.submit()">
-  <label class="custom-control-label" for="defaultInline3">Interchange</label>
-</div>
-<div class="custom-control custom-checkbox custom-control-inline">
-  <input type="checkbox" class="custom-control-input" id="defaultInline4" {% if dlist[3]=='on' %} checked {% endif %} name="datatable4" onchange="this.form.submit()">
-  <label class="custom-control-label" for="defaultInline4">Trucking Customers</label>
+<div class="card">
+    <div class="card-body">
+        <div class=""row">
+            <div class = "col-sm-12">
+                    <b>Truck Tables:</b>
+                    <div class="custom-control custom-checkbox custom-control-inline">
+                      <input type="checkbox" class="custom-control-input" id="defaultInline1" {% if dlist[0]=='on' %} checked {% endif %} name="datatable1" onchange="this.form.submit()">
+                      <label class="custom-control-label" for="defaultInline1">Trucking Jobs</label>
+                    </div>
+                    <div class="custom-control custom-checkbox custom-control-inline">
+                      <input type="checkbox" class="custom-control-input" id="defaultInline3" {% if dlist[2]=='on' %} checked {% endif %} name="datatable3" onchange="this.form.submit()">
+                      <label class="custom-control-label" for="defaultInline3">Interchange</label>
+                    </div>
+                    <div class="custom-control custom-checkbox custom-control-inline">
+                      <input type="checkbox" class="custom-control-input" id="defaultInline4" {% if dlist[3]=='on' %} checked {% endif %} name="datatable4" onchange="this.form.submit()">
+                      <label class="custom-control-label" for="defaultInline4">Trucking Customers</label>
+                    </div>
+            </div>
+        </div>
+        <small>
+        <div class="row">
+            <div class = "col-sm-2">
+                <select class="mdb-select md-form" name="thismuch" onchange="this.form.submit()">
+                    <option value="" disabled selected>Filter Table</option>
+                    <option {% if thismuch == '1' %} selected {% endif %} value='1'>Filter: Last 60 Days</option>
+                    <option {% if thismuch == '2' %} selected {% endif %} value='2'>Filter: Last 120 Days</option>
+                    <option {% if thismuch == '3' %} selected {% endif %} value='3'>Filter: Uninvoiced</option>
+                    <option {% if thismuch == '4' %} selected {% endif %} value='4'>Filter: Unpaid</option>
+                    <option {% if thismuch == '5' %} selected {% endif %} value='5'>Filter: Show All</option>
+                </select>
+            </div>
+            <div class = "col-sm-2">
+                <select class="mdb-select md-form" name="addbox" onchange="this.form.submit()">
+                  <option value="" disabled selected>Add & Upload</option>
+                  <option value="1">New Job</option>
+                  <option value="2">New Customer</option>
+                  <option value="2">New Services</option>
+                  <option value="3">New from Copy</option>
+                  <option value="3">Make Manifest</option>
+                  <option value="4">Upload Source</option>
+                  <option value="5">Upload Proof</option>
+                </select>
+            </div>
+            <div class = "col-sm-2">
+                <select class="mdb-select md-form" name="editbox" onchange="this.form.submit()">
+                  <option value="" disabled selected>Modify/Edit</option>
+                  <option value="1">Modify Item</option>
+                  <option value="2">Match Items</option>
+                  <option value="3">Accept Items</option>
+                  <option value="4">Delivery Complete</option>
+                  <option value="5">Empty</option>
+                </select>
+            </div>
+            <div class = "col-sm-2">
+                <select class="mdb-select md-form" name="invobox" onchange="this.form.submit()">
+                  <option value="" disabled selected>Invoicing</option>
+                  <option value="1">Invoice Editor</option>
+                  <option value="2">Quote Editor</option>
+                  <option value="3">Package Editor</option>
+                </select>
+            </div>
+            <div class = "col-sm-2">
+                <select class="mdb-select md-form" name="launchbox" onchange="this.form.submit()">
+                  <option value="" disabled selected>Perform Tasks</option>
+                  <option value="1">Assign Drivers</option>
+                  <option value="2">Driver Hours</option>
+                  <option value="3">Truck Logs</option>
+                  <option value="3">Maintenance Logs</option>
+                  <option value="3">Trucking Payroll</option>
+                </select>
+            </div>
+            <div class = "col-sm-2">
+                <select class="mdb-select md-form">
+                  <option value="" disabled selected>Undo/Delete</option>
+                  <option value="1">Delete Item</option>
+                  <option value="2">Undo the Invoice</option>
+                  <option value="3">Undo the Payment</option>
+                </select>
+            </div>
+        </div>
+        </small>
+
+    </div>
 </div>
