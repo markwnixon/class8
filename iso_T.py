@@ -88,6 +88,7 @@ def isoT():
         from InterchangeFuncs import InterStrip, InterMatchThis, InterDupThis, PushJobsThis
         from invoice_mimemail import invoice_mimemail
         from invoice_makers import multi_inv
+        from gledger_write import gledger_write
 
         # Zero and blank items for default
         username = session['username'].capitalize()
@@ -946,7 +947,6 @@ def isoT():
                 for aoder in alist:
                     thisodat = Orders.query.get(aoder)
                     jo = thisodat.Jo
-                    from gledger_write import gledger_write
                     gledger_write('invoice', jo, 0, 0)
                     thisodat.Istat = 2
                     db.session.commit()
@@ -959,7 +959,6 @@ def isoT():
                 mm1 = 0
             else:
                 jo = odat.Jo
-                from gledger_write import gledger_write
                 gledger_write('invoice',jo,0,0)
                 odat.Istat = 2
                 db.session.commit()
@@ -1011,7 +1010,6 @@ def isoT():
                 odat.Istat = 3
                 db.session.commit()
             emailin1 = invoice_mimemail(jo, order, docref, invo)
-            from gledger_write import gledger_write
             gledger_write('invoice',jo,0,0)
             invo = 0
             invooder = 0
@@ -1416,7 +1414,6 @@ def isoT():
                         for data in ldata:
                             data.Status = 'P'
 
-                    from gledger_write import gledger_write
                     gledger_write('income',invojo,acctdb,0)
 
                 from make_T_invoice import T_invoice
@@ -2064,7 +2061,7 @@ def isoT():
         stampdata = [3, 35, 35, 5, 120, 100, 5, 477, 350]
         leftsize = 10
         err = ['All is well', ' ', ' ', ' ',  ' ']
-        thismuch = '2'
+        thismuch = '1'
 
     if modlink == 20:
         fdata = myoslist(int_path)
