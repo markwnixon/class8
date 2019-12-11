@@ -1812,7 +1812,7 @@ def isoT():
             input = Orders(Status='00', Jo=nextjo, Load=a[1], Order=a[2], Company=company, Location=None, Booking=a[4], BOL=a[3], Container=a[5],
                            Date=a[8], Driver=None, Company2=company2, Time=a[9], Date2=a[11], Time2=a[12], Seal=a[14], Pickup=a[6], Delivery=None,
                            Amount=a[13], Path=None, Original=filesel, Description=None, Chassis=None, Detention='0', Storage='0',
-                           Release=0, Shipper=a[0], Type=a[15], Time3=None, Bid=idb, Lid=idl, Did=idd, Label=label, Dropblock1=newdrop1, Dropblock2=newdrop2, Commodity=None, Packing=None, Links=None)
+                           Release=0, Shipper=a[0], Type=a[15], Time3=None, Bid=idb, Lid=idl, Did=idd, Label=label, Dropblock1=newdrop1, Dropblock2=newdrop2, Commodity=None, Packing=None, Links=None, Hstat=0, Istat=0, Proof=None)
             db.session.add(input)
             db.session.commit()
             modata = Orders.query.filter(Orders.Jo == nextjo).first()
