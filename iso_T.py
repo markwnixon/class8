@@ -134,6 +134,7 @@ def isoT():
 
         holdvec = [0]*3
         oder, poof, tick, serv, peep, invo, invooder, cache, modlink = get_ints()
+        print('Line 137 peep modlink', peep, modlink)
         quot = 0
 
         stamp = request.values.get('stamp')
@@ -1217,7 +1218,7 @@ def isoT():
             modata = People.query.filter((People.Company == 'New') &
                                          (People.Ptype == 'Trucking')).first()
             peep = modata.id
-            err = [' ', ' ', 'Enter Data for New Company', ' ',  ' ']
+            err = ['Enter Data for New Company', ' ',  ' ']
 
         if addE is not None and numchecked > 1:
             modlink = 0
