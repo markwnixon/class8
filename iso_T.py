@@ -285,7 +285,7 @@ def isoT():
                 docref = f'tmp/{scac}/processing/tjobs/'+filesel
                 doctxt = docref.split('.', 1)[0]+'.txt'
                 modata = Orders.query.get(oder)
-
+        print(update,modlink,tick)
         if update is not None and modlink == 1:
             if oder > 0:
                 fdata = myoslist(job_path)

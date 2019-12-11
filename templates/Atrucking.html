@@ -385,7 +385,6 @@
 
             {% elif (tick>0 and modlink==1) or modlink==20 or modlink==21 %}
                 {% include 'includes/_button_upd_ret.html' %}
-                <button type="submit" class="btn btn-danger btn-sm" name="DELF">DEL-F</button>
             {% elif serv>0 and modlink==1 %}
                  {% include 'includes/_button_upd_ret.html' %}
             {% elif peep>0 and (modlink==1 or modlink==4) %}
@@ -433,7 +432,7 @@
                <tbody>
                <tr>
                  <td colspan="2">
-                 <input type = "hidden" name="modlink" value="{{modlink}}">
+                 <input type = "hidden" name="passmodlink" value="{{modlink}}">
                  <select class="form-control" type="text" name="FileSel" onchange="this.form.submit()">
                     <option value='1'>Choose Source Document for New Job</option>
                     {% for data in fdata %}
@@ -894,20 +893,20 @@
 
                 </tbody></table>
                 <input type = "hidden" name ="poof" value= {{poof}}>
-                <input type = "hidden" name ="modlink" value= {{modlink}}>
+                <input type = "hidden" name ="passmodlink" value= {{modlink}}>
 
                 {% endif %}
 
                 {% if (tick > 0 and modlink == 1) or modlink==20 %}
-                <input type = "hidden" name="modlink" value="{{modlink}}">
-                <input type = "hidden" name ="tick" value= "{{tick}}">
+                    <input type = "hidden" name="passmodlink" value="{{modlink}}">
+                    <input type = "hidden" name ="tick" value= "{{tick}}">
 
-                <table class="table table-condensed table-hover">
-                <tbody>
+                    <table class="table table-condensed table-hover">
+                    <tbody>
 
-                {% if fdata != 0 %}
-                <tr>
-                  <td colspan="2">
+                    {% if fdata != 0 %}
+                    <tr>
+                    <td colspan="2">
 
                    <select class="form-control" type="text" name="FileSel" onchange="this.form.submit()">
                       <option value='1'>Choose Source Document for Ticket</option>
@@ -1040,7 +1039,7 @@
 
 
                 {% endif %}
-            {% if username == 'Markn' %}
+            {% if username == 'Mark' %}
                <br><br><br><br><br><br>
                <table>
                    <tr align="center">
