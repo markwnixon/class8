@@ -335,10 +335,14 @@
                 {% else %}
                     {% set atc1="font-weight-bold text-center" %}
                 {% endif %}
+                {% set dest = data.Dest %}
+                {% if dest %}
+                    {% set dest = dest[0:10] %}
+                {% endif %}
             <tr>
                 <td class="{{atc1}}"  >{{ data.Booking }}</td>
                 <td class="{{atc1}}"  >{{ data.Jo }}</td>
-                <td class="{{atc1}}"  >{{ data.Dest[0:10]}}</td>
+                <td class="{{atc1}}"  >{{ dest }}</td>
                 <td class="{{atc1}}"  ><input class="align-middle" type="checkbox" name="book{{data.id}}" value="{{data.id}}"></td>
                 <td class="{{atc1}}"  >{{ data.PortCut}}</td>
                 <td class="{{atc1}}"  >{{ data.Vessel[0:10]}}</td>
