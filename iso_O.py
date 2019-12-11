@@ -2,7 +2,7 @@ from runmain import db
 from models import Vehicles, Invoices, JO, Income, Orders, Bills, Accounts, Bookings, OverSeas, Autos, People, Interchange, Drivers
 from models import ChalkBoard, Proofs, Services, TruckJobs
 from flask import render_template, flash, redirect, url_for, session, logging, request
-from CCC_system_setup import myoslist, addpath, usernames, passwords, tpath, companydata
+from CCC_system_setup import myoslist, addpath, usernames, passwords, tpath, companydata, scac
 
 import math
 from decimal import Decimal
@@ -187,6 +187,48 @@ def isoO():
         invooder = nonone(invooder)
         cache = nonone(cache)
         stayslim = nonone(stayslim)
+
+        thisbox = request.values.get('addbox')
+        if thisbox == '1':
+            newjob = 1
+        if thisbox == '2':
+            addE = 1
+        if thisbox == '3':
+            addS = 1
+        if thisbox == '4':
+            copy = 1
+        if thisbox == '5':
+            mm2 = 1
+        if thisbox == '6':
+            uploadS = 1
+        if thisbox =='7':
+            uploadP = 1
+
+        thisbox = request.values.get('editbox')
+        if thisbox == '1':
+            vmod = 1
+        if thisbox == '2':
+            match = 1
+        if thisbox == '3':
+            acceptthese = 1
+        if thisbox == '4':
+            loadc = 1
+
+        thisbox = request.values.get('invobox')
+        if thisbox == '1':
+            minvo = 1
+        if thisbox == '2':
+            mquot = 1
+        if thisbox == '3':
+            mpack = 1
+
+        thisbox = request.values.get('xbox')
+        if thisbox == '1':
+            deletehit = 1
+        if thisbox == '2':
+            uninv = 1
+        if thisbox == '3':
+            unpay = 1
 
         if returnhit is not None:
             modlink = 0

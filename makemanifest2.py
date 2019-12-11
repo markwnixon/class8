@@ -13,7 +13,7 @@ def makemanifestT(odata, pdata1, pdata2, pdata3, tdata, drvdata, cache, jtype, t
     import datetime
     import shutil
     from viewfuncs import parseline, parselinenoupper
-    from CCC_system_setup import manfile, addpath, bankdata
+    from CCC_system_setup import manfile, addpath, bankdata, scac
 
 
     joborder=odata.Jo
@@ -196,7 +196,7 @@ def makemanifestT(odata, pdata1, pdata2, pdata3, tdata, drvdata, cache, jtype, t
 
 
     line1=['SCAC', 'Driver', 'Truck #', 'Tag #', 'Size/Type', labc, 'Bill of Lading', 'Seal']
-    line1a=['OSLM', driver, truck, tag, type, container, bol, seal]
+    line1a=[scac, driver, truck, tag, type, container, bol, seal]
     for j,item in enumerate(line1a):
         if item is None:
             line1a[j]=' '

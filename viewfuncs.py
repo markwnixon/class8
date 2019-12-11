@@ -1280,54 +1280,100 @@ def docuploader(dbase):
         odat = Orders.query.get(oder)
         base = odat.Jo
 
-    file = request.files['sourceupload']
-    if file.filename == '':
-        err.append('No source file selected for uploading')
+        file = request.files['sourceupload']
+        if file.filename == '':
+            err.append('No source file selected for uploading')
 
-    if file and allowed_file(file.filename):
-        name, ext = os.path.splitext(file.filename)
-        filename1 = f'Source_{base}{ext}'
-        filename2 = f'Source_{base}.pdf'
-        output1 = addpath(tpath(dbase,filename1))
-        output2 = addpath(tpath(dbase,filename2))
-        file.save(output1)
-        if filename1 != filename2:
-            try:
-                with open(output2,"wb") as f:
-                    f.write(img2pdf.convert(output1))
-                os.remove(output1)
-            except:
-                err.append(f'Problem converting {filename1} to pdf')
-                filename2 = filename1
-        err.append(f'Source uploaded as {filename2}')
-        odat.Original = filename2
-        db.session.commit()
-    else:
-        err.append('Allowed file types are txt, pdf, png, jpg, jpeg, gif')
+        if file and allowed_file(file.filename):
+            name, ext = os.path.splitext(file.filename)
+            filename1 = f'Source_{base}{ext}'
+            filename2 = f'Source_{base}.pdf'
+            output1 = addpath(tpath(dbase,filename1))
+            output2 = addpath(tpath(dbase,filename2))
+            file.save(output1)
+            if filename1 != filename2:
+                try:
+                    with open(output2,"wb") as f:
+                        f.write(img2pdf.convert(output1))
+                    os.remove(output1)
+                except:
+                    err.append(f'Problem converting {filename1} to pdf')
+                    filename2 = filename1
+            err.append(f'Source uploaded as {filename2}')
+            odat.Original = filename2
+            db.session.commit()
+        else:
+            err.append('Allowed file types are txt, pdf, png, jpg, jpeg, gif')
 
-    file = request.files['proofupload']
-    if file.filename == '':
-        err.append('No file selected for uploading')
+    if dbase == 'poof':
+        oder = request.values.get('passoder')
+        oder = nonone(oder)
+        print(oder)
+        odat = Orders.query.get(oder)
+        base = odat.Jo
 
-    if file and allowed_file(file.filename):
-        name, ext = os.path.splitext(file.filename)
-        filename1 = f'Proof_{base}{ext}'
-        filename2 = f'Proof_{base}.pdf'
-        output1 = addpath(tpath('poof',filename1))
-        output2 = addpath(tpath('poof',filename2))
-        file.save(output1)
-        if filename1 != filename2:
-            try:
-                with open(output2,"wb") as f:
-                    f.write(img2pdf.convert(output1))
-                os.remove(output1)
-            except:
-                err.append(f'Problem converting {filename1}to pdf')
-                filename2 = filename1
-        err.append(f'Proof uploaded as {filename2}')
-        odat.Proof = filename2
-        db.session.commit()
-    else:
-        err.append('Allowed file types are txt, pdf, png, jpg, jpeg, gif')
+        file = request.files['proofupload']
+        if file.filename == '':
+            err.append('No file selected for uploading')
+
+        if file and allowed_file(file.filename):
+            name, ext = os.path.splitext(file.filename)
+            filename1 = f'Proof_{base}{ext}'
+            filename2 = f'Proof_{base}.pdf'
+            output1 = addpath(tpath('poof',filename1))
+            output2 = addpath(tpath('poof',filename2))
+            file.save(output1)
+            if filename1 != filename2:
+                try:
+                    with open(output2,"wb") as f:
+                        f.write(img2pdf.convert(output1))
+                    os.remove(output1)
+                except:
+                    err.append(f'Problem converting {filename1}to pdf')
+                    filename2 = filename1
+            err.append(f'Proof uploaded as {filename2}')
+            odat.Proof = filename2
+            db.session.commit()
+        else:
+            err.append('Allowed file types are txt, pdf, png, jpg, jpeg, gif')
 
     return err
+
+def dataget_T(thismuch, dlist):
+    # 0=order,#2=interchange,#3=people/services
+    today = datetime.date.today()
+    stopdate = today-datetime.timedelta(days=60)
+    odata = 0
+    idata = 0
+    if thismuch == '1':
+        stopdate = today-datetime.timedelta(days=60)
+        if dlist[0] == 'on':
+            odata = Orders.query.filter(Orders.Date > stopdate).all()
+        if dlist[2] == 'on':
+            idata = Interchange.query.filter(
+                (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
+    elif thismuch == '2':
+        stopdate = today-datetime.timedelta(days=120)
+        if dlist[0] == 'on':
+            odata = Orders.query.filter(Orders.Date > stopdate).all()
+        if dlist[2] == 'on':
+            idata = Interchange.query.filter(
+                (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
+    elif thismuch == '3':
+        if dlist[0] == 'on':
+            odata = Orders.query.filter(Orders.Istat<2).all()
+        if dlist[2] == 'on':
+            idata = Interchange.query.filter(
+                (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
+    elif thismuch == '4':
+        if dlist[0] == 'on':
+            odata = Orders.query.filter(Orders.Istat<4).all()
+        if dlist[2] == 'on':
+            idata = Interchange.query.filter(
+                (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
+    else:
+        if dlist[0] == 'on':
+            odata = Orders.query.all()
+        if dlist[2] == 'on':
+            idata = Interchange.query.all()
+    return odata, idata

@@ -1,20 +1,125 @@
-<div class="custom-control custom-checkbox custom-control-inline">
-  <input type="checkbox" class="custom-control-input" id="defaultInline1" {% if dlist[0]=='on' %} checked {% endif %} name="datatable1" onchange="this.form.submit()">
-  <label class="custom-control-label" for="defaultInline1">Ocean Shipping</label>
+
+<div class="d-sm-flex justify-content-between align-self-baseline">
+    <div class="p-2">
+        <b>Ocean Tables:</b>&nbsp
+            <div class="custom-control custom-checkbox custom-control-inline">
+              <input type="checkbox" class="custom-control-input" id="defaultInline1" {% if dlist[0]=='on' %} checked {% endif %} name="datatable1" onchange="this.form.submit()">
+              <label class="custom-control-label" for="defaultInline1">Ocean Shipping</label>
+            </div>
+            <div class="custom-control custom-checkbox custom-control-inline">
+              <input type="checkbox" class="custom-control-input" id="defaultInline2" {% if dlist[1]=='on' %} checked {% endif %} name="datatable2" onchange="this.form.submit()">
+              <label class="custom-control-label" for="defaultInline2">Automobiles</label>
+            </div>
+            <div class="custom-control custom-checkbox custom-control-inline">
+              <input type="checkbox" class="custom-control-input" id="defaultInline3" {% if dlist[2]=='on' %} checked {% endif %} name="datatable3" onchange="this.form.submit()">
+              <label class="custom-control-label" for="defaultInline3">Bookings</label>
+            </div>
+            <div class="custom-control custom-checkbox custom-control-inline">
+              <input type="checkbox" class="custom-control-input" id="defaultInline4" {% if dlist[3]=='on' %} checked {% endif %} name="datatable4" onchange="this.form.submit()">
+              <label class="custom-control-label" for="defaultInline4">Ocean Entities</label>
+            </div>
+            <div class="custom-control custom-checkbox custom-control-inline">
+              <input type="checkbox" class="custom-control-input" id="defaultInline5" {% if dlist[4]=='on' %} checked {% endif %} name="datatable5" onchange="this.form.submit()">
+              <label class="custom-control-label" for="defaultInline5">Interchange</label>
+            </div>
+    </div>
+        <div class="p-0">
+    <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="NewJ"
+      data-toggle="tooltip" title="Add a NEW JOB from scratch here">   New<br>&nbsp &nbsp Job &nbsp &nbsp  </button>
+->
+          <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="Vmod"
+        data-toggle="tooltip" title="MODIFY information associated with any selected item">Modify<br>Item</button>
+->
+          <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="Dockr"
+        data-toggle="tooltip" title="CREATE dock receipt">Dock<br>Receipt</button>
+->
+              <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="MakeI"
+        data-toggle="tooltip" title="Create and Edit an Invoice">Invoice<br>Editor</button>
+->
+            <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="incoming_O"
+        data-toggle="tooltip" title="Pay for Shipping Costs Associated with Jobs">Pay For<br>Shipping</button>
+->
+            <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="RecPay"
+        data-toggle="tooltip" title="Receive money and apply toward a selected Job/Invoice">Recieve<br>Money</button>
+    </div>
 </div>
-<div class="custom-control custom-checkbox custom-control-inline">
-  <input type="checkbox" class="custom-control-input" id="defaultInline2" {% if dlist[1]=='on' %} checked {% endif %} name="datatable2" onchange="this.form.submit()">
-  <label class="custom-control-label" for="defaultInline2">Automobiles</label>
-</div>
-<div class="custom-control custom-checkbox custom-control-inline">
-  <input type="checkbox" class="custom-control-input" id="defaultInline3" {% if dlist[2]=='on' %} checked {% endif %} name="datatable3" onchange="this.form.submit()">
-  <label class="custom-control-label" for="defaultInline3">Bookings</label>
-</div>
-<div class="custom-control custom-checkbox custom-control-inline">
-  <input type="checkbox" class="custom-control-input" id="defaultInline4" {% if dlist[3]=='on' %} checked {% endif %} name="datatable4" onchange="this.form.submit()">
-  <label class="custom-control-label" for="defaultInline4">Ocean Entities</label>
-</div>
-<div class="custom-control custom-checkbox custom-control-inline">
-  <input type="checkbox" class="custom-control-input" id="defaultInline5" {% if dlist[4]=='on' %} checked {% endif %} name="datatable5" onchange="this.form.submit()">
-  <label class="custom-control-label" for="defaultInline5">Interchange</label>
+
+<div class="d-sm-flex justify-content-between small">
+    <div class="p-0">
+        <select class="mdb-select md-form" name="thismuch" onchange="this.form.submit()">
+            <option value="" disabled selected>Filter Table</option>
+            <option {% if thismuch == '1' %} selected {% endif %} value='1'>Filter: Last 60 Days</option>
+            <option {% if thismuch == '2' %} selected {% endif %} value='2'>Filter: Last 120 Days</option>
+            <option {% if thismuch == '3' %} selected {% endif %} value='3'>Filter: Uninvoiced</option>
+            <option {% if thismuch == '4' %} selected {% endif %} value='4'>Filter: Unpaid</option>
+            <option {% if thismuch == '5' %} selected {% endif %} value='5'>Filter: Show All</option>
+        </select>
+    </div>
+    <div class="p-0">
+        <select class="mdb-select md-form" name="addbox" onchange="this.form.submit()">
+            <option value="" disabled selected>Add & Upload</option>
+            <option value="1">New Job</option>
+            <option value="2">New Customer</option>
+            <option value="3">New Services</option>
+            <option value="4">New from Copy</option>
+            <option value="5">Make Manifest</option>
+            <option value="6">Upload Source</option>
+            <option value="7">Upload Proof</option>
+        </select>
+    </div>
+    <div class="p-0">
+        <select class="mdb-select md-form" name="editbox" onchange="this.form.submit()">
+            <option value="" disabled selected>Modify/Edit</option>
+            <option value="1">Modify Item</option>
+            <option value="2">Match Items</option>
+            <option value="3">Accept Items</option>
+            <option value="4">Delivery Complete</option>
+            <option value="5">Empty</option>
+        </select>
+    </div>
+    <div class="p-0">
+        <select class="mdb-select md-form" name="invobox" onchange="this.form.submit()">
+            <option value="" disabled selected>Invoices/Quotes</option>
+            <option value="1">Invoice Editor</option>
+            <option value="2">Quote Editor</option>
+            <option value="3">Package Editor</option>
+        </select>
+    </div>
+    <div class="p-0">
+        <select class="mdb-select md-form" name="launchbox" onchange="this.form.submit()">
+            <option value="" disabled selected>Overseas Tasks</option>
+            <option value="1">Shipper Report</option>
+            <option value="2">Release Status</option>
+            <option value="3">Auto Scanner</option>
+        </select>
+    </div>
+    <div class="p-0">
+        <select class="mdb-select md-form" name="xbox" onchange="this.form.submit()">
+            <option value="" disabled selected>Undo/Delete</option>
+            <option value="1">Delete Item</option>
+            <option value="2">Undo the Invoice</option>
+            <option value="3">Undo the Payment</option>
+        </select>
+    </div>
+    <div class="p-0">
+        <select class="mdb-select md-form" name="viewbox" onchange="this.form.submit()">
+            <option value="" disabled selected>View Items</option>
+            <option value="1">Dock Receipt</option>
+            <option value="2">Booking Source</option>
+            <option value="3">Invoice</option>
+        </select>
+    </div>
+    <div class="p-0">
+        <select class="mdb-select md-form" name="vidbox" onchange="this.form.submit()">
+            <option value="" disabled selected>Overseas Tutorials</option>
+            <option value="1">Overview</option>
+            <option value="2">Overseas Tables</option>
+            <option value="3">Work Flow Example</option>
+            <option value="4">Making New Jobs</option>
+            <option value="5">Modifying Jobs</option>
+            <option value="6">Invoicing and Quotes</option>
+            <option value="7">Overseas Tasks</option>
+            <option value="8">Deleting Items</option>
+        </select>
+    </div>
 </div>

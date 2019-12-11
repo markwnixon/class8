@@ -39,7 +39,7 @@ def reportsettings(squeeze):
     m5=hls-18*dl
     m6=hls-23*dl
     m7=hls-27*dl
-    n1=350
+    n1=550
     n2=n1-dl
     n3=hls-27*dl
 
@@ -705,6 +705,7 @@ def custcontents(file4,itemlist,headerlist,pstops,cache):
         end=today
 
     ltm,rtm,bump,tb,ctrall,left_ctr,right_ctr,dl,dh,tdl,hls,m1,m2,m3,m4,m5,m6,m7,n1,n2,n3=reportsettings(1)
+    mtop = n1
 
     pages=[file4]
     page=1
@@ -712,7 +713,6 @@ def custcontents(file4,itemlist,headerlist,pstops,cache):
     c.setLineWidth(1)
     bottomy=n3
     complete=0
-    mtop=n1
     ptot=0.0
     for p in pstops:
         ptot=ptot+p
@@ -734,6 +734,7 @@ def custcontents(file4,itemlist,headerlist,pstops,cache):
     p5=rtm-120
     p6=rtm-80
     p7=rtm-40
+
 
     totals=[0.0,0.0]
 

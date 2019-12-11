@@ -48,6 +48,7 @@ def send_file1():
             filename2 = filename1
     odat.Original = filename2
     db.session.commit()
+    print('file uploaded')
     return "successful_upload"
 
 @app.route('/sendfile2', methods=['GET', 'POST'])
@@ -72,6 +73,7 @@ def send_file2():
             filename2 = filename1
     odat.Proof = filename2
     db.session.commit()
+    print('file uploaded')
     return "successful_upload"
 
 
@@ -466,14 +468,14 @@ def MovingV():
 @app.route('/Trucking', methods=['GET', 'POST'])
 def Trucking():
     from iso_T import isoT
-    bklist, lastpr, thismuch, etitle, ebody, emaildata, odata, pdata, idata, sdata, cdata, oder, poof, sdata2, tick, serv, peep, err, modata, caldays, daylist, nweeks, howapp, modlink, leftscreen, docref, stayslim, leftsize, newc, tdata, drvdata,dlist, rightsize, ldata, invodate, inco, invo, quot, invooder, cache, stamp, alltdata, allvdata, stampdata, fdata, filesel, today, now, doctxt, holdvec, mm1 = isoT()
+    username, bklist, lastpr, thismuch, etitle, ebody, emaildata, odata, pdata, idata, sdata, cdata, oder, poof, sdata2, tick, serv, peep, err, modata, caldays, daylist, nweeks, howapp, modlink, leftscreen, docref, stayslim, leftsize, newc, tdata, drvdata,dlist, rightsize, ldata, invodate, inco, invo, quot, invooder, cache, stamp, alltdata, allvdata, stampdata, fdata, filesel, today, now, doctxt, holdvec, mm1 = isoT()
 
     return render_template('Atrucking.html', cmpdata=cmpdata, scac=scac, data1=odata, data2=pdata, data3=idata, data4=sdata, data5=cdata, oder=oder, poof=poof, sdata=sdata2,
                            tick=tick, serv=serv, peep=peep, err=err, modata=modata, caldays=caldays, daylist=daylist, nweeks=nweeks, howapp=howapp,
                            modlink=modlink, leftscreen=leftscreen, docref=docref, stayslim=stayslim, leftsize=leftsize, newc=newc, tdata=tdata, dlist=dlist,
                            rightsize=rightsize, ldata=ldata, invodate=invodate, inco=inco, invo=invo, invooder=invooder, cache=cache, stamp=stamp, alltdata=alltdata,
                            stampdata=stampdata, fdata=fdata, filesel=filesel, today=today, now=now, doctxt=doctxt, holdvec=holdvec, etitle=etitle, ebody=ebody,
-                           emaildata=emaildata, thismuch=thismuch, mm1=mm1, allvdata=allvdata,drvdata=drvdata, bklist = bklist, lastpr = lastpr, quot = quot)
+                           emaildata=emaildata, thismuch=thismuch, mm1=mm1, allvdata=allvdata,drvdata=drvdata, bklist = bklist, lastpr = lastpr, quot = quot, username = username)
 
 # ____________________________________________________________________________________________________________________B.STORAGE
 # ____________________________________________________________________________________________________________________B.STORAGE

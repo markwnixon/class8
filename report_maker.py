@@ -27,7 +27,7 @@ def reportmaker(type,thiscomp):
     file2=addpath(f'tmp/{scac}/data/vreport/background.pdf')
     file3=addpath(f'tmp/{scac}/data/vreport/headers.pdf')
     file4=addpath(f'tmp/{scac}/data/vreport/contents.pdf')
-    note, bank, us, lab, logoi = bankdata('FC')
+    qnote, note, bank, us, lab, logoi = bankdata('FC')
     file1=addpath(f'tmp/{scac}/data/vreport/pagestart.pdf')
 
     c=canvas.Canvas(file1, pagesize=letter)

@@ -485,9 +485,9 @@ def custcalcs(thiscomp):
             keydata_all=[odat.Jo,odat.Order,odat.Booking,odat.Container,odat.BOL]
         elif oceantype=='on':
             d1=odat.PuDate
-            keydata_all=[odat.Jo,odat.Type,odat.Booking,odat.Container,odat.BOL]
+            keydata_all=[odat.Jo,odat.MoveType,odat.Booking,odat.Container,odat.ContainerType]
 
-        keydata_all=[odat.Jo,odat.Order,odat.Booking,odat.Container,odat.BOL]
+        #keydata_all=[odat.Jo,odat.Order,odat.Booking,odat.Container,odat.BOL]
         keydata=[]
         for i in range(5):
             key=request.values.get('dc'+str(i+1))

@@ -18,57 +18,6 @@ from func_cal import calmodalupdate
 from PyPDF2 import PdfFileReader
 import json
 
-
-def dataget_T(thismuch, dlist):
-    # 0=order,#1=proofs,#2=interchange,#3=people/services
-    today = datetime.date.today()
-    stopdate = today-datetime.timedelta(days=60)
-    odata = 0
-    pdata = 0
-    idata = 0
-    if thismuch == '1':
-        stopdate = today-datetime.timedelta(days=60)
-        if dlist[0] == 'on':
-            odata = Orders.query.filter(Orders.Date > stopdate).all()
-        if dlist[1] == 'on':
-            pdata = Proofs.query.filter(Proofs.Date > stopdate).all()
-        if dlist[2] == 'on':
-            idata = Interchange.query.filter(
-                (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
-    elif thismuch == '2':
-        stopdate = today-datetime.timedelta(days=120)
-        if dlist[0] == 'on':
-            odata = Orders.query.filter(Orders.Date > stopdate).all()
-        if dlist[1] == 'on':
-            pdata = Proofs.query.filter(Proofs.Date > stopdate).all()
-        if dlist[2] == 'on':
-            idata = Interchange.query.filter(
-                (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
-    elif thismuch == '3':
-        if dlist[0] == 'on':
-            odata = Orders.query.filter(Orders.Istat<2).all()
-        if dlist[1] == 'on':
-            pdata = Proofs.query.filter(Proofs.Status != 'Paid').all()
-        if dlist[2] == 'on':
-            idata = Interchange.query.filter(
-                (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
-    elif thismuch == '4':
-        if dlist[0] == 'on':
-            odata = Orders.query.filter(Orders.Istat<4).all()
-        if dlist[1] == 'on':
-            pdata = Proofs.query.filter(Proofs.Status != 'Paid').all()
-        if dlist[2] == 'on':
-            idata = Interchange.query.filter(
-                (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
-    else:
-        if dlist[0] == 'on':
-            odata = Orders.query.all()
-        if dlist[1] == 'on':
-            pdata = Proofs.query.all()
-        if dlist[2] == 'on':
-            idata = Interchange.query.all()
-    return odata, pdata, idata
-
 def erud(err):
     errup = ''
     for e in err:
@@ -84,7 +33,7 @@ def isoT():
 
         from viewfuncs import parseline, tabdata, tabdataR, popjo, jovec, newjo, timedata, nonone, nononef, init_truck_zero, dropupdate, dropupdate2, dropupdate3
         from viewfuncs import d2s, stat_update, numcheck, numcheckv, sdiff, calendar7_weeks, viewbuttons, get_ints, containersout, numcheckvec
-        from viewfuncs import txtfile, doctransfer, getexpimp, docuploader
+        from viewfuncs import txtfile, doctransfer, getexpimp, docuploader, dataget_T
         from InterchangeFuncs import InterStrip, InterMatchThis, InterDupThis, PushJobsThis
         from invoice_mimemail import invoice_mimemail
         from invoice_makers import multi_inv
@@ -92,33 +41,17 @@ def isoT():
 
         # Zero and blank items for default
         username = session['username'].capitalize()
-        pod_path = f'processing/pods/'
-        job_path = f'processing/tjobs/'
-        int_path = f'processing/interchange/'
+        pod_path, job_path, int_path = f'processing/pods/', f'processing/tjobs/', f'processing/interchange/'
         oder, poof, tick, serv, peep, invo, cache, modata, modlink, stayslim, invooder, stamp, fdata, csize, invodate, inco, cdat, pb, passdata, vdata, caldays, daylist, weeksum, nweeks = init_truck_zero()
-        filesel = ''
-        docref = ''
-        doctxt = ''
-        etitle = ''
-        ebody = ''
-        emaildata = ''
-        stampdata = ''
-        drvdata=0
-        reorder=0
-        bklist = 0
+        filesel,docref,doctxt,etitle,ebody,emaildata,stampdata = '','','','','','',''
+        drvdata,bklist=0,0
         lastpr = request.values.get('lastpr')
-
-
 
         today = datetime.date.today()
         today_dt = datetime.date.today()
         today_str = today_dt.strftime('%Y-%m-%d')
         now = datetime.datetime.now()
         now = now.time()
-        now_str24 = now.strftime('%H:%M')
-        now_str12 = now.strftime('%I:%M %p')
-
-        leftsize = 10
         howapp = 0
         newc = 'Not found at top'
 
@@ -148,6 +81,48 @@ def isoT():
         quotupdate = request.values.get('quotUpdate')
         uploadS = request.values.get('UploadS')
         uploadP = request.values.get('UploadP')
+
+        thisbox = request.values.get('addbox')
+        if thisbox == '1':
+            newjob = 1
+        if thisbox == '2':
+            addE = 1
+        if thisbox == '3':
+            addS = 1
+        if thisbox == '4':
+            copy = 1
+        if thisbox == '5':
+            mm2 = 1
+        if thisbox == '6':
+            uploadS = 1
+        if thisbox =='7':
+            uploadP = 1
+
+        thisbox = request.values.get('editbox')
+        if thisbox == '1':
+            vmod = 1
+        if thisbox == '2':
+            match = 1
+        if thisbox == '3':
+            acceptthese = 1
+        if thisbox == '4':
+            loadc = 1
+
+        thisbox = request.values.get('invobox')
+        if thisbox == '1':
+            minvo = 1
+        if thisbox == '2':
+            mquot = 1
+        if thisbox == '3':
+            mpack = 1
+
+        thisbox = request.values.get('xbox')
+        if thisbox == '1':
+            deletehit = 1
+        if thisbox == '2':
+            uninv = 1
+        if thisbox == '3':
+            unpay = 1
 
 
 
@@ -180,6 +155,9 @@ def isoT():
 
         if modlink == 70:
             err = docuploader('oder')
+            modlink = 0
+        if modlink == 71:
+            err = docuploader('poof')
             modlink = 0
 
 # ____________________________________________________________________________________________________________________E.FormVariables.Trucking
@@ -583,21 +561,16 @@ def isoT():
 # ____________________________________________________________________________________________________________________E.InvoiceUpdate.Trucking
 
 # ____________________________________________________________________________________________________________________B.GetData.Trucking
-        odata, pdata, idata = dataget_T(thismuch, dlist)
-        ##query.filter(or_(MyTable.info == None, ~MyTable.info.contains(['Recalled'])))
-        #pdata = Proofs.query.order_by(Proofs.Date).all()
-        #idata = Interchange.query.order_by(Interchange.Date.desc()).order_by(Interchange.Time.desc()).all()
+        odata, idata = dataget_T(thismuch, dlist)
         sdata = Services.query.order_by(Services.Price.desc()).all()
         cdata = People.query.filter(People.Ptype == 'Trucking').order_by(People.Company).all()
 # ____________________________________________________________________________________________________________________E.GetData.Trucking
 # ____________________________________________________________________________________________________________________B.Search.Trucking
 
         if (modlink < 10 and (update is not None or vmod is not None)) or modlink == 0:
-            oder, poof, tick, serv, peep, numchecked = numcheck(5, odata, pdata, idata, sdata, cdata, [
-                                                                'oder', 'poof', 'tick', 'serv', 'peep'])
+            oder, tick, serv, peep, numchecked = numcheck(4, odata, idata, sdata, cdata, 0, ['oder',  'tick', 'serv', 'peep'])
         if match is not None or mm1 > 0:
-            oder, poof, tick, serv, peep, numchecked = numcheck(5, odata, pdata, idata, sdata, cdata, [
-                                                                'oder', 'poof', 'tick', 'serv', 'peep'])
+            oder, tick, serv, peep, numchecked = numcheck(4, odata, idata, sdata, cdata, 0, ['oder', 'tick', 'serv', 'peep'])
 
 
         if uploadS is not None:
@@ -613,7 +586,7 @@ def isoT():
         if uploadP is not None:
             err = ['No Job Selected for Proof Upload']
             if oder > 0  and numchecked == 1:
-                modlink = 70
+                modlink = 71
                 modata = Orders.query.get(oder)
                 modata.Proof = 'star'
                 db.session.commit()
@@ -1863,16 +1836,8 @@ def isoT():
                                Seal=myo.Seal, Pickup=myo.Pickup, Delivery=None, Amount=myo.Amount, Path=None, Original=original,
                                Description=myo.Description, Chassis=myo.Chassis, Detention='0', Storage='0', Release=0, Shipper=myo.Shipper,
                                Type=myo.Type, Time3=None, Bid=myo.Bid, Lid=myo.Lid, Did=myo.Did, Label=myo.Label, Dropblock1=myo.Dropblock1,
-                               Dropblock2=myo.Dropblock2, Commodity=myo.Commodity,Packing=myo.Packing, Links=myo.Links)
-                db.session.add(input)
-                db.session.commit()
-
-            if poof > 0 and numchecked == 1:
-                myp = Proofs.query.get(poof)
-                input = Proofs(Status='Unmatched', Original='', Path='',
-                               Company=myp.Company, Location=myp.Location, Booking=myp.Booking,
-                               Order=myp.Order, BOL=myp.BOL, Container=myp.Container, Driver=myp.Driver,
-                               Date=today, Time=now)
+                               Dropblock2=myo.Dropblock2, Commodity=myo.Commodity,Packing=myo.Packing, Links=myo.Links, Hstat=-1,
+                               Istat=-1,Proof=myo.Proof)
                 db.session.add(input)
                 db.session.commit()
 
@@ -1937,6 +1902,9 @@ def isoT():
                         odat.Hstat = 0
                         db.session.commit()
                         Order_Container_Update(i)
+                    if odat.Istat == -1:
+                        odat.Istat = 0
+                        db.session.commit()
                 else:
                     err[0] = 'All status must contain A'
                     err[2] = 'Must check exactly one box to use this option'
@@ -2029,7 +1997,8 @@ def isoT():
 # ____________________________________________________________________________________________________________________E.Calendar.Trucking
     # This is the else for 1st time through (not posting data from overseas.html)
     else:
-        from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero
+        from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero, dataget_T
+        username = session['username'].capitalize()
         today = datetime.date.today()
         #today = datetime.datetime.today().strftime('%Y-%m-%d')
         now = datetime.datetime.now().strftime('%I:%M %p')
@@ -2073,12 +2042,13 @@ def isoT():
         fdata = myoslist(job_path)
         fdata.sort()
 
-    odata, pdata, idata = dataget_T(thismuch, dlist)
+    odata, idata = dataget_T(thismuch, dlist)
     alltdata = Drivers.query.all()
     allvdata = Vehicles.query.all()
-    leftsize=8
+    leftsize=9
     rightsize = 12-leftsize
     sdata2 = Services.query.order_by(Services.Service).all()
     err = erud(err)
+    pdata = 0
 
-    return bklist, lastpr, thismuch, etitle, ebody, emaildata, odata, pdata, idata, sdata, cdata, oder, poof, sdata2, tick, serv, peep, err, modata, caldays, daylist, nweeks, howapp, modlink, leftscreen, docref, 0, leftsize, newc, tdata, drvdata, dlist, rightsize, ldata, invodate, inco, invo, quot, invooder, cache, stamp, alltdata, allvdata, stampdata, fdata, filesel, today, now, doctxt, holdvec, mm1
+    return username, bklist, lastpr, thismuch, etitle, ebody, emaildata, odata, pdata, idata, sdata, cdata, oder, poof, sdata2, tick, serv, peep, err, modata, caldays, daylist, nweeks, howapp, modlink, leftscreen, docref, 0, leftsize, newc, tdata, drvdata, dlist, rightsize, ldata, invodate, inco, invo, quot, invooder, cache, stamp, alltdata, allvdata, stampdata, fdata, filesel, today, now, doctxt, holdvec, mm1

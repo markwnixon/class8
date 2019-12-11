@@ -153,10 +153,13 @@
 </div>
 {% endif %}
 
+<!--
 <br>
 {% if dlist[0]=='on' and dlist[1]!='on' and dlist[2]!='on' and dlist[3]!='on'%}
-{% include 'includes/_truckcolorcode.html' %}
+
+ {% include 'includes/_truckcolorcode.html' %}
 {% endif %}
+-->
 
 
 
@@ -376,6 +379,9 @@
             {% elif modlink==70 %}
                 <br>
                 {% include 'includes/_uploadsourcedocs.html' %}
+            {% elif modlink==71 %}
+                <br>
+                {% include 'includes/_uploadproofdocs.html' %}
 
             {% elif (tick>0 and modlink==1) or modlink==20 or modlink==21 %}
                 {% include 'includes/_button_upd_ret.html' %}
@@ -415,9 +421,11 @@
             {% elif stamp==0 and modlink != 4 and mm1 !=1 %}
                 <br>
                 {% include 'includes/_controlpanelheader.html' %}
+                {% include 'includes/_truckcolorcode.html' %}
+             <!--
                 {% include 'includes/_controlpanelT.html' %}
                 {% include 'includes/_selectpanel.html' %}
-                {% include 'includes/_tutorialpanel.html' %}
+                {% include 'includes/_tutorialpanel.html' %} -->
 
             {% elif modlink==4 and peep==0 %}
 
@@ -1032,7 +1040,7 @@
 
 
                 {% endif %}
-
+            {% if username == 'Markn' %}
                <br><br><br><br><br><br>
                <table>
                    <tr align="center">
@@ -1067,7 +1075,7 @@
                    <tr align="left"><td>mm1={{mm1}}</td></tr>
                    <tr align="left"><td>quot={{quot}}</td></tr>
                </table>
-               newc={{newc}}
+                {% endif %}
 
 
 
