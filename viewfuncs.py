@@ -1350,15 +1350,13 @@ def dataget_T(thismuch, dlist):
         if dlist[0] == 'on':
             odata = Orders.query.filter(Orders.Date > stopdate).all()
         if dlist[2] == 'on':
-            idata = Interchange.query.filter(
-                (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
+            idata = Interchange.query.filter((Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
     elif thismuch == '2':
         stopdate = today-datetime.timedelta(days=120)
         if dlist[0] == 'on':
             odata = Orders.query.filter(Orders.Date > stopdate).all()
         if dlist[2] == 'on':
-            idata = Interchange.query.filter(
-                (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
+            idata = Interchange.query.filter((Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
     elif thismuch == '3':
         if dlist[0] == 'on':
             odata = Orders.query.filter(Orders.Istat<2).all()
@@ -1376,5 +1374,4 @@ def dataget_T(thismuch, dlist):
             odata = Orders.query.all()
         if dlist[2] == 'on':
             idata = Interchange.query.all()
-    idata = Interchange.query.all()
     return odata, idata
