@@ -1376,4 +1376,5 @@ def dataget_T(thismuch, dlist):
             odata = Orders.query.all()
         if dlist[2] == 'on':
             idata = Interchange.query.all()
+    idata = Interchange.query.all()
     return odata, idata
