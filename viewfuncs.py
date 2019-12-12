@@ -54,6 +54,38 @@ def d1s(instr):
         outstr=instr
     return outstr
 
+def testdrop(dblock):
+    idret = 0
+    xtest = 'xxx'
+    newdrop = dblock
+    company = 'None'
+    dblock2 = dblock.strip()
+    ltest = len(dblock2)
+    print('ltest=',ltest)
+    if ltest == 3:
+        sfind = dblock2.lower()
+        if sfind == 'bal':
+            xtest = 'sea'
+        ddata = Drops.query.all()
+        for ddat in ddata:
+            entity = ddat.Entity
+            entity = entity.strip()
+            scomp = entity[0:3]
+            scomp = scomp.lower()
+            print(sfind,scomp)
+            if sfind == scomp or xtest == scomp:
+                idret = ddat.id
+                a1 = nons(ddat.Entity)
+                a2 = nons(ddat.Addr1)
+                a3 = nons(ddat.Addr2)
+                a4 = nons(ddat.Phone)
+                a5 = nons(ddat.Email)
+                newdrop = a1 + '\n' + a2 + '\n' + a3 + '\n' + a4 + '\n' + a5
+                company = a1
+                print('Found:',a1,a2,a3,a4,a5)
+                break
+    return idret, newdrop, company
+
 def dropupdate(dropblock):
     droplist=dropblock.splitlines()
     avec=[' ']*5

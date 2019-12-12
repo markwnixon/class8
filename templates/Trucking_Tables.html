@@ -1,0 +1,280 @@
+
+{% if dlist[0]=='on' %}
+<div class="row">
+<div class="col-sm-12" align="center">
+{% include 'includes/_tablespanelT.html' %}
+</div>
+</div>
+
+
+
+  <div class="row">
+    <div class="col-sm-12">
+        <table id="{{dt1}}" class="table  table-striped table-bordered  table-hover w-auto"  width="100%">
+            <thead>
+            <tr class="amber lighten-4 text-center" >
+                <th style="font-weight:bold">Job Order</th>
+                <th style="font-weight:bold">Bill To Company</th>
+                <th style="font-weight:bold">Order Number</th>
+                <th style="font-weight:bold">Delivery Date</th>
+                <th style="font-weight:bold">Return Date</th>
+                <th style="font-weight:bold">Booking No.</th>
+                <th style="font-weight:bold">Container No.</th>
+                <th style="font-weight:bold">Chk</th>
+                <th style="font-weight:bold">Container Type</th>
+                <th style="font-weight:bold">Bill of Lading</th>
+                <th style="font-weight:bold">Invoice Amount</th>
+                <th style="font-weight:bold">From Location</th>
+                <th style="font-weight:bold">To Location</th>
+                <th style="font-weight:bold">Drop1</th>
+                <th style="font-weight:bold">Drop2</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for data in data1 %}
+
+                {% set a = data.Hstat  %}
+                {% set b = data.Istat  %}
+
+                {% if b==4 %}
+                    {% set atc2="green text-white font-weight-bold" %}
+                {% elif b==3 %}
+                    {% set atc2="amber font-weight-bold" %}
+                {% elif b==2 %}
+                    {% set atc2="purple text-white font-weight-bold" %}
+                {% elif b==1 %}
+                    {% set atc2="blue text-white font-weight-bold" %}
+                {% elif b==-1 %}
+                    {% set atc2="yellow font-weight-bold" %}
+                {% else %}
+                    {% set atc2="white font-weight-bold" %}
+                {% endif %}
+
+                {% if a==4 %}
+                    {% set atc1="green text-white font-weight-bold" %}
+                {% elif a==3 %}
+                    {% set atc1="amber font-weight-bold" %}
+                {% elif a==2 %}
+                    {% set atc1="purple text-white font-weight-bold" %}
+                {% elif a==1 %}
+                    {% set atc1="blue text-white font-weight-bold" %}
+                {% elif a == -1 %}
+                    {% set atc1="yellow font-weight-bold" %}
+                {% else %}
+                    {% set atc1="white font-weight-bold" %}
+                {% endif %}
+
+
+            <tr >
+                <td align="center" class="{{atc1}}">{{ data.Jo }}</td>
+                <td align="center" class="{{atc1}}">{{ data.Shipper[0:18] }}</td>
+                <td align="center" class="{{atc1}}">{{ data.Order }}</td>
+                <td align="center" class="{{atc1}}">{{ data.Date }}</td>
+                <td align="center" class="{{atc1}}">{{ data.Date2 }}</td>
+                <td align="center" class="{{atc1}}">{{ data.Booking }}</td>
+                <td align="center" class="{{atc1}}">{{ data.Container }}</td>
+                <td align="center" ><input class="align-middle" type="checkbox" name="oder{{data.id}}" value="{{data.id}}"></td>
+                <td align="center" class="{{atc2}}">{{ data.Type }}</td>
+                <td align="center" class="{{atc2}}">{{ data.BOL }}</td>
+                <td align="right"  class="{{atc2}}">{{ data.Amount }}</td>
+                <td align="center" class="{{atc2}}">{{ data.Company }}</td>
+                <td align="center" class="{{atc2}}">{{ data.Company2 }}</td>
+                <td align="center" class="{{atc2}}">{{ data.Dropblock1 }}</td>
+                <td align="center" class="{{atc2}}">{{ data.Dropblock2}}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+
+{% if dlist[1] == 'on' %}
+<div class="row">
+    <div class="col-sm-12" align="center"><b>Proof Data:</b>
+    {% if dlist[0]!= 'on' %}
+     &nbsp &nbsp {% include 'includes/_tablespanelT.html' %}
+    {% endif %} </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12" align="center">
+
+        <table id="{{dt2}}" class="table table-striped table-bordered table-sm w-auto" cellspacing="0"
+  width="100%">
+            <thead>
+            <tr>
+                <th align="center" style="font-weight:bold">ID</th>
+                <th align="center" style="font-weight:bold">Order</th>
+                <th align="center" style="font-weight:bold">BOL</th>
+                <th align="center" style="font-weight:bold">Chk</th>
+                <th align="center" style="font-weight:bold">Date</th>
+                <th align="center" style="font-weight:bold">Time</th>
+                <th align="center" style="font-weight:bold">Booking</th>
+                <th align="center" style="font-weight:bold">Container</th>
+                <th align="center" style="font-weight:bold">Company</th>
+                <th align="center" style="font-weight:bold">Driver</th>
+                <th align="center" style="font-weight:bold">Status</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for data in data2 %}
+                {% if 'Paid' in data.Status %}
+                    {% set atc1="green font-weight-bold" %}
+                {% elif 'Invo' in data.Status %}
+                    {% set atc1="amber font-weight-bold" %}
+                {% elif data.Status == 'Overdue' %}
+                    {% set atc1="purple-text font-weight-bold" %}
+                {% elif data.Status == 'Matched' or data.Status == 'IOO' or data.Status == 'IOT' %}
+                    {% set atc1="blue text-white font-weight-bold" %}
+                {% else %}
+                    {% set atc1="font-weight-bold" %}
+                {% endif %}
+            <tr  >
+                <td align="center" class="{{atc1}}">{{ data.id }}</td>
+                <td class="{{atc1}}" align="center">{{ data.Order}}</td>
+                <td class="{{atc1}}"  align="center">{{ data.BOL }}</td>
+                <td class="{{atc1}}" align="center"><input class="align-middle" type="checkbox" name="poof{{data.id}}" value="{{data.id}}"></td>
+                <td class="{{atc1}}" align="center">{{ data.Date }}</td>
+                <td class="{{atc1}}" align="center">{{ data.Time }}</td>
+                <td class="{{atc1}}" align="center"  >{{ data.Booking }}</td>
+                <td class="{{atc1}}"  align="center">{{ data.Container }}</td>
+
+                <td class="{{atc1}}" align="center">{% if data.Company is not none %}{{ data.Company }}{% endif %}</td>
+                <td class="{{atc1}}" align="center">{{ data.Driver }}</td>
+                <td class="{{atc1}}" align="center">{{ data.Status }}</td>
+
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% if dlist[2] =='on' %}
+<div class="row">
+    <div class="col-sm-12" align="center"><b>Interchange Tickets:</b>
+        {% if dlist[0]!= 'on' and dlist[1]!= 'on' %}
+        &nbsp &nbsp {% include 'includes/_tablespanelT.html' %}
+        {% endif %} </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+
+<table id="{{dt3}}" class="table table-striped table-bordered table-sm w-auto" cellspacing="0"
+  width="100%">
+            <thead>
+            <tr>
+                <th style="font-weight:bold" align="center">ID</th>
+                <th style="font-weight:bold" align="center">Jo</th>
+                <th style="font-weight:bold" align="center">Chk</th>
+                <th style="font-weight:bold" align="center">Company</th>
+                <th style="font-weight:bold" align="center">Date</th>
+                <th style="font-weight:bold" align="center">Time</th>
+                <th style="font-weight:bold" align="center">Container</th>
+                <th style="font-weight:bold" align="center">ConSize</th>
+                <th style="font-weight:bold" align="center">Release</th>
+                <th style="font-weight:bold" align="center">Truck</th>
+                <th style="font-weight:bold" align="center">GrossWt</th>
+                <th style="font-weight:bold" align="center">CargoWt</th>
+                <th style="font-weight:bold" align="center">Driver</th>
+                <th style="font-weight:bold" align="center">Type</th>
+                <th style="font-weight:bold" align="center">Chassis</th>
+                <th style="font-weight:bold" align="center">Status</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for data in data3 %}
+                {% set ft=data.Status %}
+                {% if ft =='AAAAAA' %}
+                    {% set atc1="amber font-weight-bold" %}
+                {% elif ft=='BBBBBB' %}
+                    {% set atc1="font-weight-bold" %}
+                {% elif ft=='IO' %}
+                    {% set atc1="white blue-text font-weight-bold" %}
+                {% else %}
+                    {% set atc1="white red-text font-weight-bold" %}
+                {% endif %}
+
+            <tr>
+                <td class="{{atc1}}" align="center">{{ data.id }}</td>
+                <td class="{{atc1}}" align="center">{{ data.Jo }}</td>
+                <td class="{{atc1}}" align="center"><input class="align-middle" type="checkbox" name="tick{{data.id}}" value="{{data.id}}"></td>
+                <td class="{{atc1}}" align="center">{{ data.Company }}</td>
+                <td class="{{atc1}}" align="center">{{ data.Date }}</td>
+                <td class="{{atc1}}" align="center">{{ data.Time }}</td>
+                <td class="{{atc1}}" align="center">{{ data.CONTAINER }}</td>
+                <td class="{{atc1}}" align="center">{{ data.CONTYPE }}</td>
+                <td class="{{atc1}}" align="center">{{ data.RELEASE }}</td>
+                <td class="{{atc1}}" align="center">{{ data.TRUCK_NUMBER}}</td>
+                <td class="{{atc1}}" align="center">{{ data.GROSS_WT}}</td>
+                <td class="{{atc1}}" align="center">{{ data.CARGO_WT}}</td>
+                <td class="{{atc1}}" align="center">{{ data.DRIVER}}</td>
+                <td class="{{atc1}}" align="center">{{ data.TYPE}}</td>
+                <td class="{{atc1}}" align="center">{{ data.CHASSIS }}</td>
+                <td class="{{atc1}}" align="center">{{ data.Status }}</td>
+
+            </tr>
+            {% endfor %}
+            </tbody>
+            <tr>
+        </table>
+
+
+    </div>
+</div>
+{% endif %}
+
+{% if dlist[3]=='on' %}
+<div class="row">
+    <div class="col-sm-12" align="center"><b>Customer Data:</b>
+            {% if dlist[0]!= 'on' and dlist[1]!= 'on' and dlist[2]!= 'on'%}
+        &nbsp &nbsp {% include 'includes/_tablespanelT.html' %}
+        {% endif %} </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <table id="{{dt4}}" class="table table-striped table-bordered table-sm w-auto" cellspacing="0"
+  width="100%">
+            <thead>
+            <tr>
+                <th style="font-weight:bold" align="center">ID</th>
+                <th style="font-weight:bold" align="center">Chk</th>
+                <th style="font-weight:bold" align="left">Company</th>
+                <th style="font-weight:bold" align="left">Addr1</th>
+                <th style="font-weight:bold" align="left">Addr2</th>
+                <th style="font-weight:bold" align="left">Status Email</th>
+                <th style="font-weight:bold" align="left">Phone</th>
+                <th style="font-weight:bold" align="left">POD Email</th>
+                <th style="font-weight:bold" align="left">AP Email</th>
+                <th style="font-weight:bold" align="center">Role</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for data in data5 %}
+            <tr>
+                <td align="center">{{data.id}}</td>
+                <td align="center"><input class="align-middle" type="checkbox" name="peep{{data.id}}" value="{{data.id}}"></td>
+                <td style="font-weight:bold" align="left">{{ data.Company }}</td>
+                <td style="font-weight:bold" align="left">{{ data.Addr1}}</td>
+                <td style="font-weight:bold" align="left">{{ data.Addr2}}</td>
+                <td style="font-weight:bold" align="left">{{ data.Email}}</td>
+                <td style="font-weight:bold" align="left">{{ data.Telephone}}</td>
+                <td style="font-weight:bold" align="left">{{ data.Associate1}}</td>
+                <td style="font-weight:bold" align="left">{{ data.Associate2}}</td>
+                <td style="font-weight:bold" align="center">{{data.Ptype}}</td>
+
+
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+</div>
+</div>
+{% endif %}

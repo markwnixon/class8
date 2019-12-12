@@ -1,0 +1,32 @@
+<div class="row">
+{% if leftsize > 6 or stamp==1 %}
+<div class="col-sm-5" align="right">
+{% if emaildata %}
+{% include 'includes/emailprep.html' %}
+{% else %}
+Text version of file {{leftsize}}{{rightsize}}{{mm1}}:<br>
+<embed src="{{doctxt}}" width="300px" height="550px"/>
+{% endif %}
+</div>
+{% endif %}
+<div class="col-sm-7" align="right">
+{% if invo == 1 or quot == 1  and ldata %}
+<div class="card">
+{% include 'includes/_services_banner.html' %}
+</div>
+{% else %}
+Looking for: {{docref}}<br>
+{% endif %}
+{% if rightsize == 4 %}
+{% set wide = "550px" %}
+{% else %}
+{% set wide = "650pm" %}
+{% endif %}
+<embed src="{{docref}}" width={{wide}} height="800px"/>
+</div>
+</div>
+
+<input type = "hidden" name ="datatable1" value= "{{dlist[0]}}">
+<input type = "hidden" name ="datatable2" value= "{{dlist[1]}}">
+<input type = "hidden" name ="datatable3" value= "{{dlist[2]}}">
+<input type = "hidden" name ="datatable4" value= "{{dlist[3]}}">

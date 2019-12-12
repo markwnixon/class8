@@ -20,7 +20,7 @@ import json
 
 def isoT():
 
-    from viewfuncs import erud
+    from viewfuncs import erud, testdrop
 
     if request.method == 'POST':
         # ____________________________________________________________________________________________________________________B.FormVariables.Trucking
@@ -312,44 +312,8 @@ def isoT():
                 dropblock1 = request.values.get('dropblock1')
                 dropblock2 = request.values.get('dropblock2')
 
-                idl = 0
-                idd = 0
-
-                print('291:',dropblock1)
-                print('292:',dropblock2)
-                print('293:',len(dropblock1.strip()),len(dropblock2.strip()))
-
-                if len(dropblock1.strip())<7:
-                    sfind = dropblock1.strip()
-                    sfind = sfind[0:2]
-                    print(sfind)
-                    sfind = sfind.lower()
-                    ddata = Drops.query.all()
-                    for ddat in ddata:
-                        entity=ddat.Entity
-                        scomp = entity[0:2]
-                        scomp = scomp.lower()
-                        if sfind == scomp:
-                            idl = ddat.id
-                            newdrop1 = ddat.Entity + '\n' + ddat.Addr1 + '\n' + ddat.Addr2 + '\n' + ddat.Phone + '\n' + ddat.Email
-                            company = ddat.Entity
-                            break
-
-                if len(dropblock2.strip())<7:
-                    sfind = dropblock2.strip()
-                    sfind = sfind[0:2]
-                    sfind = sfind.lower()
-                    ddata = Drops.query.all()
-                    for ddat in ddata:
-                        entity=ddat.Entity
-                        entity = entity.strip()
-                        scomp = entity[0:2]
-                        scomp = scomp.lower()
-                        if sfind == scomp:
-                            idd = ddat.id
-                            newdrop2 = ddat.Entity + '\n' + ddat.Addr1 + '\n' + ddat.Addr2 + '\n' + ddat.Phone + '\n' + ddat.Email
-                            company2 = ddat.Entity
-                            break
+                idl, newdrop1, company = testdrop(dropblock1)
+                idd, newdrop2, company2 = testdrop(dropblock2)
 
                 if idl == 0:
                     company = dropupdate(dropblock1)
@@ -1748,40 +1712,9 @@ def isoT():
 
             dropblock1 = a[7]
             dropblock2 = a[10]
-            print('1618',dropblock1,dropblock2)
-            idl = 0
-            idd = 0
 
-            if len(dropblock1.strip())<7:
-                sfind = dropblock1.strip()
-                sfind = sfind[0:2]
-                print(sfind)
-                sfind = sfind.lower()
-                ddata = Drops.query.all()
-                for ddat in ddata:
-                    entity=ddat.Entity
-                    scomp = entity[0:2]
-                    scomp = scomp.lower()
-                    if sfind == scomp:
-                        idl = ddat.id
-                        newdrop1 = ddat.Entity + '\n' + ddat.Addr1 + '\n' + ddat.Addr2 + '\n' + ddat.Phone + '\n' + ddat.Email
-                        company = ddat.Entity
-                        break
-
-            if len(dropblock2.strip())<7:
-                sfind = dropblock2.strip()
-                sfind = sfind[0:2]
-                sfind = sfind.lower()
-                ddata = Drops.query.all()
-                for ddat in ddata:
-                    entity=ddat.Entity
-                    scomp = entity[0:2]
-                    scomp = scomp.lower()
-                    if sfind == scomp:
-                        idd = ddat.id
-                        newdrop2 = ddat.Entity + '\n' + ddat.Addr1 + '\n' + ddat.Addr2 + '\n' + ddat.Phone + '\n' + ddat.Email
-                        company2 = ddat.Entity
-                        break
+            idl,newdrop1,company = testdrop(dropblock1)
+            idd,newdrop2,company2 = testdrop(dropblock2)
 
             if idl == 0:
                 company = dropupdate(dropblock1)
