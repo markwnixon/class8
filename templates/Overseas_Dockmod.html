@@ -1,0 +1,110 @@
+<br>
+<div class="card">
+  <div class="card-body" align="center">
+
+<table>
+                <tr>
+                   <td><div class="input-group-text">Font Size</div></td>
+                   <td><input class="form-control" type="text" name="thisfont" value="{{modata.CommoList}}"></td>
+                </tr>
+                <tr>
+                    <td> <div class="input-group-text">HSCode:</div></td>
+                    <td>
+                        <select class="form-control" type="text" name="commodity">
+                        <option
+                        {% if modata.Commodity == 'AutoOnly' %} selected {% endif %}
+                        value="AutoOnly"> Auto(s)Only 8703.90.0100 </option>
+                        <option  {% if modata.Commodity == 'AutoPlus' %} selected {% endif %} value="AutoPlus"> Auto(s) Plus HHG 8703.90.0100</option>
+                        <option  {% if modata.Commodity == 'HHG' %} selected {% endif %} value="HHG"> Household Goods Only 9403.50.000 </option>
+                        <option  {% if modata.Commodity == 'AutoParts' %} selected {% endif %} value="AutoParts"> Auto Parts 8412.80.9000 </option>
+                        <option  {% if modata.Commodity == 'ATV' %} selected {% endif %} value="ATV"> Motorcycles/PWC/ATVs 8711.90.0100</option>
+                        <option  {% if modata.Commodity == 'Medical' %} selected {% endif %} value="Medical"> Medical Supplies 9018.90.8000</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                   <td><div class="input-group-text">In Transit To:</div></td>
+                   <td><input class="form-control" type="text" name="itt" value="{{modata.Tpath}}"></td>
+                </tr>
+                <tr>
+                    <td> <div class="input-group-text" align="right">#Pkgs:Item:Wt</div></td>
+                    <td colspan="2"><textarea class="form-control" type="text" name="description" rows="4">{{modata.Description}}</textarea></td>
+                </tr>
+                <tr>
+                    <td> <div class="input-group-text">Seal:</div></td>
+                    <td colspan="2"><input class="form-control" type="text" value="{{modata.Seal}}" name="seal"></td>
+                </tr>
+                 <tr>
+                        <td> <div class="input-group-text">Role/Type:</div></td>
+                        <td>
+                        <select class="form-control" type="text" name="reltype">
+                        <option  {% if modata.RelType == 'telex' %} selected {% endif %} value="telex"> TELEX Release </option>
+                        <option  {% if modata.RelType == 'seaway' %} selected {% endif %} value="seaway"> Seaway Bill </option>
+                        </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">AES:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.AES}}" name="aes"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">ExpRef OverRide:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.ExpRef}}" name="expref"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">AddNote:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.AddNote}}" name="addnote"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Exporter:</div></td>
+                        <td colspan="2">
+                            <select class="form-control" type="text" name="exporter" >
+                            {% for data in data3 %}
+                            <option {% if modata.Exporter == data.Company %} selected {% endif %}  value="{{data.id}}"> {{data.Company}} </option>
+                            {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Consignee:</div></td>
+                        <td colspan="2">
+                            <select class="form-control" type="text" name="consignee" >
+                            {% for data in data3 %}
+                            <option {% if modata.Consignee == data.Company %} selected {% endif %}  value="{{data.id}}"> {{data.Company}} {{data.id}} </option>
+                            {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Notify Party:</div></td>
+                        <td colspan="2">
+                            <select class="form-control" type="text" name="notify" >
+                            {% for data in data3 %}
+                            <option {% if modata.Notify == data.Company %} selected {% endif %}  value="{{data.id}}"> {{data.Company}} {{data.id}} </option>
+                            {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Freight Fwd:</div></td>
+                        <td colspan="2">
+                            <select class="form-control" type="text" name="frfor" >
+                            {% for data in data3 %}
+                            <option {% if modata.FrFor == data.Company %} selected {% endif %}  value="{{data.id}}"> {{data.Company}} </option>
+                            {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                <tr>
+                <td colspan="3">
+                <button type="submit" class="btn btn-amber btn-sm" name="DockUp">Update</button>
+                <button type="submit" class="btn btn-blue btn-sm" name="Return">Return</button>
+                <button type="submit" class="btn btn-green btn-sm" name="Efile">EFILERQ</button>
+
+                </td>
+                </tr>
+                </table>
+  </div>
+</div>
+                <input type = "hidden" name ="ship" value= {{ship}}>

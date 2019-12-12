@@ -1,0 +1,96 @@
+<table class="table table-condensed table-hover">
+<tbody>
+<tr>
+<td> <div class="input-group-text" align="right">Order ID:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="orderid" value="{{modata.Orderid}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text" align="right">Year:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="modelyear" value="{{modata.Year}}"></td>
+</tr>
+<tr>
+<td align="right"> <div class="input-group-text">Make:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="make" value="{{modata.Make}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Model:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="model" value="{{modata.Model}}"></td>
+</tr>
+<tr>
+<td align="right"> <div class="input-group-text">Color:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="color" value="{{modata.Color}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">VIN:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="vin" value="{{modata.VIN}}"></td>
+</tr>
+<tr>
+<td align="right"> <div class="input-group-text">Title No.:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="title" value="{{modata.Title}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">State:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="state" value="{{modata.State}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Empty Weight:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="empweight" value="{{modata.EmpWeight}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Value:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="cvalue" value="{{modata.Value}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Tow Company:</div></td>
+<td colspan="2">
+<select class="form-control" type="text" name="towcompany">
+<option value='1'> Add New </option>
+{% for data in pdata1 %}
+<option value="{{data.Company}}" {% if modata.TowCompany == data.Company %} selected {% endif %}> {{data.Company}} </option>
+{% endfor %}
+</select>
+</td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Tow Company (if New):</div></td>
+<td colspan="2"><input class="form-control" type="text" name="newtowcompany" value=""></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Tow Cost Package:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="towcost" value="{{modata.TowCost}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Number Cars:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="ncars" value="{{modata.Ncars}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Tow Cost Each:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="towcostea" value="{{modata.TowCostEa}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Pickup Date:</div></td>
+<td colspan="2"><input class="form-control" type="date" name="date1" value="{{modata.Date1}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Pickup From:</div></td>
+<td colspan="2">
+<input class="form-control" type="text" name="pufrom" value="{{modata.Pufrom}}">
+</td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Delivery Date:</div></td>
+<td colspan="2"><input class="form-control" type="date" name="date2" value={{modata.Date2}}></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Deliver To:</div></td>
+<td colspan="2">
+<input class="form-control" type="text" name="delto" value="{{modata.Delto}}">
+</td>
+</tr>
+<tr>
+<td align="right"> <div class="input-group-text">Dispatched By:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="dispatched" value="{{modata.Dispatched}}"></td>
+</tr>
+
+</tbody></table>
+<input type = "hidden" name ="auto" value= {{auto}}>

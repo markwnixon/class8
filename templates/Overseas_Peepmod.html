@@ -1,0 +1,69 @@
+<table class="table table-condensed table-hover">
+<tbody>
+<tr>
+<td> <div class="input-group-text">Role/Type:</div></td>
+<td>
+<select class="form-control" type="text" name="ptype">
+<option  {% if modata.Ptype == 'Overseas' %} selected {% endif %} value="Overseas"> US-Based Address </option>
+<option  {% if modata.Ptype == 'Overseas2' %} selected {% endif %} value="Overseas2"> Foreign Address </option>
+</select>
+</td>
+</tr>
+<tr>
+<td> <div class="input-group-text" align="right">Company:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="company" value="{{modata.Company}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text" align="right">First Name:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="fname" value="{{modata.First}}"></td>
+</tr>
+<tr>
+<td align="right"> <div class="input-group-text">Mid Name(s):</div></td>
+<td colspan="2"><input class="form-control" type="text" name="mnames" value="{{modata.Middle}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Last Name:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="lname" value="{{modata.Last}}"></td>
+</tr>
+<tr>
+<td align="right"> <div class="input-group-text">Address Line1:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="addr1" value="{{modata.Addr1}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Address Line2:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="addr2" value="{{modata.Addr2}}"></td>
+</tr>
+<tr>
+<td align="right"> <div class="input-group-text">Address Line3:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="addr3" value="{{modata.Addr3}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">ID Type:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="idtype" value="{{modata.Idtype}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">ID Number:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="tid" value="{{modata.Idnumber}}"></td>
+</tr>
+<tr>
+<td align="right"> <div class="input-group-text">Telephone:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="tel" value="{{modata.Telephone}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Email:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="email" value="{{modata.Email}}"></td>
+</tr>
+<tr>
+<td align="right"> <div class="input-group-text">Associate 1:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="assoc1" value="{{modata.Associate1}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Associate 2:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="assoc2" value="{{modata.Associate2}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Date:</div></td>
+<td colspan="2"><input class="form-control" type="date" name="date1" value={{modata.Date1}}></td>
+</tr>
+</tbody></table>
+<input type = "hidden" name ="peep" value= {{peep}}>

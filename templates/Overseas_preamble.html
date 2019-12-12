@@ -1,0 +1,38 @@
+{% if invo == 1  and ldata %}
+    {% include 'includes/_services_banner.html' %}
+{% endif %}
+
+{% if ondock == 1 %}
+         <div class="row">
+                <div class="col-sm-4" align="right">
+                        {% include 'includes/emailprep.html' %}
+                </div>
+                <div class="col-sm-8" align="center">
+                        Looking for: {{docref}}<br>
+                        <embed src="{{docref}}" width="650px" height="800px"/>
+                </div>
+         </div>
+{% else %}
+         <div class="row">
+            {% if leftsize > 6 %}
+                    <div class="col-sm-5" align="left">
+                            {% if emaildata %}
+                                {% include 'includes/emailprep.html' %}
+                            {% else %}
+                                Looking for: {{doctxt}}:<br>
+                                <embed src="{{doctxt}}" width="300px" height="550px"/>
+                            {% endif %}
+                    </div>
+
+                     <div class="col-sm-7" align="center">
+                            Looking for: {{docref}}<br>
+                            <embed src="{{docref}}" width="500px" height="650px"/>
+                    </div>
+            {% endif %}
+         </div>
+{% endif %}
+<input type = "hidden" name ="datatable1" value= "{{dlist[0]}}">
+<input type = "hidden" name ="datatable2" value= "{{dlist[1]}}">
+<input type = "hidden" name ="datatable3" value= "{{dlist[2]}}">
+<input type = "hidden" name ="datatable4" value= "{{dlist[3]}}">
+<input type = "hidden" name ="datatable5" value= "{{dlist[4]}}">

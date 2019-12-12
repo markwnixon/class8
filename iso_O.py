@@ -78,9 +78,12 @@ def dataget_O(thismuch, dlist):
 
 def isoO():
 
+    from viewfuncs import erud
+
     if request.method == 'POST':
         from viewfuncs import init_ocean_zero, nonone, nononef
         from invoice_mimemail import invoice_mimemail
+        from vin import getvindata
         from invoice_makers import multi_inv
         ship, book, auto, peep, comm, invo, cache, modata, modlink, stayslim, invooder, stamp, fdata, csize, invodate, inco, cdat, pb, passdata, vdata, caldays, daylist, weeksum, nweeks = init_ocean_zero()
         username = session['username'].capitalize()
@@ -90,6 +93,7 @@ def isoO():
         etitle = ''
         ebody = ''
         emaildata = ''
+        addA = None
         modal = 0
         tick = 0
         redir = 'stay'
@@ -194,11 +198,11 @@ def isoO():
         if thisbox == '2':
             addE = 1
         if thisbox == '3':
-            addS = 1
+            addA = 1
         if thisbox == '4':
             copy = 1
         if thisbox == '5':
-            mm2 = 1
+            dockr = 1
         if thisbox == '6':
             uploadS = 1
         if thisbox =='7':
@@ -360,6 +364,12 @@ def isoO():
 
 # ____________________________________________________________________________________________________________________E.FormVariables.Overseas
 # ____________________________________________________________________________________________________________________B.DataModifications.Overseas
+        if update is not None and modlink == 80:
+            vintoget = request.values.get('vintoget')
+            vinoutput = getvindata(vintoget)
+            print(vinoutput)
+            modlink = 0
+
 
         if update is not None and modlink == 2:
             modata = People.query.get(peep)
@@ -817,6 +827,11 @@ def isoO():
                                          (People.Ptype == 'Overseas')).first()
             peep = modata.id
             err = ['Enter Data for New Company', ' ']
+
+        if addA is not None and numchecked == 0:
+            leftsize = 8
+            modlink = 80
+
 
         if addE is not None and numchecked > 1:
             modlink = 0
@@ -1533,10 +1548,11 @@ def isoO():
 
         #odata = OverSeas.query.all()
         odata, adata, bdata, pdata, idata = dataget_O(thismuch, dlist)
-
+    leftsize = 9
     rightsize = 12-leftsize
     fdata = myoslist('data/vunknown')
     fdata.sort()
     sdata = Services.query.order_by(Services.Service).all()
+    err = erud(err)
 
     return etitle, ebody, emaildata, thismuch, redir, odata, bdata, pdata, adata, idata, sdata, ship, keepship, book, auto, peep, tick, err, modata, caldays, daylist, nweeks, dlist, modlink, leftscreen, docref, stayslim, doctxt, leftsize, rightsize, ldata, invodate, inco, invo, invooder, cache, newc, alltdata, fdata, tdata, today, modal, ondock

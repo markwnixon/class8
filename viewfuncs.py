@@ -244,7 +244,9 @@ def newjo(jtype,sdate):
     if jtype=='J':
         nextjo='JA'+month+day2+year[3]+eval
     else:
-        nextjo='KT'+month+day2+year[3]+eval
+        charco = scac[0]
+        charco = charco.replace('O','K')
+        nextjo= charco+jtype+month+day2+year[3]+eval
     input2 = JO(jo=nextjo, nextid=0, date=sdate, status=1)
     db.session.add(input2)
     lv.nextid=nextid+1
@@ -1375,3 +1377,11 @@ def dataget_T(thismuch, dlist):
         if dlist[2] == 'on':
             idata = Interchange.query.all()
     return odata, idata
+
+
+def erud(err):
+    errup = ''
+    for e in err:
+        if len(e) > 0:
+            errup = errup + e.strip() + '\n'
+    return errup

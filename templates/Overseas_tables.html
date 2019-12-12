@@ -1,0 +1,448 @@
+{% if dlist[0]== 'on' %}
+                <div class="row">
+                      <div class="col-sm-12" align="center">
+                          <b>Overseas Shipping Data:</b>
+                          &nbsp {% include 'includes/_tablespanelO.html' %}
+                      </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table id="{{dt1}}" class="table table-striped table-bordered table-sm w-auto" cellspacing="0" width="100%">
+                        <thead>
+                        <tr class="blue lighten-4 text-black text-center">
+                            <th style="font-weight:bold">JO</th>
+                            <th style="font-weight:bold">Booking</th>
+                            <th style="font-weight:bold">Container</th>
+                            <th style="font-weight:bold">Chk</th>
+                            <th style="font-weight:bold">PuDate</th>
+                            <th style="font-weight:bold">RetDate</th>
+                            <th style="font-weight:bold">BillTo</th>
+                            <th style="font-weight:bold">POD</th>
+                            <th style="font-weight:bold">Status</th>
+                            <th style="font-weight:bold">BkCostUs</th>
+                            <th style="font-weight:bold">BkChgCust</th>
+                            <th style="font-weight:bold">InvTot</th>
+
+
+                            <th style="font-weight:bold">ConType</th>
+                            <th style="font-weight:bold">Type</th>
+                            <th style="font-weight:bold">In/Out</th>
+                            <th style="font-weight:bold">POL</th>
+                            <th style="font-weight:bold">Origin</th>
+                            <th style="font-weight:bold">Exporter</th>
+                            <th style="font-weight:bold">Consignee</th>
+                            <th style="font-weight:bold">Notify</th>
+                            <th style="font-weight:bold">FrFor</th>
+                            <th style="font-weight:bold">PreCarry</th>
+                            <th style="font-weight:bold">Seal</th>
+                            <th style="font-weight:bold">Driver</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for data in data1 %}
+                {% set bt = data.BillTo %}
+                {% set status = data.Status %}
+                {% set a = status[0] %}
+                {% set b = status[1] %}
+                {% set c = status[2] %}
+
+                {% if b=='8' %}
+                {% set atc2="green text-white font-weight-bold" %}
+                {% elif b=='3' %}
+                {% set atc2="green font-weight-bold" %}
+                {% elif b=='2' %}
+                {% set atc2="amber font-weight-bold" %}
+                {% elif b=='1' %}
+                {% set atc2="blue text-white font-weight-bold" %}
+                {% else %}
+                {% set atc2="white font-weight-bold" %}
+                {% endif %}
+
+                {% if c=='8' %}
+                {% set atc3="green text-white font-weight-bold" %}
+                {% elif c=='3' %}
+                {% set atc3="green font-weight-bold" %}
+                {% elif c=='2' %}
+                {% set atc3="amber font-weight-bold" %}
+                {% elif c=='1' %}
+                {% set atc3="blue text-white font-weight-bold" %}
+                {% else %}
+                {% set atc3="white font-weight-bold" %}
+                {% endif %}
+
+                {% if status=='999' %}
+                    {% set atc1="green text-white font-weight-bold" %}
+                    {% set atc2="green text-white font-weight-bold" %}
+                    {% set atc3="green text-white font-weight-bold" %}
+                {% elif status=='777' %}
+                    {% set atc1="amber font-weight-bold" %}
+                    {% set atc2="amber font-weight-bold" %}
+                    {% set atc3="amber font-weight-bold" %}
+                {% elif a=='8' or a=='9' %}
+                    {% set atc1="green font-weight-bold" %}
+                {% elif a=='5' %}
+                    {% set atc1="lime font-weight-bold" %}
+                {% elif a=='4' %}
+                    {% set atc1="yellow font-weight-bold" %}
+                {% elif a=='3' %}
+                    {% set atc1="purple text-white font-weight-bold" %}
+                {% elif a=='2' %}
+                    {% set atc1="blue text-white font-weight-bold" %}
+                {% elif a=='1' %}
+                    {% set atc1="blue-text font-weight-bold" %}
+                {% else %}
+                    {% set atc1="font-weight-bold text-center" %}
+                {% endif %}
+
+
+            <tr>
+
+
+                <td  align="center" class="{{atc1}}" >{{ data.Jo }}</td>
+                <td  align="center" class="{{atc1}}" >{{ data.Booking }}</td>
+                <td align="center" class="{{atc1}}" >{{ data.Container }}</td>
+                <td align="center" class="{{atc1}}"><input class="align-middle" type="checkbox" name="ship{{data.id}}" value="{{data.id}}"></td>
+                <td align="center" class="{{atc1}}" >{{ data.PuDate }}</td>
+                <td align="center" class="{{atc1}}" >{{ data.RetDate }}</td>
+                <td align="center" class="{{atc1}}" >{{ bt }}</td>
+                <td align="center" class="{{atc1}}" >{{ data.Pod }}</td>
+                <td align="center" class="{{atc1}}" >{{ data.Status }}</td>
+
+
+                <td align="center" class="{{atc3}}" >{{ data.Estimate }}</td>
+
+                <td align="center" class="{{atc2}}" >{{ data.Charge }}</td>
+                <td align="center" class="{{atc2}}" >{{ data.Itotal }}</td>
+                <td align="center" class="{{atc2}}" >{{ data.ContainerType }}</td>
+                <td align="center" class="{{atc2}}" >{{ data.MoveType }}</td>
+                <td align="center" class="{{atc2}}" >{{ data.Direction }}</td>
+                <td align="center" class="{{atc2}}" >{{ data.Pol }}</td>
+                <td align="center" class="{{atc2}}" >{{ data.Origin }}</td>
+                <td align="center" class="{{atc2}}" >{{ data.Exporter }}</td>
+                <td align="center" class="{{atc2}}" >{{ data.Consignee }}</td>
+                <td align="center" class="{{atc2}}" >{{ data.Notify }}</td>
+                <td align="center" class="{{atc2}}" >{{ data.FrFor }}</td>
+                <td align="center" class="{{atc2}}" >{{ data.PreCarry }}</td>
+                <td align="center" class="{{atc2}}" >{{ data.Seal }}</td>
+                <td align="center" class="{{atc2}}" >{{ data.Driver }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+
+
+{% if dlist[1]== 'on' %}
+<div class="row">
+    <div class="col-sm-12" align="center"><b>Automobile Data:</b>
+    {% if dlist[0]!= 'on' %}
+     &nbsp &nbsp {% include 'includes/_tablespanelO.html' %}
+    {% endif %}
+    </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+      {% set atc1="font-weight-bold text-center" %}
+
+    <table id="{{dt2}}" class="table table-striped table-bordered table-sm w-auto" cellspacing="0"
+  width="100%">
+            <thead>
+            <tr>
+                <th class="{{atc1}}" align="center">JO</th>
+                <th class="{{atc1}}" align="center">OrderId</th>
+                <th class="{{atc1}}">Tow</th>
+                <th class="{{atc1}}" align="center">Chk</th>
+                <th class="{{atc1}}">Date</th>
+                <th class="{{atc1}}" align="center">Year</th>
+                <th class="{{atc1}}" align="center">Make</th>
+                <th class="{{atc1}}" align="center">Model</th>
+                <th class="{{atc1}}" align="center">Color</th>
+                <th class="{{atc1}}" align="center">VIN</th>
+                <th class="{{atc1}}" align="center">Title</th>
+                <th class="{{atc1}}" align="center">State</th>
+                <th class="{{atc1}}" align="center">Weight</th>
+                <th class="{{atc1}}" align="center">Value</th>
+                <th class="{{atc1}}" align="center">TowComp</th>
+
+                <th class="{{atc1}}" align="center">Status</th>
+                <th class="{{atc1}}" align="center">Pickup</th>
+                <th class="{{atc1}}" align="center">From</th>
+
+                <th class="{{atc1}}" align="center">ToLoc</th>
+
+                <th class="{{atc1}}" align="center">TowCostAll</th>
+                <th class="{{atc1}}" align="center">Ncars</th>
+                <th class="{{atc1}}" align="center">HorJO</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for data in data4 %}
+
+                {% if data.Status=='Matched' %}
+                    {% set atc1="text-primary font-weight-bold text-center" %}
+                {% elif data.Status=='New' %}
+                    {% set atc1="amber font-weight-bold text-center" %}
+                {% else %}
+                    {% set atc1="font-weight-bold text-center" %}
+                {% endif %}
+
+            <tr>
+                <td class="{{atc1}}" >{{data.Jo}}</td>
+                <td class="{{atc1}}" >{{data.Orderid}}</td>
+                <td class="{{atc1}}" >{{ data.TowCostEa }}</td>
+                <td class="{{atc1}}" ><input class="align-middle" type="checkbox" name="auto{{data.id}}" value="{{data.id}}"></td>
+                <td class="{{atc1}}" >{{ data.Date2 }}</td>
+                <td class="{{atc1}}" >{{ data.Year }}</td>
+                <td class="{{atc1}}" >{{ data.Make}}</td>
+                <td class="{{atc1}}" >{{ data.Model }}</td>
+                <td class="{{atc1}}" >{{ data.Color }}</td>
+                <td class="{{atc1}}" >{{ data.VIN }}</td>
+                <td class="{{atc1}}" >{{ data.Title }}</td>
+                <td class="{{atc1}}" >{{ data.State }}</td>
+                <td class="{{atc1}}" >{{ data.EmpWeight }}</td>
+                <td class="{{atc1}}" >{{ data.Value }}</td>
+                <td class="{{atc1}}" >{% if data.TowCompany %}{{ data.TowCompany[0:12] }} {% endif %}</td>
+
+                <td class="{{atc1}}" > {{ data.Status }}</td>
+                <td class="{{atc1}}" >{{ data.Date1 }}</td>
+                <td class="{{atc1}}" >{{ data.Pufrom }}</td>
+                <td class="{{atc1}}" >{{ data.Delto }}</td>
+
+                <td class="{{atc1}}" >{{ data.TowCost }}</td>
+                <td class="{{atc1}}" >{{ data.Ncars }}</td>
+                <td class="{{atc1}}"> {{data.Hjo}}</td>
+
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endif %}
+
+
+{% if dlist[2]== 'on' %}
+<div class="row">
+    <div class="col-sm-12" align="center"><b>Bookings Data:</b>
+    {% if dlist[0]!= 'on' and dlist[1]!= 'on' %}
+     &nbsp &nbsp {% include 'includes/_tablespanelO.html' %}
+    {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+
+      <table id="{{dt3}}" class="table table-striped table-bordered table-sm w-auto" cellspacing="0"
+  width="100%">
+            {% set atc1="font-weight-bold text-center" %}
+            <thead>
+            <tr>
+                <th class="{{atc1}}"  >Booking</th>
+                <th class="{{atc1}}"  >JO</th>
+                <th class="{{atc1}}"  >POD</th>
+                <th class="{{atc1}}"  >Chk</th>
+                <th class="{{atc1}}"  >PortCut</th>
+
+                <th class="{{atc1}}"  >Vessel</th>
+                <th class="{{atc1}}"  >ShipLine</th>
+
+                <th class="{{atc1}}"  >POL</th>
+
+                <th class="{{atc1}}"  >DocCut</th>
+                <th class="{{atc1}}"  >Sails</th>
+                <th class="{{atc1}}"  >Arrives</th>
+                <th class="{{atc1}}"  >Cost</th>
+                <th class="{{atc1}}"  >ReTyp</th>
+                <th class="{{atc1}}"  >AES</th>
+                <th class="{{atc1}}"  >ExpRef</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for data in data2 %}
+                {% if data.Status=='Matched' %}
+                    {% set atc1="text-primary font-weight-bold text-center" %}
+                {% elif data.Status=='New' %}
+                    {% set atc1="amber font-weight-bold text-center" %}
+                {% else %}
+                    {% set atc1="font-weight-bold text-center" %}
+                {% endif %}
+            <tr>
+                <td class="{{atc1}}"  >{{ data.Booking }}</td>
+                <td class="{{atc1}}"  >{{ data.Jo }}</td>
+                <td class="{{atc1}}"  >{{ data.Dest[0:10]}}</td>
+                <td class="{{atc1}}"  ><input class="align-middle" type="checkbox" name="book{{data.id}}" value="{{data.id}}"></td>
+                <td class="{{atc1}}"  >{{ data.PortCut}}</td>
+                <td class="{{atc1}}"  >{{ data.Vessel[0:10]}}</td>
+                <td class="{{atc1}}"  >{{ data.Line}}</td>
+                <td class="{{atc1}}"  >{{ data.LoadPort[0:10]}}</td>
+                <td class="{{atc1}}"  >{{ data.DocCut }}</td>
+                <td class="{{atc1}}"  >{{ data.SailDate }}</td>
+                <td class="{{atc1}}"  >{{ data.EstArr}}</td>
+                <td class="{{atc1}}"  >{{ data.Amount}}</td>
+                <td class="{{atc1}}"  >{{ data.RelType }}</td>
+                <td class="{{atc1}}"  >{{ data.AES }}</td>
+                <td class="{{atc1}}"  >{{ data.ExportRef}}</td>
+
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+
+
+{% if dlist[3]== 'on' %}
+<div class="row">
+    <div class="col-sm-12" align="center"><b>Entity Data:</b>
+    {% if dlist[0]!= 'on' and dlist[1]!= 'on' and dlist[2]!= 'on' %}
+     &nbsp &nbsp {% include 'includes/_tablespanelO.html' %}
+    {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+
+    <table id="{{dt4}}" class="table table-striped table-bordered table-sm w-auto" cellspacing="0"
+  width="100%">
+        {% set atc1="font-weight-bold" %}
+            <thead>
+            <tr>
+                <th class="{{atc1}}" align="left">ID</th>
+                <th class="{{atc1}}" align="center">Chk</th>
+                <th class="{{atc1}}" align="left">Company</th>
+                <th class="{{atc1}}" align="left">Addr1</th>
+                <th class="{{atc1}}" align="left">Addr2</th>
+                <th class="{{atc1}}" align="left">Email</th>
+                <th class="{{atc1}}" align="left">Phone</th>
+                <th class="{{atc1}}" align="left">Last</th>
+                <th class="{{atc1}}" align="left">First</th>
+                <th class="{{atc1}}" align="left">Middle</th>
+                <th class="{{atc1}}" align="left">Addr3</th>
+                <th class="{{atc1}}" align="center">Role</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for data in data3 %}
+
+              {% if data.Temp2=='New' %}
+                  {% set atc1="amber font-weight-bold" %}
+              {% elif data.Ptype=='Overseas2' %}
+                  {% set atc1="text-primary font-weight-bold" %}
+              {% else %}
+                  {% set atc1="font-weight-bold" %}
+              {% endif %}
+
+
+            <tr>
+
+
+                <td align="left" class="{{atc1}}" >{{ data.id }}</td>
+                <td align="center" class="{{atc1}}" ><input class="align-middle" type="checkbox" name="peep{{data.id}}" value="{{data.id}}"></td>
+                <td align="left" class="{{atc1}}" >{{ data.Company }}</td>
+                <td align="left" class="{{atc1}}" >{{ data.Addr1 }}</td>
+                <td align="left" class="{{atc1}}" >{{ data.Addr2 }}</td>
+                <td align="left" class="{{atc1}}" >{{ data.Email }}</td>
+                <td align="left" class="{{atc1}}" >{{ data.Telephone }}</td>
+                <td align="left" class="{{atc1}}" >{{ data.Last }}</td>
+                <td align="left" class="{{atc1}}" >{{ data.First }}</td>
+                <td align="left" class="{{atc1}}" >{{ data.Middle }}</td>
+                <td align="left" class="{{atc1}}" >{{ data.Addr3 }}</td>
+                <td align="center" class="{{atc1}}" >{{ data.Ptype}}</td>
+
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+
+    </div>
+</div>
+{% endif %}
+
+{% if dlist[4]== 'on' %}
+<div class="row">
+    <div class="col-sm-12" align="center"><b>Interchange Data:</b>
+    {% if dlist[0]!= 'on' and dlist[1]!= 'on' and dlist[2]!= 'on' and dlist[3]!= 'on' %}
+     &nbsp &nbsp {% include 'includes/_tablespanelO.html' %}
+    {% endif %}
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-sm-12">
+
+<table id="{{dt5}}" class="table table-striped table-bordered table-sm w-auto" cellspacing="0"
+  width="100%">
+                {% set atc1="font-weight-bold text-center" %}
+            <thead>
+            <tr>
+                <th class="{{atc1}}" >ID</th>
+                <th class="{{atc1}}" >Jo</th>
+                <th class="{{atc1}}" >Chk</th>
+                <th class="{{atc1}}" >Company</th>
+                <th class="{{atc1}}" >Date</th>
+                <th class="{{atc1}}" >Time</th>
+                <th class="{{atc1}}" >Container</th>
+                <th class="{{atc1}}" >Release</th>
+                <th class="{{atc1}}" >Truck</th>
+                <th class="{{atc1}}" >Driver</th>
+                <th class="{{atc1}}" >Type</th>
+                <th class="{{atc1}}" >Chassis</th>
+                <th class="{{atc1}}" >Status</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for data in data5 %}
+                {% set ft=data.Status %}
+                {% if ft =='AAAAAA' %}
+                    {% set atc1="amber font-weight-bold text-center" %}
+                {% elif ft=='BBBBBB' %}
+                    {% set atc1="font-weight-bold text-center" %}
+                {% elif ft=='IO' %}
+                    {% set atc1="white blue-text font-weight-bold text-center" %}
+                {% else %}
+                    {% set atc1="white red-text font-weight-bold text-center" %}
+                {% endif %}
+
+            <tr>
+                <td class="{{atc1}}" >{{ data.id }}</td>
+                <td class="{{atc1}}" >{{ data.Jo }}</td>
+                <td class="{{atc1}}" ><input class="align-middle" type="checkbox" name="tick{{data.id}}" value="{{data.id}}"></td>
+                <td class="{{atc1}}" >{{ data.Company }}</td>
+                <td class="{{atc1}}" >{{ data.Date }}</td>
+                <td class="{{atc1}}"  >{{ data.Time }}</td>
+                <td class="{{atc1}}" >{{ data.CONTAINER }}</td>
+                <td class="{{atc1}}" >{{ data.RELEASE }}</td>
+                <td class="{{atc1}}" >{{ data.TRUCK_NUMBER}}</td>
+                <td class="{{atc1}}" >{{ data.DRIVER}}</td>
+                <td class="{{atc1}}" >{{ data.TYPE}}</td>
+                <td class="{{atc1}}" >{{ data.CHASSIS }}</td>
+                <td class="{{atc1}}" >{{ data.Status }}</td>
+
+            </tr>
+            {% endfor %}
+            </tbody>
+            <tr>
+        </table>
+
+
+    </div>
+</div>
+{% endif %}

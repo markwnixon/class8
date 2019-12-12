@@ -1,0 +1,248 @@
+ <table class="table table-condensed table-hover">
+    <tbody>
+    {% if modlink==4 and fdata != 0 %}
+        <tr>
+            <td colspan="2">
+
+               <select class="form-control" type="text" name="FileSel" onchange="this.form.submit()">
+                  <option value='1'>Choose New Source Document for Proof</option>
+                  <option value='None' {% if filesel == 'None' %} selected {% endif %}>None</option>
+                  {% for data in fdata %}
+                  <option {% if filesel == data %} selected {% endif %}  value={{data}}> {{data}} </option>
+                  {% endfor %}
+                </select>
+                  </td>
+                </tr>
+        {% endif %}
+
+        {% if modlink==4 %}
+                {% set defcomp1 = 'First Eagle Logistics Inc' %}
+                {% set defcomp2 = 'Global Business Link' %}
+                {% set defcomp3 = 'Baltimore Seagirt' %}
+                {% set defcomp4 = 'First Eagle Logistics Inc' %}
+        {% else %}
+                {% set defcomp1 = modata.PreCarry %}
+                {% set defcomp2 = modata.FrFor %}
+                {% set defcomp3 = modata.Pol %}
+                {% set defcomp4 = modata.Origin %}
+        {% endif %}
+
+
+
+
+
+            <tr>
+                <td> <div class="input-group-text">Booking:</div></td>
+                <td colspan="2"><input class="form-control" type="text" value="{{modata.Booking}}" name="booking"></td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">Container No.:</div></td>
+                <td colspan="2"><input class="form-control" type="text" value="{{modata.Container}}" name="container"></td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">Type of Move:</div></td>
+                <td>
+                <select class="form-control" type="text" name="movetype">
+                <option  {% if modata.MoveType == 'Ocean' %} selected {% endif %} value="Ocean"> Ocean </option>
+                <option  {% if modata.MoveType == 'Air' %} selected {% endif %} value="Air">  Air </option>
+                </select>
+                </td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">Direction:</div></td>
+                <td>
+                <select class="form-control" type="text" name="direction">
+                <option  {% if modata.Direction == 'Export' %} selected {% endif %} value="Export"> Export </option>
+                <option  {% if modata.Direction == 'Import' %} selected {% endif %} value="Import"> Import </option>
+                </select>
+                </td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">Basic Commodity:</div></td>
+                <td>
+                <select class="form-control" type="text" name="commodity">
+                <option  {% if modata.Commodity == 'AutoOnly' %} selected {% endif %} value="AutoOnly"> Auto(s) Only </option>
+                <option  {% if modata.Commodity == 'AutoPlus' %} selected {% endif %} value="AutoPlus"> Auto(s) Plus HHG</option>
+                <option  {% if modata.Commodity == 'HHG' %} selected {% endif %} value="HHG"> Household Goods Only </option>
+                <option  {% if modata.Commodity == 'AutoParts' %} selected {% endif %} value="AutoParts"> Auto Parts </option>
+                <option  {% if modata.Commodity == 'ATV' %} selected {% endif %} value="ATV"> Motorcycles/PWC/ATVs </option>
+                <option  {% if modata.Commodity == 'Medical' %} selected {% endif %} value="Medical"> Medical Supplies </option>
+                </select>
+                </td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">Port of Destination</div></td>
+                <td colspan="2"><input class="form-control" type="text" name="pod" value="{{modata.Pod}}"></td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">Port of Loading</div></td>
+                <td colspan="2">
+                    <select class="form-control" type="text" name="pol" >
+                    {% for data in data3 %}
+                    <option {% if defcomp3 == data.Company %} selected {% endif %}  value="{{data.Company}}"> {{data.Company}} </option>
+                    {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">Point of Origin:</div></td>
+                <td colspan="2">
+                    <select class="form-control" type="text" name="origin" >
+                    {% for data in data3 %}
+                    <option {% if defcomp4 == data.Company %} selected {% endif %}  value="{{data.Company}}"> {{data.Company}} </option>
+                    {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                {% set datespot = modata.PuDate %}
+                {% if not datespot %}
+                    {% set datespot = today %}
+                {% endif %}
+                <td> <div class="input-group-text">Pickup Empty Date:</div></td>
+                <td colspan="2"><input class="form-control" type="date" value={{datespot}} name="pudate"></td>
+            </tr>
+            <tr>
+                {% set datespot = modata.RetDate %}
+                {% if not datespot %}
+                    {% set datespot = today %}
+                {% endif %}
+                <td> <div class="input-group-text">Return Load Date:</div></td>
+                <td colspan="2"><input class="form-control" type="date" value={{datespot}} name="retdate"></td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">Containerized:</div></td>
+                <td>
+                <select class="form-control" type="text" name="ctype">
+                <option  {% if modata.ContainerType == 'None' %} selected {% endif %} value='None'> None </option>
+                <option  {% if modata.ContainerType == '53FT DRY' %} selected {% endif %} value='53FT DRY'> 53 DRY </option>
+                <option  {% if modata.ContainerType == '20FT STD' %} selected {% endif %} value='20FT STD'> 20 STD </option>
+                <option  {% if modata.ContainerType == '40FT STD' %} selected {% endif %} value='40FT STD'> 40 STD </option>
+                <option  {% if modata.ContainerType == '40FT HC' %} selected {% endif %} value='40FT HC'> 40 HC </option>
+                <option  {% if modata.ContainerType == '40FT OT' %} selected {% endif %} value='40FT OT'> 40 OT </option>
+                <option  {% if modata.ContainerType == '40FT REF' %} selected {% endif %} value='40FT REF'> 40 REF </option>
+                <option  {% if modata.ContainerType == '45FT STD' %} selected {% endif %} value='45FT STD'> 45 STD </option>
+                <option  {% if modata.ContainerType == '45FT HC' %} selected {% endif %} value='45FT HC'> 45 HC </option>
+                <option  {% if modata.ContainerType == 'LCL' %} selected {% endif %} value='LCL'> LCL </option>
+                <option  {% if modata.ContainerType == 'RORO' %} selected {% endif %} value='RORO'> RORO </option>
+                </select>
+                </td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">BkCost:</div></td>
+                <td colspan="2"><input class="form-control" type="text" value="{{modata.Estimate}}" name="estimate"></td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">Charge:</div></td>
+                <td colspan="2"><input class="form-control" type="text" value="{{modata.Charge}}" name="charge"></td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">Bill This To:</div></td>
+                <td colspan="2">
+                    <select class="form-control" type="text" name="billto" >
+                    {% for data in data3 %}
+                      {% if data.Ptype=='Overseas2' %}
+                        {% set prefix='FA: ' %}
+                      {% else %}
+                        {% set prefix='US: ' %}
+                      {% endif %}
+                    <option {% if modata.BillTo == data.Company %} selected {% endif %}  value="{{data.id}}"> {{prefix}}{{data.Company}} </option>
+                    {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">Exporter:</div></td>
+                <td colspan="2">
+                    <select class="form-control" type="text" name="exporter" >
+                    {% for data in data3 %}
+                      {% if data.Ptype=='Overseas' %}
+                        {% set prefix='US: ' %}
+                           <option {% if modata.Exporter == data.Company %} selected {% endif %}  value="{{data.id}}"> {{prefix}}{{data.Company}} </option>
+                        {% endif %}
+                     {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">Consignee:</div></td>
+                <td colspan="2">
+                    <select class="form-control" type="text" name="consignee" >
+                    {% for data in data3 %}
+                      {% if data.Ptype=='Overseas2' %}
+                        {% set prefix='FA: ' %}
+                           <option {% if modata.Consignee == data.Company %} selected {% endif %}  value="{{data.id}}"> {{prefix}}{{data.Company}} </option>
+                      {% endif %}
+                    {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">Notify Party:</div></td>
+                <td colspan="2">
+                    <select class="form-control" type="text" name="notify" >
+                    {% for data in data3 %}
+                      {% if data.Ptype=='Overseas2' %}
+                        {% set prefix='FA: ' %}
+                            <option {% if modata.Notify == data.Company %} selected {% endif %}  value="{{data.id}}"> {{prefix}}{{data.Company}} </option>
+                       {% endif %}
+                    {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">Freight Forwarder:</div></td>
+                <td colspan="2">
+                    <select class="form-control" type="text" name="frfor" >
+                    {% for data in data3 %}
+                      {% if data.Ptype=='Overseas' %}
+                        {% set prefix='US: ' %}
+                            <option {% if defcomp2 == data.Company %} selected {% endif %}  value="{{data.id}}"> {{prefix}}{{data.Company}} </option>
+                      {% endif %}
+                    {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">Pre-Carry:</div></td>
+                <td colspan="2">
+                    <select class="form-control" type="text" name="precarry" >
+                    {% for data in data3 %}
+                    {% if data.Ptype=='Overseas' %}
+                      {% set prefix='US: ' %}
+                    <option {% if defcomp1 == data.Company %} selected {% endif %}  value="{{data.id}}">{{prefix}}{{data.Company}} </option>
+                    {% endif %}{% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text" align="right">Description:</div></td>
+                <td colspan="2"><textarea class="form-control" type="text" name="description" rows="4">{{modata.Description}}</textarea></td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">Seal:</div></td>
+                <td colspan="2"><input class="form-control" type="text" value="{{modata.Seal}}" name="seal"></td>
+            </tr>
+
+            <tr>
+                <td> <div class="input-group-text">Driver:</div></td>
+                <td colspan="2">
+                    <select class="form-control" type="text" name="driver" >
+                    {% for data in alltdata %}
+                    <option {% if modata.Driver == data.Name %} selected {% endif %}  value="{{data.Name}}"> {{data.Name}} </option>
+                    {% endfor %}
+                    </select>
+            </td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">StartTime:</div></td>
+                <td colspan="2"><input class="form-control" type="time" value={{modata.StartTime}} name="starttime"></td>
+            </tr>
+            <tr>
+                <td> <div class="input-group-text">EndTime:</div></td>
+                <td colspan="2"><input class="form-control" type="time" value={{modata.EndTime}} name="endtime"></td>
+            </tr>
+
+
+            </tbody></table>
+            <input type = "hidden" name ="ship" value= {{ship}}>

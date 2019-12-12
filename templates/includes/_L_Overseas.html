@@ -1,0 +1,53 @@
+  {% if leftscreen == 0 %}
+    {% if invo == 1  and ldata %}
+        {% include 'includes/_services_banner.html' %}
+    {% endif %}
+
+    <div class="row">
+        {% if leftsize > 6 %}
+            <div class="col-sm-5" align="left">
+
+                {% if emaildata %}
+                    {% include 'includes/emailprep.html' %}
+                {% else %}
+                    Looking for: {{doctxt}}:<br>
+                    <embed src="{{doctxt}}" width="300px" height="550px"/>
+                {% endif %}
+            </div>
+        {% endif %}
+        <div class="col-sm-7" align="right">
+        Looking for: {{docref}}<br>
+        <embed src="{{docref}}" width="500px" height="550px"/>
+        </div>
+    </div>
+    <input type = "hidden" name ="datatable1" value= "{{dlist[0]}}">
+    <input type = "hidden" name ="datatable2" value= "{{dlist[1]}}">
+    <input type = "hidden" name ="datatable3" value= "{{dlist[2]}}">
+    <input type = "hidden" name ="datatable4" value= "{{dlist[3]}}">
+    <input type = "hidden" name ="datatable5" value= "{{dlist[4]}}">
+
+
+ {% elif leftscreen == 2 %}
+
+        {% include 'includes/_calendarO.html' %}
+    <input type = "hidden" name ="datatable1" value= "{{dlist[0]}}">
+    <input type = "hidden" name ="datatable2" value= "{{dlist[1]}}">
+    <input type = "hidden" name ="datatable3" value= "{{dlist[2]}}">
+    <input type = "hidden" name ="datatable4" value= "{{dlist[3]}}">
+    <input type = "hidden" name ="datatable5" value= "{{dlist[4]}}">
+
+  {% else %}
+
+    {% if stayslim== 0 %}
+        {% set dt1='dtHorizontalVerticalExample1' %}
+        {% set dt2='dtHorizontalVerticalExample2' %}
+        {% set dt3='dtHorizontalVerticalExample3' %}
+        {% set dt4='dtHorizontalVerticalExample4' %}
+        {% set dt5='dtHorizontalVerticalExample5' %}
+    {% else %}
+        {% set dt1='dtH1' %}
+        {% set dt2='dtH2' %}
+        {% set dt3='dtH3' %}
+        {% set dt4='dtH4' %}
+        {% set dt5='dtH5' %}
+    {% endif %}

@@ -18,15 +18,9 @@ from func_cal import calmodalupdate
 from PyPDF2 import PdfFileReader
 import json
 
-def erud(err):
-    errup = ''
-    for e in err:
-        if len(e) > 0:
-            errup = errup + e.strip() + '\n'
-    return errup
-
-
 def isoT():
+
+    from viewfuncs import erud
 
     if request.method == 'POST':
         # ____________________________________________________________________________________________________________________B.FormVariables.Trucking

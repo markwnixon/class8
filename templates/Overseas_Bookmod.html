@@ -1,0 +1,67 @@
+<table class="table table-condensed table-hover">
+<tbody>
+<tr>
+<td> <div class="input-group-text">Booking</div></td>
+<td colspan="2"><input class="form-control" type="text" name="booking" value="{{modata.Booking}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Job Order</div></td>
+<td colspan="2"><input class="form-control" type="text" name="joborder" value="{{modata.Jo}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Export Reference</div></td>
+<td colspan="2"><input class="form-control" type="text" name="exportref" value="{{modata.ExportRef}}"></td>
+</tr>
+
+<tr>
+<td> <div class="input-group-text">Vessel</div></td>
+<td colspan="2"><input class="form-control" type="text" name="vessel" value="{{modata.Vessel}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">ShipLine</div></td>
+<td colspan="2"><input class="form-control" type="text" name="shipline" value="{{modata.Line}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Load Port:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="load" value="{{modata.LoadPort}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Dest Port:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="dest" value="{{modata.Dest}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Port Cut-Off:</div></td>
+<td colspan="2"><input class="form-control" type="date" value={{modata.PortCut}} name="portcut"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Doc Cut-Off:</div></td>
+<td colspan="2"><input class="form-control" type="date" value={{modata.DocCut}} name="doccut"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Sail Date:</div></td>
+<td colspan="2"><input class="form-control" type="date" value={{modata.SailDate}} name="saildate"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Estimated Arrival:</div></td>
+<td colspan="2"><input class="form-control" type="date" value={{modata.EstArr}} name="estarr"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Amount (COGS):</div></td>
+<td colspan="2"><input class="form-control" type="text" value={{modata.Amount}} name="amount"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Role/Type:</div></td>
+<td>
+<select class="form-control" type="text" name="reltype">
+<option  {% if modata.RelType == 'telex' %} selected {% endif %} value="telex"> TELEX Release </option>
+<option  {% if modata.RelType == 'seaway' %} selected {% endif %} value="seaway"> Seaway Bill </option>
+</select>
+</td>
+</tr>
+<tr>
+<td> <div class="input-group-text">AES:</div></td>
+<td colspan="2"><input class="form-control" type="text" value={{modata.AES}} name="aes"></td>
+</tr>
+
+</tbody></table>
+<input type = "hidden" name ="book" value= {{book}}>

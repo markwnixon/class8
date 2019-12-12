@@ -1,0 +1,60 @@
+<table>
+    <tr><td colspan="3"><div class="input-group-text">History of Bills and Payments on JO {{modata.Jo}}</div></td>
+    </tr>
+    <tr>
+        <td><b>Date</b></td><td><b>Service</b></td><td><b>Invoiced</b></td><td></td>
+    </tr>
+    {% for data in ldata[0] %}
+    <tr>
+       <td>{{data.Date}}</td><td>{{data.Service}}</td><td align="right">{{data.Amount}}</td>
+    <td align="right"><input type="checkbox" name="invo{{data.id}}" value="{{data.id}}">
+    </tr>
+    {% endfor %}
+    <tr><td><b>Total</b></td> <td> </td> <td align="right"><b>{{ldata[3]}}</b></td> </tr>
+    <tr><td colspan="3">  </td></tr>
+    <tr>
+        <td><b>Date</b></td><td><b>Reference</b></td><td><b>Received</b></td><td></td>
+    </tr>
+    {% for data in ldata[1] %}
+    <tr>
+       <td>{{data.Date}}</td><td>{{data.Ref}}</td><td align="right">{{data.Amount}}</td>
+    <td align="right"><input type="checkbox" name="pay{{data.id}}" value="{{data.id}}">
+    </tr>
+    {% endfor %}
+    <tr><td><b>Total</b></td> <td> </td> <td align="right"><b>{{ldata[4]}}</b></td> </tr>
+    <tr><td colspan="3">  </td></tr>
+    <tr>
+        <td><b>Date</b></td><td><b>Company Paid</b></td><td><b>BillAmt</b></td><td></td>
+    </tr>
+    {% for data in ldata[2] %}
+    <tr>
+       <td>{{data.pDate}}</td><td>{{data.Company}}</td><td align="right">{{data.bAmount}}</td>
+    <td align="right"><input type="checkbox" name="invo{{data.id}}" value="{{data.id}}">
+    </tr>
+    {% endfor %}
+    {% set obal=ldata[6]%}
+    {% set prof=ldata[7]%}
+    {% if obal[0]=='-' %}
+        {% set cpick1 = 'red text-white font-weight-bold' %}
+    {% else %}
+        {% set cpick1 = 'green text-white font-weight-bold' %}
+    {% endif %}
+    {% if prof[0]=='-' %}
+        {% set cpick2 = 'red text-white font-weight-bold' %}
+    {% else %}
+        {% set cpick2 = 'green text-white font-weight-bold' %}
+    {% endif %}
+    <tr><td><b>Total</b></td> <td> </td> <td align="right"><b>{{ldata[5]}}</b></td> </tr>
+    <tr><td colspan="3">  </td></tr>
+    <tr><td colspan="3">  </td></tr>
+    <tr><td><b>Open Balance:</b></td> <td> </td> <td align="right" class="{{cpick1}}">${{obal}}&nbsp;</td> </tr>
+    <tr><td colspan="3">  </td></tr>
+    <tr><td><b>Gross Profit:</b></td> <td> </td> <td align="right" class="{{cpick2}}">${{prof}}&nbsp;</td> </tr>
+    <tr><td colspan="3">  </td></tr>
+    <tr><td colspan="3">  </td></tr>
+    <tr>
+       <td colspan="4"><button type="submit" class="btn btn-blue btn-sm" name="Return">Return</button>
+    <button type="submit" class="btn btn-red btn-sm" name="killthis">Delete</button></td>
+   </tr>
+</table>
+<input type = "hidden" name ="modlink" value= {{modlink}}>
