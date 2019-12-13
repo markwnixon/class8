@@ -7,8 +7,8 @@
         <div class="col-sm-3" align="left">
             <br>
 <input class="form-control" type="text" name="txtBarcode" id="txtBarcode">
-<button class="btn btn-primary"  onclick = "window.location.href = 'bwstw://startscanner?field=txtBarcode'">Start Scanner</button>
-<button type="submit" class="btn btn-primary" name="ThisJob">Send Scan</button>
+<button class="btn btn-primary"  onclick="javascript:startBarcodeScanner();">Start Scanner</button>
+<button type="submit" class="btn btn-primary" name="ThisJob">Decode VIN</button>
 
 <button type="button" name="btnScanBarcode" id="btnScanBarcode"
     style="height:56px;border-width:0px;"
@@ -18,7 +18,7 @@
 
         </div>
         <div class="col-sm-9" align="left">
-            My auto data found is:  {{ myautodata }}
+            {{ myautodata }}
         </div>
     </div>
 </div>

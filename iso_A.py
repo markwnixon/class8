@@ -84,8 +84,15 @@ def send_file2():
 @app.route('/Barcode', methods=['GET', 'POST'])
 def Barcode():
     if request.method == 'POST':
-        gotdat = request.values.get('txtBarcode')
-        myautodata = f'Data Found Is:{gotdat}'
+        gd = request.values.get('txtBarcode')
+        ld = len(gd)
+        if ld >= 18:
+            gd = gd[-17:]
+        if ld<17:
+            gd = f'VIN too short.  Need 17 char got {ld}'
+
+
+        myautodata = f'Decoding data for:{gd}'
     else:
         myautodata = 'No Data Yet'
     return render_template(f'Barcode.html',cmpdata=cmpdata, scac=scac, myautodata = myautodata)
