@@ -81,6 +81,15 @@ def send_file2():
     print('file uploaded')
     return "successful_upload"
 
+@app.route('/Barcode', methods=['GET', 'POST'])
+def Barcode():
+    if request.method == 'POST':
+        gotdat = request.values.get('txtBarcode')
+        myautodata = f'Data Found Is:{gotdat}'
+    else:
+        myautodata = 'No Data Yet'
+    return render_template(f'Barcode.html',cmpdata=cmpdata, scac=scac, myautodata = myautodata)
+
 
 @app.route('/')
 def index():
