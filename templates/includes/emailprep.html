@@ -4,10 +4,15 @@
 {% set emailcc2=emaildata[5] %}
 {% set etitle = emaildata[0] %}
 {% set ebody = emaildata[1] %}
+{% if invo>0 and stamp != 1%}
+    {% set etype = 'Invoice' %}
+{% elif inco>0 %}
+    {% set etype = 'Payment' %}
+{% endif %}
 
 <br>
 <div class="card">
-  <div class="card-header">
+  <div class="card-header" align = "center">
     Enter Email Associated with this {{ etype }}
   </div>
 <div class="card-body">

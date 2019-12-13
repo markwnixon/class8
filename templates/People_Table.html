@@ -1,0 +1,48 @@
+<br>
+<div class="card">
+<div class="card-header">
+Enter Customer Information
+</div>
+<div class="card-body">
+<table class="table table-condensed table-hover">
+<tbody>
+<tr>
+<td> <div class="input-group-text" align="right">Company/Name:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="company" value="{{modata.Company}}"></td>
+</tr>
+<tr>
+<td align="right"> <div class="input-group-text">Address Line1:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="addr1" value="{{modata.Addr1}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Address Line2:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="addr2" value="{{modata.Addr2}}"></td>
+</tr>
+<tr>
+<td align="right"> <div class="input-group-text">Telephone:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="tel" value="{{modata.Telephone}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Email Status:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="email" value="{{modata.Email}}"></td>
+</tr>
+<tr>
+<td align="right"> <div class="input-group-text">Email POD:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="assoc1" value="{{modata.Associate1}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Email AcctPayable:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="assoc2" value="{{modata.Associate2}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Date:</div></td>
+<td colspan="2"><input class="form-control" type="date" name="date1" value={{modata.Date1}}></td>
+</tr>
+</tbody></table>
+    {% include 'includes/_button_upd_ret.html' %}
+</div>
+</div>
+<input type = "hidden" name ="peep" value= {{peep}}>
+<input type = "hidden" name ="shipper" value= "{{holdvec[0]}}">
+<input type = "hidden" name ="thislcomp" value= "{{holdvec[1]}}">
+<input type = "hidden" name ="thisdcomp" value= "{{holdvec[2]}}">

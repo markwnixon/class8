@@ -1,0 +1,87 @@
+<table class="table table-condensed table-hover">
+<tbody>
+<tr>
+<td> <div class="input-group-text">Bill To:</div></td>
+<td colspan="2">
+<select class="form-control" type="text" name="shipper">
+<option value='Add New Company'>Add New Company</option>
+{% for data in data5 %}
+<option {% if data.Company == modata.Shipper %} selected {% endif %} value="{{data.Company}}">{{data.Company}}</option>
+{% endfor %}
+</select>
+</td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Load:</div></td>
+<td colspan="2"><input class="form-control" type="text" value="{{modata.Load}}" name="load"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Order:</div></td>
+<td colspan="2"><input class="form-control" type="text" value="{{modata.Order}}" name="order"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Bill of Lading</div></td>
+<td colspan="2"><input class="form-control" type="text" name="bol" value="{{modata.BOL}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Booking</div></td>
+<td colspan="2"><input class="form-control" type="text" name="booking" value="{{modata.Booking}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Container:</div></td>
+<td colspan="2"><input class="form-control" type="text" value="{{modata.Container}}" name="container"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Containerized:</div></td>
+<td>
+<select class="form-control" type="text" name="ctype">
+<option  {% if modata.Type == 'None' %} selected {% endif %} value='None'> None </option>
+<option  {% if modata.Type == '53FT Dry' %} selected {% endif %} value='53FT Dry'> 53FT Dry </option>
+<option  {% if modata.Type == '20FT STD' %} selected {% endif %} value='20FT STD'> 20FT STD </option>
+<option  {% if modata.Type == '40FT STD' %} selected {% endif %} value='40FT STD'> 40FT STD </option>
+<option  {% if modata.Type == '40FT HC' %} selected {% endif %} value='40FT HC'> 40FT HC </option>
+<option  {% if modata.Type == '40FT OT' %} selected {% endif %} value='40FT OT'> 40FT OT </option>
+<option  {% if modata.Type == '40FT REF' %} selected {% endif %} value='40FT REF'> 40FT REF </option>
+<option  {% if modata.Type == '45FT STD' %} selected {% endif %} value='45FT STD'> 45FT STD </option>
+<option  {% if modata.Type == '45FT HC' %} selected {% endif %} value='45FT HC'> 45FT HC </option>
+<option  {% if modata.Type == 'LCL' %} selected {% endif %} value='LCL'> LCL </option>
+<option  {% if modata.Type == 'RORO' %} selected {% endif %} value='RORO'> RORO </option>
+</select>
+</td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Pickup Number:</div></td>
+<td colspan="2"><input class="form-control" type="text" value="{{modata.Pickup}}" name="pickup"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text" data-toggle="tooltip" title="Enter 1st 3 letters of an existing location and program will load entire address for you on UPDATE">
+Load At:</div></td>
+<td colspan="2"><textarea class="form-control" type="text" name="dropblock1" rows="5">{{modata.Dropblock1}}</textarea></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Load Date:</div></td>
+<td colspan="2"><input class="form-control" type="date" value={{modata.Date}} name="date"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Load Time:</div></td>
+<td colspan="2"><input class="form-control" type="time" value={{modata.Time}} name="time"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text" data-toggle="tooltip" title="Enter 1st 3 letters of an existing location and program will load entire address for you on UPDATE">Deliver To:</div></td>
+<td colspan="2"><textarea class="form-control" type="text" name="dropblock2" rows="5">{{modata.Dropblock2}}</textarea></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Del Date:</div></td>
+<td colspan="2"><input class="form-control" type="date" value={{modata.Date2}} name="date2"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Del Time:</div></td>
+<td colspan="2"><input class="form-control" type="time" value={{modata.Time2}} name="time2"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Line Haul Amount:</div></td>
+<td colspan="2"><input class="form-control" type="text" value="{{modata.Amount}}" name="amount"></td>
+</tr>
+
+</tbody></table>
+<input type = "hidden" name ="oder" value= {{oder}}>

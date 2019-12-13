@@ -1,0 +1,94 @@
+<br>
+<div class="card">
+<div class="card-header">
+Enter New Job Information
+</div>
+<div class="card-body">
+
+
+<table class="table table-condensed table-hover">
+<tbody>
+<tr>
+<td><div class="input-group-text">Job Start Date:</div></td>
+<td><input class="form-control" type="date" name="dstart" value="{{today}}"></td>
+</tr>
+<tr>
+<td><div class="input-group-text">Choose Customer:</div></td>
+<td>
+<select class="form-control" type="text" name="shipper" onchange="this.form.submit()">
+<option value='1'>Choose Later</option>
+<option value='2'>Add New Now</option>
+{% for data in data5 %}
+<option value="{{data.Company}}" {% if data.Company == holdvec[0] %} selected {% endif %}> {{data.Company}} </option>
+{% endfor %}</select>
+</td>
+</tr>
+<tr>
+<td><div class="input-group-text">Order:</div></td>
+<td><input class="form-control" type="text" name="order" value=" "></td>
+</tr>
+<tr>
+<td><div class="input-group-text">Bill of Lading:</div></td>
+<td><input class="form-control" type="text" name="bol" value=" "></td>
+</tr>
+<tr>
+<td><div class="input-group-text">Booking:</div></td>
+<td><input class="form-control" type="text" name="booking" value=" "></td>
+</tr>
+<tr>
+<td><div class="input-group-text">Container:</div></td>
+<td><input class="form-control" type="text" name="container" value=" "></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Containerized:</div></td>
+<td>
+<select class="form-control" type="text" name="ctype">
+<option    value='None'> None </option>
+<option    value='53FT Dry'> 53FT Dry </option>
+<option    value='20FT STD'> 20FT STD </option>
+<option   selected  value='40FT STD'> 40FT STD </option>
+<option   value='40FT HC'> 40FT HC </option>
+<option   value='40FT OT'> 40FT OT </option>
+<option   value='40FT REF'> 40FT REF </option>
+<option   value='45FT STD'> 45FT STD </option>
+<option   value='45FT HC'> 45FT HC </option>
+<option   value='LCL'> LCL </option>
+<option   value='RORO'> RORO </option>
+
+</select>
+</td>
+</tr>
+<tr>
+<td><div class="input-group-text">Pickup No.:</div></td>
+<td><input class="form-control" type="text" name="pickup" value=" "></td>
+</tr>
+<tr>
+<td> <div class="input-group-text" data-toggle="tooltip" title="Enter 1st 3 letters of an existing location and program will load entire address for you on UPDATE">Load At:<br>test</div></td>
+<td colspan="2"><textarea class="form-control" type="text" name="dropblock1" rows="4">  </textarea></td>
+</tr>
+<tr>
+<td><div class="input-group-text">Load Date:</div></td>
+<td><input class="form-control" type="date" name="ldate" value="{{today}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text" data-toggle="tooltip" title="Enter 1st 3 letters of an existing location and program will load entire address for you on UPDATE">Deliver To:</div></td>
+<td colspan="2"><textarea class="form-control" type="text" name="dropblock2" rows="4"></textarea></td>
+</tr>
+<tr>
+<td><div class="input-group-text">Deliver Date:</div></td>
+<td><input class="form-control" type="date" name="ddate" value="{{today}}"></td>
+</tr>
+<tr>
+<td><div class="input-group-text">Job Total Value:</div></td>
+<td><input class="form-control" type="text" name="thisamt" value="905.00"></td>
+</tr>
+<tr>
+<tr>
+<td colspan="2">
+<button type="submit" class="btn btn-primary" name="ThisJob">Create Job</button>
+<button type="submit" class="btn btn-elegant" name="Return">Return</button>
+</td>
+</tr></tbody></table>
+
+</div>
+</div>

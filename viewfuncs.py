@@ -1300,6 +1300,33 @@ def global_inv(odata,odervec):
 
     return docref
 
+
+def make_new_order():
+    sdate = request.values.get('dstart')
+    if sdate is None:
+        sdate = today.strftime('%Y-%m-%d')
+    jtype = 'T'
+    nextjo = newjo(jtype, sdate)
+    input = Orders(Status='00', Jo=nextjo, Load=None, Order=None, Company=None, Location=None, Booking=None,
+                   BOL=None, Container=None,
+                   Date=None, Driver=None, Company2=None, Time=None, Date2=None, Time2=None, Seal=None,
+                   Pickup=None, Delivery=None,
+                   Amount=None, Path=None, Original=None, Description=None, Chassis=None, Detention='0',
+                   Storage='0',
+                   Release=0, Shipper=None, Type=None, Time3=None, Bid=None, Lid=None, Did=None, Label='FileUpload',
+                   Dropblock1=None, Dropblock2=None, Commodity=None, Packing=None, Links=None, Hstat=0, Istat=0,
+                   Proof=None)
+    db.session.add(input)
+    db.session.commit()
+    odat = Orders.query.filter(Orders.Jo == nextjo).first()
+    oid = odat.id
+    print('madeneworder',oid,nextjo)
+    return oid,nextjo
+
+
+
+
+
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -1312,7 +1339,13 @@ def docuploader(dbase):
         oder = nonone(oder)
         print(oder)
         odat = Orders.query.get(oder)
-        base = odat.Jo
+        if odat is not None:
+            base = odat.Jo
+        else:
+            oder, jo = make_new_order()
+            odat = Orders.query.get(oder)
+            if odat is not None:
+                base = odat.Jo
 
         file = request.files['sourceupload']
         if file.filename == '':
@@ -1371,7 +1404,7 @@ def docuploader(dbase):
         else:
             err.append('Allowed file types are txt, pdf, png, jpg, jpeg, gif')
 
-    return err
+    return err, oder
 
 def dataget_T(thismuch, dlist):
     # 0=order,#2=interchange,#3=people/services
@@ -1393,11 +1426,17 @@ def dataget_T(thismuch, dlist):
             idata = Interchange.query.filter((Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
     elif thismuch == '3':
         if dlist[0] == 'on':
-            odata = Orders.query.filter(Orders.Istat<2).all()
+            odata = Orders.query.filter(Orders.Istat<1).all()
         if dlist[2] == 'on':
             idata = Interchange.query.filter(
                 (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
     elif thismuch == '4':
+        if dlist[0] == 'on':
+            odata = Orders.query.filter(Orders.Istat==1).all()
+        if dlist[2] == 'on':
+            idata = Interchange.query.filter(
+                (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
+    elif thismuch == '5':
         if dlist[0] == 'on':
             odata = Orders.query.filter(Orders.Istat<4).all()
         if dlist[2] == 'on':
@@ -1417,3 +1456,4 @@ def erud(err):
         if len(e) > 0:
             errup = errup + e.strip() + '\n'
     return errup
+

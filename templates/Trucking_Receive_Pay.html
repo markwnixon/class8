@@ -1,0 +1,38 @@
+<table class="table table-condensed table-hover">
+<tbody>
+<tr>
+<td> <div class="input-group-text">Amount:</div></td>
+<td colspan="2"><input class="form-control" type="text" value={{modata.Amount}} name="recamount"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Customer Chk/Remit/Ref#:</div></td>
+<td colspan="2"><input class="form-control" type="text" value="{{modata.Ref}}" name="custref"></td>
+</tr>
+<tr>
+<td><div class="input-group-text">Description:</div></td>
+<td><textarea class="form-control" type="text" name="desc" rows="2">{{modata.Description}}</textarea></td></tr>
+<tr>
+<td> <div class="input-group-text">Date:</div></td>
+<td colspan="2"><input class="form-control" type="date" name="recdate" value={{modata.Date}}></td>
+</tr>
+<tr>
+<td><div class="input-group-text">Funds Received as:</div></td>
+<td colspan="2">
+<select class="form-control" type="text" name="acctto">
+{% for b in bklist %}
+<option  {% if modata.SubJo == b %} selected {% endif %} value='{{b}}'>
+{% if b =='Cash' %} Cash or Single-Job Check
+{% elif b == 'Mcheck' %} Multi-Job Check
+{% elif b == 'Mremit' %} Multi-Job Remittance
+{% else %} Direct to {{b}} {% endif %}
+
+</option>
+{% endfor %}
+</td>
+</tr>
+</tbody></table>
+<input type = "hidden" name ="invooder" value= {{invooder}}>
+<input type = "hidden" name ="invo" value= {{invo}}>
+<input type = "hidden" name ="odor" value= {{odor}}>
+<input type = "hidden" name ="cache" value= {{cache}}>
+<input type = "hidden" name ="inco" value= {{inco}}>

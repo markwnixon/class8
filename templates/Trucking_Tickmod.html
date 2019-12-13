@@ -1,0 +1,56 @@
+<input type = "hidden" name="passmodlink" value="{{modlink}}">
+<input type = "hidden" name ="tick" value= "{{tick}}">
+
+<table class="table table-condensed table-hover">
+<tbody>
+
+<tr>
+<td> <div class="input-group-text" align="right">Container:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="intcontainer" value="{{modata.CONTAINER}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text" align="right">Date:</div></td>
+<td colspan="2"><input class="form-control" type="date" name="intdate" value={{modata.Date}}></td>
+</tr>
+<tr>
+<td align="right"> <div class="input-group-text">Time:</div></td>
+<td colspan="2"><input class="form-control" type="time" name="inttime" value={{modata.Time}}></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Chassis:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="chassis" value="{{modata.CHASSIS}}"></td>
+</tr>
+<tr>
+<td align="right"> <div class="input-group-text">Booking/Release:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="release" value="{{modata.RELEASE}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Truck:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="truck" value="{{modata.TRUCK_NUMBER}}"></td>
+</tr>
+<tr>
+<td align="right"> <div class="input-group-text">Gross Wt:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="grosswt" value="{{modata.GROSS_WT}}"></td>
+</tr>
+
+<tr>
+<td> <div class="input-group-text">Driver:</div></td>
+<td><select type="text" name="driver" class="form-control">
+{% for data in alltdata: %}
+<option {% if data.Name == modata.DRIVER %} selected {% endif %} value="{{data.Name}}">{{data.Name}}</option>
+{% endfor %}
+</select>
+</td>
+</tr>
+<tr>
+<td> <div class="input-group-text">In/Out Type:</div></td>
+<td><select type="text" name="type" class="form-control">
+<option {% if modata.TYPE == 'Load In' %} selected {% endif %} value="Load In">Load In</option>
+<option {% if modata.TYPE == 'Load Out' %} selected {% endif %} value="Load Out">Load Out</option>
+<option {% if modata.TYPE == 'Empty In' %} selected {% endif %} value="Empty In">Empty In</option>
+<option {% if modata.TYPE == 'Empty Out' %} selected {% endif %} value="Empty Out">Empty Out</option>
+</select>
+</td>
+</tr>
+
+</tbody></table>

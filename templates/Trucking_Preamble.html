@@ -1,22 +1,20 @@
 <div class="row">
 {% if leftsize > 6 or stamp==1 %}
 <div class="col-sm-5" align="right">
-{% if emaildata %}
-{% include 'includes/emailprep.html' %}
-{% else %}
-Text version of file {{leftsize}}{{rightsize}}{{mm1}}:<br>
-<embed src="{{doctxt}}" width="300px" height="550px"/>
-{% endif %}
+    {% if emaildata %}
+        {% include 'includes/emailprep.html' %}
+    {% elif modlink == 4 %}
+        <br>
+        {% include 'includes/_uploadsourcedocs.html' %}
+
+    {% else %}
+        Text version of file {{leftsize}}{{rightsize}}{{mm1}}:<br>
+        <embed src="{{doctxt}}" width="400px" height="650px"/>
+    {% endif %}
 </div>
 {% endif %}
-<div class="col-sm-7" align="right">
-{% if invo == 1 or quot == 1  and ldata %}
-<div class="card">
-{% include 'includes/_services_banner.html' %}
-</div>
-{% else %}
+<div class="col-sm-7" align="center">
 Looking for: {{docref}}<br>
-{% endif %}
 {% if rightsize == 4 %}
 {% set wide = "550px" %}
 {% else %}

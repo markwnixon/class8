@@ -17,6 +17,7 @@ import requests
 import mimetypes
 from urllib.parse import urlparse
 import img2pdf
+from viewfuncs import make_new_order
 
 today = datetime.datetime.today()
 year = str(today.year)
@@ -28,10 +29,14 @@ cmpdata = companydata()
 
 @app.route('/sendfile1', methods=['GET', 'POST'])
 def send_file1():
+    print('sendingfile1')
     odat = Orders.query.filter(Orders.Original=='star').first()
     if odat is not None:
         oder = odat.id
         jo = odat.Jo
+    else:
+        oder,jo = make_new_order()
+        odat = Orders.query.get(oder)
     fileob = request.files["file2upload"]
     name, ext = os.path.splitext(fileob.filename)
     filename1 = f'Source_{jo}{ext}'

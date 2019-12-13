@@ -6,6 +6,7 @@ from InterchangeFuncs import Order_Container_Update, Matched_Now
 from iso_InvM import updateinvo
 from email_appl import etemplate_truck
 
+
 import math
 from decimal import Decimal
 import datetime
@@ -32,13 +33,14 @@ def isoT():
         from invoice_mimemail import invoice_mimemail
         from invoice_makers import multi_inv
         from gledger_write import gledger_write
+        import requests
 
         # Zero and blank items for default
         username = session['username'].capitalize()
         pod_path, job_path, int_path = f'processing/pods/', f'processing/tjobs/', f'processing/interchange/'
         oder, poof, tick, serv, peep, invo, cache, modata, modlink, stayslim, invooder, stamp, fdata, csize, invodate, inco, cdat, pb, passdata, vdata, caldays, daylist, weeksum, nweeks = init_truck_zero()
         filesel,docref,doctxt,etitle,ebody,emaildata,stampdata = '','','','','','',''
-        drvdata,bklist=0,0
+        drvdata, bklist, servid, howapp= 0, 0, 0, 0
         lastpr = request.values.get('lastpr')
 
         today = datetime.date.today()
@@ -46,7 +48,6 @@ def isoT():
         today_str = today_dt.strftime('%Y-%m-%d')
         now = datetime.datetime.now()
         now = now.time()
-        howapp = 0
         newc = 'Not found at top'
 
         match, modify, vmod, minvo, mpack, viewo, viewi, viewp, printn, addE, addS, slim, stayslim, unslim, limitptype, returnhit, deletehit, update, invoupdate, emailnow, emailinvo, newjob, thisjob, recpay, hispay, recupdate, calendar, calupdate = viewbuttons()
@@ -75,6 +76,12 @@ def isoT():
         quotupdate = request.values.get('quotUpdate')
         uploadS = request.values.get('UploadS')
         uploadP = request.values.get('UploadP')
+        invoserv = request.values.get('invoserv')
+
+        if invoserv is not None:
+            invoupdate = '1'
+            servid = nonone(invoserv)
+
 
         thisbox = request.values.get('addbox')
         if thisbox == '1':
@@ -148,9 +155,16 @@ def isoT():
             quot = 0
             mm1 = 0
 
-        if modlink == 70:
-            err = docuploader('oder')
-            modlink = 0
+        if modlink == 70 or modlink == 4:
+            err, oid = docuploader('oder')
+            if modlink == 4:
+                oder = oid
+                odat = Orders.query.get(oder)
+                docref = f'tmp/{scac}/data/vorders/' + odat.Original
+                print(oder,docref)
+                modlink = 1
+            else:
+                modlink = 0
         if modlink == 71:
             err = docuploader('poof')
             modlink = 0
@@ -270,14 +284,8 @@ def isoT():
 
         if update is None and modlink == 1:
             if oder > 0:
-                fdata = myoslist(job_path)
-                fdata.sort()
-                filesel = request.values.get('FileSel')
-                cdata = People.query.filter(
-                    People.Ptype == 'Trucking').order_by(People.Company).all()
                 leftsize = 8
                 leftscreen = 0
-                docref = f'tmp/{scac}/processing/tjobs/'+filesel
                 doctxt = docref.split('.', 1)[0]+'.txt'
                 modata = Orders.query.get(oder)
         print(update,modlink,tick)
@@ -435,6 +443,11 @@ def isoT():
                 db.session.commit()
                 err = [' ', ' ', 'Modification to Services Data with ID ' +
                        str(modata.id) + ' completed.', ' ',  ' ']
+                sdat = Services.query.filter(Services.Service == 'New').first()
+                if sdat is not None:
+                    print('Removing Uncompleted Service Data')
+                    Services.query.filter(Services.Service == 'New').delete()
+                    db.session.commit()
                 modlink = 0
 
             if peep > 0:
@@ -471,6 +484,7 @@ def isoT():
             if quotupdate is not None:
                 quot = 1
                 invo = 1
+
             leftsize = 8
             odata1 = Orders.query.get(invooder)
 
@@ -1506,12 +1520,10 @@ def isoT():
                 cache = myo.Storage+1
 
                 # These are the services we wish to add to the invoice
-                sdata = Services.query.order_by(Services.Price.desc()).all()
-                for data in sdata:
-                    testone = request.values.get('serv'+str(data.id))
-                    if testone:
-                        servid = int(testone)
-                        mys = Services.query.get(servid)
+                print('servid=',servid)
+                if servid > 0:
+                    mys = Services.query.get(servid)
+                    if mys is not None:
                         qty = 1
                         descript = ' '
                         if mys.Service == 'Line Haul':
@@ -1973,7 +1985,10 @@ def isoT():
     odata, idata = dataget_T(thismuch, dlist)
     alltdata = Drivers.query.all()
     allvdata = Vehicles.query.all()
-    leftsize=9
+    if invo is not None:
+        leftsize = 8
+    else:
+        leftsize=9
     rightsize = 12-leftsize
     sdata2 = Services.query.order_by(Services.Service).all()
     err = erud(err)
