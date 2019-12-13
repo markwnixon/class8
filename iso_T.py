@@ -165,9 +165,11 @@ def isoT():
                 modlink = 1
             else:
                 modlink = 0
+            print('err=',err)
         if modlink == 71:
-            err = docuploader('poof')
+            err, oid = docuploader('poof')
             modlink = 0
+            print('err=', err)
 
 # ____________________________________________________________________________________________________________________E.FormVariables.Trucking
 # ____________________________________________________________________________________________________________________B.DataUpdates.Trucking
@@ -730,7 +732,7 @@ def isoT():
                 except:
                     stampdata = [3, 35, 35, 5, 120, 100, 5, 477, 350,'loadconfirmation','proofs','invoice','none']
 
-                emaildata = etemplate_truck('invoice',1,data1.Bid,jo.order)
+                emaildata = etemplate_truck('invoice',2,odata1.Bid,jo, order)
                 invo = 3
 
                 if ofile is None:
