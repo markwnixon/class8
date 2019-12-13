@@ -106,7 +106,11 @@ table tr td{
  <script type="text/javascript" src="tmp/js/addons/datatables.min.js"></script>
 
 <script>
-
+function startBarcodeScanner()
+{
+	alert("Using client JavaScript to start scanner.");
+	window.location.href = 'bwstw://startscanner?field=txtField2';
+}
 
 var dragHandler = function(evt){
 evt.preventDefault();

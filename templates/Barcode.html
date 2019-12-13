@@ -10,7 +10,12 @@
 <button type="submit" class="btn btn-primary" name="ThisJob" onclick = "window.location.href = 'bwstw://startscanner?field=txtBarcode'">Start Scanner</button>
 <button type="submit" class="btn btn-primary" name="ThisJob">Send Scan</button>
 
-            <a href="bwstw://startscanner">Link to start scanner</a>
+<button type="button" name="btnScanBarcode" id="btnScanBarcode"
+    style="height:56px;border-width:0px;"
+    onclick="javascript:startBarcodeScanner();">
+<img src="http://berrywing.com/images/barcode_2d.png" style="height: 50px; width: 50px">
+</button>
+
         </div>
         <div class="col-sm-9" align="left">
             My auto data found is:  {{ myautodata }}
