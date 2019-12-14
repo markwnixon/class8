@@ -87,18 +87,29 @@ def Barcode():
     if request.method == 'POST':
         gd = request.values.get('txtBarcode')
         ld = len(gd)
-        if ld >= 18:
+        suc = False
+        specs = 0
+
+        # ld of length 17 and 18 reserved for automobile barcodes only
+        if ld == 18:
             gd = gd[-17:]
+            ld = len(gd)
         if ld<17:
-            gd = f'VIN too short.  Need 17 char got {ld}'
+            gd = f'VIN too short.  Need 17 char got {ld} in {gd}'
+        if ld>17:
+            gd = f'VIN too long.  Need 17 char got {ld} in {gd}'
 
         if len(gd) == 17:
-            myautodata = getvindata(gd)
+            decodeheader = f'Decoded VIN:{gd}'
+            suc, specs = getvindata(gd)
         else:
-            myautodata = f'Decoding data for:{gd}'
+            decodeheader = f'Decoding data for:{gd}'
     else:
-        myautodata = 'No Data Yet'
-    return render_template(f'Barcode.html',cmpdata=cmpdata, scac=scac, myautodata = myautodata)
+        decodeheader = 'No Data Yet'
+        suc = False
+        specs = 0
+
+    return render_template(f'Barcode.html',cmpdata=cmpdata, scac=scac, decodeheader=decodeheader, suc=suc, specs=specs)
 
 
 @app.route('/')

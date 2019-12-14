@@ -20,25 +20,22 @@ def getvindata(vintoget):
     r = requests.request("GET", url, headers=headers, params=querystring)
     dataret = r.json()
     print(dataret)
-    testret = dataret['success']
-    print(testret)
-    specs = dataret['specification']
-    vin = specs['vin']
-    year = specs['year']
-    make = specs['make']
-    model = specs['model']
-    trim = specs['trim_level']
-    engine = specs['engine']
-    style = specs['style']
-    height = specs['overall_height']
-    length = specs['overall_length']
-    width = specs['overall_width']
+    suc = dataret['success']
+    print(suc)
+    if suc is True:
+        specs = dataret['specification']
+        vin = specs['vin']
+        year = specs['year']
+        make = specs['make']
+        model = specs['model']
 
-    input = Autos(Jo=None, Hjo=None, Year=year, Make=make, Model=model, Color=None, VIN=vin,
-                  Title='', State='', EmpWeight=None, Dispatched=None, Value=None,
-                  TowCompany=None, TowCost=None, TowCostEa=None, Original='',
-                  Status='New', Date1=today, Date2=today, Pufrom=None, Delto=None, Ncars=1, Orderid=None)
-    db.session.add(input)
-    db.session.commit()
+        input = Autos(Jo=None, Hjo=None, Year=year, Make=make, Model=model, Color=None, VIN=vin,
+                      Title='', State='', EmpWeight='Star', Dispatched=None, Value='Star',
+                      TowCompany=None, TowCost=None, TowCostEa=None, Original='',
+                      Status='New', Date1=today, Date2=today, Pufrom=None, Delto=None, Ncars=1, Orderid=None)
+        db.session.add(input)
+        db.session.commit()
+    else:
+        specs = 0
 
-    return r.text
+    return suc, specs

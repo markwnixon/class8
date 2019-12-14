@@ -5,24 +5,41 @@
 <div class="table-responsive">
     <div class="row">
         <div class="col-sm-3" align="left">
-            <br>
-<input class="form-control" type="text" name="txtBarcode" id="txtBarcode">
-<button type="button" name="btnScanBarcode" id="btnScanBarcode"
-    style="height:56px;border-width:0px;"
-    onclick="javascript:startBarcodeScanner();">
-<img src="http://berrywing.com/images/barcode_2d.png" style="height: 50px; width: 50px">
-</button>
-<!--
-<button class="btn btn-primary" name="btnScanBarcode" id="btnScanBarcode" onclick="javascript:startBarcodeScanner();">Start Scanner</button>
--->
+                <br>
+                <input class="form-control" type="text" name="txtBarcode" id="txtBarcode">
+                <button type="button" class="btn btn-primary" name="btnScanBarcode" id="btnScanBarcode"
+                    onclick="javascript:startBarcodeScanner();">
+                <!--<img src="http://berrywing.com/images/barcode_2d.png" style="height: 50px; width: 50px">-->
+                    Scan & Submit
+                </button>
+                           <!-- style="height:56px;border-width:0px;"-->
+                <!--
+                <button class="btn btn-primary" name="btnScanBarcode" id="btnScanBarcode" onclick="javascript:startBarcodeScanner();">Start Scanner</button>
+                -->
 
-<button type="submit" class="btn btn-primary" name="ThisJob">Decode VIN</button>
+                <button type="submit" class="btn btn-primary" name="ThisJob">Decode VIN</button>
+                <br>
+                <div class="card">
 
+                        <div class="card-header">
+                        Message: {{ decodeheader }}
+                        </div>
 
+                        <div class="card-body">
+                        {% if suc  %}
+                            {% for key in specs %}
+                            {{ key.upper() }} : {{ specs[key] }}<br>
+                            {% endfor %}
+                        {% else %}
+                            No specifications obtained
+                        {% endif %}
+                        </div>
 
+                </div>
         </div>
+
         <div class="col-sm-9" align="left">
-            {{ myautodata }}
+
         </div>
     </div>
 </div>
