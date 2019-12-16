@@ -1,3 +1,16 @@
+{% set htype = 'Modify Payment Received on' %}
+{% set update = 'recUpdate'%}
+{% set logonly = 'logRec'%}
+{% set etype = 'Payment' %}
+
+<br>
+
+<div class="card">
+<div class="card-header">
+{{htype}} {{modata.Jo}}
+</div>
+<div class="card-body">
+
 <table class="table table-condensed table-hover">
 <tbody>
 <tr>
@@ -31,6 +44,14 @@
 </td>
 </tr>
 </tbody></table>
+
+{% include 'includes/_inco_invo.html' %}
+
+</div>
+</div>
+
+
+
 <input type = "hidden" name ="invooder" value= {{invooder}}>
 <input type = "hidden" name ="invo" value= {{invo}}>
 <input type = "hidden" name ="odor" value= {{odor}}>

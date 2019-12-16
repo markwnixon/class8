@@ -1,9 +1,15 @@
+<br>
+<div class="card">
+<div class="card-header">
+Create Manifest for Job {{ modata.Jo }}
+</div>
 
+<div class="card-body">
 <table>
 <tbody>
 <tr>
     <td> <div class="input-group-text">Driver:</div></td>
-    <td><select type="text" name="driver" class="form-control">
+    <td><select type="text" name="driver" class="form-control" onchange="this.form.submit()">
         {% for data in alltdata: %}
         <option {% if data.Name == drvdata.Name %} selected {% endif %} value="{{data.Name}}">{{data.Name}}</option>
         {% endfor %}
@@ -17,7 +23,7 @@
 
 
 <td> <div class="input-group-text">Truck Unit:</div></td>
-    <td><select type="text" name="truck" class="form-control">
+    <td><select type="text" name="truck" class="form-control" onchange="this.form.submit()">
         {% for data in allvdata: %}
         <option {% if data.Unit == tdata.Unit %} selected {% endif %} value="{{data.Unit}}">{{data.Unit}}</option>
         {% endfor %}
@@ -78,9 +84,6 @@
 
 </tbody>
 </table>
-<p class="small">
-<button type="submit" class="btn btn-elegant btn-sm" name="Update">Update</button>
-
-<button type="submit" class="btn btn-blue btn-sm" name="Return">Return</button>
-
-</p>
+{% include 'includes/_button_upd_ret.html' %}
+</div>
+</div>

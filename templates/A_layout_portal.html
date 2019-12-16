@@ -132,14 +132,27 @@ var dropHandler1 = function(evt){
     };
 
     var promise = $.ajax(req);
+    promise.then(returntomain1);
 };
+
+function returntomain1(sitelocation)
+{
+    window.location.href = sitelocation;
+}
+
+
 
 var dropHandler2 = function(evt){
     evt.preventDefault();
     var files = evt.originalEvent.dataTransfer.files;
+    var oid = document.getElementById("passoder").value;
+    var uptype = document.getElementById("uploadtype").value;
+
 
     var formData = new FormData();
     formData.append("file2upload", files[0]);
+    formData.append("oid",oid);
+    formData.append("uptype",uptype);
 
     var req = {
         url: "/sendfile2",
@@ -150,6 +163,7 @@ var dropHandler2 = function(evt){
     };
 
     var promise = $.ajax(req);
+    promise.then(returntomain1('/Trucking'));
 };
 
 var dropHandlerSet1 = {

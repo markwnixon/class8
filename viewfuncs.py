@@ -197,19 +197,19 @@ def parselinenoupper(line,j):
     return outline
 
 def nonone(input):
-    if input is not None:
+    if input is not None and input != 'None':
         output=int(input)
     else:
         output=0
     return output
 
 def nons(input):
-    if input is None:
+    if input is None or input == 'None':
         input=''
     return input
 
 def nononef(input):
-    if input=='' or input==' ' or input=='None':
+    if input=='' or input==' ' or input=='None' or input is None:
         output=0.00
     else:
         input=input.replace('$','').replace(',','')
@@ -1305,19 +1305,62 @@ def make_new_order():
     sdate = request.values.get('dstart')
     if sdate is None:
         sdate = today.strftime('%Y-%m-%d')
+
     jtype = 'T'
     nextjo = newjo(jtype, sdate)
-    input = Orders(Status='00', Jo=nextjo, Load=None, Order=None, Company=None, Location=None, Booking=None,
-                   BOL=None, Container=None,
-                   Date=None, Driver=None, Company2=None, Time=None, Date2=None, Time2=None, Seal=None,
-                   Pickup=None, Delivery=None,
-                   Amount=None, Path=None, Original=None, Description=None, Chassis=None, Detention='0',
+
+    vals = ['shipper', 'load', 'order', 'bol', 'booking', 'container', 'pickup',
+            'dropblock1', 'ldate', 'ltime', 'dropblock2', 'ddate', 'dtime', 'thisamt', 'seal', 'ctype']
+    a = list(range(len(vals)))
+    i = 0
+    for ix, vx in enumerate(vals):
+        a[ix] = request.values.get(vx)
+
+    bid = People.query.filter(People.Company == a[0]).first()
+    if bid is not None:
+        idb = bid.id
+    else:
+        idb = 0
+
+    dropblock1 = a[7]
+    dropblock2 = a[10]
+
+    idl, newdrop1, company = testdrop(dropblock1)
+    idd, newdrop2, company2 = testdrop(dropblock2)
+
+    if idl == 0:
+        company = dropupdate(dropblock1)
+        newdrop1 = a[7]
+        lid = Drops.query.filter(Drops.Entity == company).first()
+        if lid is not None:
+            idl = lid.id
+        else:
+            idl = 0
+
+    if idd == 0:
+        company2 = dropupdate(dropblock2)
+        newdrop2 = a[10]
+        did = Drops.query.filter(Drops.Entity == company2).first()
+        if did is not None:
+            idd = did.id
+        else:
+            idd = 0
+
+    if a[13] is None:
+        a[13] = '0.00'
+
+    input = Orders(Status='00', Jo=nextjo, Load=a[1], Order=a[2], Company=company, Location=None, Booking=a[4],
+                   BOL=a[3], Container=a[5],
+                   Date=a[8], Driver=None, Company2=company2, Time=a[9], Date2=a[11], Time2=a[12], Seal=a[14],
+                   Pickup=a[6], Delivery=None,
+                   Amount=a[13], Path=None, Original=None, Description=None, Chassis=None, Detention='0',
                    Storage='0',
-                   Release=0, Shipper=None, Type=None, Time3=None, Bid=None, Lid=None, Did=None, Label='FileUpload',
-                   Dropblock1=None, Dropblock2=None, Commodity=None, Packing=None, Links=None, Hstat=0, Istat=0,
+                   Release=0, Shipper=a[0], Type=a[15], Time3=None, Bid=idb, Lid=idl, Did=idd, Label='FileUpload',
+                   Dropblock1=newdrop1, Dropblock2=newdrop2, Commodity=None, Packing=None, Links=None, Hstat=0, Istat=0,
                    Proof=None)
     db.session.add(input)
     db.session.commit()
+
     odat = Orders.query.filter(Orders.Jo == nextjo).first()
     oid = odat.id
     print('madeneworder',oid,nextjo)
@@ -1337,7 +1380,7 @@ def docuploader(dbase):
     if dbase == 'oder':
         oder = request.values.get('passoder')
         oder = nonone(oder)
-        print(oder)
+        print('docuploader oder value:',oder)
         odat = Orders.query.get(oder)
         if odat is not None:
             base = odat.Jo
@@ -1375,7 +1418,7 @@ def docuploader(dbase):
     if dbase == 'poof':
         oder = request.values.get('passoder')
         oder = nonone(oder)
-        print(oder)
+        print('oder for proof upload:',oder)
         odat = Orders.query.get(oder)
         base = odat.Jo
 
@@ -1383,12 +1426,14 @@ def docuploader(dbase):
         if file.filename == '':
             err.append('No file selected for uploading')
 
+        print(file.filename)
+
         if file and allowed_file(file.filename):
             name, ext = os.path.splitext(file.filename)
             filename1 = f'Proof_{base}{ext}'
             filename2 = f'Proof_{base}.pdf'
-            output1 = addpath(tpath('poof',filename1))
-            output2 = addpath(tpath('poof',filename2))
+            output1 = addpath(tpath(dbase,filename1))
+            output2 = addpath(tpath(dbase,filename2))
             file.save(output1)
             if filename1 != filename2:
                 try:
@@ -1402,6 +1447,7 @@ def docuploader(dbase):
             odat.Proof = filename2
             db.session.commit()
         else:
+            print('file not uploaded')
             err.append('Allowed file types are txt, pdf, png, jpg, jpeg, gif')
 
     return err, oder
@@ -1455,5 +1501,7 @@ def erud(err):
     for e in err:
         if len(e) > 0:
             errup = errup + e.strip() + '\n'
+    if len(errup)<1:
+        errup = 'All is Well'
     return errup
 

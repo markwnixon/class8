@@ -1,3 +1,13 @@
+<br>
+<div class="card">
+<div class="card-header">
+Modifying {{ modata.Jo }}
+</div>
+<div class="card-body">
+
+
+
+
 <table class="table table-condensed table-hover">
 <tbody>
 <tr>
@@ -10,10 +20,6 @@
 {% endfor %}
 </select>
 </td>
-</tr>
-<tr>
-<td> <div class="input-group-text">Load:</div></td>
-<td colspan="2"><input class="form-control" type="text" value="{{modata.Load}}" name="load"></td>
 </tr>
 <tr>
 <td> <div class="input-group-text">Order:</div></td>
@@ -56,32 +62,30 @@
 <tr>
 <td> <div class="input-group-text" data-toggle="tooltip" title="Enter 1st 3 letters of an existing location and program will load entire address for you on UPDATE">
 Load At:</div></td>
-<td colspan="2"><textarea class="form-control" type="text" name="dropblock1" rows="5">{{modata.Dropblock1}}</textarea></td>
+<td colspan="2"><textarea class="form-control" type="text" name="dropblock1" rows="3">{{modata.Dropblock1}}</textarea></td>
 </tr>
 <tr>
 <td> <div class="input-group-text">Load Date:</div></td>
 <td colspan="2"><input class="form-control" type="date" value={{modata.Date}} name="date"></td>
 </tr>
 <tr>
-<td> <div class="input-group-text">Load Time:</div></td>
-<td colspan="2"><input class="form-control" type="time" value={{modata.Time}} name="time"></td>
-</tr>
 <tr>
 <td> <div class="input-group-text" data-toggle="tooltip" title="Enter 1st 3 letters of an existing location and program will load entire address for you on UPDATE">Deliver To:</div></td>
-<td colspan="2"><textarea class="form-control" type="text" name="dropblock2" rows="5">{{modata.Dropblock2}}</textarea></td>
+<td colspan="2"><textarea class="form-control" type="text" name="dropblock2" rows="3">{{modata.Dropblock2}}</textarea></td>
 </tr>
 <tr>
 <td> <div class="input-group-text">Del Date:</div></td>
 <td colspan="2"><input class="form-control" type="date" value={{modata.Date2}} name="date2"></td>
 </tr>
 <tr>
-<td> <div class="input-group-text">Del Time:</div></td>
-<td colspan="2"><input class="form-control" type="time" value={{modata.Time2}} name="time2"></td>
-</tr>
-<tr>
-<td> <div class="input-group-text">Line Haul Amount:</div></td>
+<td> <div class="input-group-text">Base Charge:</div></td>
 <td colspan="2"><input class="form-control" type="text" value="{{modata.Amount}}" name="amount"></td>
 </tr>
 
 </tbody></table>
 <input type = "hidden" name ="oder" value= {{oder}}>
+{% include 'includes/_button_upd_ret.html' %}
+
+
+</div>
+</div>

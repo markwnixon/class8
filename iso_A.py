@@ -17,7 +17,7 @@ import requests
 import mimetypes
 from urllib.parse import urlparse
 import img2pdf
-from viewfuncs import make_new_order
+from viewfuncs import make_new_order, nonone
 
 today = datetime.datetime.today()
 year = str(today.year)
@@ -58,14 +58,22 @@ def send_file1():
 
 @app.route('/sendfile2', methods=['GET', 'POST'])
 def send_file2():
-    odat = Orders.query.filter(Orders.Proof=='star').first()
+    uptype = request.values['uptype']
+    print(uptype)
+    oder = request.values['oid']
+    oder = nonone(oder)
+    print(oder)
+    odat = Orders.query.get(oder)
     if odat is not None:
-        oder = odat.id
         jo = odat.Jo
     fileob = request.files["file2upload"]
     name, ext = os.path.splitext(fileob.filename)
-    filename1 = f'Proof_{jo}{ext}'
-    filename2 = f'Proof_{jo}.pdf'
+    if uptype == 'proof':
+        filename1 = f'Proof_{jo}{ext}'
+        filename2 = f'Proof_{jo}.pdf'
+    elif uptype == 'source':
+        filename1 = f'Source_{jo}{ext}'
+        filename2 = f'Source_{jo}.pdf'
     output1 = addpath(tpath('oder', filename1))
     output2 = addpath(tpath('oder', filename2))
     fileob.save(output1)
@@ -76,9 +84,12 @@ def send_file2():
             os.remove(output1)
         except:
             filename2 = filename1
-    odat.Proof = filename2
+    if uptype == 'proof':
+        odat.Proof = filename2
+    elif uptype == 'source':
+        odat.Original = filename2
     db.session.commit()
-    print('file uploaded')
+    print(f'File {filename2} uploaded')
     return "successful_upload"
 
 @app.route('/Barcode', methods=['GET', 'POST'])
@@ -100,10 +111,14 @@ def Barcode():
             gd = f'VIN too long.  Need 17 char got {ld} in {gd}'
 
         if len(gd) == 17:
-            decodeheader = f'Decoded VIN:{gd}'
-            suc, specs = getvindata(gd)
+            adat = Autos.query.filter(Autos.VIN == gd).first()
+            if adat is not None:
+                decodeheader = f'VIN:{gd} already in database'
+            else:
+                decodeheader = f'Decoded VIN:{gd}'
+                suc, specs = getvindata(gd)
         else:
-            decodeheader = f'Decoding data for:{gd}'
+            decodeheader = f'{gd}'
     else:
         decodeheader = 'No Data Yet'
         suc = False
@@ -503,14 +518,14 @@ def MovingV():
 @app.route('/Trucking', methods=['GET', 'POST'])
 def Trucking():
     from iso_T import isoT
-    username, bklist, lastpr, thismuch, etitle, ebody, emaildata, odata, pdata, idata, sdata, cdata, oder, poof, sdata2, tick, serv, peep, err, modata, caldays, daylist, nweeks, howapp, modlink, leftscreen, docref, stayslim, leftsize, newc, tdata, drvdata,dlist, rightsize, ldata, invodate, inco, invo, quot, invooder, cache, stamp, alltdata, allvdata, stampdata, fdata, filesel, today, now, doctxt, holdvec, mm1 = isoT()
+    doclist, username, bklist, lastpr, thismuch, etitle, ebody, emaildata, odata, pdata, idata, sdata, cdata, oder, poof, sdata2, tick, serv, peep, err, modata, caldays, daylist, nweeks, howapp, modlink, leftscreen, docref, stayslim, leftsize, newc, tdata, drvdata,dlist, rightsize, ldata, invodate, inco, invo, quot, invooder, cache, stamp, alltdata, allvdata, stampdata, fdata, filesel, today, now, doctxt, holdvec, mm1, viewtype = isoT()
 
     return render_template('Atrucking.html', cmpdata=cmpdata, scac=scac, data1=odata, data2=pdata, data3=idata, data4=sdata, data5=cdata, oder=oder, poof=poof, sdata=sdata2,
-                           tick=tick, serv=serv, peep=peep, err=err, modata=modata, caldays=caldays, daylist=daylist, nweeks=nweeks, howapp=howapp,
+                           tick=tick, serv=serv, peep=peep, err=err, modata=modata, caldays=caldays, daylist=daylist, nweeks=nweeks, howapp=howapp, doclist=doclist,
                            modlink=modlink, leftscreen=leftscreen, docref=docref, stayslim=stayslim, leftsize=leftsize, newc=newc, tdata=tdata, dlist=dlist,
                            rightsize=rightsize, ldata=ldata, invodate=invodate, inco=inco, invo=invo, invooder=invooder, cache=cache, stamp=stamp, alltdata=alltdata,
                            stampdata=stampdata, fdata=fdata, filesel=filesel, today=today, now=now, doctxt=doctxt, holdvec=holdvec, etitle=etitle, ebody=ebody,
-                           emaildata=emaildata, thismuch=thismuch, mm1=mm1, allvdata=allvdata,drvdata=drvdata, bklist = bklist, lastpr = lastpr, quot = quot, username = username)
+                           emaildata=emaildata, thismuch=thismuch, mm1=mm1, allvdata=allvdata,drvdata=drvdata, bklist = bklist, lastpr = lastpr, quot = quot, username = username, viewtype=viewtype)
 
 # ____________________________________________________________________________________________________________________B.STORAGE
 # ____________________________________________________________________________________________________________________B.STORAGE

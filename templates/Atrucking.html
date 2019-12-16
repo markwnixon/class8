@@ -2,7 +2,6 @@
 
 {% block body %}
 <form action="{{ url_for ('Trucking') }}" method="post" enctype="multipart/form-data">
-
 <div class="table-responsive">
     <div class="row">
         <div class="col-sm-{{leftsize}}" align="center">
@@ -48,47 +47,16 @@
 
         <div class="col-sm-{{rightsize}}" align = "left">
             <div class="row">
-                <div class="col-sm-12">
-                    {% if (oder > 0 or poof > 0) and modlink==1 %}
-                        {% include 'includes/_button_upd_ret.html' %}
+                <div class="col-sm-12" align=""center">
 
-                    {% elif modlink==70 %}
-                        <br>
+                    {% if modlink==70 %}
                         {% include 'includes/_uploadsourcedocs.html' %}
 
                     {% elif modlink==71 %}
-                        <br>
                         {% include 'includes/_uploadproofdocs.html' %}
-
-                    {% elif (tick>0 and modlink==1) or modlink==20 or modlink==21 %}
-                        {% include 'includes/_button_upd_ret.html' %}
-
-                    {% elif serv>0 and modlink==1 %}
-                         {% include 'includes/_button_upd_ret.html' %}
-
-                    {% elif peep>0 and (modlink==1 or modlink==4) %}
-                        <br><br><br><br><br><br>
 
                     {% elif leftscreen == 2 %}
                        {% include 'includes/_button_cal.html' %}
-
-                    {% elif inco>0 %}
-                       {% set htype = 'Modify Payment Received on' %}
-                       {% set update = 'recUpdate'%}
-                       {% set logonly = 'logRec'%}
-                       {% set etype = 'Payment' %}
-                       {% include 'includes/_inco_invo.html' %}
-
-                    {% elif invo>0 and stamp != 1%}
-                       {% if ldata %}
-                            {% set htype = 'Modify Invoice Information on' %}
-                       {% else %}
-                            {% set htype = 'View Invoice Information on' %}
-                       {% endif %}
-                       {% set update = 'invoUpdate'%}
-                       {% set logonly = 'logInvo'%}
-                       {% set etype = 'Invoice' %}
-                       {% include 'includes/_inco_invo.html' %}
 
                     {% elif quot>0 %}
                        {% if ldata %}
@@ -100,18 +68,29 @@
                        {% set logonly = 'logInvo'%}
                        {% include 'includes/_inco_invo.html' %}
 
-                    {% elif stamp==0 and modlink != 4 and mm1 !=1 %}
-                        <br>
-                        {% include 'includes/_controlpanelheader.html' %}
-                        {% include 'includes/_truckcolorcode.html' %}
-
                     {% elif modlink==4 and peep==0 %}
                         {% include 'Trucking_New_or_Mod_Job.html' %}
 
                     {% elif mm1==1 %}
                         {% include 'includes/_manifestpanel.html' %}
-                    {% else %}
+                    {% elif stamp > 0 %}
                         {% include 'Trucking_Email_Prep.html' %}
+
+                    {% elif peep > 0 and modlink > 0 %}
+                        {% include 'People_Table.html' %}
+
+                    {% elif serv > 0 and modlink > 0 %}
+                        {% include 'Services_Table.html' %}
+
+                    {% elif invo == 0 and inco == 0  %}
+                        <br>
+                        {% include 'includes/_controlpanelheader.html' %}
+                        {% if viewtype == 0 %}
+                            {% include 'includes/_truckcolorcode.html' %}
+                        {% else %}
+                            {% include 'includes/_button_upd_ret.html' %}
+                        {% endif %}
+
                    {% endif %}
                 </div>
             </div>
@@ -119,6 +98,9 @@
 
             <div class="row">
                 <div class="col-sm-12">
+
+
+
                     {% if (invo > 0 or quot > 0) and ldata %}
                         {% include 'Trucking_Invoice_Prep.html' %}
                     {% endif %}
@@ -135,14 +117,7 @@
                         {% include 'Trucking_Tickmod.html' %}
                     {% endif %}
 
-                    {% if serv > 0 and modlink > 0 %}
-                        {% include 'Services_Table.html' %}
-                    {% endif %}
 
-
-                    {% if peep > 0 and modlink > 0 %}
-                        {% include 'People_Table.html' %}
-                    {% endif %}
 
                     {% include 'Debugtable.html' %}
 
@@ -152,10 +127,9 @@
     </div>
 </div>
 <input type = "hidden" name ="lastpr" value= "{{lastpr}}">
-<input type = "hidden" name ="FileSel" value= "{{filesel}}">
 <input type = "hidden" name ="thismuch" value= "{{thismuch}}">
 <input type = "hidden" name ="passmanifest" value= "{{mm1}}">
-<input type = "hidden" name ="passoder" value= "{{oder}}">
+<input type = "hidden" name ="passoder" id="passoder" value= "{{oder}}">
 <input type = "hidden" name="passmodlink" value="{{modlink}}">
 </form>
 

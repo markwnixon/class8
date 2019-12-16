@@ -8,19 +8,47 @@
         {% include 'includes/_uploadsourcedocs.html' %}
 
     {% else %}
+        {% if viewtype == 'gate2' %}
+            {% set ftxt = doclist[4] %}
+            {% set wide = "550px" %}
+            Showing: {{ftxt}}<br>
+            <embed src="{{ftxt}}" width={{wide}} height="800px"/>
+        {% else %}
+            {% set ftxt = doclist[1] %}
+
+        This page left blank intentionally
+        <!--
         Text version of file {{leftsize}}{{rightsize}}{{mm1}}:<br>
-        <embed src="{{doctxt}}" width="400px" height="650px"/>
+        <embed src="{{ftxt}}" width="400px" height="650px"/>
+        -->
+        {% endif %}
     {% endif %}
 </div>
 {% endif %}
 <div class="col-sm-7" align="center">
-Looking for: {{docref}}<br>
+
+
 {% if rightsize == 4 %}
 {% set wide = "550px" %}
 {% else %}
 {% set wide = "650pm" %}
 {% endif %}
-<embed src="{{docref}}" width={{wide}} height="800px"/>
+
+{% if viewtype == 'gate2' or viewtype == 'gate1'%}
+    {% set fdoc = doclist[5] %}
+{% elif viewtype == 'proof' %}
+    {% set fdoc = doclist[2] %}
+{% elif viewtype == 'manifest' %}
+    {% set fdoc = doclist[3] %}
+{% elif viewtype == 'mpack' %}
+    {% set fdoc = doclist[6] %}
+{% else %}
+    {% set fdoc = doclist[0] %}
+{% endif %}
+{% if fdoc != 0 %}
+Showing: {{fdoc}}<br>
+<embed src="{{fdoc}}" width={{wide}} height="800px"/>
+{% endif %}
 </div>
 </div>
 

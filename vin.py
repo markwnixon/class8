@@ -23,6 +23,7 @@ def getvindata(vintoget):
     suc = dataret['success']
     print(suc)
     if suc is True:
+        print('Successful pull of VIN')
         specs = dataret['specification']
         vin = specs['vin']
         year = specs['year']

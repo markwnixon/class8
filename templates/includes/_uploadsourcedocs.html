@@ -1,8 +1,9 @@
+<br>
 <div class="card">
-    <div class="card-header bg-info text-white">
-        Upload Source for Order:{{modata.Order}} Company:{{modata.Shipper}}
+    <div class="card-header bg-info text-white" align="left">
+        Optional File Upload of Source Document for Job:{{modata.Jo}} Company:{{modata.Shipper}}
     </div>
-    <div class="card-body" align = "center">
+    <div class="card-body" align = "left">
 
     <dl>
         <p>
@@ -16,13 +17,17 @@
 <br><br>
 
 <div class="card" align="center">
+    <div class="card-header bg-info text-white" align="left">
+        Optional Drag and Drop for Source File Upload
+    </div>
     <div class="card-body" align = "center">
             <div class="container" align="center">
-                <div class="droparea1" >(Optional) Drop Here</div>
-                <div class="tablearea" id="tablearea"></div>
+                <div class="droparea2" align="center">(Optional) Drop Here</div>
+                <div class="tablearea" id="tablearea" align="center"></div>
             </div>
     </div>
 </div>
 
 <input type = "hidden" name="passmodlink" value="{{modlink}}">
 <input type = "hidden" name="passoder" value="{{oder}}">
+<input type = "hidden" name="uploadtype" id="uploadtype" value="source">

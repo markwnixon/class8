@@ -1,27 +1,46 @@
+{% if ldata %}
+    {% set htype = 'Modify Invoice Information on' %}
+{% else %}
+    {% set htype = 'View Invoice Information on' %}
+{% endif %}
+{% set update = 'invoUpdate'%}
+{% set logonly = 'logInvo'%}
+{% set etype = 'Invoice' %}
+
+<br>
+<div class="card">
+    <div class="card-header">
+    Edit Invoice {{ modata.Jo }}{% include 'includes/_inco_invo.html' %}
+    </div>
+
+<div class="card-body">
+
 <div class="p-0">
     <select class="mdb-select md-form" name="invoserv" onchange="this.form.submit()">
-        <option value="" disabled selected>Add Services</option>
+        <option value="" disabled selected>Add Services to Invoice</option>
         {% for sd in sdata %}
             <option value="{{ sd.id }}">{{ sd.Service }} ${{ sd.Price }}</option>
         {% endfor %}
     </select>
 </div>
 
-<div class="card">
-<div class="card-body">
+
+
 
 <table class="table table-condensed table-hover">
 <tbody>
-<tr><td><div class="input-group-text">Invoice Date:</div></td><td><input class="form-control" type="date" value={{invodate}} name="invodate"></td></tr>
+<tr><td><div class="input-group-text">Invoice Date:</div></td><td colspan="3"><input class="form-control" type="date" value={{invodate}} name="invodate"></td></tr>
+
 {% for data in ldata %}
-        <tr><td><div class="input-group-text">Item:</div></td><td><div class="input-group-text">{{data.Service}}</div></td></tr>
-        <tr><td><div class="input-group-text">Quantity:</div></td><td><input class="form-control" type="text" value={{data.Qty}} name="qty{{data.id}}"></td></tr>
-        <tr><td><div class="input-group-text">Cost Each:</div></td><td><input class="form-control" type="text" value={{data.Ea}} name="cost{{data.id}}"></td></tr>
-        <tr><td><div class="input-group-text">Description:</div></td><td><textarea class="form-control" type="text" name="desc{{data.id}}" rows="2">{{data.Description}}</textarea></td></tr>
+    <tr><td colspan="4'"></td></tr>
+        <tr><td><div class="input-group-text">Item:</div></td><td colspan="3"><div class="input-group-text">{{data.Service}}</div></td></tr>
+        <tr><td><div class="input-group-text">Quantity:</div></td><td><input class="form-control" type="text" value={{data.Qty}} name="qty{{data.id}}"></td>
+            <td><div class="input-group-text">Cost Each:</div></td><td><input class="form-control" type="text" value={{data.Ea}} name="cost{{data.id}}"></td></tr>
+        <tr><td><div class="input-group-text">Description:</div></td><td colspan="3"><textarea class="form-control" type="text" name="desc{{data.id}}" rows="2">{{data.Description}}</textarea></td></tr>
 {% endfor %}
 </tbody></table>
 
-
+{% include 'includes/_inco_invo.html' %}
 </div>
 </div>
 

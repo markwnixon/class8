@@ -15,7 +15,7 @@ Enter New Job Information
 <tr>
 <td><div class="input-group-text">Choose Customer:</div></td>
 <td>
-<select class="form-control" type="text" name="shipper" onchange="this.form.submit()">
+<select class="form-control" type="text" name="shipper">
 <option value='1'>Choose Later</option>
 <option value='2'>Add New Now</option>
 {% for data in data5 %}
@@ -63,7 +63,7 @@ Enter New Job Information
 <td><input class="form-control" type="text" name="pickup" value=" "></td>
 </tr>
 <tr>
-<td> <div class="input-group-text" data-toggle="tooltip" title="Enter 1st 3 letters of an existing location and program will load entire address for you on UPDATE">Load At:<br>test</div></td>
+<td> <div class="input-group-text" data-toggle="tooltip" title="Enter 1st 3 letters of an existing location and program will load entire address for you on UPDATE">Load At:</div></td>
 <td colspan="2"><textarea class="form-control" type="text" name="dropblock1" rows="4">  </textarea></td>
 </tr>
 <tr>
@@ -79,14 +79,14 @@ Enter New Job Information
 <td><input class="form-control" type="date" name="ddate" value="{{today}}"></td>
 </tr>
 <tr>
-<td><div class="input-group-text">Job Total Value:</div></td>
+<td><div class="input-group-text">Job Base Charge:</div></td>
 <td><input class="form-control" type="text" name="thisamt" value="905.00"></td>
 </tr>
 <tr>
 <tr>
 <td colspan="2">
-<button type="submit" class="btn btn-primary" name="ThisJob">Create Job</button>
-<button type="submit" class="btn btn-elegant" name="Return">Return</button>
+<button type="submit" class="btn btn-green" name="ThisJob">Create Job</button>
+<button type="submit" class="btn btn-elegant" name="Return">&nbsp; Cancel &nbsp;</button>
 </td>
 </tr></tbody></table>
 
