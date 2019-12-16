@@ -1858,6 +1858,7 @@ def isoT():
         doclist = [0]*7
         filesel = ''
         docref = ''
+        doctxt = ''
         etitle = ''
         ebody = ''
         emaildata = ''
