@@ -58,15 +58,18 @@
                     {% elif leftscreen == 2 %}
                        {% include 'includes/_button_cal.html' %}
 
-                    {% elif quot>0 %}
-                       {% if ldata %}
-                            {% set htype = 'Modify Quote Information on' %}
-                       {% else %}
-                            {% set htype = 'View Quote Information on' %}
-                       {% endif %}
-                       {% set update = 'quotUpdate'%}
-                       {% set logonly = 'logInvo'%}
-                       {% include 'includes/_inco_invo.html' %}
+                    {% elif quot>0  %}
+                        {% if ldata %}
+                                {% set htype = 'Modify Quote Information on' %}
+                                {% else %}
+                                {% set htype = 'View Quote Information on' %}
+                        {% endif %}
+                        {% set update = 'quotUpdate'%}
+                        {% set logonly = 'logInvo'%}
+                        {% include 'includes/_inco_invo.html' %}
+                        {% if ldata %}
+                                {% include 'Trucking_Invoice_Prep.html' %}
+                        {% endif %}
 
                     {% elif modlink==4 and peep==0 %}
                         {% include 'Trucking_New_or_Mod_Job.html' %}
@@ -82,7 +85,19 @@
                     {% elif serv > 0 and modlink > 0 %}
                         {% include 'Services_Table.html' %}
 
-                    {% elif invo == 0 and inco == 0  %}
+                    {% elif invo > 0 and ldata %}
+                        {% include 'Trucking_Invoice_Prep.html' %}
+
+                    {% elif inco > 0 %}
+                        {% include 'Trucking_Receive_Pay.html' %}
+
+                    {% elif oder > 0 and modlink == 1 %}
+                        {% include 'Trucking_Jobmod.html' %}
+
+                    {% elif (tick > 0 and modlink == 1) or modlink==20 %}
+                        {% include 'Trucking_Tickmod.html' %}
+
+                    {% else  %}
                         <br>
                         {% include 'includes/_controlpanelheader.html' %}
                         {% if viewtype == 0 %}
@@ -98,27 +113,7 @@
 
             <div class="row">
                 <div class="col-sm-12">
-
-
-
-                    {% if (invo > 0 or quot > 0) and ldata %}
-                        {% include 'Trucking_Invoice_Prep.html' %}
-                    {% endif %}
-
-                    {% if inco > 0 %}
-                        {% include 'Trucking_Receive_Pay.html' %}
-                    {% endif %}
-
-                    {% if oder > 0 and modlink == 1 %}
-                        {% include 'Trucking_Jobmod.html' %}
-                    {% endif %}
-
-                    {% if (tick > 0 and modlink == 1) or modlink==20 %}
-                        {% include 'Trucking_Tickmod.html' %}
-                    {% endif %}
-
-
-
+                    <br><br><br><br><br><br>
                     {% include 'Debugtable.html' %}
 
                 </div>

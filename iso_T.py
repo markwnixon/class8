@@ -1027,7 +1027,7 @@ def isoT():
                     doclist[4] = f'tmp/{scac}/data/vinterchange/{idat.Original}'
                     err.append(f'Viewing document {idat.Original}')
                 else:
-                    err.append('There is no gate out ticket available for this selection')
+                    err.append('There is no gate OUT ticket available for this selection')
 
                 idat = Interchange.query.filter( (Interchange.Jo == odat.Jo) & (Interchange.TYPE.contains('In')) ).first()
                 if idat is not None:
@@ -1036,7 +1036,7 @@ def isoT():
                     doclist[5] = f'tmp/{scac}/data/vinterchange/{idat.Original}'
                     err.append(f'Viewing document {idat.Original}')
                 else:
-                    err.append('There is no gate in ticket available for this selection')
+                    err.append('There is no gate IN ticket available for this selection')
             else:
                 err.append('Must select one job to use this function')
 
@@ -1730,17 +1730,23 @@ def isoT():
 
 # ____________________________________________________________________________________________________________________B.ManualUpdate.Trucking
 
-        if loadc is not None:
-            err.append('Must check at least one box')
+        if loadc == 1:
             if oder > 0:
-                err.append('Load Completion Status Updated')
                 myo = Orders.query.get(oder)
                 hstat = myo.Hstat
-                if hstat == 0 or hstat == 1:
-                    myo.Hstat = 3
+                istat = myo.Istat
+                if hstat != 4:
+                    if istat == 4:
+                        myo.Hstat = 4
+                        err.append('Load Completion Status Updated to Complete with Pay')
+                    else:
+                        myo.Hstat = 3
+                        err.append('Load Completion Status Updated to Manaully Set Complete')
                     db.session.commit()
                 else:
-                    err.append('Load already has a complete status')
+                    err.append('Load already has paid & complete status')
+            else:
+                err.append('Must check at least one box')
 
         if acceptthese is not None:
             err.append('Must check at least one box')

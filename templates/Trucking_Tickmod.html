@@ -1,3 +1,13 @@
+<br>
+<div class="card">
+<div class="card-header">
+Modifying Interchange Ticket: {{ modata.CONTAINER }} {{ modata.TYPE }}
+</div>
+<div class="card-body">
+
+
+
+
 <input type = "hidden" name="passmodlink" value="{{modlink}}">
 <input type = "hidden" name ="tick" value= "{{tick}}">
 
@@ -54,3 +64,10 @@
 </tr>
 
 </tbody></table>
+
+<input type = "hidden" name ="oder" value= {{oder}}>
+{% include 'includes/_button_upd_ret.html' %}
+
+
+</div>
+</div>
