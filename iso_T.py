@@ -693,11 +693,9 @@ def isoT():
                 emaildata[i] = request.values.get('edat'+str(i))
 
         if mpack is not None and numchecked == 1:
-            err.append('Must have order, proof and invoice complete to make this selection')
             if oder > 0:
                 odata1 = Orders.query.get(oder)
                 company = odata1.Shipper
-                pdata1 = Proofs.query.filter(Proofs.Order == odata1.Order).first()
                 ofile = odata1.Original
                 cdat = People.query.get(int(odata1.Bid))
 
@@ -716,18 +714,18 @@ def isoT():
                 if ofile is None:
                     err.append('No original order data')
                 else:
-                    docref1 = f'tmp/{scac}/data/vorders/' + odata1.Original
+                    docref1 = f'tmp/{scac}/data/vorders/{odata1.Original}'
                 docref3 = odata1.Path
-                if pdata1 is None:
-                    err.append('No Proof data')
-                else:
-                    docref2 = pdata1.Original
-                if docref3 is None:
+                docref2 = f'tmp/{scac}/data/vproofs/{odata1.Proof}'
+                if docref2 is None or docref2 == 'None':
+                    err.append('No Proof Data')
+                if docref3 is None or docref3 == 'None':
                     err.append('No Invoice data')
+                print(f'The documents are {docref1},{docref2},{docref3}')
             else:
                 err.append('No Order data')
 
-            if oder > 0 and pdata1 and docref3 and ofile:
+            if oder > 0 and docref2 and docref3 and ofile:
                 err.append('Sign the package')
                 stamp = 1
                 invooder = oder

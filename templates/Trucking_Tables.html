@@ -92,7 +92,7 @@
 
 {% if dlist[1] == 'on' %}
 <div class="row">
-    <div class="col-sm-12" align="center"><b>Proof Data:</b>
+    <div class="col-sm-12" align="center"><b>Services Panel:</b>
     {% if dlist[0]!= 'on' %}
      &nbsp &nbsp {% include 'includes/_tablespanelT.html' %}
     {% endif %} </div>
@@ -100,56 +100,7 @@
 
 <div class="row">
     <div class="col-sm-12" align="center">
-
-        <table id="{{dt2}}" class="table table-striped table-bordered table-sm w-auto" cellspacing="0"
-  width="100%">
-            <thead>
-            <tr>
-                <th align="center" style="font-weight:bold">ID</th>
-                <th align="center" style="font-weight:bold">Order</th>
-                <th align="center" style="font-weight:bold">BOL</th>
-                <th align="center" style="font-weight:bold">Chk</th>
-                <th align="center" style="font-weight:bold">Date</th>
-                <th align="center" style="font-weight:bold">Time</th>
-                <th align="center" style="font-weight:bold">Booking</th>
-                <th align="center" style="font-weight:bold">Container</th>
-                <th align="center" style="font-weight:bold">Company</th>
-                <th align="center" style="font-weight:bold">Driver</th>
-                <th align="center" style="font-weight:bold">Status</th>
-
-            </tr>
-            </thead>
-            <tbody>
-            {% for data in data2 %}
-                {% if 'Paid' in data.Status %}
-                    {% set atc1="green font-weight-bold" %}
-                {% elif 'Invo' in data.Status %}
-                    {% set atc1="amber font-weight-bold" %}
-                {% elif data.Status == 'Overdue' %}
-                    {% set atc1="purple-text font-weight-bold" %}
-                {% elif data.Status == 'Matched' or data.Status == 'IOO' or data.Status == 'IOT' %}
-                    {% set atc1="blue text-white font-weight-bold" %}
-                {% else %}
-                    {% set atc1="font-weight-bold" %}
-                {% endif %}
-            <tr  >
-                <td align="center" class="{{atc1}}">{{ data.id }}</td>
-                <td class="{{atc1}}" align="center">{{ data.Order}}</td>
-                <td class="{{atc1}}"  align="center">{{ data.BOL }}</td>
-                <td class="{{atc1}}" align="center"><input class="align-middle" type="checkbox" name="poof{{data.id}}" value="{{data.id}}"></td>
-                <td class="{{atc1}}" align="center">{{ data.Date }}</td>
-                <td class="{{atc1}}" align="center">{{ data.Time }}</td>
-                <td class="{{atc1}}" align="center"  >{{ data.Booking }}</td>
-                <td class="{{atc1}}"  align="center">{{ data.Container }}</td>
-
-                <td class="{{atc1}}" align="center">{% if data.Company is not none %}{{ data.Company }}{% endif %}</td>
-                <td class="{{atc1}}" align="center">{{ data.Driver }}</td>
-                <td class="{{atc1}}" align="center">{{ data.Status }}</td>
-
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        {% include 'includes/_servicepanel.html' %}
     </div>
 </div>
 {% endif %}

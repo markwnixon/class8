@@ -11,7 +11,7 @@
             <tbody>
             {% for data in sdata %}
             <tr>
-                <td align="center">{{ data.Service[0:15] }}</td>
+                <td align="center">{{ data.Service }}</td>
                 <td align="center">{{ data.Price}}</td>
                 <td align="right"><input type="checkbox" name="serv{{data.id}}" value="{{data.id}}">
             </tr>
