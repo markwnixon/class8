@@ -21,6 +21,7 @@ import json
 def isoT():
 
     from viewfuncs import erud, testdrop, make_new_order
+    from blend_pdf import blendticks
 
     if request.method == 'POST':
         # ____________________________________________________________________________________________________________________B.FormVariables.Trucking
@@ -599,6 +600,9 @@ def isoT():
                 docref=makemanifestT(modata, pdata1, None, None, tdata, drvdata, cache, jtype, time1, time2, commodity, packing, bol)
                 fname = os.path.basename(docref)
                 modata.Delivery = fname
+                viewtype = 'manifest'
+                doclist[3] = docref
+                doclist[0] = f'tmp/{scac}/data/vorders/{modata.Original}'
                 db.session.commit()
 
             else:
@@ -1022,7 +1026,7 @@ def isoT():
                 odat = Orders.query.get(oder)
                 idat = Interchange.query.filter( (Interchange.Jo == odat.Jo) & (Interchange.TYPE.contains('Out')) ).first()
                 if idat is not None:
-                    viewtype = 'gate2'
+                    viewtype = 'gate1'
                     leftscreen = 0
                     doclist[4] = f'tmp/{scac}/data/vinterchange/{idat.Original}'
                     err.append(f'Viewing document {idat.Original}')
@@ -1033,8 +1037,22 @@ def isoT():
                 if idat is not None:
                     viewtype = 'gate2'
                     leftscreen = 0
+                    con = idat.CONTAINER
                     doclist[5] = f'tmp/{scac}/data/vinterchange/{idat.Original}'
                     err.append(f'Viewing document {idat.Original}')
+                    if doclist[4] !=0 and doclist[5] != 0:
+                        viewtype = 'gate3'
+                        #Get a blended ticket
+                        con = idat.CONTAINER
+                        newdoc = f'tmp/{scac}/data/vinterchange/{con}_Blended.pdf'
+                        if os.path.isfile(addpath(newdoc)):
+                            print(f'{newdoc} exists')
+                        else:
+                            blendticks(addpath(doclist[4]),addpath(doclist[5]),addpath(newdoc))
+                        doclist[6] = newdoc
+                        doclist[5] = 0
+                        doclist[4] = 0
+
                 else:
                     err.append('There is no gate IN ticket available for this selection')
             else:

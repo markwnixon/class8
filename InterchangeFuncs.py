@@ -68,17 +68,14 @@ def InterMatchThis(id):
         db.session.commit()
     odat=Orders.query.filter( (Orders.Container==container) | (Orders.Booking==release) ).first()
     if odat is not None:
-        status=odat.Status
-        bit1=status[0]
-        if bit1=='0' and 'Out' in type:
+        hstat = odat.Hstat
+        if hstat==0 and 'Out' in type:
             if(odat.Container)=='TBD':
                 odat.Container=idat.CONTAINER
-            newstatus=stat_update(status,'1',0)
-            odat.Status=newstatus
+            odat.Hstat = 1
             db.session.commit()
-        if bit1=='1' and 'In' in type:
-            newstatus=stat_update(status,'2',0)
-            odat.Status=newstatus
+        if hstat==1 and 'In' in type:
+            odat.Hstat = 2
             db.session.commit()
     odat=OverSeas.query.filter( (OverSeas.Container==container) | (OverSeas.Booking==release) ).first()
     if odat is not None:
@@ -288,19 +285,18 @@ def Push_Orders():
             if odat is not None:
                 idat.Company=odat.Shipper
                 idat.Jo=odat.Jo
-                status=odat.Status
-                bit1=status[0]
-                if bit1=='0':
-                    newstatus=stat_update(status,'1',0)
-                    odat.Status=newstatus
+                hstat = odat.Hstat
+                if hstat == 0:
+                    odat.Hstat = 1
+                db.session.commit()
+
                 #See if there is a matching interchange ticket to update as well
                 mdat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('Lock')) & (Interchange.CONTAINER==container) & (Interchange.TYPE.contains('In')) ).first()
                 if mdat is not None:
                     mdat.Company=odat.Shipper
                     mdat.Jo=odat.Jo
-                    if bit1=='0' or bit1=='1':
-                        newstatus=stat_update(status,'2',0)
-                        odat.Status=newstatus
+                    if hstat<2:
+                        odat.Hstat=2
                     db.session.commit()
 
 def Order_Container_Update(oder):
@@ -312,15 +308,12 @@ def Order_Container_Update(oder):
         type=idat.TYPE
         idat.Company=odat.Shipper
         idat.Jo=odat.Jo
-        status=odat.Status
-        bit1=status[0]
-        if 'Out' in type and (bit1=='0' or bit1=='A'):
-            newstatus=stat_update(status,'1',0)
-            odat.Status=newstatus
+        hstat=odat.Hstat
+        if 'Out' in type and hstat<1:
+            odat.Hstat = 1
             db.session.commit()
         if 'In' in type:
-            newstatus=stat_update(status,'2',0)
-            odat.Status=newstatus
+            odat.Hstat = 2
             db.session.commit()
 
 
@@ -360,48 +353,17 @@ def PushJobsThis(id):
         idat.Company=odat.Shipper
         idat.Jo=odat.Jo
         odat.Container=container
-        status=odat.Status
-        bit1=status[0]
-        if bit1=='0' and 'Out' in type:
-            newstatus=stat_update(status,'1',0)
-            odat.Status=newstatus
+        hstat = odat.Hstat
+        if hstat == 0 and 'Out' in type:
+            odat.Hstat=1
         if 'Out' in type:
             odat.Date=idat.Date
-        if (bit1=='1' or bit1=='0') and 'In' in type:
-            newstatus=stat_update(status,'2',0)
-            odat.Status=newstatus
+        if hstat<2 and 'In' in type:
+            odat.Hstat=2
         if 'In' in type:
             odat.Date2=idat.Date
         db.session.commit()
 
-
-    if odat is not None:
-        idat.Company=odat.Shipper
-        idat.Jo=odat.Jo
-        odat.Container=container
-        status=odat.Status
-        bit1=status[0]
-        if bit1=='0' and 'Out' in type:
-            newstatus=stat_update(status,'1',0)
-            odat.Status=newstatus
-        if 'Out' in type:
-            odat.Date=idat.Date
-        if (bit1=='1' or bit1=='0') and 'In' in type:
-            newstatus=stat_update(status,'2',0)
-            odat.Status=newstatus
-        if 'In' in type:
-            odat.Date2=idat.Date
-        db.session.commit()
-
-    #Automatically update Dry Van status to complete if invoiced
-    odata=Orders.query.filter(Orders.Container.contains('53DV'))
-    for data in odata:
-        status=data.Status
-        bit2=int(status[1])
-        if bit2>0:
-            newstatus=stat_update(status,'3',0)
-            data.Status=newstatus
-            db.session.commit()
 
         #And also push back to Interchange in case several new bookings have been created
     odata=OverSeas.query.filter(OverSeas.Container=='TBD')

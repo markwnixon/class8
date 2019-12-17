@@ -1,6 +1,10 @@
+
 <div class="row">
 {% if leftsize > 6 or stamp==1 %}
-<div class="col-sm-5" align="right">
+
+
+
+<div class="col-sm-5" align="center">
     {% if emaildata %}
         {% include 'includes/emailprep.html' %}
     {% elif modlink == 4 %}
@@ -8,8 +12,8 @@
         {% include 'includes/_uploadsourcedocs.html' %}
 
     {% else %}
-        {% if viewtype == 'gate2' %}
-            {% set ftxt = doclist[4] %}
+        {% if viewtype == 'manifest' %}
+            {% set ftxt = doclist[0] %}
             {% set wide = "550px" %}
             Showing: {{ftxt}}<br>
             <embed src="{{ftxt}}" width={{wide}} height="800px"/>
@@ -33,8 +37,9 @@
 {% else %}
 {% set wide = "650pm" %}
 {% endif %}
-
-{% if viewtype == 'gate2' or viewtype == 'gate1'%}
+{% if viewtype == 'gate1' %}
+    {% set fdoc = doclist[4] %}
+{% elif viewtype == 'gate2' %}
     {% set fdoc = doclist[5] %}
 {% elif viewtype == 'proof' %}
     {% set fdoc = doclist[2] %}
@@ -42,11 +47,13 @@
     {% set fdoc = doclist[3] %}
 {% elif viewtype == 'mpack' %}
     {% set fdoc = doclist[6] %}
+{% elif viewtype == 'gate3' %}
+    {% set fdoc = doclist[6] %}
 {% else %}
     {% set fdoc = doclist[0] %}
 {% endif %}
 {% if fdoc != 0 %}
-Showing: {{fdoc}}<br>
+{{fdoc}}<br>
 <embed src="{{fdoc}}" width={{wide}} height="800px"/>
 {% endif %}
 </div>
