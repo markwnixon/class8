@@ -731,6 +731,8 @@ def isoT():
                 doclist[7] = f'tmp/{scac}/data/vorders/P_c{cache2}_{odata1.Jo}.pdf'
                 #Package output file
                 docref = f'tmp/{scac}/data/vorders/P_c{cache2}_{odata1.Jo}.pdf'
+                odata1.Location = docref
+                db.session.commit()
 
                 for ix in range(3):
                     fexist[ix] = os.path.isfile(addpath(doclist[ix]))
@@ -895,11 +897,14 @@ def isoT():
             oder = 0
 
         if emailnow is not None or emailinvo is not None:
+            oder=request.values.get('passoder')
+            oder=nonone(oder)
+            odat=Orders.query.get(oder)
             stamp = 1
             leftscreen = 1
             leftsize = 10
             modlink = 0
-            odat = Orders.query.get(invooder)
+            print(odat,invooder)
             if emailnow is not None or invo > 1:
                 docref = odat.Location
             else:
