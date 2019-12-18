@@ -79,7 +79,7 @@ def isoT():
         invoserv = request.values.get('invoserv')
         mm3 = nonone(request.values.get('passmanifest'))
         viewtype = 0
-        doclist = [0]*7
+        doclist = [0]*8
 
         if invoserv is not None:
             invoupdate = '1'
@@ -642,10 +642,8 @@ def isoT():
             oder=request.values.get('passoder')
             oder=nonone(oder)
             odat=Orders.query.get(oder)
-            pdat=Proofs.query.filter(Proofs.Order==odat.Order).first()
             idata=Interchange.query.filter(Interchange.CONTAINER==odat.Container).all()
             packitems=[]
-            stampdata=[]
             stampdata = [0]*9
             for i in range(9):
                 stampdata[i] = request.values.get('stampdata'+str(i))
@@ -655,18 +653,41 @@ def isoT():
                 test=request.values.get(packname)
                 if test != 'none':
                     if test == 'loadconfirm':
-                        packitems.append(addpath(f'tmp/{scac}/data/vorders/'+odat.Original))
-                        stampdata.append('loadconfirm')
+                        fa = addpath(f'tmp/{scac}/data/vorders/{odat.Original}')
+                        if os.path.isfile(fa):
+                            packitems.append(fa)
+                            stampdata.append('loadconfirm')
+                        else:
+                            err.append('No Source Document')
                     if test == 'invoice':
-                        packitems.append(addpath(odat.Path))
-                        stampdata.append('invoice')
-                    if test == 'proofs' and pdat is not None:
-                        packitems.append(addpath(pdat.Original))
-                        stampdata.append('proofs')
+                        fa = addpath(odat.Path)
+                        if os.path.isfile(fa):
+                            packitems.append(fa)
+                            stampdata.append('invoice')
+                        else:
+                            err.append('No Invoice')
+                    if test == 'proofs':
+                        fa = addpath(f'tmp/{scac}/data/vproofs/{odat.Proof}')
+                        if os.path.isfile(fa):
+                            packitems.append(fa)
+                            stampdata.append('proofs')
+                        else:
+                            err.append('No proof file exists')
                     if test == 'ticks' and idata is not None:
-                        stampdata.apend('ticks')
-                        for idat in idata:
-                            packitems.append(addpath(idat.Original))
+                        stampdata.append('ticks')
+                        if len(idata)>1:
+                            # Get a blended ticket
+                            con = idata[0].CONTAINER
+                            newdoc = f'tmp/{scac}/data/vinterchange/{con}_Blended.pdf'
+                            if os.path.isfile(addpath(newdoc)):
+                                print(f'{newdoc} exists already')
+                            else:
+                                g1 = f'tmp/{scac}/data/vinterchange/{idata[0].Original}'
+                                g2 = f'tmp/{scac}/data/vinterchange/{idata[1].Original}'
+                                blendticks(addpath(g1), addpath(g2), addpath(newdoc))
+                            packitems.append(addpath(newdoc))
+                        else:
+                            packitems.append(addpath(f'tmp/{scac}/data/vinterchange/{idata[0].Original}'))
                 else:
                     stampdata.append('none')
                     print('packitems final:',packitems)
@@ -674,8 +695,8 @@ def isoT():
 
             cache2 = int(odat.Detention)
             cache2 = cache2+1
-            docref = f'tmp/{scac}/data/vorders/P_c'+str(cache2)+'_' + odat.Original
-            docin = f'tmp/{scac}/data/vorders/P_c'+str(cache2)+'_' + odat.Original
+            docref = f'tmp/{scac}/data/vorders/P_c{cache2}_{odat.Jo}.pdf'
+            docin = f'tmp/{scac}/data/vorders/P_c{cache2}_{odat.Jo}.pdf'
             pdflist=['pdfunite']+packitems+[addpath(docref)]
             tes = subprocess.check_output(pdflist)
             odat.Location = docref
@@ -694,11 +715,32 @@ def isoT():
 
         if mpack is not None and numchecked == 1:
             if oder > 0:
+                fexist = [0] * 5
+                dockind = ['Source', 'Proof', 'Invoice', 'Gate Out', 'Gate In']
+                packitems = []
+                viewtype = 'mpack'
+                leftscreen = 0
+                stamp = 1
                 odata1 = Orders.query.get(oder)
                 company = odata1.Shipper
-                ofile = odata1.Original
-                cdat = People.query.get(int(odata1.Bid))
+                cache2 = int(odata1.Detention)
+                cache2 = cache2 + 1
+                doclist[0] = f'tmp/{scac}/data/vorders/{odata1.Original}'
+                doclist[1] = f'tmp/{scac}/data/vproofs/{odata1.Proof}'
+                doclist[2] = odata1.Path
+                doclist[7] = f'tmp/{scac}/data/vorders/P_c{cache2}_{odata1.Jo}.pdf'
+                #Package output file
+                docref = f'tmp/{scac}/data/vorders/P_c{cache2}_{odata1.Jo}.pdf'
 
+                for ix in range(3):
+                    fexist[ix] = os.path.isfile(addpath(doclist[ix]))
+                    if fexist[ix] == 0:
+                        err.append(f'No {dockind[ix]} Document Exists')
+                    else:
+                        packitems.append(addpath(doclist[ix]))
+
+                print('packitems final:', packitems)
+                cdat = People.query.get(int(odata1.Bid))
                 jo = odata1.Jo
                 order = odata1.Order
                 stampstring = cdat.Original
@@ -708,74 +750,16 @@ def isoT():
                 except:
                     stampdata = [3, 35, 35, 5, 120, 100, 5, 477, 350,'loadconfirmation','proofs','invoice','none']
 
+
+                pdflist = ['pdfunite'] + packitems + [addpath(docref)]
+                tes = subprocess.check_output(pdflist)
+
                 emaildata = etemplate_truck('invoice',2,odata1.Bid,jo, order)
                 invo = 3
 
-                if ofile is None:
-                    err.append('No original order data')
-                else:
-                    docref1 = f'tmp/{scac}/data/vorders/{odata1.Original}'
-                docref3 = odata1.Path
-                docref2 = f'tmp/{scac}/data/vproofs/{odata1.Proof}'
-                if docref2 is None or docref2 == 'None':
-                    err.append('No Proof Data')
-                if docref3 is None or docref3 == 'None':
-                    err.append('No Invoice data')
-                print(f'The documents are {docref1},{docref2},{docref3}')
+
             else:
-                err.append('No Order data')
-
-            if oder > 0 and docref2 and docref3 and ofile:
-                err.append('Sign the package')
-                stamp = 1
-                invooder = oder
-                leftscreen = 0
-                leftsize = 8
-                modlink = 0
-                cache2 = int(odata1.Detention)
-                cache2 = cache2+1
-                # sandiwich it all together
-                docref = f'tmp/{scac}/data/vorders/P_c'+'_' + odata1.Original
-                if 'Knight' in company:
-                    tes = subprocess.check_output(['pdfunite', addpath(
-                        docref1), addpath(docref2), addpath(docref3), addpath(docref)])
-                else:
-                    try:
-                        tes = subprocess.check_output(['pdfunite', addpath(
-                            docref3), addpath(docref2), addpath(docref1), addpath(docref)])
-                    except:
-                        odata1.Original = 'temp.pdf'
-                        docref = f'tmp/{scac}/data/vorders/P_c'+'_' + 'temp.pdf'
-                        tes = subprocess.check_output(
-                            ['pdfunite', addpath(docref3), addpath(docref2), addpath(docref)])
-
-                odata1.Location = docref
-                odata1.Detention = cache2
-                db.session.commit()
-
-            elif oder > 0 and pdata1 and docref3 and docref2:
-                err.append('Sign the package')
-                stamp = 1
-                invooder = oder
-                leftscreen = 0
-                leftsize = 8
-                modlink = 0
-                cache2 = int(odata1.Detention)
-                cache2 = cache2+1
-                # sandiwich it all together
-                docref = f'tmp/{scac}/data/vorders/P_c'+'_' + odata1.Order + '.pdf'
-                if 1 == 1:  # try:
-                    tes = subprocess.check_output(
-                        ['pdfunite', addpath(docref3), addpath(docref2), addpath(docref)])
-                if 1 == 2:  # except:
-                    odata1.Original = 'temp.pdf'
-                    docref = f'tmp/{scac}/data/vorders/P_c'+'_' + 'temp.pdf'
-                    tes = subprocess.check_output(
-                        ['pdfunite', addpath(docref3), addpath(docref2), addpath(docref)])
-
-                odata1.Location = docref
-                odata1.Detention = cache2
-                db.session.commit()
+                err.append('Must Select One Job to Use this Function')
 
         if stampnow is not None:
             # if stampnow is called the document will already be recreated as a blank for here
@@ -1877,7 +1861,7 @@ def isoT():
         today = datetime.date.today()
         #today = datetime.datetime.today().strftime('%Y-%m-%d')
         now = datetime.datetime.now().strftime('%I:%M %p')
-        doclist = [0]*7
+        doclist = [0]*8
         filesel = ''
         docref = ''
         doctxt = ''

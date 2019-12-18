@@ -77,7 +77,7 @@ def sigdoc(stampdata, docin, docref):
         c = canvas.Canvas(file2, pagesize=letter)
         c.setLineWidth(1)
         sigpage=sigpage-1
-        logo = addpath("tmp/sensitive/marksign2.jpg")
+        logo = addpath(f'tmp/{scac}/sensitive/marksign2.jpg')
         c.drawImage(logo, sigx, sigy, width=150, preserveAspectRatio=True, mask='auto')
         c.showPage()
         c.save()
@@ -113,7 +113,7 @@ def sigdoc(stampdata, docin, docref):
         file2 = addpath(f'tmp/{scac}/data/processing/t2.pdf')
         c = canvas.Canvas(file2, pagesize=letter)
         c.setLineWidth(1)
-        xbox = addpath("tmp/pics/x100.png")
+        xbox = addpath(f'tmp/{scac}/pics/x100.png')
         c.drawImage(xbox, xmarkx, xmarky, width=30, preserveAspectRatio=True, mask='auto')
         c.showPage()
         c.save()
