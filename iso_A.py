@@ -670,11 +670,11 @@ def login():
             else:
                 app.logger.info('PASSWORDS DO NOT MATCH')
                 error = 'Passwords do not match'
-                return render_template('login.html', error=error, cmpdata=cmpdata)
+                return render_template('login.html', error=error, cmpdata=cmpdata, scac=scac)
 
         else:
             error = 'Username not found'
-            return render_template('login.html', error=error, cmpdata=cmpdata)
+            return render_template('login.html', error=error, cmpdata=cmpdata, scac=scac)
 
     return render_template('login.html',cmpdata=cmpdata, scac=scac)
 

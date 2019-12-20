@@ -216,7 +216,7 @@ class Proofs(db.Model):
 class Orders(db.Model):
     __tablename__ = 'orders'
     id = db.Column('id', db.Integer, primary_key=True)
-    Status = db.Column('Status', db.String(50))
+    Status = db.Column('Status', db.String(200))
     Jo = db.Column('JO', db.String(25))
     Load = db.Column('Load', db.String(50))
     Order = db.Column('Order', db.String(50))
@@ -256,11 +256,16 @@ class Orders(db.Model):
     Links = db.Column('Links', db.String(100))
     Hstat = db.Column('Hstat', db.Integer)
     Istat = db.Column('Istat', db.Integer)
-    Proof = db.Column('Proof', db.String(200))
+    Proof = db.Column('Proof', db.String(100))
+    Invoice = db.Column('Invoice', db.String(100))
+    Gate = db.Column('Gate', db.String(100))
+    Package = db.Column('Package', db.String(100))
+    Manifest = db.Column('Manifest', db.String(100))
 
     def __init__(self, Status, Jo, Load, Order, Company, Location, BOL, Booking, Container, Driver, Pickup,
                  Delivery, Amount, Date, Time, Date2, Time2, Time3, Path, Original, Description, Chassis,
-                 Detention, Storage, Release, Company2, Seal, Shipper, Type, Bid, Lid, Did, Label, Dropblock1, Dropblock2, Commodity, Packing, Links, Hstat, Istat, Proof):
+                 Detention, Storage, Release, Company2, Seal, Shipper, Type, Bid, Lid, Did, Label, Dropblock1,
+                 Dropblock2, Commodity, Packing, Links, Hstat, Istat, Proof, Invoice, Gate, Package, Manifest):
         self.Status = Status
         self.Jo = Jo
         self.Load = Load
@@ -301,6 +306,10 @@ class Orders(db.Model):
         self.Hstat = Hstat
         self.Istat = Istat
         self.Proof = Proof
+        self.Invoice = Invoice
+        self.Gate = Gate
+        self.Package = Package
+        self.Manifest = Manifest
 
 
 class Drops(db.Model):

@@ -1357,7 +1357,7 @@ def make_new_order():
                    Storage='0',
                    Release=0, Shipper=a[0], Type=a[15], Time3=None, Bid=idb, Lid=idl, Did=idd, Label='FileUpload',
                    Dropblock1=newdrop1, Dropblock2=newdrop2, Commodity=None, Packing=None, Links=None, Hstat=0, Istat=0,
-                   Proof=None)
+                   Proof=None,Invoice=None,Gate=None,Package=None,Manifest=None)
     db.session.add(input)
     db.session.commit()
 

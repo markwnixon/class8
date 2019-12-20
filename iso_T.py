@@ -225,25 +225,6 @@ def isoT():
                 docref = fpath + filesel
                 doctxt = fpath + base + '.txt'
 
-                if modlink == 21:
-                    modata = Proofs.query.get(poof)
-                    #Save values placed in table thus far:
-                    vals = ['order', 'bol', 'container', 'booking',
-                            'shipper', 'location', 'proofdate', 'prooftime']
-                    a = list(range(len(vals)))
-                    i = 0
-                    for v in vals:
-                        a[i] = request.values.get(v)
-                        i = i + 1
-                    modata.Order = a[0]
-                    modata.BOL = a[1]
-                    modata.Container = a[2]
-                    modata.Booking = a[3]
-                    modata.Company = a[4]
-                    modata.Location = a[5]
-                    modata.Date = a[6]
-                    modata.Time = a[7]
-                    db.session.commit()
 
                 delf = request.values.get('DELF')
                 if delf is not None:
@@ -603,6 +584,7 @@ def isoT():
                 viewtype = 'manifest'
                 doclist[3] = docref
                 doclist[0] = f'tmp/{scac}/data/vorders/{modata.Original}'
+                modata.Manifest = os.path.basename(docref)
                 db.session.commit()
 
             else:
@@ -637,61 +619,75 @@ def isoT():
 
         print('leftscreen',leftscreen)
 # ____________________________________________________________________________________________________________________E.Search.Trucking
+        def packmake(odat):
+            idata = Interchange.query.filter(Interchange.CONTAINER == odat.Container).all()
+            packitems = []
+            stampdata = [0] * 9
+            for i in range(9):
+                stampdata[i] = request.values.get('stampdata' + str(i))
+            for i in range(4):
+                packname = 'section' + str(i + 1)
+                test = request.values.get(packname)
+                print(packname,test)
+                if test != 'none':
+                    if test == 'Source':
+                        fa = addpath(f'tmp/{scac}/data/vorders/{odat.Original}')
+                        if os.path.isfile(fa):
+                            packitems.append(fa)
+                            stampdata.append('Source')
+                        else:
+                            err.append('No Source Document')
+                    if test == 'Invoice':
+                        fa = addpath(f'tmp/{scac}/data/vinvoice/{odat.Invoice}')
+                        if os.path.isfile(fa):
+                            packitems.append(fa)
+                            stampdata.append('Invoice')
+                        else:
+                            err.append('No Invoice')
+                    if test == 'Proofs':
+                        fa = addpath(f'tmp/{scac}/data/vproofs/{odat.Proof}')
+                        if os.path.isfile(fa):
+                            packitems.append(fa)
+                            stampdata.append('Proofs')
+                        else:
+                            err.append('No proof file exists')
+                    if test == 'Ticks':
+                        fa = addpath(f'tmp/{scac}/data/vinterchange/{odat.Gate}')
+                        if os.path.isfile(fa):
+                            packitems.append(fa)
+                            stampdata.append('Ticks')
+                        elif idata is not None:
+                            stampdata.append('Ticks')
+                            if len(idata) > 1:
+                                # Get a blended ticket
+                                con = idata[0].CONTAINER
+                                newdoc = f'tmp/{scac}/data/vinterchange/{con}_Blended.pdf'
+                                if os.path.isfile(addpath(newdoc)):
+                                    print(f'{newdoc} exists already')
+                                else:
+                                    g1 = f'tmp/{scac}/data/vinterchange/{idata[0].Original}'
+                                    g2 = f'tmp/{scac}/data/vinterchange/{idata[1].Original}'
+                                    blendticks(addpath(g1), addpath(g2), addpath(newdoc))
+                                packitems.append(addpath(newdoc))
+                            else:
+                                packitems.append(addpath(f'tmp/{scac}/data/vinterchange/{idata[0].Original}'))
+                else:
+                    stampdata.append('none')
+
+            if len(stampdata) < 13:
+                for ix in range(len(stampdata), 13):
+                    stampdata.append('none')
+
+            return packitems, stampdata, err
+
 # ____________________________________________________________________________________________________________________B.Package.Trucking
         if reorder is not None or stampnow is not None:
             oder=request.values.get('passoder')
             oder=nonone(oder)
             odat=Orders.query.get(oder)
-            idata=Interchange.query.filter(Interchange.CONTAINER==odat.Container).all()
-            packitems=[]
-            stampdata = [0]*9
-            for i in range(9):
-                stampdata[i] = request.values.get('stampdata'+str(i))
-            for i in range(4):
-                packname='section'+str(i+1)
-                print(packname)
-                test=request.values.get(packname)
-                if test != 'none':
-                    if test == 'loadconfirm':
-                        fa = addpath(f'tmp/{scac}/data/vorders/{odat.Original}')
-                        if os.path.isfile(fa):
-                            packitems.append(fa)
-                            stampdata.append('loadconfirm')
-                        else:
-                            err.append('No Source Document')
-                    if test == 'invoice':
-                        fa = addpath(odat.Path)
-                        if os.path.isfile(fa):
-                            packitems.append(fa)
-                            stampdata.append('invoice')
-                        else:
-                            err.append('No Invoice')
-                    if test == 'proofs':
-                        fa = addpath(f'tmp/{scac}/data/vproofs/{odat.Proof}')
-                        if os.path.isfile(fa):
-                            packitems.append(fa)
-                            stampdata.append('proofs')
-                        else:
-                            err.append('No proof file exists')
-                    if test == 'ticks' and idata is not None:
-                        stampdata.append('ticks')
-                        if len(idata)>1:
-                            # Get a blended ticket
-                            con = idata[0].CONTAINER
-                            newdoc = f'tmp/{scac}/data/vinterchange/{con}_Blended.pdf'
-                            if os.path.isfile(addpath(newdoc)):
-                                print(f'{newdoc} exists already')
-                            else:
-                                g1 = f'tmp/{scac}/data/vinterchange/{idata[0].Original}'
-                                g2 = f'tmp/{scac}/data/vinterchange/{idata[1].Original}'
-                                blendticks(addpath(g1), addpath(g2), addpath(newdoc))
-                            packitems.append(addpath(newdoc))
-                        else:
-                            packitems.append(addpath(f'tmp/{scac}/data/vinterchange/{idata[0].Original}'))
-                else:
-                    stampdata.append('none')
-                    print('packitems final:',packitems)
-                    print('stampdata final:',stampdata)
+
+            packitems, stampdata, err = packmake(odat)
+            print('My stampdata is', stampdata)
 
             cache2 = int(odat.Detention)
             cache2 = cache2+1
@@ -699,14 +695,13 @@ def isoT():
             docin = f'tmp/{scac}/data/vorders/P_c{cache2}_{odat.Jo}.pdf'
             pdflist=['pdfunite']+packitems+[addpath(docref)]
             tes = subprocess.check_output(pdflist)
-            odat.Location = docref
+            odat.Package = docref
             odat.Detention = cache2
             db.session.commit()
             print('docref=',docref)
             leftscreen = 0
             stampstring = json.dumps(stampdata)
-            cdat=People.query.get(int(odat.Bid))
-            cdat.Original=stampstring
+            odat.Status=stampstring
             db.session.commit()
             #Get the email data also in case changes occur there
             emaildata = [0]*6
@@ -716,47 +711,119 @@ def isoT():
         if mpack is not None and numchecked == 1:
             if oder > 0:
                 fexist = [0] * 5
-                dockind = ['Source', 'Proof', 'Invoice', 'Gate Out', 'Gate In']
-                packitems = []
+                dockind = ['Source', 'Proofs', 'Invoice', 'Gate']
+
                 viewtype = 'mpack'
                 leftscreen = 0
                 stamp = 1
-                odata1 = Orders.query.get(oder)
-                company = odata1.Shipper
-                cache2 = int(odata1.Detention)
+                odat = Orders.query.get(oder)
+                company = odat.Shipper
+                jo = odat.Jo
+                order = odat.Order
+                cache2 = int(odat.Detention)
                 cache2 = cache2 + 1
-                doclist[0] = f'tmp/{scac}/data/vorders/{odata1.Original}'
-                doclist[1] = f'tmp/{scac}/data/vproofs/{odata1.Proof}'
-                doclist[2] = odata1.Path
-                doclist[7] = f'tmp/{scac}/data/vorders/P_c{cache2}_{odata1.Jo}.pdf'
-                #Package output file
-                docref = f'tmp/{scac}/data/vorders/P_c{cache2}_{odata1.Jo}.pdf'
-                odata1.Location = docref
+                docref = f'tmp/{scac}/data/vorders/P_c{cache2}_{odat.Jo}.pdf'
+                doclist[7] = f'tmp/{scac}/data/vorders/P_c{cache2}_{odat.Jo}.pdf'
+                odat.Detention = str(cache2)
                 db.session.commit()
 
-                for ix in range(3):
-                    fexist[ix] = os.path.isfile(addpath(doclist[ix]))
-                    if fexist[ix] == 0:
-                        err.append(f'No {dockind[ix]} Document Exists')
-                    else:
-                        packitems.append(addpath(doclist[ix]))
+                stampstring = odat.Status
+                stampdata = json.loads(stampstring)
+                if isinstance(stampdata, list):
+                    print('stampdata is',stampdata)
+                else:
+                    stampdata = None
+
+                if stampdata is None:
+                    packitems = []
+                    stampdata = [3, 35, 35, 5, 120, 100, 5, 477, 350]
+                    doclist[0] = f'tmp/{scac}/data/vorders/{odat.Original}'
+                    doclist[1] = f'tmp/{scac}/data/vproofs/{odat.Proof}'
+                    doclist[2] = f'tmp/{scac}/data/vinvoice/{odat.Invoice}'
+                    doclist[3] = f'tmp/{scac}/data/vinterchange/{odat.Gate}'
+
+                    #Package output file
+
+                    odat.Package = docref
+                    db.session.commit()
+
+                    for ix in range(4):
+                        fexist[ix] = os.path.isfile(addpath(doclist[ix]))
+                        if fexist[ix] == 0:
+                            print(f'{addpath(doclist[ix])} does not exist')
+                            err.append(f'No {dockind[ix]} Document Exists')
+                        else:
+                            packitems.append(addpath(doclist[ix]))
+                            stampdata.append(dockind[ix])
+
+                    if len(stampdata)<13:
+                        for ix in range(len(stampdata),13):
+                            stampdata.append('none')
+
+                    print('packitems final:', packitems)
+                    print('stampdata final:', stampdata)
+                    stampstring = json.dumps(stampdata)
+                    print(len(stampstring))
+                    print(stampstring)
+                    odat.Status = stampstring
+                    db.session.commit()
+                else:
+                    packitems = []
+                    subdata = stampdata[9:13]
+                    stampdata = stampdata[0:9]
+                    print('subdata is ',subdata)
+                    for test in subdata:
+                        if test != 'none':
+                            if test == 'Source':
+                                fa = addpath(f'tmp/{scac}/data/vorders/{odat.Original}')
+                                if os.path.isfile(fa):
+                                    packitems.append(fa)
+                                    stampdata.append(test)
+                            if test == 'Invoice':
+                                fa = addpath(f'tmp/{scac}/data/vinvoice/{odat.Invoice}')
+                                if os.path.isfile(fa):
+                                    packitems.append(fa)
+                                    stampdata.append(test)
+                            if test == 'Proofs':
+                                fa = addpath(f'tmp/{scac}/data/vproofs/{odat.Proof}')
+                                if os.path.isfile(fa):
+                                    packitems.append(fa)
+                                    stampdata.append(test)
+                            if test == 'Ticks':
+                                idata = Interchange.query.filter(Interchange.CONTAINER == odat.Container).all()
+                                if idata is not None:
+                                    if len(idata) > 1:
+                                        # Get a blended ticket
+                                        con = idata[0].CONTAINER
+                                        newdoc = f'tmp/{scac}/data/vinterchange/{con}_Blended.pdf'
+                                        if os.path.isfile(addpath(newdoc)):
+                                            print(f'{newdoc} exists already')
+                                        else:
+                                            g1 = f'tmp/{scac}/data/vinterchange/{idata[0].Original}'
+                                            g2 = f'tmp/{scac}/data/vinterchange/{idata[1].Original}'
+                                            blendticks(addpath(g1), addpath(g2), addpath(newdoc))
+                                        packitems.append(addpath(newdoc))
+                                        stampdata.append(test)
+                                    else:
+                                        packitems.append(addpath(f'tmp/{scac}/data/vinterchange/{idata[0].Original}'))
+                                        stampdata.append(test)
+
+                    if len(stampdata)<13:
+                        for ix in range(len(stampdata),13):
+                            stampdata.append('none')
+
+                    # Get the email data also in case changes occur there
+                    emaildata = [0] * 6
+                    for i in range(6):
+                        emaildata[i] = request.values.get('edat' + str(i))
 
                 print('packitems final:', packitems)
-                cdat = People.query.get(int(odata1.Bid))
-                jo = odata1.Jo
-                order = odata1.Order
-                stampstring = cdat.Original
-                print('the stampstring=',stampstring)
-                try:
-                    stampdata = json.loads(stampstring)
-                except:
-                    stampdata = [3, 35, 35, 5, 120, 100, 5, 477, 350,'loadconfirmation','proofs','invoice','none']
-
+                print('stampdata final:', stampdata)
 
                 pdflist = ['pdfunite'] + packitems + [addpath(docref)]
                 tes = subprocess.check_output(pdflist)
 
-                emaildata = etemplate_truck('invoice',2,odata1.Bid,jo, order)
+                emaildata = etemplate_truck('invoice',2,odat.Bid,jo, order)
                 invo = 3
 
 
@@ -774,7 +841,7 @@ def isoT():
             cache2 = int(odat.Detention)
             #docin already set in previous area
             docref = f'tmp/{scac}/data/vorders/P_s' + str(cache2) + '_' + odat.Original
-            odat.Location = docref
+            odat.Package = docref
             db.session.commit()
             #stampdata already set in previous area
             from sigdoc import sigdoc
@@ -815,7 +882,7 @@ def isoT():
 
             for j, i in enumerate(odervec):
                 odat = Orders.query.get(i)
-                odat.Location = docref
+                odat.Package = docref
                 db.session.commit()
 
             import make_TP_invoice
@@ -834,7 +901,7 @@ def isoT():
             for i in odervec:
                 odat = Orders.query.get(i)
                 etitle = etitle+' '+odat.Jo
-                filegather.append(addpath(odat.Path))
+                filegather.append(addpath(odat.Invoice))
                 odat.Istat = 1
                 db.session.commit()
 
@@ -906,9 +973,9 @@ def isoT():
             modlink = 0
             print(odat,invooder)
             if emailnow is not None or invo > 1:
-                docref = odat.Location
+                docref = odat.Package
             else:
-                docref = odat.Path
+                docref = odat.Invoice
             jo = odat.Jo
             order = odat.Order
             alink = odat.Links
@@ -959,9 +1026,9 @@ def isoT():
             if oder > 0:
                 modata = Orders.query.get(oder)
                 try:
-                    docref = modata.Path
+                    docref = modata.Invoice
                     # Need to check for number of pages as this will tell us if is is a package or an individual invoice
-                    npages = PdfFileReader(open(modata.Path, "rb")).getNumPages()
+                    npages = PdfFileReader(open(modata.Invoice, "rb")).getNumPages()
                     if npages >= 3:
                         invo = 3
                     else:
@@ -998,7 +1065,7 @@ def isoT():
         if viewm and numchecked == 1:
             if oder > 0:
                 modata = Orders.query.get(oder)
-                if modata.Delivery is not None:
+                if modata.Manifest is not None:
                     viewtype = 'manifest'
                     leftscreen = 0
                     doclist[3] = f'tmp/{scac}/data/vmanifest/{modata.Delivery}'
@@ -1011,37 +1078,47 @@ def isoT():
         if viewg and numchecked == 1:
             if oder > 0:
                 odat = Orders.query.get(oder)
-                idat = Interchange.query.filter( (Interchange.Jo == odat.Jo) & (Interchange.TYPE.contains('Out')) ).first()
-                if idat is not None:
-                    viewtype = 'gate1'
-                    leftscreen = 0
-                    doclist[4] = f'tmp/{scac}/data/vinterchange/{idat.Original}'
-                    err.append(f'Viewing document {idat.Original}')
+                base = odat.Gate
+                newdoc = f'tmp/{scac}/data/vinterchange/{base}'
+                if os.path.isfile(addpath(newdoc)):
+                    doclist[6] = newdoc
+                    doclist[5] = 0
+                    doclist[4] = 0
                 else:
-                    err.append('There is no gate OUT ticket available for this selection')
+                    jo = odat.Jo
+                    idat = Interchange.query.filter( (Interchange.Jo == odat.Jo) & (Interchange.TYPE.contains('Out')) ).first()
+                    if idat is not None:
+                        viewtype = 'gate1'
+                        leftscreen = 0
+                        doclist[4] = f'tmp/{scac}/data/vinterchange/{idat.Original}'
+                        err.append(f'Viewing document {idat.Original}')
+                    else:
+                        err.append('There is no gate OUT ticket available for this selection')
 
-                idat = Interchange.query.filter( (Interchange.Jo == odat.Jo) & (Interchange.TYPE.contains('In')) ).first()
-                if idat is not None:
-                    viewtype = 'gate2'
-                    leftscreen = 0
-                    con = idat.CONTAINER
-                    doclist[5] = f'tmp/{scac}/data/vinterchange/{idat.Original}'
-                    err.append(f'Viewing document {idat.Original}')
-                    if doclist[4] !=0 and doclist[5] != 0:
-                        viewtype = 'gate3'
-                        #Get a blended ticket
+                    idat = Interchange.query.filter( (Interchange.Jo == odat.Jo) & (Interchange.TYPE.contains('In')) ).first()
+                    if idat is not None:
+                        viewtype = 'gate2'
+                        leftscreen = 0
                         con = idat.CONTAINER
-                        newdoc = f'tmp/{scac}/data/vinterchange/{con}_Blended.pdf'
-                        if os.path.isfile(addpath(newdoc)):
-                            print(f'{newdoc} exists')
-                        else:
-                            blendticks(addpath(doclist[4]),addpath(doclist[5]),addpath(newdoc))
-                        doclist[6] = newdoc
-                        doclist[5] = 0
-                        doclist[4] = 0
+                        doclist[5] = f'tmp/{scac}/data/vinterchange/{idat.Original}'
+                        err.append(f'Viewing document {idat.Original}')
+                        if doclist[4] !=0 and doclist[5] != 0:
+                            viewtype = 'gate3'
+                            #Get a blended ticket
+                            con = idat.CONTAINER
+                            base = f'{jo}_{con}_blend.pdf'
+                            newdoc = f'tmp/{scac}/data/vinterchange/{base}'
+                            if os.path.isfile(addpath(newdoc)):
+                                print(f'{newdoc} exists')
+                            else:
+                                blendticks(addpath(doclist[4]),addpath(doclist[5]),addpath(newdoc))
+                            odat.Gate = base
+                            doclist[6] = newdoc
+                            doclist[5] = 0
+                            doclist[4] = 0
 
-                else:
-                    err.append('There is no gate IN ticket available for this selection')
+                    else:
+                        err.append('There is no gate IN ticket available for this selection')
             else:
                 err.append('Must select one job to use this function')
 
@@ -1606,10 +1683,10 @@ def isoT():
 
                     for ldatl in ldata:
                         ldatl.Pid = pdata1.id
-                        ldatl.Original = docref
+                        ldatl.Original = os.path.basename(docref)
                         db.session.commit()
 
-                    myo.Path = docref
+                    myo.Invoice = os.path.basename(docref)
                     myo.Storage = cache
                     myo.Amount = d2s(total)
                     db.session.commit()
@@ -1697,7 +1774,7 @@ def isoT():
                                Description=myo.Description, Chassis=myo.Chassis, Detention='0', Storage='0', Release=0, Shipper=myo.Shipper,
                                Type=myo.Type, Time3=None, Bid=myo.Bid, Lid=myo.Lid, Did=myo.Did, Label=myo.Label, Dropblock1=myo.Dropblock1,
                                Dropblock2=myo.Dropblock2, Commodity=myo.Commodity,Packing=myo.Packing, Links=myo.Links, Hstat=-1,
-                               Istat=-1,Proof=myo.Proof)
+                               Istat=-1,Proof=None,Invoice=None,Gate=None,Package=None,Manifest=None)
                 db.session.add(input)
                 db.session.commit()
             else:
