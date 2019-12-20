@@ -468,8 +468,9 @@
                    <td><div class="input-group-text">Bill for Company:</div></td>
                    <td>
                     <select class="form-control" type="text" name="ctype" onchange="this.form.submit()">
-                      <option {% if modata.Co == 'J' %} selected {% endif %} value='J'>  Jays Auto  </option>
-                      <option {% if modata.Co == 'K' %} selected {% endif %} value="K" > One Stop Logistics</option>
+                    {% for kco in klist %}
+                      <option {% if modata.Co == kco[0] %} selected {% endif %} value="{{ kco[0] }}">  {{ kco[1:] }} </option>
+                    {% endfor %}
                     </select>
                   </td>
                 </tr>
