@@ -1357,7 +1357,7 @@ def make_new_order():
                    Storage='0',
                    Release=0, Shipper=a[0], Type=a[15], Time3=None, Bid=idb, Lid=idl, Did=idd, Label='FileUpload',
                    Dropblock1=newdrop1, Dropblock2=newdrop2, Commodity=None, Packing=None, Links=None, Hstat=0, Istat=0,
-                   Proof=None,Invoice=None,Gate=None,Package=None,Manifest=None)
+                   Proof=None,Invoice=None,Gate=None,Package=None,Manifest=None,Scache=0,Pcache=0,Icache=0,Mcache=0,Pkcache=0)
     db.session.add(input)
     db.session.commit()
 
@@ -1384,11 +1384,13 @@ def docuploader(dbase):
         odat = Orders.query.get(oder)
         if odat is not None:
             base = odat.Jo
+            scache = odat.Scache
         else:
             oder, jo = make_new_order()
             odat = Orders.query.get(oder)
             if odat is not None:
                 base = odat.Jo
+                scache = odat.Scache
 
         file = request.files['sourceupload']
         if file.filename == '':
@@ -1397,20 +1399,22 @@ def docuploader(dbase):
         if file and allowed_file(file.filename):
             name, ext = os.path.splitext(file.filename)
             filename1 = f'Source_{base}{ext}'
-            filename2 = f'Source_{base}.pdf'
+            filename2 = f'Source_{base}_c{str(scache)}.pdf'
             output1 = addpath(tpath(dbase,filename1))
             output2 = addpath(tpath(dbase,filename2))
-            file.save(output1)
-            if filename1 != filename2:
+            if ext != '.pdf':
                 try:
-                    with open(output2,"wb") as f:
+                    file.save(output1)
+                    with open(output2, "wb") as f:
                         f.write(img2pdf.convert(output1))
                     os.remove(output1)
                 except:
-                    err.append(f'Problem converting {filename1} to pdf')
                     filename2 = filename1
+            else:
+                file.save(output2)
             err.append(f'Source uploaded as {filename2}')
             odat.Original = filename2
+            odat.Scache = scache + 1
             db.session.commit()
         else:
             err.append('Allowed file types are txt, pdf, png, jpg, jpeg, gif')
@@ -1421,6 +1425,7 @@ def docuploader(dbase):
         print('oder for proof upload:',oder)
         odat = Orders.query.get(oder)
         base = odat.Jo
+        pcache = odat.Pcache
 
         file = request.files['proofupload']
         if file.filename == '':
@@ -1431,20 +1436,22 @@ def docuploader(dbase):
         if file and allowed_file(file.filename):
             name, ext = os.path.splitext(file.filename)
             filename1 = f'Proof_{base}{ext}'
-            filename2 = f'Proof_{base}.pdf'
+            filename2 = f'Proof_{base}_c{str(pcache)}.pdf'
             output1 = addpath(tpath(dbase,filename1))
             output2 = addpath(tpath(dbase,filename2))
-            file.save(output1)
-            if filename1 != filename2:
+            if ext != '.pdf':
                 try:
-                    with open(output2,"wb") as f:
+                    file.save(output1)
+                    with open(output2, "wb") as f:
                         f.write(img2pdf.convert(output1))
                     os.remove(output1)
                 except:
-                    err.append(f'Problem converting {filename1}to pdf')
                     filename2 = filename1
+            else:
+                file.save(output2)
             err.append(f'Proof uploaded as {filename2}')
             odat.Proof = filename2
+            odat.Pcache = pcache + 1
             db.session.commit()
         else:
             print('file not uploaded')

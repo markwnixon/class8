@@ -181,6 +181,15 @@ class Interchange(db.Model):
         self.Jo = Jo
         self.Company = Company
 
+class LastMessage(db.Model):
+    __tablename__='lastmessage'
+    id = db.Column('id', db.Integer, primary_key=True)
+    User = db.Column('User', db.String(45))
+    Err = db.Column('Err', db.String(400))
+
+    def __init__(self, User, Err):
+        self.User = User
+        self.Err = Err
 
 class Proofs(db.Model):
     __tablename__ = 'proofs'
@@ -261,11 +270,17 @@ class Orders(db.Model):
     Gate = db.Column('Gate', db.String(100))
     Package = db.Column('Package', db.String(100))
     Manifest = db.Column('Manifest', db.String(100))
+    Scache = db.Column('scache', db.Integer)
+    Pcache = db.Column('pcache', db.Integer)
+    Icache = db.Column('icache', db.Integer)
+    Mcache = db.Column('mcache', db.Integer)
+    Pkcache = db.Column('pkcache', db.Integer)
 
     def __init__(self, Status, Jo, Load, Order, Company, Location, BOL, Booking, Container, Driver, Pickup,
                  Delivery, Amount, Date, Time, Date2, Time2, Time3, Path, Original, Description, Chassis,
                  Detention, Storage, Release, Company2, Seal, Shipper, Type, Bid, Lid, Did, Label, Dropblock1,
-                 Dropblock2, Commodity, Packing, Links, Hstat, Istat, Proof, Invoice, Gate, Package, Manifest):
+                 Dropblock2, Commodity, Packing, Links, Hstat, Istat, Proof, Invoice, Gate, Package, Manifest,
+                 Scache, Pcache, Icache, Mcache, Pkcache):
         self.Status = Status
         self.Jo = Jo
         self.Load = Load
@@ -310,6 +325,11 @@ class Orders(db.Model):
         self.Gate = Gate
         self.Package = Package
         self.Manifest = Manifest
+        self.Scache = Scache
+        self.Pcache = Pcache
+        self.Icache = Icache
+        self.Mcache = Mcache
+        self.Pkcache = Pkcache
 
 
 class Drops(db.Model):

@@ -1,33 +1,28 @@
 <br>
 <div class="card">
     <div class="card-header bg-info text-white" align="left">
-        Optional File Upload of Source Document for Job:{{modata.Jo}} Company:{{modata.Shipper}}
+        File Upload of Source Document for Job:{{modata.Jo}} Company:{{modata.Shipper}}
     </div>
     <div class="card-body" align = "left">
-
-    <dl>
-        <p>
-        <input type="file" name="sourceupload" autocomplete="off">
+        Option 1: Upload Source Document Using File Select
+        <dl>
+            <p>
+            <input type="file" name="sourceupload" autocomplete="off">
+            </p>
+        </dl><p>
+        <input type="submit" value="Upload Now">
         </p>
-    </dl><p>
-    <input type="submit" value="Upload Now">
-    </p>
     </div>
-</div>
-<br><br>
-
-<div class="card" align="center">
-    <div class="card-header bg-info text-white" align="left">
-        Optional Drag and Drop for Source File Upload
-    </div>
-    <div class="card-body" align = "center">
-            <div class="container" align="center">
-                <div class="droparea2" align="center">(Optional) Drop Here</div>
-                <div class="tablearea" id="tablearea" align="center"></div>
-            </div>
+    <div class="card-body" align = "left">
+        Option 2: Upload Source Document Using Drag and Drop
+        <div class="container" align="center">
+            <div class="droparea" align="center">(Optional) Drop Here</div>
+            <div class="tablearea" id="tablearea" align="center"></div>
+        </div>
     </div>
 </div>
 
 <input type = "hidden" name="passmodlink" value="{{modlink}}">
 <input type = "hidden" name="passoder" value="{{oder}}">
 <input type = "hidden" name="uploadtype" id="uploadtype" value="source">
+<input type = "hidden" name="username" id="username" value="{{ username }}">

@@ -54,7 +54,7 @@ table tr td{
     border: 0px !important;
 }
 
-.droparea1 {
+.droparea {
   width: 200px;
   height: 200px;
   border-style: solid;
@@ -64,21 +64,6 @@ table tr td{
   line-height: 200px;
   text-align: center;
 }
-.droparea2 {
-  width: 200px;
-  height: 200px;
-  border-style: solid;
-  border-width: 3px;
-  border-color: blue;
-  float: left;
-  line-height: 200px;
-  text-align: center;
-}
-
-
-
-
-
 
 </style>
 
@@ -116,46 +101,27 @@ var dragHandler = function(evt){
 evt.preventDefault();
 };
 
-var dropHandler1 = function(evt){
-    evt.preventDefault();
-    var files = evt.originalEvent.dataTransfer.files;
-
-    var formData = new FormData();
-    formData.append("file2upload", files[0]);
-
-    var req = {
-        url: "/sendfile1",
-        method: "post",
-        processData: false,
-        contentType: false,
-        data: formData
-    };
-
-    var promise = $.ajax(req);
-    promise.then(returntomain1);
-};
-
-function returntomain1(sitelocation)
+function returntoflask(sitelocation)
 {
     window.location.href = sitelocation;
 }
 
 
-
-var dropHandler2 = function(evt){
+var dropHandler = function(evt){
     evt.preventDefault();
     var files = evt.originalEvent.dataTransfer.files;
     var oid = document.getElementById("passoder").value;
     var uptype = document.getElementById("uploadtype").value;
-
+    var user = document.getElementById("username").value;
 
     var formData = new FormData();
     formData.append("file2upload", files[0]);
     formData.append("oid",oid);
     formData.append("uptype",uptype);
+    formData.append("user",user);
 
     var req = {
-        url: "/sendfile2",
+        url: "/FileUpload",
         method: "post",
         processData: false,
         contentType: false,
@@ -163,22 +129,15 @@ var dropHandler2 = function(evt){
     };
 
     var promise = $.ajax(req);
-    promise.then(returntomain1('/Trucking'));
+    promise.then(returntoflask('/Trucking'));
 };
 
-var dropHandlerSet1 = {
+var dropHandlerSet = {
     dragover: dragHandler,
-    drop: dropHandler1
+    drop: dropHandler
 };
 
-var dropHandlerSet2 = {
-    dragover: dragHandler,
-    drop: dropHandler2
-};
-
-$(".droparea1").on(dropHandlerSet1);
-
-$(".droparea2").on(dropHandlerSet2);
+$(".droparea").on(dropHandlerSet);
 
 $(document).ready(function () {
 $('#dtH1').DataTable({

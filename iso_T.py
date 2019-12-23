@@ -1,5 +1,5 @@
 from runmain import db
-from models import Gledger, Vehicles, Invoices, JO, Income, Orders, Bills, Accounts, Bookings, OverSeas, Autos, People, Interchange, Drivers, ChalkBoard, Proofs, Services, Drops
+from models import Gledger, Vehicles, Invoices, JO, Income, Orders,  Accounts, LastMessage, People, Interchange, Drivers, ChalkBoard, Proofs, Services, Drops
 from flask import render_template, flash, redirect, url_for, session, logging, request
 from CCC_system_setup import myoslist, addpath, tpath, companydata, scac
 from InterchangeFuncs import Order_Container_Update, Matched_Now
@@ -497,23 +497,51 @@ def isoT():
             oder, tick, serv, peep, numchecked = numcheck(4, odata, idata, sdata, cdata, 0, ['oder',  'tick', 'serv', 'peep'])
 
         if uploadS is not None:
-            err.append('No Job Selected for Source Upload')
             if oder > 0  and numchecked == 1:
+                odat = Orders.query.get(oder)
+                jo = odat.Jo
+                scache = odat.Scache
+                filename2 = f'Source_{jo}_c{str(scache)}.pdf'
+                err.append(f'File uploaded as {filename2}')
+                #Provide a file name for the upload and store message:
+                edat = LastMessage.query.filter(LastMessage.User == username).first()
+                if edat is not None:
+                    edat.Err = json.dumps(err)
+                    db.session.commit()
+                else:
+                    input = LastMessage(User=username, Err=json.dumps(err))
+                    db.session.add(input)
+                    db.session.commit()
+
                 modlink = 70
                 leftscreen = 1
                 mm3 = 0
             else:
+                err.append('No Job Selected for Source Upload')
                 err.append('Select One Box')
 
         if uploadP is not None:
-            err.append('No Job Selected for Proof Upload')
             if oder > 0  and numchecked == 1:
+                odat = Orders.query.get(oder)
+                jo = odat.Jo
+                pcache = odat.Pcache
+                filename2 = f'Proof_{jo}_c{str(pcache)}.pdf'
+                err.append(f'File uploaded as {filename2}')
+                #Provide a file name for the upload and store message:
+                edat = LastMessage.query.filter(LastMessage.User == username).first()
+                if edat is not None:
+                    edat.Err = json.dumps(err)
+                    db.session.commit()
+                else:
+                    input = LastMessage(User=username, Err=json.dumps(err))
+                    db.session.add(input)
+                    db.session.commit()
                 leftscreen = 1
                 modlink = 71
                 mm3 = 0
             else:
+                err.append('No Job Selected for Proof Upload')
                 err.append('Select One Box')
-        print('leftscreen',leftscreen)
 
 
         if mm2 is not None or mm3 == 1:
@@ -616,8 +644,6 @@ def isoT():
             Income.query.filter(Income.Jo == odat.Jo).delete()
             Gledger.query.filter(Gledger.Tcode == odat.Jo).delete()
             db.session.commit()
-
-        print('leftscreen',leftscreen)
 # ____________________________________________________________________________________________________________________E.Search.Trucking
         def packmake(odat):
             idata = Interchange.query.filter(Interchange.CONTAINER == odat.Container).all()
@@ -994,7 +1020,6 @@ def isoT():
             invooder = 0
             stamp = 0
             err.append(f'Successful email to: {emailin1}')
-        print('leftscreen',leftscreen)
 # ____________________________________________________________________________________________________________________E.Email.Trucking
 # ____________________________________________________________________________________________________________________B.Views.Trucking
 
@@ -1236,8 +1261,6 @@ def isoT():
             leftsize = 8
             modlink = 3
             modata = Services.query.get(peep)
-
-        print('leftscreen',leftscreen)
 
         if addE is not None and numchecked == 0:
             leftsize = 8
@@ -1481,7 +1504,6 @@ def isoT():
                 leftsize = 8
                 modlink = 7
 # ____________________________________________________________________________________________________________________E.PaymentHistory.Trucking
-        print('leftscreen',leftscreen)
 # ____________________________________________________________________________________________________________________B.Invoice.Trucking and Quotes
         if (minvo is not None and oder > 0) and numchecked > 1:
             err.append('Could not create multi-job invoice')
@@ -1703,7 +1725,6 @@ def isoT():
                 else:
                     emaildata = etemplate_truck('quote',6,modata.Bid,jo,order)
                 #invo = 1
-        print('leftscreen',leftscreen)
 # ____________________________________________________________________________________________________________________E.Invoice.Trucking
 # ____________________________________________________________________________________________________________________B.Newjob.Trucking
         if newjob is not None:
@@ -1934,12 +1955,20 @@ def isoT():
             if calupdate is not None:
                 err = calmodalupdate(daylist, username, 'Trucking')
                 caldays, daylist, weeksum = calendar7_weeks('Trucking', nweeks)
-        print('leftscreen',leftscreen)
 # ____________________________________________________________________________________________________________________E.Calendar.Trucking
     # This is the else for 1st time through (not posting data from overseas.html)
     else:
         from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero, dataget_T
         username = session['username'].capitalize()
+        edat = LastMessage.query.filter(LastMessage.User==username).first()
+        print(f'username={username} edat={edat.Err}')
+        if edat is not None:
+            err = json.loads(edat.Err)
+            # Got the past message now set it back to default
+            edat.Err = json.dumps(['All is Well from Previous'])
+            db.session.commit()
+        else:
+            err = []
         today = datetime.date.today()
         #today = datetime.datetime.today().strftime('%Y-%m-%d')
         now = datetime.datetime.now().strftime('%I:%M %p')
@@ -1969,7 +1998,6 @@ def isoT():
         leftscreen = 1
         holdvec = [0]*3
         quot = 0
-        err = []
 
         stampdata = [3, 35, 35, 5, 120, 100, 5, 477, 350]
         leftsize = 10

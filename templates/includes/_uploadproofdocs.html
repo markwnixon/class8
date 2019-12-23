@@ -1,25 +1,29 @@
+<br>
 <div class="card">
     <div class="card-header bg-info text-white">
         Upload Proof for Order:{{modata.Order}} Company:{{modata.Shipper}}
     </div>
     <div class="card-body">
-    Upload Proof Document
-    <dl>
-        <p>
-        <input type="file" name="proofupload" autocomplete="off">
-        </p>
-    </dl>
-    <p>
-    <input type="submit" value="Upload Now">
-    </p>
+            Option 1: Upload Proof Document Using File Select
+            <dl>
+                <p>
+                <input type="file" name="proofupload" autocomplete="off">
+                </p>
+            </dl>
+            <p>
+            <input type="submit" value="Upload Now">
+            </p>
     </div>
-</div>
-<br><br>
-<div class="container">
-    <div class="droparea2">(Optional) Drop File Here</div>
-    <div class="tablearea" id="tablearea"></div>
+    <div class="card-body">
+        Option 2: Upload Proof Document Using Drag and Drop
+        <div class="container">
+            <div class="droparea">(Optional) Drop File Here</div>
+            <div class="tablearea" id="tablearea"></div>
+        </div>
+    </div>
 </div>
 
 <input type = "hidden" name="passmodlink" value="{{modlink}}">
 <input type = "hidden" name="passoder" value="{{oder}}">
 <input type = "hidden" name="uploadtype" id="uploadtype" value="proof">
+<input type = "hidden" name="username" id="username" value="{{ username }}">

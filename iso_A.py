@@ -1,6 +1,6 @@
 from runmain import app, db
 from models import users, ChalkBoard, Interchange, Orders, Proofs, General
-from models import Services, Drivers, JO, People, OverSeas, Chassis
+from models import Services, Drivers, JO, People, OverSeas, Chassis, LastMessage
 from models import Autos, Bookings, Vehicles, Invoices, Income, Accounts, Bills, Drops
 
 from flask import render_template, flash, redirect, url_for, session, logging, request
@@ -9,6 +9,7 @@ from decimal import Decimal
 
 import datetime
 import os
+import json
 
 
 from twilio.twiml.messaging_response import MessagingResponse
@@ -27,69 +28,54 @@ month = str(today.month)
 from CCC_system_setup import companydata, statpath, addpath, scac, tpath
 cmpdata = companydata()
 
-@app.route('/sendfile1', methods=['GET', 'POST'])
-def send_file1():
-    print('sendingfile1')
-    odat = Orders.query.filter(Orders.Original=='star').first()
-    if odat is not None:
-        oder = odat.id
-        jo = odat.Jo
-    else:
-        oder,jo = make_new_order()
-        odat = Orders.query.get(oder)
-    fileob = request.files["file2upload"]
-    name, ext = os.path.splitext(fileob.filename)
-    filename1 = f'Source_{jo}{ext}'
-    filename2 = f'Source_{jo}.pdf'
-    output1 = addpath(tpath('oder', filename1))
-    output2 = addpath(tpath('oder', filename2))
-    fileob.save(output1)
-    if filename1 != filename2:
-        try:
-            with open(output2, "wb") as f:
-                f.write(img2pdf.convert(output1))
-            #os.remove(output1)
-        except:
-            filename2 = filename1
-    odat.Original = filename2
-    db.session.commit()
-    print('file uploaded')
-    return "successful_upload"
-
-@app.route('/sendfile2', methods=['GET', 'POST'])
-def send_file2():
+@app.route('/FileUpload', methods=['GET', 'POST'])
+def FileUpload():
+    err=[]
     uptype = request.values['uptype']
     print(uptype)
     oder = request.values['oid']
     oder = nonone(oder)
     print(oder)
+    user = request.values['user']
+    print(user)
     odat = Orders.query.get(oder)
-    if odat is not None:
-        jo = odat.Jo
+    jo = odat.Jo
+    pcache = odat.Pcache
+    scache = odat.Scache
     fileob = request.files["file2upload"]
     name, ext = os.path.splitext(fileob.filename)
     if uptype == 'proof':
-        filename1 = f'Proof_{jo}{ext}'
-        filename2 = f'Proof_{jo}.pdf'
+        filename1 = f'Proof_{jo}_c{str(pcache)}{ext}'
+        filename2 = f'Proof_{jo}_c{str(pcache)}.pdf'
+        output1 = addpath(tpath('poof', filename1))
+        output2 = addpath(tpath('poof', filename2))
+        odat.Pcache = pcache + 1
+        db.session.commit()
     elif uptype == 'source':
-        filename1 = f'Source_{jo}{ext}'
-        filename2 = f'Source_{jo}.pdf'
-    output1 = addpath(tpath('oder', filename1))
-    output2 = addpath(tpath('oder', filename2))
-    fileob.save(output1)
-    if filename1 != filename2:
+        filename1 = f'Source_{jo}_c{str(scache)}{ext}'
+        filename2 = f'Source_{jo}_c{str(scache)}.pdf'
+        output1 = addpath(tpath('oder', filename1))
+        output2 = addpath(tpath('oder', filename2))
+        odat.Scache = scache + 1
+        db.session.commit()
+    if ext != '.pdf':
         try:
+            fileob.save(output1)
             with open(output2, "wb") as f:
                 f.write(img2pdf.convert(output1))
             os.remove(output1)
         except:
             filename2 = filename1
+    else:
+        fileob.save(output2)
     if uptype == 'proof':
         odat.Proof = filename2
     elif uptype == 'source':
         odat.Original = filename2
     db.session.commit()
-    print(f'File {filename2} uploaded')
+
+    print(f'File {fileob.filename} uploaded as {filename2}')
+
     return "successful_upload"
 
 @app.route('/Barcode', methods=['GET', 'POST'])
