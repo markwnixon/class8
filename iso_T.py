@@ -2005,7 +2005,10 @@ def isoT():
         edat = LastMessage.query.filter(LastMessage.User==username).first()
         print(f'username={username} edat={edat.Err}')
         if edat is not None:
-            err = json.loads(edat.Err)
+            try:
+                err = json.loads(edat.Err)
+            except:
+                err=['Problem with Json Loads']
             # Got the past message now set it back to default
             edat.Err = json.dumps(['All is Well from Previous'])
             db.session.commit()
