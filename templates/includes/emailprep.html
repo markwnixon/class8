@@ -10,6 +10,7 @@
 <div class="card">
   <div class="card-header" align = "center">
     Enter Email Associated with this {{ etype }}<br>
+      {% if stamp %}
       {% if stamp > 0 %}
             <div class="d-sm-flex justify-content-center small">
                 <div class="p-0">
@@ -25,6 +26,7 @@
                 </div>
             </div>
     {% endif %}
+  {% endif %}
   </div>
 <div class="card-body">
 <div class="input-group-text">E-Title:</div>
