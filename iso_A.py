@@ -78,6 +78,8 @@ def FileUpload():
 
     return "successful_upload"
 
+
+
 @app.route('/Barcode', methods=['GET', 'POST'])
 def Barcode():
     from vin import getvindata

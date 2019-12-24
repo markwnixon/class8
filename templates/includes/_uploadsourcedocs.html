@@ -13,6 +13,7 @@
         <input type="submit" value="Upload Now">
         </p>
     </div>
+    {% if modlink != 4 %}
     <div class="card-body" align = "left">
         Option 2: Upload Source Document Using Drag and Drop
         <div class="container" align="center">
@@ -20,7 +21,9 @@
             <div class="tablearea" id="tablearea" align="center"></div>
         </div>
     </div>
+    {% endif %}
 </div>
+
 
 <input type = "hidden" name="passmodlink" value="{{modlink}}">
 <input type = "hidden" name="passoder" value="{{oder}}">

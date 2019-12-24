@@ -78,6 +78,8 @@ def isoT():
         uploadP = request.values.get('UploadP')
         invoserv = request.values.get('invoserv')
         mm3 = nonone(request.values.get('passmanifest'))
+        eprof = request.values.get('emlprofile')
+        print('eprof=',eprof)
         viewtype = 0
         doclist = [0]*8
 
@@ -645,16 +647,29 @@ def isoT():
             Gledger.query.filter(Gledger.Tcode == odat.Jo).delete()
             db.session.commit()
 # ____________________________________________________________________________________________________________________E.Search.Trucking
-        def packmake(odat):
+        def packmake(odat, eprof):
             idata = Interchange.query.filter(Interchange.CONTAINER == odat.Container).all()
             packitems = []
+            if eprof == '1':
+                dockind = ['Source', 'none', 'none', 'none']
+            if eprof == '2':
+                dockind = ['Ticks', 'none', 'none', 'none']
+            elif eprof == '3':
+                dockind = ['Invoice', 'none', 'none', 'none']
+            elif eprof == '4':
+                dockind = ['Proofs', 'none', 'none', 'none']
+            elif eprof == '5':
+                dockind = ['Invoice', 'Proofs', 'none', 'none']
             stampdata = [0] * 9
             for i in range(9):
                 stampdata[i] = request.values.get('stampdata' + str(i))
             for i in range(4):
-                packname = 'section' + str(i + 1)
-                test = request.values.get(packname)
-                print(packname,test)
+                if eprof is None or eprof == '6':
+                    packname = 'section' + str(i + 1)
+                    test = request.values.get(packname)
+                else:
+                    test = dockind[i]
+
                 if test != 'none':
                     if test == 'Source':
                         fa = addpath(f'tmp/{scac}/data/vorders/{odat.Original}')
@@ -694,6 +709,8 @@ def isoT():
                                     g1 = f'tmp/{scac}/data/vinterchange/{idata[0].Original}'
                                     g2 = f'tmp/{scac}/data/vinterchange/{idata[1].Original}'
                                     blendticks(addpath(g1), addpath(g2), addpath(newdoc))
+                                    odat.Gate = f'{con}_Blended.pdf'
+                                    db.session.commit()
                                 packitems.append(addpath(newdoc))
                             else:
                                 packitems.append(addpath(f'tmp/{scac}/data/vinterchange/{idata[0].Original}'))
@@ -707,12 +724,13 @@ def isoT():
             return packitems, stampdata, err
 
 # ____________________________________________________________________________________________________________________B.Package.Trucking
-        if reorder is not None or stampnow is not None:
+        if reorder is not None or stampnow is not None or eprof is not None:
+
             oder=request.values.get('passoder')
             oder=nonone(oder)
             odat=Orders.query.get(oder)
 
-            packitems, stampdata, err = packmake(odat)
+            packitems, stampdata, err = packmake(odat, eprof)
             print('My stampdata is', stampdata)
 
             cache2 = int(odat.Detention)
@@ -730,15 +748,25 @@ def isoT():
             odat.Status=stampstring
             db.session.commit()
             #Get the email data also in case changes occur there
-            emaildata = [0]*6
-            for i in range(6):
-                emaildata[i] = request.values.get('edat'+str(i))
 
-        if mpack is not None and numchecked == 1:
+            if eprof is not None:
+                thisprofile = 'eprof' + eprof
+                kind = 0
+                emaildata = etemplate_truck(thisprofile, kind, odat)
+                print('myemaildata:', thisprofile,emaildata)
+            else:
+                emaildata = [0] * 7
+                for i in range(7):
+                    emaildata[i] = request.values.get('edat' + str(i))
+
+
+        if (mpack is not None and numchecked == 1):
+            if eprof is not None:
+                oder = request.values.get('passoder')
+                oder = nonone(oder)
             if oder > 0:
                 fexist = [0] * 5
                 dockind = ['Source', 'Proofs', 'Invoice', 'Gate']
-
                 viewtype = 'mpack'
                 leftscreen = 0
                 stamp = 1
@@ -754,10 +782,13 @@ def isoT():
                 db.session.commit()
 
                 stampstring = odat.Status
-                stampdata = json.loads(stampstring)
-                if isinstance(stampdata, list):
-                    print('stampdata is',stampdata)
-                else:
+                try:
+                    stampdata = json.loads(stampstring)
+                    if isinstance(stampdata, list):
+                        print('stampdata is',stampdata)
+                    else:
+                        stampdata = None
+                except:
                     stampdata = None
 
                 if stampdata is None:
@@ -770,17 +801,18 @@ def isoT():
 
                     #Package output file
 
-                    odat.Package = docref
+                    odat.Package = f'P_c{cache2}_{odat.Jo}.pdf'
                     db.session.commit()
 
                     for ix in range(4):
-                        fexist[ix] = os.path.isfile(addpath(doclist[ix]))
-                        if fexist[ix] == 0:
-                            print(f'{addpath(doclist[ix])} does not exist')
-                            err.append(f'No {dockind[ix]} Document Exists')
-                        else:
-                            packitems.append(addpath(doclist[ix]))
-                            stampdata.append(dockind[ix])
+                        if dockind[ix] != 'none':
+                            fexist[ix] = os.path.isfile(addpath(doclist[ix]))
+                            if fexist[ix] == 0:
+                                print(f'{addpath(doclist[ix])} does not exist')
+                                err.append(f'No {dockind[ix]} Document Exists')
+                            else:
+                                packitems.append(addpath(doclist[ix]))
+                                stampdata.append(dockind[ix])
 
                     if len(stampdata)<13:
                         for ix in range(len(stampdata),13):
@@ -839,8 +871,8 @@ def isoT():
                             stampdata.append('none')
 
                     # Get the email data also in case changes occur there
-                    emaildata = [0] * 6
-                    for i in range(6):
+                    emaildata = [0] * 7
+                    for i in range(7):
                         emaildata[i] = request.values.get('edat' + str(i))
 
                 print('packitems final:', packitems)
@@ -849,7 +881,13 @@ def isoT():
                 pdflist = ['pdfunite'] + packitems + [addpath(docref)]
                 tes = subprocess.check_output(pdflist)
 
-                emaildata = etemplate_truck('invoice',2,odat.Bid,jo, order)
+                if eprof is not None:
+                    thisprofile = 'eprof'+eprof
+                    kind=0
+                else:
+                    thisprofile = 'invoice'
+                    kind=2
+                emaildata = etemplate_truck(thisprofile,kind,odat)
                 invo = 3
 
 
@@ -936,7 +974,7 @@ def isoT():
 
             odat.Detention = cache2
             db.session.commit()
-            emaildata = etemplate_truck2('invoice',2,odat.Bid,jo,order)
+            emaildata = etemplate_truck2('invoice',2,odat)
             invo = 3
 # ____________________________________________________________________________________________________________________E.Package2.Trucking
 # ____________________________________________________________________________________________________________________B.Email.Trucking
@@ -1002,20 +1040,24 @@ def isoT():
                 docref = odat.Package
             else:
                 docref = odat.Invoice
+
             jo = odat.Jo
             order = odat.Order
-            alink = odat.Links
-            if alink is not None:
-                alist = json.loads(alink)
-                for aoder in alist:
-                    thisodat = Orders.query.get(aoder)
-                    thisodat.Istat = 3
+
+            if eprof is None or eprof == 3 or eprof ==5:
+                alink = odat.Links
+                if alink is not None:
+                    alist = json.loads(alink)
+                    for aoder in alist:
+                        thisodat = Orders.query.get(aoder)
+                        thisodat.Istat = 3
+                        db.session.commit()
+                else:
+                    odat.Istat = 3
                     db.session.commit()
-            else:
-                odat.Istat = 3
-                db.session.commit()
+                gledger_write('invoice',jo,0,0)
+
             emailin1 = invoice_mimemail(jo, order, docref, invo)
-            gledger_write('invoice',jo,0,0)
             invo = 0
             invooder = 0
             stamp = 0
@@ -1061,7 +1103,7 @@ def isoT():
                     print('This file has', npages)
                     jo = modata.Jo
                     order = modata.Order
-                    emaildata = etemplate_truck('invoice',3,modata.Bid,jo,order)
+                    emaildata = etemplate_truck('invoice',3,modata)
                     # idat=Invoices.query.filter(Invoices.Jo==modata.Jo).first()
                     # if idat is not None:
                     #    docref=idat.Original
@@ -1539,7 +1581,7 @@ def isoT():
                 leftsize = 8
                 err.append(f'Multi-Invoice:{json.dumps(odervec)}')
                 err.append(f'Viewing {docref}')
-                emaildata = etemplate_truck('invoice',5,myo.Bid,myo.Jo,myo.Order)
+                emaildata = etemplate_truck('invoice',5,myo)
                 invo = 2
 
         if ((minvo is not None and oder > 0 and numchecked == 1) or invoupdate is not None) or ((mquot is not None and oder > 0 and numchecked ==1 ) or quotupdate is not None):
@@ -1721,9 +1763,9 @@ def isoT():
                     jo = modata.Jo
                     order = modata.Order
                 if (minvo is not None and oder > 0 and numchecked == 1) or invoupdate is not None:
-                    emaildata = etemplate_truck('invoice',6,modata.Bid,jo,order)
+                    emaildata = etemplate_truck('invoice',6,modata)
                 else:
-                    emaildata = etemplate_truck('quote',6,modata.Bid,jo,order)
+                    emaildata = etemplate_truck('quote',6,modata)
                 #invo = 1
 # ____________________________________________________________________________________________________________________E.Invoice.Trucking
 # ____________________________________________________________________________________________________________________B.Newjob.Trucking

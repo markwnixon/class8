@@ -28,23 +28,11 @@ def invoice_mimemail(invo,order,docref,npack):
     emailcc2=request.values.get('edat5')
     etitle=request.values.get('edat0')
     ebody=request.values.get('edat1')
+    newfile = request.values.get('edat6')
     order=order.strip()
 
-    if npack==3:
-        newfile='Invoice_Package_Order_'+order
-    elif npack==2:
-        newfile=f'Summary_Invoice_{today}'
-        newfile = newfile.replace(' ','_').replace('-','').replace(':','')
-        newfile = newfile.split('.')[0]
-    else:
-        newfile='Invoice_Order_'+order
-
-    if npack==5:
-        newfile=newfile.replace('Order_','Booking_')
-
-    newfile=newfile+'.pdf'
-
-    shutil.copy(addpath(docref),newfile)
+    if newfile != 'none':
+        shutil.copy(addpath(docref),newfile)
 
     #emailto = "export@firsteaglelogistics.com"
     emailfrom = em['invo']
@@ -70,14 +58,16 @@ def invoice_mimemail(invo,order,docref,npack):
     #body = 'Dear Customer:\n\nYour invoice is attached. Please remit payment at your earliest convenience.\n\nThank you for your business- we appreciate it very much.\n\nSincerely,\n\nFIRST EAGLE LOGISTICS,INC.\n\n\nNorma Ghanem\nFirst Eagle Logistics, Inc.\n505 Hampton Park Blvd Unit O\nCapitol Heights,MD 20743\n301 516 3000'
     msg.attach(MIMEText(ebody, 'plain'))
 
-    attachment = open(newfile, "rb")
+    if newfile != 'none':
+        attachment = open(newfile, "rb")
+        part = MIMEBase('application', 'octet-stream')
+        part.set_payload((attachment).read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', "attachment; filename= %s" % newfile)
+        msg.attach(part)
+        attachment.close()
+        os.remove(newfile)
 
-    part = MIMEBase('application', 'octet-stream')
-    part.set_payload((attachment).read())
-    encoders.encode_base64(part)
-    part.add_header('Content-Disposition', "attachment; filename= %s" % newfile)
-
-    msg.attach(part)
     print('username=',username,password)
     server = smtplib.SMTP(ourserver)
     #server.connect(ourserver, 465)
@@ -90,6 +80,6 @@ def invoice_mimemail(invo,order,docref,npack):
     server.sendmail(emailfrom, emailto, msg.as_string())
     server.quit()
 
-    os.remove(newfile)
+
 
     return emailin1
