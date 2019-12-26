@@ -1783,8 +1783,12 @@ def isoT():
             cdata = People.query.filter(People.Ptype == 'Trucking').order_by(People.Company).all()
             leftsize = 8
             leftscreen = 0
-            docref = f'tmp/{scac}/processing/tjobs/'+filesel
-            doctxt = docref.split('.', 1)[0]+'.txt'
+            try:
+                docref = f'tmp/{scac}/processing/tjobs/'+filesel
+                doctxt = docref.split('.', 1)[0]+'.txt'
+            except:
+                docref = ''
+                doctxt = ''
             shipper = request.values.get('shipper')
             pufrom = request.values.get('thislcomp')
             deltoc = request.values.get('thisdcomp')

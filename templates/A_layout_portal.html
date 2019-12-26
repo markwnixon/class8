@@ -65,6 +65,12 @@ table tr td{
   text-align: center;
 }
 
+#pics img {
+position:absolute;
+display: none;
+}
+
+
 </style>
 
     <title>Portal</title>
@@ -96,6 +102,31 @@ function startBarcodeScanner()
 	alert("Using client JavaScript to start scanner.");
 	window.location.href = 'bwstw://startscanner?field=txtBarcode';
 }
+
+
+$(document).ready(function() {
+    $('#picOne').fadeIn(1500).delay(3500).fadeOut(1500);
+    $('#picTwo').delay(5000).fadeIn(1500);
+});
+
+$(document).ready(function() {
+
+    runslide();
+
+    function runslide() {
+    $('#pic1').fadeIn(1500).delay(3500).fadeOut(1500);
+    $('#pic2').delay(5000).fadeIn(1500).delay(3500).fadeOut(1500);
+
+    setTimeout(runslide, 10000);
+    }
+
+});
+
+
+
+
+
+
 
 var dragHandler = function(evt){
 evt.preventDefault();

@@ -17,6 +17,17 @@
 <!-- MDBootstrap Datatables  -->
 <link href="css/addons/datatables.min.css" rel="stylesheet">
 
+<style>
+
+#pics img {
+position:absolute;
+display: none;
+    width:350px;
+
+}
+
+</style>
+
     <title>{{cmpdata[0]}}</title>
   </head>
     <body>
@@ -40,5 +51,48 @@
 
 <!-- MDBootstrap Datatables  -->
  <script type="text/javascript" src="tmp/js/addons/datatables.min.js"></script>
+
+<script>
+
+runslide1();
+
+function runslide1() {
+    $('#pic1').fadeIn(1500).delay(3500).fadeOut(1500, function() {
+        $('#pic2').fadeIn(1500).delay(3500).fadeOut(1500, function() {
+            runslide1();
+            });
+                });
+}
+
+runslide2();
+function runslide2() {
+    $('#pic5').fadeIn(1500).delay(3500).fadeOut(1500, function() {
+        $('#pic6').fadeIn(1500).delay(3500).fadeOut(1500, function() {
+            $('#pic7').fadeIn(1500).delay(3500).fadeOut(1500, function() {
+                $('#pic8').fadeIn(1500).delay(3500).fadeOut(1500, function() {
+            runslide2();});});});});
+}
+runslide3();
+function runslide3() {
+    $('#pic9').fadeIn(1500).delay(3500).fadeOut(1500, function() {
+        $('#pic10').fadeIn(1500).delay(3500).fadeOut(1500, function() {
+            $('#pic11').fadeIn(1500).delay(3500).fadeOut(1500, function() {
+                $('#pic12').fadeIn(1500).delay(3500).fadeOut(1500, function() {
+            runslide3();});});});});
+}
+runslide4();
+function runslide4() {
+    $('#pic13').fadeIn(1500).delay(3500).fadeOut(1500, function() {
+        $('#pic14').fadeIn(1500).delay(3500).fadeOut(1500, function() {
+            $('#pic15').fadeIn(1500).delay(3500).fadeOut(1500, function() {
+                $('#pic16').fadeIn(1500).delay(3500).fadeOut(1500, function() {
+            runslide4();});});});});
+}
+
+
+</script>
+
+
+
   </body>
 </html>
