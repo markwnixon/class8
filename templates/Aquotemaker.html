@@ -135,10 +135,13 @@
     <br><br>
         <div class="card" align=""left">
             <div class = "card-header">
-                Preview
+                Quick Preview
             </div>
             <div class="card-body">
-            {{ emaildata[1]|safe }}
+                {% if qdat %}
+                    {{ qdat.Title|safe }}<br><br>
+                    {{ qdat.Body|safe }}
+                    {% endif %}
             </div>
         </div>
     </div>
@@ -169,6 +172,7 @@
              <td colspan = '2'>
                  <button type="submit" class="btn btn-elegant btn-sm" name="GetQuote">Get<br>Quote</button>
                  <button type="submit" class="btn btn-elegant btn-sm" name="Update">Update<br>Bid</button>
+                 <button type="submit" class="btn btn-green btn-sm" name="UpdateE">Update<br>Email</button>
                  <button type="submit" class="btn btn-green btn-sm" name="Email">Email<br>Quote</button>
                  <button type="submit" class="btn btn-blue btn-sm" name="Return">Return To<br>Table</button>
              </td>
@@ -177,25 +181,18 @@
         </table>
         </div></div>
 
-    {% if qdata %}
-        <div class="card">
-          <div class="card-header">
-           Quotes Email Box
-          </div>
-        <div class="card-body">
-        <table class="table table-condensed table-hover">
-            <tbody>
-            <tr><td>
-                {% for qd in qdata %}
-                    {% if qd.id == quot %}
-                        <textarea class="form-control" type="text" name="eoutput" rows="5">{{qd.Body | safe}}</textarea>
-                    {% endif %}
-                {% endfor %}
-            </td></tr>
-            </tbody>
-        </table>
-        </div></div>
-    {% endif %}
+        <div class="card" align="left">
+            <div class = "card-header">
+                Email Request
+            </div>
+            <div class="card-body" align=""left">
+                {% if qdat %}
+                    From:  {{ qdat.From|safe }}<br><br>
+                    Title:  {{ qdat.Title|safe }}<br><br>
+                    {{ qdat.Body|safe }}
+                {% endif %}
+            </div>
+        </div>
 {% endif %}
 <input type = "hidden" name ="quotpass" value= "{{quot}}">
 <input type = "hidden" name ="thismuch" value= "{{thismuch}}">

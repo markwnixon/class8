@@ -1507,17 +1507,19 @@ def dataget_Q(thismuch):
     qdata = 0
     if thismuch == '1':
         stopdate = today-datetime.timedelta(days=10)
-        qdata = Quotes.query.filter( (Quotes.Status != 'X') & (Quotes.Date > stopdate) ).all()
+        qdata = Quotes.query.filter( (Quotes.Status != -1) & (Quotes.Date > stopdate) ).all()
     elif thismuch == '2':
         stopdate = today-datetime.timedelta(days=30)
-        qdata = Quotes.query.filter( (Quotes.Status != 'X') & (Quotes.Date > stopdate) ).all()
+        qdata = Quotes.query.filter( (Quotes.Status != -1) & (Quotes.Date > stopdate) ).all()
     elif thismuch == '3':
-        qdata = Quotes.query.filter(Quotes.Status == '1').all()
+        qdata = Quotes.query.filter(Quotes.Status == 3).all()
     elif thismuch == '4':
-        qdata = Quotes.query.filter(Quotes.Status == 'X').all()
+        qdata = Quotes.query.filter(Quotes.Status == -1).all()
+    elif thismuch == '5':
+        qdata = Quotes.query.filter(Quotes.Status != -1).all()
     else:
         stopdate = today - datetime.timedelta(days=10)
-        qdata = Quotes.query.filter( (Quotes.Status != 'X') & (Quotes.Date > stopdate) ).all()
+        qdata = Quotes.query.filter( (Quotes.Status != -1) & (Quotes.Date > stopdate) ).all()
 
     return qdata
 

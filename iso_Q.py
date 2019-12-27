@@ -175,7 +175,7 @@ def add_quote_emails():
 
         qdat = Quotes.query.filter((Quotes.Title == subject) & (Quotes.From==thisfrom) & (Quotes.Date==newdate)).first()
         if qdat is None:
-            input = Quotes(Date=newdate,From=thisfrom,Title=subject,Body=body,Response=None,Amount=None,Location=None,Status='0',Responder=None,RespDate=None,Start='Seagirt Marine Terminal, Baltimore, MD')
+            input = Quotes(Date=newdate,From=thisfrom,Title=subject,Body=body,Response=None,Amount=None,Location=None,Status=0,Responder=None,RespDate=None,Start='Seagirt Marine Terminal, Baltimore, MD')
             db.session.add(input)
             db.session.commit()
 
@@ -272,13 +272,7 @@ def maketable():
 
 def sendquote(bidthis):
     etitle = request.values.get('edat0')
-    if etitle is None:
-        etitle = f'{cdata[0]} Quote to {locto} from {locfrom}'
     ebody = request.values.get('edat1')
-    if ebody is None:
-        customer = 'NAY'
-        ebody = f'Hello {customer}, \n\n<br><br>{cdata[0]} is pleased to offer a quote of <b>${bidthis}</b> for this load to {locto}.\nThe quote is inclusive of tolls, fuel, and 2 hrs of load time.  Additional accessorial charges may apply and are priced according the following table:\n\n'
-        ebody = ebody + maketable()
     emailin1 = request.values.get('edat2')
     emailin2 = request.values.get('edat3')
     emailcc1 = request.values.get('edat4')
@@ -396,11 +390,13 @@ def emailonly(emailin):
 def isoQuote():
     username = session['username'].capitalize()
     quot=0
+    qdat=None
     from viewfuncs import dataget_Q, nonone, numcheck
     if request.method == 'POST':
         emailgo = request.values.get('Email')
         updatego = request.values.get('GetQuote')
         updatebid = request.values.get('Update')
+        updateE = request.values.get('UpdateE')
         returnhit = request.values.get('Return')
         bidthis = request.values.get('bidthis')
         bidthis = d2s(bidthis)
@@ -409,24 +405,34 @@ def isoQuote():
         taskbox = request.values.get('taskbox')
         taskbox = nonone(taskbox)
 
+        qdata = dataget_Q(thismuch)
+        quot, numchecked = numcheck(1, qdata, 0, 0, 0, 0, ['quot'])
+        if quot == 0:
+            quot = request.values.get('quotpass')
+            quot = nonone(quot)
+        qdat = Quotes.query.get(quot)
+        print(quot, numchecked, username)
+
         if returnhit is not None:
             taskbox = 0
             quot = 0
 
         if taskbox == 2:
-            qdat.Status = 'X'
+            qdat.Status = -1
             db.session.commit()
+            taskbox = 0
+
+        if taskbox == 3:
+            qdat.Status = 0
+            db.session.commit()
+            taskbox = 0
+
+        if taskbox == 4:
+            qdat.Status = 3
+            db.session.commit()
+            taskbox = 0
 
         if taskbox == 1:
-
-            qdata = dataget_Q(thismuch)
-            quot, numchecked = numcheck(1, qdata, 0, 0, 0, 0, ['quot'])
-            if quot == 0:
-                quot = request.values.get('quotpass')
-                quot = nonone(quot)
-            qdat = Quotes.query.get(quot)
-            print(quot,numchecked,username)
-
             if numchecked == 1 and qdat is not None:
                 locto = qdat.Location
                 if locto is None:
@@ -442,32 +448,31 @@ def isoQuote():
             if quot > 0:
                 locfrom = qdat.Start
                 if locfrom is None:
-                    locfrom = '2600 Broening Highway, Baltimore, MD'
+                    locfrom = 'Seagirt Marine Terminal, Baltimore, MD 21224'
 
-                if updatego is not None or updatebid is not None or emailgo is not None:
+                if updatego is not None or updatebid is not None or emailgo is not None or updateE is not None:
                     locto = request.values.get('locto')
                     if locto is None:
                         locto = '505 Hampton Park Blvd, Capitol Heights, MD  20743'
                     locfrom = request.values.get('locfrom')
                     emailto = request.values.get('edat2')
-                    if updatebid is not None:
-                        bidthis = request.values.get('bidthis')
                     respondnow = datetime.datetime.now()
                     qdat.Start = locfrom
                     qdat.Location = locto
                     qdat.From = emailto
-                    oldbid = qdat.Amount
-                    bidthis = d2s(bidthis)
                     qdat.Amount = bidthis
                     qdat.Responder = username
                     qdat.RespDate = respondnow
+                    qdat.Status = 1
                     db.session.commit()
 
                 if emailgo is not None:
+                    qdat.Status = 2
+                    db.session.commit()
                     emaildata = sendquote(bidthis)
 
 
-
+                print('Running Directions:',locfrom,locto,bidthis,taskbox,quot)
                 try:
                     ####################################  Directions Section  ######################################
                     miles, hours, lats, lons, dirdata, tot_dist, tot_dura = get_directions(locfrom,locto)
@@ -582,7 +587,7 @@ def isoQuote():
 
 
                     biddata = [d2s(roundup(bid)),d2s(roundup(std_bid)),d2s(roundup(cma_bid))]
-                    if updatego is not None or (updatego is None and updatebid is None) or passon is not None:
+                    if updatego is not None:
                         bidthis = d2s(roundup(bid))
 
                 except:
@@ -614,19 +619,20 @@ def isoQuote():
                     emailin1 = request.values.get('edat2')
                     if updatego is None:
                         emailin1 = emailonly(emailto)
-                    emailin2 = request.values.get('edat3')
-                    emailcc1 = request.values.get('edat4')
-                    emailcc2 = request.values.get('edat5')
+                    emailin2 = None
+                    emailcc1 = usernames['info']
+                    emailcc2 = usernames['expo']
                     emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2]
                 else:
                     #Set the email data:
-                    etitle = request.values.get('edat0')
-                    ebody = request.values.get('edat1')
-                    print('bidschange:',oldbid,bidthis)
-                    try:
-                        ebody = ebody.replace(oldbid, bidthis)
-                    except:
-                        print('No old bid')
+                    if updatebid is not None or updatego is not None:
+                        etitle = f'{cdata[0]} Quote to {locto} from {locfrom}'
+                        customer = friendly(qdat.From)
+                        ebody = f'Hello {customer}, \n\n<br><br>{cdata[0]} is pleased to offer a quote of <b>${bidthis}</b> for this load to {locto}.\nThe quote is inclusive of tolls, fuel, and 2 hrs of load time.  Additional accessorial charges may apply and are priced according the following table:\n\n'
+                        ebody = ebody + maketable()
+                    else:
+                        etitle = request.values.get('edat0')
+                        ebody = request.values.get('edat1')
                     emailin1 = request.values.get('edat2')
                     emailin2 = request.values.get('edat3')
                     emailcc1 = request.values.get('edat4')
@@ -674,6 +680,7 @@ def isoQuote():
     else:
 
         username = session['username'].capitalize()
+        qdat=None
         locto = '505 Hampton Park Blvd, Capitol Heights, MD  20743'
         locfrom = 'Baltimore Seagirt'
         etitle = f'{cdata[0]} Quote for Drayage to {locto} from {locfrom}'
@@ -706,4 +713,4 @@ def isoQuote():
 
     qdata = dataget_Q(thismuch)
     print(quot)
-    return costdata, biddata, expdata, timedata, distdata, emaildata, locto, locfrom, newdirdata, qdata, bidthis, taskbox, thismuch, quot
+    return costdata, biddata, expdata, timedata, distdata, emaildata, locto, locfrom, newdirdata, qdata, bidthis, taskbox, thismuch, quot, qdat

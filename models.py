@@ -417,7 +417,7 @@ class Quotes(db.Model):
     Response = db.Column('Response', db.String(500))
     Amount = db.Column('Amount', db.String(45))
     Location = db.Column('Location', db.String(200))
-    Status = db.Column('Status', db.String(45))
+    Status = db.Column('Status', db.Integer)
     Responder = db.Column('Responder', db.String(45))
     RespDate = db.Column('RespDate', db.DateTime)
     Start = db.Column('Start', db.String(45))
