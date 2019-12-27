@@ -404,14 +404,18 @@ def isoQuote():
         thismuch = request.values.get('thismuch')
         taskbox = request.values.get('taskbox')
         taskbox = nonone(taskbox)
+        quotbut = request.values.get('optradio')
 
         qdata = dataget_Q(thismuch)
-        quot, numchecked = numcheck(1, qdata, 0, 0, 0, 0, ['quot'])
+        #quot, numchecked = numcheck(1, qdata, 0, 0, 0, 0, ['quot'])
+
+        if quotbut is not None:
+            quot=nonone(quotbut)
         if quot == 0:
             quot = request.values.get('quotpass')
             quot = nonone(quot)
         qdat = Quotes.query.get(quot)
-        print(quot, numchecked, username)
+        print(quot, quotbut, username)
 
         if returnhit is not None:
             taskbox = 0
@@ -433,7 +437,7 @@ def isoQuote():
             taskbox = 0
 
         if taskbox == 1:
-            if numchecked == 1 and qdat is not None:
+            if quot>0 and qdat is not None:
                 locto = qdat.Location
                 if locto is None:
                     locto = get_place(qdat.Body)
@@ -470,6 +474,8 @@ def isoQuote():
                     qdat.Status = 2
                     db.session.commit()
                     emaildata = sendquote(bidthis)
+                    taskbox=0
+                    quot=0
 
 
                 print('Running Directions:',locfrom,locto,bidthis,taskbox,quot)
@@ -587,7 +593,7 @@ def isoQuote():
 
 
                     biddata = [d2s(roundup(bid)),d2s(roundup(std_bid)),d2s(roundup(cma_bid))]
-                    if updatego is not None:
+                    if updatego is not None or quotbut is not None:
                         bidthis = d2s(roundup(bid))
 
                 except:
@@ -607,7 +613,7 @@ def isoQuote():
                     distdata = []
 
 
-                if numchecked == 1:
+                if quotbut is not None:
                     #Set the email data:
                     etitle = f'{cdata[0]} Quote to {locto} from {locfrom}'
                     if qdat is not None:
@@ -627,7 +633,10 @@ def isoQuote():
                     #Set the email data:
                     if updatebid is not None or updatego is not None:
                         etitle = f'{cdata[0]} Quote to {locto} from {locfrom}'
-                        customer = friendly(qdat.From)
+                        if qdat is not None:
+                            customer = friendly(qdat.From)
+                        else:
+                            customer = friendly(emailto)
                         ebody = f'Hello {customer}, \n\n<br><br>{cdata[0]} is pleased to offer a quote of <b>${bidthis}</b> for this load to {locto}.\nThe quote is inclusive of tolls, fuel, and 2 hrs of load time.  Additional accessorial charges may apply and are priced according the following table:\n\n'
                         ebody = ebody + maketable()
                     else:
@@ -644,8 +653,9 @@ def isoQuote():
 
         else:
             qdata = dataget_Q(thismuch)
-            quot, numchecked = numcheck(1, qdata, 0, 0, 0, 0, ['quot'])
-            qdat = Quotes.query.get(quot)
+            quot = request.values.get('optradio')
+            if quot is not None:
+                qdat = Quotes.query.get(quot)
             locto = '505 Hampton Park Blvd, Capitol Heights, MD  20743'
             locfrom = 'Baltimore Seagirt'
             etitle = f'{cdata[0]} Quote for Drayage to {locto} from {locfrom}'

@@ -37,13 +37,39 @@
                     {% set atc1="font-weight-bold" %}
                 {% endif %}
 
+                {% if data.id == quot|int %}
+                    {% set atc1="red text-white font-weight-bold" %}
+                {% endif %}
+                {% if data.Title|length > 40 %}
+                    {% set tit = data.Title[0:39] %}
+                {% else %}
+                    {% set tit = data.Title %}
+                {% endif %}
 
-            <tr >
-                <td align="center" ><input {% if data.id == quot %} checked {% endif %} class="align-middle" type="checkbox" name="quot{{data.id}}" value="{{data.id}}" onchange="this.form.submit()"></td>
-                <td align="center" class="{{atc1}}">{{ data.Date }}</td>
-                <td align="left" class="{{atc1}}">{{ data.From }}</td>
-                <td align="left" class="{{atc1}}">{{ data.Title }}</td>
-                <td align="center" class="{{atc1}}">{{ data.Location }}</td>
+                {% if data.Location %}
+                    {% if data.Location|length > 20 %}
+                        {% set loc = data.Location[0:19] %}
+                    {% else %}
+                        {% set loc = data.Location %}
+                    {% endif %}
+                {% else %}
+                    {% set loc=' ' %}
+                {% endif %}
+
+
+            <tr>
+                <td align="center" >
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input type="radio" {% if data.id == quot|int %} checked {% endif %} class="form-check-input"  name="optradio" id="quot{{data.id}}" value="{{data.id}}" onchange="this.form.submit()">{{ '>>' }}
+                        </label>
+                    </div>
+
+                </td>
+                <td align="center" class="{{atc1}}">{{ data.Date }}&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td align="left" class="{{atc1}}">{{ data.From }}&nbsp;&nbsp;</td>
+                <td align="left" class="{{atc1}}">{{ tit }}</td>
+                <td align="center" class="{{atc1}}">{{ loc }}</td>
                 <td align="center" class="{{atc1}}">{{ data.Amount }}</td>
                 <td align="center" class="{{atc1}}">{{ data.Responder }}</td>
                 <td align="center" class="{{atc1}}">{{ data.RespDate }}</td>
