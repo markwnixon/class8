@@ -411,15 +411,18 @@ class Quotes(db.Model):
     __tablename__ = 'quotes'
     id = db.Column('id', db.Integer, primary_key=True)
     Date = db.Column('Date', db.DateTime)
-    From = db.Column('From', db.String(45))
-    Title = db.Column('Title', db.String(90))
+    From = db.Column('From', db.String(200))
+    Title = db.Column('Title', db.String(200))
     Body = db.Column('Body', db.String(500))
     Response = db.Column('Response', db.String(500))
     Amount = db.Column('Amount', db.String(45))
-    Location = db.Column('Location', db.String(45))
+    Location = db.Column('Location', db.String(200))
     Status = db.Column('Status', db.String(45))
+    Responder = db.Column('Responder', db.String(45))
+    RespDate = db.Column('RespDate', db.DateTime)
+    Start = db.Column('Start', db.String(45))
 
-    def __init__(self, Date, From, Title, Body, Response, Amount, Location, Status):
+    def __init__(self, Date, From, Title, Body, Response, Amount, Location, Status, Responder, RespDate, Start):
         self.Date = Date
         self.From = From
         self.Title = Title
@@ -428,6 +431,9 @@ class Quotes(db.Model):
         self.Amount = Amount
         self.Location = Location
         self.Status = Status
+        self.Responder = Responder
+        self.RespDate = RespDate
+        self.Start = Start
 
 class Drivers(db.Model):
     __tablename__ = 'drivers'

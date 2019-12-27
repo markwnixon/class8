@@ -178,8 +178,8 @@ def AutoScanner():
 @app.route('/QuoteMaker', methods=['GET', 'POST'])
 def QuoteMaker():
     from iso_Q import isoQuote
-    costdata, biddata, expdata, timedata, distdata, emaildata, locto, locfrom, dirdata, qdata, thisid, bidthis = isoQuote()
-    return render_template('Aquotemaker.html', cmpdata=cmpdata, scac=scac, costdata = costdata, biddata=biddata, expdata = expdata, timedata = timedata, distdata = distdata, locto=locto, locfrom=locfrom, emaildata = emaildata, dirdata=dirdata, qdata = qdata, thisid=thisid, bidthis=bidthis)
+    costdata, biddata, expdata, timedata, distdata, emaildata, locto, locfrom, dirdata, qdata, bidthis, taskbox, thismuch, quot = isoQuote()
+    return render_template('Aquotemaker.html', cmpdata=cmpdata, scac=scac, costdata = costdata, biddata=biddata, expdata = expdata, timedata = timedata, distdata = distdata, locto=locto, locfrom=locfrom, emaildata = emaildata, dirdata=dirdata, qdata = qdata, bidthis=bidthis, taskbox = taskbox, thismuch=thismuch, quot=quot)
 
 
 @app.route('/InvoiceMaint', methods=['GET', 'POST'])

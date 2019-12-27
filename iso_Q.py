@@ -132,7 +132,7 @@ def hard_decode(raw):
 def add_quote_emails():
     username = usernames['quot']
     password = passwords['quot']
-    dayback = 14
+    dayback = 7
     datefrom = (datetime.date.today() - datetime.timedelta(dayback)).strftime("%d-%b-%Y")
     con = imaplib.IMAP4_SSL(imap_url)
     con.login(username, password)
@@ -175,7 +175,7 @@ def add_quote_emails():
 
         qdat = Quotes.query.filter((Quotes.Title == subject) & (Quotes.From==thisfrom) & (Quotes.Date==newdate)).first()
         if qdat is None:
-            input = Quotes(Date=newdate,From=thisfrom,Title=subject,Body=body,Response=None,Amount=None,Location=None,Status='0')
+            input = Quotes(Date=newdate,From=thisfrom,Title=subject,Body=body,Response=None,Amount=None,Location=None,Status='0',Responder=None,RespDate=None,Start='Seagirt Marine Terminal, Baltimore, MD')
             db.session.add(input)
             db.session.commit()
 
@@ -278,11 +278,11 @@ def sendquote(bidthis):
     if ebody is None:
         customer = 'NAY'
         ebody = f'Hello {customer}, \n\n<br><br>{cdata[0]} is pleased to offer a quote of <b>${bidthis}</b> for this load to {locto}.\nThe quote is inclusive of tolls, fuel, and 2 hrs of load time.  Additional accessorial charges may apply and are priced according the following table:\n\n'
+        ebody = ebody + maketable()
     emailin1 = request.values.get('edat2')
     emailin2 = request.values.get('edat3')
     emailcc1 = request.values.get('edat4')
     emailcc2 = request.values.get('edat5')
-    ebody = ebody + maketable()
     emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2]
     # Add the accessorial table and signature to the email body:
     send_mimemail(emaildata,'quot')
@@ -394,181 +394,271 @@ def emailonly(emailin):
         return emailin
 
 def isoQuote():
+    username = session['username'].capitalize()
+    quot=0
+    from viewfuncs import dataget_Q, nonone, numcheck
     if request.method == 'POST':
         emailgo = request.values.get('Email')
         updatego = request.values.get('GetQuote')
         updatebid = request.values.get('Update')
-        passon = request.values.get('PassOn')
-        qbox = request.values.get('emselect')
+        returnhit = request.values.get('Return')
         bidthis = request.values.get('bidthis')
         bidthis = d2s(bidthis)
         locfrom = request.values.get('locfrom')
-        if locfrom is None:
-            locfrom = '2600 Broening Highway, Baltimore, MD'
+        thismuch = request.values.get('thismuch')
+        taskbox = request.values.get('taskbox')
+        taskbox = nonone(taskbox)
 
-        if updatego is not None or updatebid is not None:
-            locto = request.values.get('locto')
-            emailto = request.values.get('edat2')
-            if locto is None:
-                locto = '505 Hampton Park Blvd, Capitol Heights, MD  20743'
-        else:
-            qdat = Quotes.query.get(qbox)
-            if qdat is not None:
-                locto = get_place(qdat.Body)
-                emailto = qdat.From
-            else:
-                locto = '505 Hampton Park Blvd, Capitol Heights, MD  20743'
-                emailto = 'Unknown'
+        if returnhit is not None:
+            taskbox = 0
+            quot = 0
 
-        if passon is not None:
-            qdat = Quotes.query.get(qbox)
+        if taskbox == 2:
             qdat.Status = 'X'
             db.session.commit()
 
-        if emailgo is not None:
-            emaildata = sendquote(bidthis)
-            qdat = Quotes.query.get(qbox)
-            if qdat is not None:
-                qdat.Response = emaildata[1]
-                qdat.Amount = bidthis
-                qdat.Location = locto
+        if taskbox == 1:
 
-        qdata = Quotes.query.filter(Quotes.Status == '0').all()
+            qdata = dataget_Q(thismuch)
+            quot, numchecked = numcheck(1, qdata, 0, 0, 0, 0, ['quot'])
+            if quot == 0:
+                quot = request.values.get('quotpass')
+                quot = nonone(quot)
+            qdat = Quotes.query.get(quot)
+            print(quot,numchecked,username)
 
-        if qbox is not None and qdata is not None:
-            if passon is None:
+            if numchecked == 1 and qdat is not None:
+                locto = qdat.Location
+                if locto is None:
+                    locto = get_place(qdat.Body)
+                    qdat.Location = locto
+                    db.session.commit()
+                emailto = qdat.From
+                if emailto is None:
+                    emailto = qdat.From
+                    qdat.From = emailto
+                    db.session.commit()
+
+            if quot > 0:
+                locfrom = qdat.Start
+                if locfrom is None:
+                    locfrom = '2600 Broening Highway, Baltimore, MD'
+
+                if updatego is not None or updatebid is not None or emailgo is not None:
+                    locto = request.values.get('locto')
+                    if locto is None:
+                        locto = '505 Hampton Park Blvd, Capitol Heights, MD  20743'
+                    locfrom = request.values.get('locfrom')
+                    emailto = request.values.get('edat2')
+                    if updatebid is not None:
+                        bidthis = request.values.get('bidthis')
+                    respondnow = datetime.datetime.now()
+                    qdat.Start = locfrom
+                    qdat.Location = locto
+                    qdat.From = emailto
+                    oldbid = qdat.Amount
+                    bidthis = d2s(bidthis)
+                    qdat.Amount = bidthis
+                    qdat.Responder = username
+                    qdat.RespDate = respondnow
+                    db.session.commit()
+
+                if emailgo is not None:
+                    emaildata = sendquote(bidthis)
+
+
+
                 try:
-                    qdat=Quotes.query.get(qbox)
-                    thisid = qdat.id
+                    ####################################  Directions Section  ######################################
+                    miles, hours, lats, lons, dirdata, tot_dist, tot_dura = get_directions(locfrom,locto)
+                    #print(f'Total distance {d1s(tot_dist)} miles and total duration {d1s(tot_dura)} hours')
+
+                    #Calculate road tolls
+                    tollroadlist = ['I-76','NJ Tpke']
+                    tollroadcpm = [.784, .275]
+                    legtolls = len(dirdata)*[0.0]
+                    legcodes = len(dirdata)*['None']
+                    for lx,mi in enumerate(miles):
+                        for nx,tollrd in enumerate(tollroadlist):
+                            if tollrd in dirdata[lx]:
+                                legtolls[lx] = tollroadcpm[nx]*mi
+                                legcodes[lx] = tollrd
+
+                    #Calculate plaza tolls
+                    fm_tollbox =  [39.267757, -76.610192, 39.261248, -76.563158]
+                    bht_tollbox = [39.259962, -76.566240, 39.239063, -76.603324]
+                    fsk_tollbox = [39.232770, -76.502453, 39.202279, -76.569906]
+                    bay_tollbox = [39.026893, -76.417512, 38.964938, -76.290104]
+                    sus_tollbox = [39.585193, -76.142883, 39.552328, -76.033975]
+                    new_tollbox = [39.647121, -75.774523, 39.642613, -75.757187] #Newark Delaware Toll Center
+                    dmb_tollbox = [39.702146, -75.553479, 39.669730, -75.483284]
+                    tollcodes = ['FM', 'BHT', 'FSK', 'BAY', 'SUS', 'NEW', 'DMB']
+                    tollboxes = [fm_tollbox, bht_tollbox, fsk_tollbox, bay_tollbox, sus_tollbox, new_tollbox, dmb_tollbox]
+
+                    for jx,lat in enumerate(lats):
+                        stat1 = 'ok'
+                        stat2 = 'ok'
+                        stat3 = 0
+                        stat4 = 0
+                        tollcode = 'None'
+                        la = float(lat)
+                        lo = float(lons[jx])
+                        for kx, tollbox in enumerate(tollboxes):
+                            lah = max([tollbox[0],tollbox[2]])
+                            lal = min([tollbox[0], tollbox[2]])
+                            loh = max([tollbox[1],tollbox[3]])
+                            lol = min([tollbox[1], tollbox[3]])
+                            if la > lal and la < lah:
+                                stat1 = 'toll'
+                                if lo > lol and lo < loh:
+                                    stat2 = 'toll'
+                                    tollcode = tollcodes[kx]
+                                    legtolls[jx] = 24.00
+                                    legcodes[jx] = tollcode
+                            if jx > 0:
+                                lam = (lah + lal)/2.0
+                                lom = (loh + lol)/2.0
+                                la_last = float(lats[jx-1])
+                                lo_last= float(lons[jx-1])
+                                stat3, stat4 = checkcross(lam,la_last,la,lom,lo_last,lo)
+                                if stat3 == 1 and stat4 ==1:
+                                    tollcode = tollcodes[kx]
+                                    legtolls[jx] = 24.00
+                                    legcodes[jx] = tollcode
+                        ##print(lat,lons[jx],stat1, stat2, stat3, stat4, tollcode)
+
+                    tot_tolls = 0.00
+                    ex_drv = 27.41
+                    ex_fuel = .48
+                    ex_toll = 24.00
+                    ex_insur = 4.00
+                    ex_rm = .22
+                    ex_misc = .04
+                    ex_ga = 15
+                    expdata = [d2s(ex_drv), d2s(ex_fuel), d2s(ex_toll), d2s(ex_insur), d2s(ex_rm), d2s(ex_misc), d2s(ex_ga)]
+
+                    porttime = 1.4
+                    loadtime = 2.0
+                    triptime = tot_dura * 2.0
+                    glidetime = 1.0 + triptime*.01
+                    tottime = porttime + loadtime + triptime + glidetime
+                    timedata = [d1s(triptime), d1s(porttime), d1s(loadtime), d1s(glidetime), d1s(tottime)]
+
+                    tripmiles = tot_dist * 2.0
+                    portmiles = .4
+                    glidemiles = 10 + .005*tripmiles
+                    totmiles = tripmiles + portmiles + glidemiles
+                    distdata = [d1s(tripmiles), d1s(portmiles), '0.0', d1s(glidemiles), d1s(totmiles)]
+
+                    newdirdata=[]
+                    for lx, aline in enumerate(dirdata):
+                        tot_tolls += legtolls[lx]
+                        aline = aline.replace('<div style="font-size:0.9em">Toll road</div>','')
+                        aline = aline.strip()
+                        #print(aline)
+                        #print(f'Dist:{d1s(miles[lx])}, Time:{d1s(hours[lx])}, ')
+                        if legtolls[lx] < .000001:
+                            newdirdata.append(f'{d1s(miles[lx])} MI {d2s(hours[lx])} HRS {aline}')
+                        else:
+                            newdirdata.append(f'{d1s(miles[lx])} MI {d2s(hours[lx])} HRS {aline} Tolls:${d2s(legtolls[lx])}, TollCode:{legcodes[lx]}')
+
+                    # Cost Analysis:
+                    cost_drv = tottime * ex_drv
+                    cost_fuel = totmiles * ex_fuel
+                    cost_tolls = 2.0 * tot_tolls
+
+                    cost_insur = tottime * ex_insur
+                    cost_rm = totmiles * ex_rm
+                    cost_misc = totmiles * ex_misc
+
+                    cost_direct = cost_drv + cost_fuel + cost_tolls + cost_insur + cost_rm + cost_misc
+                    cost_ga = cost_direct * ex_ga/100.0
+                    cost_total = cost_direct + cost_ga
+                    costdata = [d2s(cost_drv),d2s(cost_fuel),d2s(cost_tolls),d2s(cost_insur), d2s(cost_rm), d2s(cost_misc), d2s(cost_ga), d2s(cost_direct), d2s(cost_total)]
+
+                    bid = cost_total * 1.2
+                    cma_bid = bid/1.13
+                    std_bid = 250. + 2.1*totmiles
+
+
+                    biddata = [d2s(roundup(bid)),d2s(roundup(std_bid)),d2s(roundup(cma_bid))]
+                    if updatego is not None or (updatego is None and updatebid is None) or passon is not None:
+                        bidthis = d2s(roundup(bid))
+
                 except:
-                    thisid = 0
-            else:
-                qdat = qdata[0]
-                thisid = qdat.id
+                    costdata = None
+                    biddata = None
+                    newdirdata = None
+                    bidthis = None
+                    ex_drv = 27.41
+                    ex_fuel = .48
+                    ex_toll = 24.00
+                    ex_insur = 4.00
+                    ex_rm = .22
+                    ex_misc = .04
+                    ex_ga = 15
+                    expdata = [d2s(ex_drv), d2s(ex_fuel), d2s(ex_toll), d2s(ex_insur), d2s(ex_rm), d2s(ex_misc), d2s(ex_ga)]
+                    timedata = []
+                    distdata = []
 
 
-        try:
-            ####################################  Directions Section  ######################################
-            miles, hours, lats, lons, dirdata, tot_dist, tot_dura = get_directions(locfrom,locto)
-            #print(f'Total distance {d1s(tot_dist)} miles and total duration {d1s(tot_dura)} hours')
-
-            #Calculate road tolls
-            tollroadlist = ['I-76','NJ Tpke']
-            tollroadcpm = [.784, .275]
-            legtolls = len(dirdata)*[0.0]
-            legcodes = len(dirdata)*['None']
-            for lx,mi in enumerate(miles):
-                for nx,tollrd in enumerate(tollroadlist):
-                    if tollrd in dirdata[lx]:
-                        legtolls[lx] = tollroadcpm[nx]*mi
-                        legcodes[lx] = tollrd
-
-            #Calculate plaza tolls
-            fm_tollbox =  [39.267757, -76.610192, 39.261248, -76.563158]
-            bht_tollbox = [39.259962, -76.566240, 39.239063, -76.603324]
-            fsk_tollbox = [39.232770, -76.502453, 39.202279, -76.569906]
-            bay_tollbox = [39.026893, -76.417512, 38.964938, -76.290104]
-            sus_tollbox = [39.585193, -76.142883, 39.552328, -76.033975]
-            new_tollbox = [39.647121, -75.774523, 39.642613, -75.757187] #Newark Delaware Toll Center
-            dmb_tollbox = [39.702146, -75.553479, 39.669730, -75.483284]
-            tollcodes = ['FM', 'BHT', 'FSK', 'BAY', 'SUS', 'NEW', 'DMB']
-            tollboxes = [fm_tollbox, bht_tollbox, fsk_tollbox, bay_tollbox, sus_tollbox, new_tollbox, dmb_tollbox]
-
-            for jx,lat in enumerate(lats):
-                stat1 = 'ok'
-                stat2 = 'ok'
-                stat3 = 0
-                stat4 = 0
-                tollcode = 'None'
-                la = float(lat)
-                lo = float(lons[jx])
-                for kx, tollbox in enumerate(tollboxes):
-                    lah = max([tollbox[0],tollbox[2]])
-                    lal = min([tollbox[0], tollbox[2]])
-                    loh = max([tollbox[1],tollbox[3]])
-                    lol = min([tollbox[1], tollbox[3]])
-                    if la > lal and la < lah:
-                        stat1 = 'toll'
-                        if lo > lol and lo < loh:
-                            stat2 = 'toll'
-                            tollcode = tollcodes[kx]
-                            legtolls[jx] = 24.00
-                            legcodes[jx] = tollcode
-                    if jx > 0:
-                        lam = (lah + lal)/2.0
-                        lom = (loh + lol)/2.0
-                        la_last = float(lats[jx-1])
-                        lo_last= float(lons[jx-1])
-                        stat3, stat4 = checkcross(lam,la_last,la,lom,lo_last,lo)
-                        if stat3 == 1 and stat4 ==1:
-                            tollcode = tollcodes[kx]
-                            legtolls[jx] = 24.00
-                            legcodes[jx] = tollcode
-                ##print(lat,lons[jx],stat1, stat2, stat3, stat4, tollcode)
-
-            tot_tolls = 0.00
-            ex_drv = 27.41
-            ex_fuel = .48
-            ex_toll = 24.00
-            ex_insur = 4.00
-            ex_rm = .22
-            ex_misc = .04
-            ex_ga = 15
-            expdata = [d2s(ex_drv), d2s(ex_fuel), d2s(ex_toll), d2s(ex_insur), d2s(ex_rm), d2s(ex_misc), d2s(ex_ga)]
-
-            porttime = 1.4
-            loadtime = 2.0
-            triptime = tot_dura * 2.0
-            glidetime = 1.0 + triptime*.01
-            tottime = porttime + loadtime + triptime + glidetime
-            timedata = [d1s(triptime), d1s(porttime), d1s(loadtime), d1s(glidetime), d1s(tottime)]
-
-            tripmiles = tot_dist * 2.0
-            portmiles = .4
-            glidemiles = 10 + .005*tripmiles
-            totmiles = tripmiles + portmiles + glidemiles
-            distdata = [d1s(tripmiles), d1s(portmiles), '0.0', d1s(glidemiles), d1s(totmiles)]
-
-            newdirdata=[]
-            for lx, aline in enumerate(dirdata):
-                tot_tolls += legtolls[lx]
-                aline = aline.replace('<div style="font-size:0.9em">Toll road</div>','')
-                aline = aline.strip()
-                #print(aline)
-                #print(f'Dist:{d1s(miles[lx])}, Time:{d1s(hours[lx])}, ')
-                if legtolls[lx] < .000001:
-                    newdirdata.append(f'{d1s(miles[lx])} MI {d2s(hours[lx])} HRS {aline}')
+                if numchecked == 1:
+                    #Set the email data:
+                    etitle = f'{cdata[0]} Quote to {locto} from {locfrom}'
+                    if qdat is not None:
+                        customer = friendly(qdat.From)
+                    else:
+                        customer = friendly(emailto)
+                    ebody = f'Hello {customer}, \n\n<br><br>{cdata[0]} is pleased to offer a quote of <b>${bidthis}</b> for this load to {locto}.\nThe quote is inclusive of tolls, fuel, and 2 hrs of load time.  Additional accessorial charges may apply and are priced according the following table:\n\n'
+                    ebody = ebody + maketable()
+                    emailin1 = request.values.get('edat2')
+                    if updatego is None:
+                        emailin1 = emailonly(emailto)
+                    emailin2 = request.values.get('edat3')
+                    emailcc1 = request.values.get('edat4')
+                    emailcc2 = request.values.get('edat5')
+                    emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2]
                 else:
-                    newdirdata.append(f'{d1s(miles[lx])} MI {d2s(hours[lx])} HRS {aline} Tolls:${d2s(legtolls[lx])}, TollCode:{legcodes[lx]}')
-
-            # Cost Analysis:
-            cost_drv = tottime * ex_drv
-            cost_fuel = totmiles * ex_fuel
-            cost_tolls = 2.0 * tot_tolls
-
-            cost_insur = tottime * ex_insur
-            cost_rm = totmiles * ex_rm
-            cost_misc = totmiles * ex_misc
-
-            cost_direct = cost_drv + cost_fuel + cost_tolls + cost_insur + cost_rm + cost_misc
-            cost_ga = cost_direct * ex_ga/100.0
-            cost_total = cost_direct + cost_ga
-            costdata = [d2s(cost_drv),d2s(cost_fuel),d2s(cost_tolls),d2s(cost_insur), d2s(cost_rm), d2s(cost_misc), d2s(cost_ga), d2s(cost_direct), d2s(cost_total)]
-
-            bid = cost_total * 1.2
-            cma_bid = bid/1.13
-            std_bid = 250. + 2.1*totmiles
+                    #Set the email data:
+                    etitle = request.values.get('edat0')
+                    ebody = request.values.get('edat1')
+                    print('bidschange:',oldbid,bidthis)
+                    try:
+                        ebody = ebody.replace(oldbid, bidthis)
+                    except:
+                        print('No old bid')
+                    emailin1 = request.values.get('edat2')
+                    emailin2 = request.values.get('edat3')
+                    emailcc1 = request.values.get('edat4')
+                    emailcc2 = request.values.get('edat5')
+                    emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2]
+                    #qdat.Response = ebody
+                    db.session.commit()
 
 
-            biddata = [d2s(roundup(bid)),d2s(roundup(std_bid)),d2s(roundup(cma_bid))]
-            if updatego is not None or (updatego is None and updatebid is None) or passon is not None:
-                bidthis = d2s(roundup(bid))
-
-        except:
+        else:
+            qdata = dataget_Q(thismuch)
+            quot, numchecked = numcheck(1, qdata, 0, 0, 0, 0, ['quot'])
+            qdat = Quotes.query.get(quot)
+            locto = '505 Hampton Park Blvd, Capitol Heights, MD  20743'
+            locfrom = 'Baltimore Seagirt'
+            etitle = f'{cdata[0]} Quote for Drayage to {locto} from {locfrom}'
+            if qdat is not None:
+                ebody = qdat.Body
+            else:
+                ebody = f'Regirgitation from the input'
+            efrom = usernames['quot']
+            eto1 = 'unknown'
+            eto2 = ''
+            ecc1 = usernames['expo']
+            ecc2 = usernames['info']
+            emaildata = [etitle, ebody, eto1, eto2, ecc1, ecc2, efrom]
             costdata = None
             biddata = None
             newdirdata = None
             bidthis = None
+
+
             ex_drv = 27.41
             ex_fuel = .48
             ex_toll = 24.00
@@ -581,24 +671,9 @@ def isoQuote():
             distdata = []
 
 
-        if emailgo is None:
-            #Set the email data:
-            etitle = f'{cdata[0]} Quote to {locto} from {locfrom}'
-            if qdat is not None:
-                customer = friendly(qdat.From)
-            else:
-                customer = friendly(emailto)
-            ebody = f'Hello {customer}, \n\n<br><br>{cdata[0]} is pleased to offer a quote of <b>${bidthis}</b> for this load to {locto}.\nThe quote is inclusive of tolls, fuel, and 2 hrs of load time.  Additional accessorial charges may apply and are priced according the following table:\n\n'
-            emailin1 = request.values.get('edat2')
-            if updatego is None:
-                emailin1 = emailonly(emailto)
-            emailin2 = request.values.get('edat3')
-            emailcc1 = request.values.get('edat4')
-            emailcc2 = request.values.get('edat5')
-            emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2]
-
     else:
 
+        username = session['username'].capitalize()
         locto = '505 Hampton Park Blvd, Capitol Heights, MD  20743'
         locfrom = 'Baltimore Seagirt'
         etitle = f'{cdata[0]} Quote for Drayage to {locto} from {locfrom}'
@@ -625,10 +700,10 @@ def isoQuote():
         timedata = []
         distdata = []
         add_quote_emails()
-        qdata = Quotes.query.filter(Quotes.Status == '0').all()
-        if qdata:
-            thisid = qdata[0].id
-        else:
-            thisid = 0
+        thismuch = 1
+        taskbox = 0
+        quot=0
 
-    return costdata, biddata, expdata, timedata, distdata, emaildata, locto, locfrom, newdirdata, qdata, thisid, bidthis
+    qdata = dataget_Q(thismuch)
+    print(quot)
+    return costdata, biddata, expdata, timedata, distdata, emaildata, locto, locfrom, newdirdata, qdata, bidthis, taskbox, thismuch, quot

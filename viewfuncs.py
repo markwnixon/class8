@@ -1,5 +1,5 @@
 from runmain import db
-from models import Invoices, JO, Income, Bills, Accounts, Bookings, OverSeas, Autos, People, Interchange, Drivers, ChalkBoard, Orders, Drops, Services
+from models import Invoices, JO, Income, Bills, Accounts, Bookings, OverSeas, Autos, People, Interchange, Drivers, ChalkBoard, Orders, Drops, Services, Quotes
 from flask import session, logging, request
 import datetime
 import calendar
@@ -1501,6 +1501,25 @@ def dataget_T(thismuch, dlist):
         if dlist[2] == 'on':
             idata = Interchange.query.all()
     return odata, idata
+
+def dataget_Q(thismuch):
+    today = datetime.date.today()
+    qdata = 0
+    if thismuch == '1':
+        stopdate = today-datetime.timedelta(days=10)
+        qdata = Quotes.query.filter( (Quotes.Status != 'X') & (Quotes.Date > stopdate) ).all()
+    elif thismuch == '2':
+        stopdate = today-datetime.timedelta(days=30)
+        qdata = Quotes.query.filter( (Quotes.Status != 'X') & (Quotes.Date > stopdate) ).all()
+    elif thismuch == '3':
+        qdata = Quotes.query.filter(Quotes.Status == '1').all()
+    elif thismuch == '4':
+        qdata = Quotes.query.filter(Quotes.Status == 'X').all()
+    else:
+        stopdate = today - datetime.timedelta(days=10)
+        qdata = Quotes.query.filter( (Quotes.Status != 'X') & (Quotes.Date > stopdate) ).all()
+
+    return qdata
 
 
 def erud(err):

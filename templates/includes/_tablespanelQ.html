@@ -1,0 +1,29 @@
+
+
+<div class="d-sm-flex justify-content-center small">
+    <div class="p-0">
+        <select class="mdb-select md-form" name="thismuch" onchange="this.form.submit()">
+            <option value="" disabled selected>Filter Quote Table {{ thismuch }}</option>
+            <option {% if thismuch == '1' %} selected {% endif %} value='1'>Filter: Last 10 Days</option>
+            <option {% if thismuch == '2' %} selected {% endif %} value='2'>Filter: Last 30 Days</option>
+            <option {% if thismuch == '3' %} selected {% endif %} value='3'>Filter: Jobs Won</option>
+            <option {% if thismuch == '4' %} selected {% endif %} value='4'>Filter: Show Removed</option>
+            <option {% if thismuch == '5' %} selected {% endif %} value='4'>Filter: Show All</option>
+        </select>
+    </div>
+    &nbsp; &nbsp;
+    <div class="p-0">
+        <select class="mdb-select md-form" name="taskbox" onchange="this.form.submit()">
+            <option value="" disabled selected>Quote Tasks</option>
+            <option value="1">Prepare Quote for Selected Item</option>
+            <option value="2">View All Data for Item</option>
+            <option value="3">Remove Item from List</option>
+            <option value="4">Reinstate Removed Item</option>
+            <option value="5">Delivery Complete</option>
+        </select>
+    </div>
+    &nbsp; &nbsp;
+
+</div>
+
+
