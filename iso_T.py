@@ -1,5 +1,5 @@
 from runmain import db
-from models import Gledger, Vehicles, Invoices, JO, Income, Orders,  Accounts, LastMessage, People, Interchange, Drivers, ChalkBoard, Proofs, Services, Drops
+from models import DriverAssign, Gledger, Vehicles, Invoices, JO, Income, Orders,  Accounts, LastMessage, People, Interchange, Drivers, ChalkBoard, Proofs, Services, Drops
 from flask import render_template, flash, redirect, url_for, session, logging, request
 from CCC_system_setup import myoslist, addpath, tpath, companydata, scac
 from InterchangeFuncs import Order_Container_Update, Matched_Now
@@ -20,7 +20,7 @@ import json
 
 def isoT():
 
-    from viewfuncs import erud, testdrop, make_new_order
+    from viewfuncs import erud, testdrop, make_new_order, driver_assignments, driver_payroll
     from blend_pdf import blendticks
 
     if request.method == 'POST':
@@ -79,9 +79,16 @@ def isoT():
         invoserv = request.values.get('invoserv')
         mm3 = nonone(request.values.get('passmanifest'))
         eprof = request.values.get('emlprofile')
+        lbox = request.values.get('launchbox')
+        lbox = nonone(lbox)
         print('eprof=',eprof)
+        print('lbox=', lbox)
         viewtype = 0
         doclist = [0]*8
+        holdvec = [0] * 8
+
+
+
 
         if invoserv is not None:
             invoupdate = '1'
@@ -145,7 +152,7 @@ def isoT():
         err=[]
 
 
-        holdvec = [0]*3
+
         oder, poof, tick, serv, peep, invo, invooder, cache, modlink = get_ints()
         print('Line 137 peep modlink', peep, modlink)
         quot = 0
@@ -164,6 +171,17 @@ def isoT():
             inco = 0
             oder = 0
             quot = 0
+            lbox=0
+
+        if lbox > 0:
+            if lbox == 1:
+                lbox,holdvec,err = driver_assignments(lbox,holdvec)
+                print('h=',lbox,holdvec)
+            if lbox == 2 and modlink==1:
+                fdata = DriverAssign.query.filter(DriverAssign.Hours != None).all()
+            if lbox == 3:
+                lbox, holdvec, err = driver_payroll(lbox, holdvec)
+
 
 
         if modlink == 70 or (modlink == 4 and (newjob is None and thisjob is None and update is None)):
@@ -489,7 +507,7 @@ def isoT():
 # ____________________________________________________________________________________________________________________E.InvoiceUpdate.Trucking
 
 # ____________________________________________________________________________________________________________________B.GetData.Trucking
-        odata, idata = dataget_T(thismuch, dlist)
+        odata, idata, fdata = dataget_T(thismuch, dlist, lbox)
         sdata = Services.query.order_by(Services.Price.desc()).all()
         cdata = People.query.filter(People.Ptype == 'Trucking').order_by(People.Company).all()
 # ____________________________________________________________________________________________________________________E.GetData.Trucking
@@ -1215,10 +1233,6 @@ def isoT():
             leftsize = 8
 
             if oder > 0:
-
-                fdata = myoslist(job_path)
-                fdata.sort()
-
                 modata = Orders.query.get(oder)
                 csize = People.query.filter(
                     People.Ptype == 'Trucking').order_by(People.Company).all()
@@ -1231,7 +1245,6 @@ def isoT():
                             docref = f'tmp/{scac}/data/vorders/' + modata.Original
                             doctxt = docref.split('.', 1)[0]+'.txt'
                             err.append('All is well')
-                            fdata.append(modata.Original)
 
             if poof > 0:
                 modata = Proofs.query.get(poof)
@@ -1330,12 +1343,6 @@ def isoT():
                                 SEALS='', SCALE_WT='', CARGO_WT='', Time=None, Status='Unmatched', Original='', Path='', TYPE='Empty Out', Jo='', Company='')
             db.session.add(input)
             db.session.commit()
-            fdata = myoslist(int_path)
-            fdata.sort()
-            if len(fdata) > 0:
-                docref = int_path+fdata[0]
-            else:
-                docref = f'tmp/{scac}/data/vunknown/NewJob.pdf'
             modata = Interchange.query.filter(Interchange.CONTAINER == 'New').first()
             tick = modata.id
             err.append('Enter Data for New Interchange Ticket')
@@ -1767,6 +1774,8 @@ def isoT():
                 else:
                     emaildata = etemplate_truck('quote',6,modata)
                 #invo = 1
+        if minvo is not None and oder == 0:
+            err.append('Must select a job to create/edit invoice')
 # ____________________________________________________________________________________________________________________E.Invoice.Trucking
 # ____________________________________________________________________________________________________________________B.Newjob.Trucking
         if newjob is not None:
@@ -1777,9 +1786,6 @@ def isoT():
             docref = None
 
         if newjob is None and modlink == 4:
-            filesel = request.values.get('FileSel')
-            fdata = myoslist(job_path)
-            fdata.sort()
             cdata = People.query.filter(People.Ptype == 'Trucking').order_by(People.Company).all()
             leftsize = 8
             leftscreen = 0
@@ -2048,22 +2054,13 @@ def isoT():
         leftscreen = 1
         holdvec = [0]*3
         quot = 0
+        lbox = 0
 
         stampdata = [3, 35, 35, 5, 120, 100, 5, 477, 350]
         leftsize = 10
         thismuch = '1'
 
-    if modlink == 20:
-        fdata = myoslist(int_path)
-        fdata.sort()
-    elif modlink == 21:
-        fdata = myoslist(pod_path)
-        fdata.sort()
-    elif modlink == 4:
-        fdata = myoslist(job_path)
-        fdata.sort()
-
-    odata, idata = dataget_T(thismuch, dlist)
+    odata, idata, fdata = dataget_T(thismuch, dlist, lbox)
     alltdata = Drivers.query.all()
     allvdata = Vehicles.query.all()
     if invo is not None:
@@ -2077,5 +2074,5 @@ def isoT():
     if doclist[0] == 0:
         doclist = [docref] + doclist[1:]
 
-    print(viewtype,doclist)
-    return doclist, username, bklist, lastpr, thismuch, etitle, ebody, emaildata, odata, pdata, idata, sdata, cdata, oder, poof, sdata2, tick, serv, peep, err, modata, caldays, daylist, nweeks, howapp, modlink, leftscreen, docref, 0, leftsize, newc, tdata, drvdata, dlist, rightsize, ldata, invodate, inco, invo, quot, invooder, cache, stamp, alltdata, allvdata, stampdata, fdata, filesel, today, now, doctxt, holdvec, mm2, viewtype
+    print(viewtype,doclist,lbox)
+    return lbox, doclist, username, bklist, lastpr, thismuch, etitle, ebody, emaildata, odata, pdata, idata, sdata, cdata, oder, poof, sdata2, tick, serv, peep, err, modata, caldays, daylist, nweeks, howapp, modlink, leftscreen, docref, 0, leftsize, newc, tdata, drvdata, dlist, rightsize, ldata, invodate, inco, invo, quot, invooder, cache, stamp, alltdata, allvdata, stampdata, fdata, filesel, today, now, doctxt, holdvec, mm2, viewtype

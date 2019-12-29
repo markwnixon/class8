@@ -1,5 +1,5 @@
 from runmain import db
-from models import Invoices, JO, Income, Bills, Accounts, Bookings, OverSeas, Autos, People, Interchange, Drivers, ChalkBoard, Orders, Drops, Services, Quotes
+from models import Trucklog, DriverAssign, Invoices, JO, Income, Bills, Accounts, Bookings, OverSeas, Autos, People, Interchange, Drivers, ChalkBoard, Orders, Drops, Services, Quotes
 from flask import session, logging, request
 import datetime
 import calendar
@@ -11,6 +11,7 @@ import img2pdf
 from CCC_system_setup import addpath, scac, tpath
 
 today=datetime.date.today()
+today_str = today.strftime('%Y-%m-%d')
 
 def nodollar(infloat):
     outstr="%0.2f" % infloat
@@ -1459,48 +1460,74 @@ def docuploader(dbase):
 
     return err, oder
 
-def dataget_T(thismuch, dlist):
+def dataget_T(thismuch, dlist, lbox):
     # 0=order,#2=interchange,#3=people/services
     today = datetime.date.today()
     stopdate = today-datetime.timedelta(days=60)
     odata = 0
     idata = 0
+    fdata = 0
     if thismuch == '1':
         stopdate = today-datetime.timedelta(days=60)
         if dlist[0] == 'on':
             odata = Orders.query.filter(Orders.Date > stopdate).all()
         if dlist[2] == 'on':
             idata = Interchange.query.filter((Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
+        if lbox == 2:
+            fdata = DriverAssign.query.filter((DriverAssign.Hours != None) & (DriverAssign.Date > stopdate)).all()
+        elif lbox==3 or lbox == 4:
+            fdata = Trucklog.query.filter(Trucklog.Date > stopdate).all()
     elif thismuch == '2':
         stopdate = today-datetime.timedelta(days=120)
         if dlist[0] == 'on':
             odata = Orders.query.filter(Orders.Date > stopdate).all()
         if dlist[2] == 'on':
             idata = Interchange.query.filter((Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
+        if lbox == 2:
+            fdata = DriverAssign.query.filter((DriverAssign.Hours != None) & (DriverAssign.Date > stopdate)).all()
+        elif lbox == 3 or lbox == 4:
+            fdata = Trucklog.query.filter(Trucklog.Date > stopdate).all()
     elif thismuch == '3':
         if dlist[0] == 'on':
             odata = Orders.query.filter(Orders.Istat<1).all()
         if dlist[2] == 'on':
             idata = Interchange.query.filter(
                 (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
+        if lbox == 2:
+            fdata = DriverAssign.query.filter(DriverAssign.Hours != None).all()
+        elif lbox == 3 or lbox == 4:
+            fdata = Trucklog.query.all()
     elif thismuch == '4':
         if dlist[0] == 'on':
             odata = Orders.query.filter(Orders.Istat==1).all()
         if dlist[2] == 'on':
             idata = Interchange.query.filter(
                 (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
+        if lbox == 2:
+            fdata = DriverAssign.query.filter(DriverAssign.Hours != None).all()
+        elif lbox == 3 or lbox == 4:
+            fdata = Trucklog.query.all()
     elif thismuch == '5':
         if dlist[0] == 'on':
             odata = Orders.query.filter(Orders.Istat<4).all()
         if dlist[2] == 'on':
             idata = Interchange.query.filter(
                 (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
+        if lbox == 2:
+            fdata = DriverAssign.query.filter(DriverAssign.Hours != None).all()
+        elif lbox == 3 or lbox == 4:
+            fdata = Trucklog.query.all()
     else:
         if dlist[0] == 'on':
             odata = Orders.query.all()
         if dlist[2] == 'on':
             idata = Interchange.query.all()
-    return odata, idata
+        if lbox == 2:
+            fdata = DriverAssign.query.all()
+        elif lbox == 3 or lbox == 4:
+            fdata = Trucklog.query.all()
+
+    return odata, idata, fdata
 
 def dataget_Q(thismuch):
     today = datetime.date.today()
@@ -1533,3 +1560,251 @@ def erud(err):
         errup = 'All is Well'
     return errup
 
+
+def getdatevec(d1, d2, driver, deftrk):
+    dvec = [d1]
+    d1 = datetime.datetime.strptime(d1, '%Y-%m-%d')
+    dwvec = [d1.strftime('%a')]
+    d2 = datetime.datetime.strptime(d2, '%Y-%m-%d')
+
+    # Get driver data, either from past record or from default
+    dat = DriverAssign.query.filter((DriverAssign.Driver == driver) & (DriverAssign.Date == d1)).first()
+    tat1 = Trucklog.query.filter( (Trucklog.Date == d1) & (Trucklog.DriverStart==driver) ).first()
+    tat2 = Trucklog.query.filter( (Trucklog.Date == d1) & (Trucklog.DriverEnd==driver) ).first()
+    if dat is None and tat1 is None:
+        if d1.strftime('%a') == 'Sat' or d1.strftime('%a') == 'Sun':
+            tsvec = ['None']
+            tevec = ['None']
+        else:
+            tsvec = [deftrk]
+            tevec = [deftrk]
+    else:
+        if dat is not None:
+            tsvec = [dat.UnitStart]
+            tevec = [dat.UnitStop]
+        elif tat1 is not None:
+            tsvec = [tat1.Unit]
+            if tat2 is not None:
+                tevec = [tat2.Unit]
+            else:
+                tevec = [tat1.Unit]
+
+
+    while d1 < d2:
+        d1 = d1 + datetime.timedelta(1)
+        dvec.append(d1.strftime('%Y-%m-%d'))
+        dwvec.append(d1.strftime('%a'))
+
+        dat = DriverAssign.query.filter((DriverAssign.Driver == driver) & (DriverAssign.Date == d1)).first()
+        tat1 = Trucklog.query.filter((Trucklog.Date == d1) & (Trucklog.DriverStart == driver)).first()
+        tat2 = Trucklog.query.filter((Trucklog.Date == d1) & (Trucklog.DriverEnd == driver)).first()
+        if dat is None and tat1 is None:
+            if d1.strftime('%a') == 'Sat' or d1.strftime('%a') == 'Sun':
+                tsvec.append('None')
+                tevec.append('None')
+            else:
+                tsvec.append(deftrk)
+                tevec.append(deftrk)
+        else:
+            if dat is not None:
+                tsvec.append(dat.UnitStart)
+                tevec.append(dat.UnitStop)
+            elif tat1 is not None:
+                tsvec.append(tat1.Unit)
+                if tat2 is not None:
+                    tevec.append(tat2.Unit)
+                else:
+                    tevec.append(tat1.Unit)
+
+    return dvec, dwvec, tsvec, tevec
+
+def driver_assignments(lbox,holdvec):
+    err=[]
+    lupdate = request.values.get('LboxUpdate')
+
+    thisdriver = request.values.get('thisdriver')
+    print('thisdriver=',thisdriver)
+    if thisdriver is None:
+        holdvec[0] = 'Sam Ghanem'
+    else:
+        holdvec[0] = thisdriver
+
+    thisdefault = request.values.get('truckdefault')
+    if thisdefault is None:
+        tdat = Drivers.query.filter(Drivers.Name==holdvec[0]).first()
+        holdvec[1] = tdat.Truck
+    else:
+        tdat = Drivers.query.filter(Drivers.Name == holdvec[0]).first()
+        tdat.Truck = thisdefault
+        db.session.commit()
+        holdvec[1] = thisdefault
+
+    start = request.values.get('dstart')
+    if isinstance(start,str):
+        holdvec[2] = start
+    else:
+        holdvec[2] = today - datetime.timedelta(14)
+        holdvec[2] = holdvec[2].strftime('%Y-%m-%d')
+
+    stop = request.values.get('dfinish')
+    if isinstance(stop,str):
+        holdvec[3] = stop
+    else:
+        holdvec[3] = today_str
+
+    print(start,stop)
+    err.append(f'Ready to Update Logs for {holdvec[0]}')
+    holdvec[4],holdvec[5],holdvec[6],holdvec[7] = getdatevec(holdvec[2],holdvec[3],holdvec[0],holdvec[1])
+
+    #If ready to update then update the driving records:
+    if lupdate is not None:
+        for jx,d1 in enumerate(holdvec[4]):
+            d1 = datetime.datetime.strptime(d1, '%Y-%m-%d')
+            drv = holdvec[0]
+            units = request.values.get('trks' + str(jx))
+            unite = request.values.get('trke' + str(jx))
+            tdat = DriverAssign.query.filter( (DriverAssign.Date==d1) & (DriverAssign.Driver==drv) ).first()
+            if tdat is not None:
+                tdat.UnitStart = units
+                tdat.UnitStop = unite
+                db.session.commit()
+            else:
+                if units is not None:
+                    #Get the trucklog data for the Unit used:
+                    input = DriverAssign(Date=d1,Driver=drv,UnitStart=units,UnitStop=unite,StartStamp=None,EndStamp=None,Hours=None,Miles=None,Status=0,Radius=None,Rloc=None)
+                    db.session.add(input)
+                    db.session.commit()
+
+            tdat = DriverAssign.query.filter((DriverAssign.Date == d1) & (DriverAssign.Driver == drv)).first()
+            tlog = Trucklog.query.filter( (Trucklog.Date == d1) & (Trucklog.Unit==units) ).first()
+            if tlog is not None:
+                tlog.DriverStart = drv
+                tdat.StartStamp = tlog.GPSin
+                tdat.Miles = tlog.Distance
+                tdat.Radius = tlog.Rdist
+                tdat.Rloc = tlog.Rloc
+                db.session.commit()
+
+            tlog = Trucklog.query.filter( (Trucklog.Date == d1) & (Trucklog.Unit==unite) ).first()
+            if tlog is not None:
+                tlog.DriverEnd = drv
+                tdat.EndStamp = tlog.GPSout
+                try:
+                    diff = tdat.EndStamp - tdat.StartStamp
+                    hours = diff.seconds/3600.0
+                except:
+                    hours = 0
+                tdat.Hours = d2s(hours)
+                db.session.commit()
+        err.append(f'Successful Update for Driver {drv}')
+        lbox=0
+    return lbox,holdvec,err
+
+def driver_payroll(lbox,holdvec):
+    err=[]
+    thisdriver = request.values.get('thisdriver')
+    print('thisdriver=', thisdriver)
+    if thisdriver is None:
+        holdvec[0] = 'Sam Ghanem'
+    else:
+        holdvec[0] = thisdriver
+
+    pstart = datetime.datetime(year=2019, month=1,day=7)
+    pstarts = [pstart.strftime('%Y-%m-%d')]
+    pstop = pstart + datetime.timedelta(13)
+    pstops = [pstop.strftime('%Y-%m-%d')]
+    for ix in range(30):
+        pstart = pstart+datetime.timedelta(14)
+        pstop = pstart+datetime.timedelta(13)
+        pstarts.append(pstart.strftime('%Y-%m-%d'))
+        pstops.append(pstop.strftime('%Y-%m-%d'))
+
+    ichange = 0
+    for jx,d1 in enumerate(pstarts):
+        d1 = datetime.datetime.strptime(d1, '%Y-%m-%d')
+        d1 = d1.date()
+        if d1>today and ichange==0:
+            ichange=1
+            thispstart = d1
+            thispstop = d1+datetime.timedelta(13)
+            thispstart=thispstart.strftime('%Y-%m-%d')
+            thispstop = thispstop.strftime('%Y-%m-%d')
+            holdvec[1] = jx-1
+
+    thispaycycle = request.values.get('paycycle')
+    if thispaycycle is not None:
+        thispaycycle = nonone(thispaycycle)
+        pstart = pstarts[thispaycycle]
+        pstop = pstops[thispaycycle]
+        holdvec[1] = thispaycycle
+    else:
+        pstart = thispstart
+        pstop = thispstop
+
+    holdvec[2]=pstarts
+    holdvec[3]=pstops
+
+    #Now calculate payroll for the pay period
+    plines=[]
+    ptable='<table><thead><tr><th>Day</th><th align="center">Date</th><th align="center">Driver</th><th>Unit</th><th>Start</th><th>Unit</th><th>Stop</th><th>Hours</th></tr></thead><tbody>'
+    tot1 = 0
+    tot2 = 0
+    d1 = datetime.datetime.strptime(pstart, '%Y-%m-%d')
+    d1 = d1.date()
+    wk1 = d1 + datetime.timedelta(6)
+    a1 = d1.strftime('%a')
+    d2 = datetime.datetime.strptime(pstop, '%Y-%m-%d')
+    d2 = d2.date()
+    while d1 < d2:
+        dat = DriverAssign.query.filter( (DriverAssign.Driver==holdvec[0]) & (DriverAssign.Date==d1) ).first()
+        if dat is not None:
+            try:
+                hours = float(dat.Hours)
+            except:
+                hours = 0.00
+            t1 = str(dat.StartStamp)
+            t2 = str(dat.EndStamp)
+            try:
+                t1 = t1[11:16]
+            except:
+                t1 = '0:00'
+            try:
+                t2 = t2[11:16]
+            except:
+                t2 = '0:00'
+
+            if hours > 0.0:
+                ptable=ptable+f'<tr><td>{a1}</td><td>{d1}&nbsp;</td><td>{holdvec[0]}</td><td>&nbsp;{dat.UnitStart}&nbsp;</td><td align="center">{t1}</td><td align="center">&nbsp;{dat.UnitStop}&nbsp;</td><td align="center">{t2}</td><td align="center">{dat.Hours}</td></tr>'
+                if d1 <= wk1:
+                    tot1 = tot1 + hours
+                else:
+                    tot2 = tot2 + hours
+
+        d1 = d1 + datetime.timedelta(1)
+        a1 = d1.strftime('%a')
+
+    if tot1 > 40.0:
+        ot1 = tot1 - 40.0
+        tot1 = 40.0
+    else:
+        ot1 = 0.0
+
+    if tot2 > 40.0:
+        ot2 = tot2 - 40.0
+        tot2 = 40.0
+    else:
+        ot2 = 0.0
+
+    reg_hours = tot1 + tot2
+    ot_hours = ot1 + ot2
+
+    ptable=ptable+'</tbody></table>'
+    plines.append(f'1st Week Summary: {d1s(tot1)} Regular Hours and {d1s(ot1)} OT')
+    plines.append(f'2nd Week Summary: {d1s(tot2)} Regular Hours and {d1s(ot2)} OT')
+    plines.append(f'Combined Summary: {d1s(reg_hours)} Regular Hours and {d1s(ot_hours)} OT')
+
+    holdvec[4]=ptable
+    holdvec[5]=plines
+
+    err.append(f'Payroll Hours for Driver:{holdvec[0]}')
+    return lbox,holdvec,err

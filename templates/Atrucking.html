@@ -4,10 +4,19 @@
 <form action="{{ url_for ('Trucking') }}" method="post" enctype="multipart/form-data">
 <div class="table-responsive">
     <div class="row">
+
+
+
         <div class="col-sm-{{leftsize}}" align="center">
 
             {% if leftscreen == 0 %}
                 {% include 'Trucking_Preamble.html' %}
+
+            {% elif lbox == 2%}
+                {% include 'Trucking_DriverHours.html' %}
+
+            {% elif lbox==3 or lbox == 4 %}
+                {% include 'Trucking_TruckLog.html' %}
 
             {% elif leftscreen == 2 %}
                 {% include 'includes/_calendarT.html' %}
@@ -45,6 +54,10 @@
 
         </div>
 
+
+
+
+
         <div class="col-sm-{{rightsize}}" align = "left">
             <div class="row">
                 <div class="col-sm-12" align=""center">
@@ -61,9 +74,10 @@
                     {% elif quot>0  %}
                         {% if ldata %}
                                 {% set htype = 'Modify Quote Information on' %}
-                                {% else %}
+                        {% else %}
                                 {% set htype = 'View Quote Information on' %}
                         {% endif %}
+
                         {% set update = 'quotUpdate'%}
                         {% set logonly = 'logInvo'%}
                         {% include 'includes/_inco_invo.html' %}
@@ -97,6 +111,16 @@
                     {% elif (tick > 0 and modlink == 1) or modlink==20 %}
                         {% include 'Trucking_Tickmod.html' %}
 
+                    {% elif lbox == 1 %}
+                        <br>
+                        {% include 'includes/_controlpanelheader.html' %}
+                        {% include 'Truck_Assign_Drivers.html' %}
+
+                    {% elif lbox == 3 %}
+                        <br>
+                        {% include 'includes/_controlpanelheader.html' %}
+                        {% include 'Truck_Driver_Payroll.html' %}
+
                     {% else  %}
                         <br>
                         {% include 'includes/_controlpanelheader.html' %}
@@ -121,6 +145,7 @@
         </div>
     </div>
 </div>
+<input type = "hidden" name ="launchbox" value= "{{lbox}}">
 <input type = "hidden" name ="lastpr" value= "{{lastpr}}">
 <input type = "hidden" name ="thismuch" value= "{{thismuch}}">
 <input type = "hidden" name ="passmanifest" value= "{{mm1}}">

@@ -1,0 +1,54 @@
+<br>
+<div class="card">
+    <div class="card-header">
+        Run Truck Driver Payroll
+        <button type="submit" class="btn btn-sm btn-elegant" name="Return">Cancel</button>
+    </div>
+<div class="card-body">
+    <div class="d-sm-flex justify-content-center">
+        <div class="p-0">
+        Driver:
+            <select class="mdb-select md-form" name="thisdriver" onchange="this.form.submit()">
+                <option value="" disabled selected>Select Driver</option>
+                {% for drv in alltdata %}
+                <option {% if drv.Name == holdvec[0] %} selected {% endif %} value='{{ drv.Name }}'>{{ drv.Name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+&nbsp&nbsp
+        <div class="p-0">
+        {% set jx = holdvec[1] %}
+        {% set pps = holdvec[2] %}
+        {% set ppe = holdvec[3] %}
+        {% set d1 = pps[jx] %}
+        {% set d2 = ppe[jx] %}
+        PayCycle:
+            <select class="mdb-select md-form" name="paycycle" onchange="this.form.submit()">
+                <option value="" disabled selected>Assign New Default</option>
+                {% for ps in pps %}
+                    {% set ix = loop.index-1 %}
+                <option {% if ps == d1 %} selected {% endif %} value='{{ ix }}'>From: {{ ps }} to {{ ppe[ix] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="d-sm-flex justify-content-center">
+        <div class="p-0">
+            <div class="input-group-text">From Date</div><input class="form-control" type="date" name="pstart" value="{{d1}}">
+        </div>
+        <div class="p-0">
+           <div class="input-group-text">To Date</div><input class="form-control" type="date" name="pstop" value="{{d2}}">
+        </div>
+    </div>
+
+    {% set plines = holdvec[5] %}
+    {% set ptable = holdvec[4] %}
+    {{ ptable | safe }}
+    {% for pline in plines %}
+       <small>{{ pline }}</small><br>
+    {% endfor %}
+
+
+
+</div>

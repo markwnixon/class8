@@ -453,6 +453,34 @@ class Drivers(db.Model):
         self.Path = Path
         self.Phone = Phone
 
+class DriverAssign(db.Model):
+    __tablename__ = 'driverassign'
+    id = db.Column('id', db.Integer, primary_key=True)
+    Date = db.Column('Date', db.DateTime)
+    Driver = db.Column('Driver', db.String(30))
+    UnitStart = db.Column('UnitStart', db.String(20))
+    UnitStop = db.Column('UnitStop', db.String(20))
+    StartStamp = db.Column('StartStamp', db.DateTime)
+    EndStamp = db.Column('EndStamp', db.DateTime)
+    Hours = db.Column('Hours', db.String(45))
+    Miles = db.Column('Miles', db.String(45))
+    Status = db.Column('Status', db.String(45))
+    Radius = db.Column('Radius', db.String(45))
+    Rloc = db.Column('Rloc', db.String(200))
+
+    def __init__(self, Date, Driver, UnitStart, UnitStop,StartStamp,EndStamp,Hours,Miles,Status,Radius,Rloc):
+        self.Date = Date
+        self.Driver = Driver
+        self.UnitStart = UnitStart
+        self.UnitStop = UnitStop
+        self.StartStamp = StartStamp
+        self.EndStamp = EndStamp
+        self.Hours = Hours
+        self.Miles = Miles
+        self.Status = Status
+        self.Radius = Radius
+        self.Rloc = Rloc
+
 
 class People(db.Model):
     __tablename__ = 'people'
@@ -784,41 +812,47 @@ class Trucklog(db.Model):
     __tablename__ = 'trucklog'
     id = db.Column('id', db.Integer, primary_key=True)
     Date = db.Column('Date', db.Date)
+    Tag = db.Column('Tag', db.String(45))
+    Unit = db.Column('Unit', db.String(45))
     GPSin= db.Column('GPSin', db.DateTime)
     GPSout = db.Column('GPSout', db.DateTime)
-    Tag = db.Column('Tag', db.String(45))
+    Shift = db.Column('Shift', db.String(45))
     Distance = db.Column('Distance', db.String(45))
-    Stoptime = db.Column('Stoptime', db.String(45))
+    Rdist = db.Column('Rdist', db.String(45))
+    Rloc = db.Column('Rloc', db.String(200))
     Gotime = db.Column('Gotime', db.String(45))
     Odomstart = db.Column('Odomstart', db.String(45))
     Odomstop = db.Column('Odomstop', db.String(45))
     Odverify = db.Column('Odverify', db.String(45))
-    Driver = db.Column('Driver', db.String(45))
-    Phone = db.Column('Phone', db.String(45))
+    DriverStart = db.Column('DriverStart', db.String(45))
+    DriverEnd = db.Column('DriverEnd', db.String(45))
     Maintrecord = db.Column('Maintrecord', db.String(45))
-    Locationstart = db.Column('Locationstart', db.String(45))
-    Locationstop = db.Column('Locationstop', db.String(45))
+    Locationstart = db.Column('Locationstart', db.String(200))
+    Locationstop = db.Column('Locationstop', db.String(200))
     Maintid = db.Column('Maintid', db.String(45))
     Status = db.Column('Status', db.String(45))
 
-    def __init__(self, Date, GPSin, GPSout, Tag, Distance, Stoptime, Gotime, Odomstart, Odomstop, Odverify, Driver, Phone, Maintrecord, Locationstart, Locationstop, Maintid, Status):
+    def __init__(self, Date, Tag, Unit, GPSin, GPSout, Shift, Distance, Gotime, Odomstart, Odomstop, Odverify, DriverStart, DriverEnd, Maintrecord, Locationstart, Locationstop, Maintid, Status, Rdist, Rloc):
         self.Date = Date
         self.GPSin = GPSin
         self.GPSout = GPSout
         self.Tag = Tag
+        self.Unit = Unit
         self.Distance = Distance
-        self.Stoptime = Stoptime
+        self.Shift = Shift
         self.Gotime = Gotime
         self.Odomstart = Odomstart
         self.Odomstop = Odomstop
         self.Odverify = Odverify
-        self.Driver = Driver
-        self.Phone = Phone
+        self.DriverStart = DriverStart
+        self.DriverEnd = DriverEnd
         self.Maintrecord = Maintrecord
         self.Locationstart = Locationstart
         self.Locationstop = Locationstop
         self.Mainid = Maintid
         self.Status = Status
+        self.Rdist = Rdist
+        self.Rloc = Rloc
 
 class Driverlog(db.Model):
     __tablename__ = 'driverlog'
