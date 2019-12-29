@@ -1475,7 +1475,7 @@ def dataget_T(thismuch, dlist, lbox):
             idata = Interchange.query.filter((Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
         if lbox == 2:
             fdata = DriverAssign.query.filter((DriverAssign.Hours != None) & (DriverAssign.Date > stopdate)).all()
-        elif lbox==3 or lbox == 4:
+        elif lbox==1 or lbox==3 or lbox == 4:
             fdata = Trucklog.query.filter(Trucklog.Date > stopdate).all()
     elif thismuch == '2':
         stopdate = today-datetime.timedelta(days=120)
@@ -1485,7 +1485,7 @@ def dataget_T(thismuch, dlist, lbox):
             idata = Interchange.query.filter((Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
         if lbox == 2:
             fdata = DriverAssign.query.filter((DriverAssign.Hours != None) & (DriverAssign.Date > stopdate)).all()
-        elif lbox == 3 or lbox == 4:
+        elif lbox==1 or lbox==3 or lbox == 4:
             fdata = Trucklog.query.filter(Trucklog.Date > stopdate).all()
     elif thismuch == '3':
         if dlist[0] == 'on':
@@ -1495,7 +1495,7 @@ def dataget_T(thismuch, dlist, lbox):
                 (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
         if lbox == 2:
             fdata = DriverAssign.query.filter(DriverAssign.Hours != None).all()
-        elif lbox == 3 or lbox == 4:
+        elif lbox==1 or lbox==3 or lbox == 4:
             fdata = Trucklog.query.all()
     elif thismuch == '4':
         if dlist[0] == 'on':
@@ -1505,7 +1505,7 @@ def dataget_T(thismuch, dlist, lbox):
                 (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
         if lbox == 2:
             fdata = DriverAssign.query.filter(DriverAssign.Hours != None).all()
-        elif lbox == 3 or lbox == 4:
+        elif lbox==1 or lbox==3 or lbox == 4:
             fdata = Trucklog.query.all()
     elif thismuch == '5':
         if dlist[0] == 'on':
@@ -1515,7 +1515,7 @@ def dataget_T(thismuch, dlist, lbox):
                 (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
         if lbox == 2:
             fdata = DriverAssign.query.filter(DriverAssign.Hours != None).all()
-        elif lbox == 3 or lbox == 4:
+        elif lbox==1 or lbox==3 or lbox == 4:
             fdata = Trucklog.query.all()
     else:
         if dlist[0] == 'on':
@@ -1524,7 +1524,7 @@ def dataget_T(thismuch, dlist, lbox):
             idata = Interchange.query.all()
         if lbox == 2:
             fdata = DriverAssign.query.all()
-        elif lbox == 3 or lbox == 4:
+        elif lbox==1 or lbox==3 or lbox == 4:
             fdata = Trucklog.query.all()
 
     return odata, idata, fdata
