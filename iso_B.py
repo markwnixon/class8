@@ -147,7 +147,10 @@ def isoB(indat):
 
             # Create the new database entry for the source document
             sdate = adat.Date2
-            billno = 'TBD'+str(aid)
+            try:
+                billno = 'TBD'+str(aid)
+            except:
+                billno = 'TBD'
             ckmemo = 'Towing for Horizon Motors Car Purchase'
             bamt = d2s(adat.TowCost)
             bcomp = request.values.get('bcomp')

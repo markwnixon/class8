@@ -23,7 +23,10 @@ def etemplate_truck(type,kind,odat):
 
     if 'eprof' in type or 'invoice' in type:
         od, bol, con = odat.Order, odat.BOL, odat.Container
-        od, bol, con = od.strip(), bol.strip(), con.strip()
+        try:
+            od, bol, con = od.strip(), bol.strip(), con.strip()
+        except:
+            print('Some objects are None')
         dblk = odat.Dropblock2.splitlines()
         pdat = People.query.get(key)
         estatus, epod, eaccts = pdat.Email, pdat.Associate1, pdat.Associate2

@@ -1845,3 +1845,12 @@ def container_list(lbox,holdvec):
     err.append('Unused Export Bookings Last 20 Days')
 
     return lbox, holdvec, err
+
+def get_invo_data(invo, holdvec):
+    err=[]
+    co = 'Global Business Link'
+    holdvec[0] = co
+    odata = Orders.query.filter((Orders.Shipper == co) & (Orders.Istat < 4) & (Orders.Istat > 0)).all()
+    holdvec[1] = odata
+    err.append(f'Showing Open Invoices for {holdvec[0]}')
+    return invo, holdvec, err

@@ -20,7 +20,7 @@ import json
 
 def isoT():
 
-    from viewfuncs import erud, testdrop, make_new_order, driver_assignments, driver_payroll, container_list
+    from viewfuncs import erud, testdrop, make_new_order, driver_assignments, driver_payroll, container_list, get_invo_data
     from blend_pdf import blendticks
 
     if request.method == 'POST':
@@ -87,7 +87,8 @@ def isoT():
         doclist = [0]*8
         holdvec = [0] * 8
 
-
+        oder, poof, tick, serv, peep, invo, invooder, cache, modlink = get_ints()
+        quot = 0
 
 
         if invoserv is not None:
@@ -128,6 +129,9 @@ def isoT():
             mquot = 1
         if thisbox == '3':
             mpack = 1
+        if thisbox == '4':
+            invo = 4
+            invo, holdvec, err = get_invo_data(invo, holdvec)
 
         thisbox = request.values.get('viewbox')
         if thisbox == '1':
@@ -150,13 +154,6 @@ def isoT():
             unpay = 1
 
         err=[]
-
-
-
-        oder, poof, tick, serv, peep, invo, invooder, cache, modlink = get_ints()
-        print('Line 137 peep modlink', peep, modlink)
-        quot = 0
-
         stamp = request.values.get('stamp')
         leftscreen = 1
         ldata = None

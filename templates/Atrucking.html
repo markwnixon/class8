@@ -25,6 +25,10 @@
                 <input type = "hidden" name ="datatable3" value= "{{dlist[2]}}">
                 <input type = "hidden" name ="datatable4" value= "{{dlist[3]}}">
 
+            {% elif invo == 4 %}
+                {% set dt1='dtHorizontalVerticalExample1' %}
+                {% include 'Trucking_ReceiveAccount.html' %}
+
             {% else %}
                 {% if stayslim== 0 %}
                     {% set dt1='dtHorizontalVerticalExample1' %}
