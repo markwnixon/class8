@@ -150,7 +150,8 @@ def isoB(indat):
             try:
                 billno = 'TBD'+str(aid)
             except:
-                billno = 'TBD'
+                aid = 0
+                billno = 'TBD' + str(aid)
             ckmemo = 'Towing for Horizon Motors Car Purchase'
             bamt = d2s(adat.TowCost)
             bcomp = request.values.get('bcomp')
