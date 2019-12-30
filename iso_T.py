@@ -2016,7 +2016,6 @@ def isoT():
         from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero, dataget_T
         username = session['username'].capitalize()
         edat = LastMessage.query.filter(LastMessage.User==username).first()
-        print(f'username={username} edat={edat.Err}')
         if edat is not None:
             try:
                 err = json.loads(edat.Err)

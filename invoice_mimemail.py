@@ -32,7 +32,9 @@ def invoice_mimemail(invo,order,docref,npack):
     order=order.strip()
 
     if newfile != 'none':
-        shutil.copy(addpath(docref),newfile)
+        cfrom = addpath(f'tmp/{scac}/data/vinvoice/' + docref)
+        print(cfrom,newfile)
+        shutil.copy(cfrom,newfile)
 
     #emailto = "export@firsteaglelogistics.com"
     emailfrom = em['invo']
