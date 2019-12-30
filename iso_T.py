@@ -20,7 +20,7 @@ import json
 
 def isoT():
 
-    from viewfuncs import erud, testdrop, make_new_order, driver_assignments, driver_payroll
+    from viewfuncs import erud, testdrop, make_new_order, driver_assignments, driver_payroll, container_list
     from blend_pdf import blendticks
 
     if request.method == 'POST':
@@ -181,6 +181,8 @@ def isoT():
                 fdata = DriverAssign.query.filter(DriverAssign.Hours != None).all()
             if lbox == 3:
                 lbox, holdvec, err = driver_payroll(lbox, holdvec)
+            if lbox == 6:
+                lbox, holdvec, err = container_list(lbox, holdvec)
 
 
 

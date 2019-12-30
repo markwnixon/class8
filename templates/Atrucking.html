@@ -129,6 +129,12 @@
                         {% else %}
                             {% include 'includes/_button_upd_ret.html' %}
                         {% endif %}
+                        {% if lbox == 6 %}
+                            <br><b>Unpulled Import Containers</b>
+                            {{ holdvec[0] | safe }}
+                            <br><b>Unused Export Bookings</b>
+                            {{ holdvec[1] | safe }}
+                        {% endif %}
 
                    {% endif %}
                 </div>

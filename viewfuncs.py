@@ -1808,3 +1808,40 @@ def driver_payroll(lbox,holdvec):
 
     err.append(f'Payroll Hours for Driver:{holdvec[0]}')
     return lbox,holdvec,err
+
+
+def container_list(lbox,holdvec):
+    today = datetime.date.today()
+    stopdate = today-datetime.timedelta(days=20)
+    err=[]
+    comps = []
+    tjobs = Orders.query.filter( (Orders.Hstat < 1) & (Orders.Date > stopdate) ).all()
+    for job in tjobs:
+        com = job.Shipper
+        if com not in comps:
+            comps.append(com)
+    imlines='<br>'
+    exlines='<br>'
+    if len(comps) >= 1:
+        for com in comps:
+            tjobs = Orders.query.filter( (Orders.Hstat < 1) & (Orders.Shipper==com) & (Orders.Date > stopdate)).all()
+            for ix,job in enumerate(tjobs):
+                con = job.Container
+                bk = job.Booking
+                if con =='' or con == 'TBD':
+                    if ix == 0:
+                        exlines = exlines + f'<b>{com}</b><br>'
+                    exlines = exlines + f'{bk}<br>'
+                else:
+                    if ix == 0:
+                        imlines = imlines + f'<b>{com}</b><br>'
+                    imlines = imlines + f'{con}<br>'
+
+
+
+    holdvec[0] = imlines
+    holdvec[1] = exlines
+    err.append('Unpulled Import Container Last 20 Days')
+    err.append('Unused Export Bookings Last 20 Days')
+
+    return lbox, holdvec, err
