@@ -33,7 +33,7 @@ def isoT():
         from invoice_mimemail import invoice_mimemail
         from invoice_makers import multi_inv
         from gledger_write import gledger_write
-        import requests
+        err=[]
 
         # Zero and blank items for default
         username = session['username'].capitalize()
@@ -81,11 +81,14 @@ def isoT():
         eprof = request.values.get('emlprofile')
         lbox = request.values.get('launchbox')
         lbox = nonone(lbox)
-        print('eprof=',eprof)
+        passinvo = request.values.get('passinvo')
+        passinvo = nonone(passinvo)
+        print('passinvo=',passinvo)
+
         print('lbox=', lbox)
         viewtype = 0
         doclist = [0]*8
-        holdvec = [0] * 8
+        holdvec = [0] * 15
 
         oder, poof, tick, serv, peep, invo, invooder, cache, modlink = get_ints()
         quot = 0
@@ -129,7 +132,8 @@ def isoT():
             mquot = 1
         if thisbox == '3':
             mpack = 1
-        if thisbox == '4':
+        if thisbox == '4' or passinvo == 4:
+            lbox = 0
             invo = 4
             invo, holdvec, err = get_invo_data(invo, holdvec)
 
@@ -153,7 +157,7 @@ def isoT():
         if thisbox == '3':
             unpay = 1
 
-        err=[]
+
         stamp = request.values.get('stamp')
         leftscreen = 1
         ldata = None
@@ -1387,6 +1391,9 @@ def isoT():
             if recpay is not None:
                 invooder = oder
             odat = Orders.query.get(invooder)
+
+
+
             invojo = odat.Jo
             co = invojo[0]
             acdata = Accounts.query.filter((Accounts.Type=='Bank') & (Accounts.Co == co)).all()

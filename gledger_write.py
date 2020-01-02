@@ -16,7 +16,7 @@ from func_cal import calmodalupdate
 from PyPDF2 import PdfFileReader
 
 def gledger_write(bus,jo,acctdb,acctcr):
-    try:
+    if 1 == 1:
         dt = datetime.datetime.now()
         cc=jo[0] # this is the company we will be working on
         if bus=='invoice':
@@ -50,7 +50,7 @@ def gledger_write(bus,jo,acctdb,acctcr):
 
         if bus=='income':
 
-            if 'Cash' in acctdb or 'Mremit' in acctdb or 'Mcheck' in acctdb:
+            if 'Cash' in acctdb or 'Check' in acctdb or 'Mcheck' in acctdb or 'Undeposited' in acctdb:
                 acctdb='Cash'
                 dtype = 'ID'
             else:
@@ -193,5 +193,5 @@ def gledger_write(bus,jo,acctdb,acctcr):
                     input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=acctdb,Sid=adb.id,Type='XC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
                     db.session.add(input2)
                 db.session.commit()
-    except:
+    if 1 == 2:
         print('Warning could not write to gledger')

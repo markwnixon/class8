@@ -226,6 +226,18 @@ $('#dtH5').DataTable({
 $('.dataTables_length').addClass('bs-select');
 });
 
+$(document).ready(function () {
+$('#dtH6').DataTable({
+"order": [[ 4, "desc" ]],
+"scrollX": true,
+"scrollY": 400,
+"stateSave": true,
+"paging": false,
+"searching": false // false to disable search (or any other option)
+});
+$('.dataTables_length').addClass('bs-select');
+});
+
 
 
 

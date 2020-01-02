@@ -26,7 +26,7 @@
                 <input type = "hidden" name ="datatable4" value= "{{dlist[3]}}">
 
             {% elif invo == 4 %}
-                {% set dt1='dtHorizontalVerticalExample1' %}
+                {% set dt1='dtHorizontalVerticalExample7' %}
                 {% include 'Trucking_ReceiveAccount.html' %}
 
             {% else %}
@@ -155,6 +155,7 @@
         </div>
     </div>
 </div>
+<input type = "hidden" name ="passinvo" value= "{{invo}}">
 <input type = "hidden" name ="launchbox" value= "{{lbox}}">
 <input type = "hidden" name ="lastpr" value= "{{lastpr}}">
 <input type = "hidden" name ="thismuch" value= "{{thismuch}}">

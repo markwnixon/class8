@@ -352,6 +352,12 @@ def writechecks(bdat, pdat, cache, sbdata, links):
     c.drawString(ltm+20, memoline2-dl, 'Payee Address:')
     c.drawString(ltm+20, memoline3-dl, 'Payee Address:')
     c.setFont('Helvetica', 10, leading=None)
+    if addr1 is None:
+        addr1 = ''
+    if addr2 is None:
+        addr2 = ''
+    if pufrom is None:
+        pufrom = ''
     c.drawString(ltm+20, memoline2-dl*2, company)
     c.drawString(ltm+20, memoline2-dl*2-11, addr1)
     c.drawString(ltm+20, memoline2-dl*2-22, addr2)

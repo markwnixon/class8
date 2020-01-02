@@ -1847,10 +1847,203 @@ def container_list(lbox,holdvec):
     return lbox, holdvec, err
 
 def get_invo_data(invo, holdvec):
+    today = datetime.date.today()
+    today_str = today.strftime('%Y-%m-%d')
+    stopdate = today-datetime.timedelta(days=300)
     err=[]
-    co = 'Global Business Link'
+
+    #Determine unique shippers:
+    comps = []
+    tjobs = Orders.query.filter( (Orders.Istat < 4) & (Orders.Date > stopdate) ).all()
+    for job in tjobs:
+        com = job.Shipper
+        if com not in comps:
+            comps.append(com)
+    co = request.values.get('getaccount')
     holdvec[0] = co
-    odata = Orders.query.filter((Orders.Shipper == co) & (Orders.Istat < 4) & (Orders.Istat > 0)).all()
+
+    # If first time up there is not selection so set to todays date
+    if co is None:
+        holdvec[7] = today_str
+    else:
+        holdvec[7] = request.values.get('thisdate')
+
+    #This is the relevant data for selection
+    odata = Orders.query.filter((Orders.Shipper == co) & (Orders.Istat < 4) & (Orders.Istat > 1) & (Orders.Date > stopdate)).all()
+    lenod = len(odata)
+    if lenod < 1:
+        if co is None:
+            err.append('Choose Account to Receive Payments On')
+        else:
+            err.append(f'{holdvec[0]} has only uninvoiced orders')
+    else:
+        err.append(f'Showing invoices for {holdvec[0]}')
     holdvec[1] = odata
-    err.append(f'Showing Open Invoices for {holdvec[0]}')
+    holdvec[2] = comps
+
+    thechecks = [0]*len(odata)
+    amts = ['0.00']*len(odata)
+    invts = ['0.00']*len(odata)
+    runck = request.values.get('previewpay')
+    update = request.values.get('updatepay')
+    invotot = 0.0
+    paytot = 0.0
+    if runck is not None or update is not None:
+        if runck is not None:
+            err.append(f'Totaling Open Invoices for {holdvec[0]}')
+        else:
+            err.append(f'Recording Invoices for {holdvec[0]}')
+
+        for jx,odat in enumerate(odata):
+
+            #Make sure we have an invoice and get the invoice total if we do
+            idat = Invoices.query.filter(Invoices.Jo == odat.Jo).first()
+            if idat is not None:
+                invototal = idat.Total
+                invts[jx] = invototal
+                amts[jx] = invototal
+
+            ckon = request.values.get('oder'+str(odat.id))
+            if ckon is not None:
+                thechecks[jx]=1
+                invotot = invotot + float(invts[jx])
+                recthis = request.values.get('amount'+str(odat.id))
+                try:
+                    paytot = paytot+float(recthis)
+                    amts[jx] = d2s(recthis)
+                except:
+                    err.append(f'Bad Amt Received JO {odat.Jo}')
+                    amts[jx] = '0.00'
+    else:
+        #Need to get the invoice totals even on the first pass:
+        for jx, odat in enumerate(odata):
+            idat = Invoices.query.filter(Invoices.Jo == odat.Jo).first()
+            if idat is not None:
+                invototal = idat.Total
+                invts[jx] = invototal
+                amts[jx] = invototal
+
+    holdvec[3] = thechecks
+    holdvec[4] = d2s(invotot)
+    holdvec[5] = d2s(paytot)
+    holdvec[6] = amts
+    holdvec[8] = request.values.get('thisref')
+    holdvec[12] = invts
+    print('amts=',amts)
+    print(holdvec[7],holdvec[8])
+    depmethod = request.values.get('paymethod')
+    if depmethod is None:
+        deps = ['Choose Pay Method First']
+        acctdb = 'None'
+    elif depmethod == 'Cash' or depmethod == 'Check':
+        deps = ['Undeposited Funds']
+        acctdb = 'Undeposited Funds'
+    elif depmethod == 'Credit Card':
+        acctdb = request.values.get('acctfordeposit')
+        deps = []
+        acdata = Accounts.query.filter((Accounts.Type == 'Bank') & (Accounts.Description.contains('Merchant'))).all()
+        for acd in acdata:
+            deps.append(acd.Name)
+    elif depmethod == 'Direct Deposit':
+        acctdb = request.values.get('acctfordeposit')
+        #Get the account for deposit listing and the account for deposit selection:
+        deps = []
+        acdata = Accounts.query.filter( (Accounts.Type == 'Bank') | (Accounts.Type == 'Exch') ).all()
+        for acd in acdata:
+            deps.append(acd.Name)
+
+    holdvec[9] = deps
+    holdvec[14] = depmethod
+    holdvec[10] = acctdb
+    autodis = request.values.get('autodisbox')
+    autodis = nonone(autodis)
+    holdvec[11] = autodis
+
+    # Enable Record button if all selections required are made
+    try:
+        paytotf = float(paytot)
+        if paytotf > 0.0 and acctdb is not None:
+            holdvec[13] = 1
+            err.append('Record capability enabled')
+        else:
+            holdvec[13] = 0
+            if co is not None:
+                if paytotf == 0.00:
+                    err.append('Choose Invoices to Receive Against')
+                if acctdb is None:
+                    err.append('Choose Account to Deposit Funds')
+    except:
+        holdvec[13] = 0
+
+    if update is not None:
+        err = []
+        #Apply the payments
+        for jx, odat in enumerate(odata):
+            if thechecks[jx]==1:
+                invojo = odat.Jo
+
+                if amts[jx] != '0.00':
+
+                    # Begin Income Creation:
+                    custref = holdvec[8]
+                    recamount = amts[jx]
+                    recdate = datetime.datetime.strptime(holdvec[7], '%Y-%m-%d')
+
+                    incdat = Income.query.filter(Income.Jo == invojo).first()
+                    if incdat is None:
+                        err.append(f'Creating New Payment on Jo {invojo}')
+                        paydesc = f'Received payment on Invoice {invojo}'
+
+                        input = Income(Jo=odat.Jo, SubJo=acctdb, Pid=odat.Bid, Description=paydesc,
+                                       Amount=recamount, Ref=custref, Date=recdate, Original=None)
+                        db.session.add(input)
+                        db.session.commit()
+
+                    try:
+                        rec = float(recamount)
+                    except:
+                        rec = 0.00
+                    try:
+                        owe = float(invts[jx])
+                    except:
+                        owe = 0.00
+
+                    print('autodis=',autodis,rec,owe)
+                    if autodis == 1 and rec < owe:
+                        disamt = rec - owe
+                        #Need to add a discounting invoice to zero out the balance
+                        input = Invoices(Jo=invojo, SubJo=None, Pid=odat.Bid, Service='Discount', Description='Auto Discount',
+                                         Ea=d2s(disamt), Qty=1, Amount=d2s(disamt), Total=d2s(rec), Date=today,
+                                         Original=None, Status='P')
+                        db.session.add(input)
+                        db.session.commit()
+                        #Adjust Invoice Totals for all Line Items on this Order:
+                        ldata = Invoices.query.filter(Invoices.Jo == invojo).all()
+                        for data in ldata:
+                            data.Total = d2s(rec)
+                            db.session.commit()
+                        err.append(f'Info: Discount created for JO {odat.Jo} to balance invoice')
+                        owe = 0.00
+
+                    if rec < owe:
+                        err.append(f'Warning: Payment for JO {odat.Jo} less than invoiced')
+                    else:
+                        ldata = Invoices.query.filter(Invoices.Jo == invojo).all()
+                        for data in ldata:
+                            data.Status = 'P'
+                            db.session.commit()
+
+                    hstat = odat.Hstat
+                    if hstat == 2 or hstat == 3:
+                        odat.Hstat = 4
+                    odat.Istat = 4
+                    db.session.commit()
+
+                    from gledger_write import gledger_write
+                    gledger_write('income',invojo,acctdb,0)
+                    invo = 0
+
+                else:
+                    err.append(f'Have no Invoice to Receive Against for JO={invojo}')
+
     return invo, holdvec, err

@@ -114,6 +114,7 @@ def isoB(indat):
             adat = Autos.query.get(towid)
             pufrom = adat.Pufrom
             bdesc = 'Towing performed by \r\n'+adat.TowCompany
+            print('Towing Items',adat.TowCompany,adat.Pufrom)
             adata = Autos.query.filter(Autos.Orderid == adat.Orderid).all()
             for dat in adata:
                 bdesc = bdesc+'\r\n'+nons(dat.Year)+' '+nons(dat.Make) + \
@@ -123,6 +124,15 @@ def isoB(indat):
 
             cdat = People.query.filter((People.Company == adat.TowCompany) & (
                 (People.Ptype == 'TowCo') | (People.Ptype == 'Vendor'))).first()
+            if cdat is None:
+                input = People(Company=adat.TowCompany, First=None, Middle=None, Last=None, Addr1=None, Addr2=None, Addr3=None,
+                               Idtype=None, Idnumber=None, Telephone=None,
+                               Email=None, Associate1=None, Associate2=None, Date1=today, Date2=None, Original=None,
+                               Ptype='TowCo', Temp1=None, Temp2=None, Accountid=None)
+                db.session.add(input)
+                db.session.commit()
+                cdat = People.query.filter((People.Company == adat.TowCompany) & (
+                        (People.Ptype == 'TowCo') | (People.Ptype == 'Vendor'))).first()
 
             if cdat is not None:
                 cid = cdat.Accountid
@@ -148,10 +158,10 @@ def isoB(indat):
             # Create the new database entry for the source document
             sdate = adat.Date2
             try:
-                billno = 'TBD'+str(aid)
+                billno = f'{scac}_Bill_{str(aid)}'
             except:
                 aid = 0
-                billno = 'TBD' + str(aid)
+                billno = f'{scac}_Bill_{str(aid)}'
             ckmemo = 'Towing for Horizon Motors Car Purchase'
             bamt = d2s(adat.TowCost)
             bcomp = request.values.get('bcomp')
@@ -318,7 +328,7 @@ def isoB(indat):
                         gledger_write('newbill',modata.Jo,modata.bAccount,modata.pAccount)
 
                 if modal == 1:
-                    billno = 'Bill'+str(tid)
+                    billno = f'{scac}_Bill_{str(tid)}'
                     input = ChalkBoard(Jo=billno, creator=username,
                                        comments='Auto Message Bill Paid', status=1)
                     db.session.add(input)
@@ -614,7 +624,7 @@ def isoB(indat):
             toacct = request.values.get('toacct')
             btype = 'XFER'
             bclass = 'Non Expense'
-            billno = 'New Xfer'
+            billno = f'{scac}_Bill_XFER'
             ckmemo = request.values.get('ckmemo')
             bdesc = request.values.get('bdesc')
             baccount = request.values.get('baccount')
@@ -630,7 +640,7 @@ def isoB(indat):
             db.session.commit()
 
             modata = Bills.query.filter(Bills.Jo == 'New Xfer').first()
-            billno = 'X'+str(modata.id)
+            billno = f'{scac}_Bill_{str(modata.id)}'
             modata.Jo = billno
             db.session.commit()
 
@@ -828,7 +838,7 @@ def isoB(indat):
             else:
                 docref = None
 
-            billno = 'XFER'
+            billno = f'{scac}_Bill_XFER'
             bdesc = request.values.get('bdesc')
             bamt = request.values.get('bamt')
             bamt = d2s(bamt)
@@ -888,7 +898,7 @@ def isoB(indat):
             if paybill2 is not None:
                 bill = nonone(paybill2)
                 numchecked = 1
-                billno = 'Bill'+str(bill)
+                billno = f'{scac}_Bill_{str(bill)}'
                 input = ChalkBoard(Jo=billno, creator=username, register_date = today,
                                    comments='Auto Message Bill Pay Started')
                 db.session.add(input)
@@ -1102,7 +1112,7 @@ def isoB(indat):
                         fnum = 'note'+str(tid)
                         fput = request.values.get(fnum)
                         if len(fput) > 3:
-                            billno = 'Bill'+str(tid)
+                            billno = f'{scac}_Bill_{str(tid)}'
                             input = ChalkBoard(Jo=billno, creator=username,
                                                comments=fput, status=1)
                             db.session.add(input)
