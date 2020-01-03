@@ -173,6 +173,8 @@ def isoT():
             oder = 0
             quot = 0
             lbox=0
+            eprof = None
+            leftscreen = 1
 
         if lbox > 0:
             if lbox == 1:
@@ -756,21 +758,28 @@ def isoT():
 
             cache2 = int(odat.Detention)
             cache2 = cache2+1
-            docref = f'tmp/{scac}/data/vorders/P_c{cache2}_{odat.Jo}.pdf'
+            docref = f'tmp/{scac}/data/vpackages/P_c{cache2}_{odat.Jo}.pdf'
             docin = f'tmp/{scac}/data/vorders/P_c{cache2}_{odat.Jo}.pdf'
-            pdflist=['pdfunite']+packitems+[addpath(docref)]
-            tes = subprocess.check_output(pdflist)
-            odat.Package = docref
-            odat.Detention = cache2
-            db.session.commit()
-            print('docref=',docref)
-            leftscreen = 0
-            stampstring = json.dumps(stampdata)
-            odat.Status=stampstring
-            db.session.commit()
+            try:
+                pdflist=['pdfunite']+packitems+[addpath(docref)]
+                tes = subprocess.check_output(pdflist)
+                odat.Package = f'P_c{cache2}_{odat.Jo}.pdf'
+                odat.Detention = cache2
+                db.session.commit()
+                print('docref=', docref)
+                leftscreen = 0
+                stampstring = json.dumps(stampdata)
+                print('stampstring=', stampstring)
+                odat.Status = stampstring
+                db.session.commit()
+            except:
+                print('The File Does Not Exist')
+                leftscreen = 0
+
             #Get the email data also in case changes occur there
 
             if eprof is not None:
+                holdvec[0] = eprof
                 thisprofile = 'eprof' + eprof
                 kind = 0
                 emaildata = etemplate_truck(thisprofile, kind, odat)
@@ -899,8 +908,9 @@ def isoT():
                 print('packitems final:', packitems)
                 print('stampdata final:', stampdata)
 
-                pdflist = ['pdfunite'] + packitems + [addpath(docref)]
-                tes = subprocess.check_output(pdflist)
+                if len(packitems) >= 1:
+                    pdflist = ['pdfunite'] + packitems + [addpath(docref)]
+                    tes = subprocess.check_output(pdflist)
 
                 if eprof is not None:
                     thisprofile = 'eprof'+eprof
@@ -1065,6 +1075,8 @@ def isoT():
             jo = odat.Jo
             order = odat.Order
 
+            print('eprof at iso_T 1068 decision tree=', eprof)
+
             if eprof is None or eprof == 3 or eprof ==5:
                 alink = odat.Links
                 if alink is not None:
@@ -1078,7 +1090,7 @@ def isoT():
                     db.session.commit()
                 gledger_write('invoice',jo,0,0)
 
-            emailin1 = invoice_mimemail(jo, order, docref, invo)
+            emailin1 = invoice_mimemail(order, docref, eprof)
             invo = 0
             invooder = 0
             stamp = 0

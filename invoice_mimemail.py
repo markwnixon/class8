@@ -18,7 +18,7 @@ import datetime
 today = datetime.datetime.today()
 #today = today.date()
 
-def invoice_mimemail(invo,order,docref,npack):
+def invoice_mimemail(order,docref,eprof):
 
     ourserver = websites['mailserver']
 
@@ -30,9 +30,16 @@ def invoice_mimemail(invo,order,docref,npack):
     ebody=request.values.get('edat1')
     newfile = request.values.get('edat6')
     order=order.strip()
+    try:
+        iprof = int(eprof)
+    except:
+        iprof = 0
 
     if newfile != 'none':
-        cfrom = addpath(f'tmp/{scac}/data/vinvoice/' + docref)
+        if iprof > 0:
+            cfrom = addpath(f'tmp/{scac}/data/vpackages/{docref}')
+        else:
+            cfrom = addpath(f'tmp/{scac}/data/vinvoice/{docref}')
         print(cfrom,newfile)
         shutil.copy(cfrom,newfile)
 
