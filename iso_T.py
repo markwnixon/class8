@@ -20,7 +20,7 @@ import json
 
 def isoT():
 
-    from viewfuncs import erud, testdrop, make_new_order, driver_assignments, driver_payroll, container_list, get_invo_data
+    from viewfuncs import erud, testdrop, make_new_order, driver_assignments, driver_payroll, container_list, get_invo_data, Orders_Form_Update, Orders_Drop_Update
     from blend_pdf import blendticks
 
     if request.method == 'POST':
@@ -190,7 +190,7 @@ def isoT():
 
 
         if modlink == 4 and (newjob is None and thisjob is None and update is None):
-            upnow = request.values.get('Upload Now')
+            upnow = request.values.get('uploadnow')
             if upnow is not None:
                 err, oid = docuploader('oder')
                 if modlink == 4:
@@ -307,79 +307,50 @@ def isoT():
 
         if update is None and modlink == 1:
             if oder > 0:
+                Orders_Form_Update(oder)
+                shipper = request.values.get('shipper')
+
+                holdvec[0], holdvec[1], holdvec[2] = shipper, 0, 0
+                plist = []
+                delist = []
+                oshipper = Orders.query.filter(Orders.Shipper == shipper).all()
+                for tship in oshipper:
+                    pu = tship.Company.strip()
+                    du = tship.Company2.strip()
+                    if pu not in plist:
+                        plist.append(pu)
+                    if du not in delist:
+                        delist.append(du)
+                holdvec[4] = plist
+                holdvec[5] = delist
+                holdvec[6] = request.values.get('getpuloc')
+                holdvec[7] = request.values.get('getduloc')
+                if holdvec[6] is not None:
+                    oship = Orders.query.filter((Orders.Shipper == shipper) & (Orders.Company == holdvec[6])).first()
+                    if oship is not None:
+                        holdvec[8] = oship.Dropblock1
+
+                if holdvec[8] is not None:
+                    oship = Orders.query.filter((Orders.Shipper == shipper) & (Orders.Company2 == holdvec[7])).first()
+                    if oship is not None:
+                        holdvec[9] = oship.Dropblock2
                 leftsize = 8
                 leftscreen = 0
-                doctxt = docref.split('.', 1)[0]+'.txt'
                 modata = Orders.query.get(oder)
-        print(update,modlink,tick)
+                try:
+                    docref = f'tmp/{scac}/data/vorders/{modata.Original}'
+                except:
+                    docref = ''
+
         if update is not None and modlink == 1:
             if oder > 0:
+                Orders_Form_Update(oder)
+                Orders_Drop_Update(oder)
                 modata = Orders.query.get(oder)
-                hstat = modata.Hstat
-                if hstat == -1:
-                    modata.Hstat = 0
-                vals = ['load', 'order', 'bol', 'booking', 'container', 'pickup',
-                        'date', 'time', 'date2', 'time2', 'amount', 'ctype']
-                a = list(range(len(vals)))
-                for i, v in enumerate(vals):
-                    a[i] = request.values.get(v)
-
-                shipper = request.values.get('shipper')
-                modata.Shipper = shipper
-
-                dropblock1 = request.values.get('dropblock1')
-                dropblock2 = request.values.get('dropblock2')
-
-                idl, newdrop1, company = testdrop(dropblock1)
-                idd, newdrop2, company2 = testdrop(dropblock2)
-
-                if idl == 0:
-                    company = dropupdate(dropblock1)
-                    newdrop1 = dropblock1
-                    lid = Drops.query.filter(Drops.Entity == company).first()
-                    idl = lid.id
-
-                if idd == 0:
-                    company2 = dropupdate(dropblock2)
-                    newdrop2 = dropblock2
-                    did = Drops.query.filter(Drops.Entity == company2).first()
-                    idd = did.id
-
-                modata.Company2 = company2
-                modata.Company = company
-                modata.Dropblock2 = newdrop2
-                modata.Dropblock1 = newdrop1
-                bid = People.query.filter(People.Company == shipper).first()
-                if bid is not None:
-                    modata.Bid = bid.id
-                modata.Lid = idl
-                modata.Did = idd
-                modata.Load = a[0]
-                modata.Order = a[1]
-                modata.BOL = a[2]
-                modata.Booking = a[3]
-                modata.Container = a[4]
-                modata.Pickup = a[5]
-                modata.Type = a[11]
                 try:
-                    modata.Date = a[6]
+                    docref = f'tmp/{scac}/data/vorders/{modata.Original}'
                 except:
-                    modata.Date = None
-                    err.append('Bad Date Value')
-                modata.Time = a[7]
-                try:
-                    modata.Date2 = a[8]
-                except:
-                    modata.Date2 = None
-                    err.append('Bad Date Value')
-                modata.Time2 = a[9]
-                modata.Amount = d2s(a[10])
-                try:
-                    modata.Label = modata.Jo+' '+a[1]+' '+shipper+' ' + a[10]
-                except:
-                    modata.Label = modata.Jo+' '+shipper
-
-                db.session.commit()
+                    docref = ''
                 err.append('Modification to Trucking JO ' + modata.Jo + ' completed.')
                 modlink = 0
                 Order_Container_Update(oder)
@@ -1813,12 +1784,6 @@ def isoT():
             cdata = People.query.filter(People.Ptype == 'Trucking').order_by(People.Company).all()
             leftsize = 8
             leftscreen = 0
-            try:
-                docref = f'tmp/{scac}/processing/tjobs/'+filesel
-                doctxt = docref.split('.', 1)[0]+'.txt'
-            except:
-                docref = ''
-                doctxt = ''
             shipper = request.values.get('shipper')
             pufrom = request.values.get('thislcomp')
             deltoc = request.values.get('thisdcomp')
@@ -1846,18 +1811,27 @@ def isoT():
                 deltoc = 0
             holdvec[0], holdvec[1], holdvec[2] = shipper, pufrom, deltoc
             plist=[]
-            dlist=[]
+            delist=[]
             oshipper = Orders.query.filter(Orders.Shipper == shipper).all()
             for tship in oshipper:
-                pu = tship.Company
-                du = tship.Company2
+                pu = tship.Company.strip()
+                du = tship.Company2.strip()
                 if pu not in plist:
                     plist.append(pu)
-                if du not in dlist:
-                    dlist.append(du)
+                if du not in delist:
+                    delist.append(du)
             holdvec[4]=plist
-            holdvec[5]=dlist
+            holdvec[5]=delist
             holdvec[6] = request.values.get('getpuloc')
+            holdvec[7] = request.values.get('getduloc')
+            if holdvec[6] is not None:
+                oship = Orders.query.filter( (Orders.Shipper == shipper) & (Orders.Company == holdvec[6]) ).first()
+                if oship is not None:
+                    holdvec[8] = oship.Dropblock1
+            if holdvec[8] is not None:
+                oship = Orders.query.filter( (Orders.Shipper == shipper) & (Orders.Company2 == holdvec[7]) ).first()
+                if oship is not None:
+                    holdvec[9] = oship.Dropblock2
 
 
 

@@ -62,13 +62,14 @@ Enter New Job Information
 <td><div class="input-group-text">Pickup No.:</div></td>
 <td><input class="form-control" type="text" name="pickup" value=" "></td>
 </tr>
+
 {% set pus = holdvec[4] %}
 {% set thispu = holdvec[6] %}
 {% if pus %}
     <tr>
         <td><div class="input-group-text">Previous Load Locs</div></td>
         <td>
-            <select class="form-control" type="text" name="getpuloc">
+            <select class="form-control" type="text" name="getpuloc" onchange="this.form.submit()">
             <option value="">Optional Choose from Previous</option>
             {% for pu in pus %}
                 <option {% if pu == thispu %} selected {% endif %} value='{{pu}}'>{{pu}}</option>
@@ -77,25 +78,43 @@ Enter New Job Information
         </td>
     </tr>
 {% endif %}
+
 <tr>
 <td> <div class="input-group-text" data-toggle="tooltip" title="Enter 1st 3 letters of an existing location and program will load entire address for you on UPDATE">Load At:</div></td>
-<td colspan="2"><textarea class="form-control" type="text" name="dropblock1" rows="4">  </textarea></td>
+<td colspan="2"><textarea class="form-control" type="text" name="dropblock1" rows="4">{% if holdvec[8] != 0 %}{{ holdvec[8]}}{% endif %}</textarea></td>
 </tr>
+
+
 <tr>
 <td><div class="input-group-text">Load Date:</div></td>
-<td><input class="form-control" type="date" name="ldate" value="{{today}}"></td>
+<td><input class="form-control" type="date" name="date" value="{{today}}"></td>
 </tr>
+{% set dus = holdvec[5] %}
+{% set thisdu = holdvec[7] %}
+{% if dus %}
+    <tr>
+        <td><div class="input-group-text">Previous Delv Locs</div></td>
+        <td>
+            <select class="form-control" type="text" name="getduloc" onchange="this.form.submit()">
+            <option value="">Optional Choose from Previous</option>
+            {% for du in dus %}
+                <option {% if du == thisdu %} selected {% endif %} value='{{du}}'>{{du}}</option>
+            {% endfor %}
+            </select>
+        </td>
+    </tr>
+{% endif %}
 <tr>
 <td> <div class="input-group-text" data-toggle="tooltip" title="Enter 1st 3 letters of an existing location and program will load entire address for you on UPDATE">Deliver To:</div></td>
-<td colspan="2"><textarea class="form-control" type="text" name="dropblock2" rows="4"></textarea></td>
+<td colspan="2"><textarea class="form-control" type="text" name="dropblock2" rows="4">{% if holdvec[9] != 0 %}{{ holdvec[9]}}{% endif %}</textarea></td>
 </tr>
 <tr>
 <td><div class="input-group-text">Deliver Date:</div></td>
-<td><input class="form-control" type="date" name="ddate" value="{{today}}"></td>
+<td><input class="form-control" type="date" name="date2" value="{{today}}"></td>
 </tr>
 <tr>
 <td><div class="input-group-text">Job Base Charge:</div></td>
-<td><input class="form-control" type="text" name="thisamt" value="905.00"></td>
+<td><input class="form-control" type="text" name="amount" value="905.00"></td>
 </tr>
 <tr>
 <tr>

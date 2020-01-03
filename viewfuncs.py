@@ -1310,10 +1310,9 @@ def make_new_order():
     jtype = 'T'
     nextjo = newjo(jtype, sdate)
 
-    vals = ['shipper', 'load', 'order', 'bol', 'booking', 'container', 'pickup',
-            'dropblock1', 'ldate', 'ltime', 'dropblock2', 'ddate', 'dtime', 'thisamt', 'seal', 'ctype']
+    vals = ['shipper', 'order', 'bol', 'booking', 'container', 'pickup',
+            'date', 'date2', 'amount', 'ctype', 'dropblock1', 'dropblock2']
     a = list(range(len(vals)))
-    i = 0
     for ix, vx in enumerate(vals):
         a[ix] = request.values.get(vx)
 
@@ -1323,15 +1322,15 @@ def make_new_order():
     else:
         idb = 0
 
-    dropblock1 = a[7]
-    dropblock2 = a[10]
+    dropblock1 = a[10]
+    dropblock2 = a[11]
 
     idl, newdrop1, company = testdrop(dropblock1)
     idd, newdrop2, company2 = testdrop(dropblock2)
 
     if idl == 0:
         company = dropupdate(dropblock1)
-        newdrop1 = a[7]
+        newdrop1 = a[10]
         lid = Drops.query.filter(Drops.Entity == company).first()
         if lid is not None:
             idl = lid.id
@@ -1340,23 +1339,23 @@ def make_new_order():
 
     if idd == 0:
         company2 = dropupdate(dropblock2)
-        newdrop2 = a[10]
+        newdrop2 = a[11]
         did = Drops.query.filter(Drops.Entity == company2).first()
         if did is not None:
             idd = did.id
         else:
             idd = 0
 
-    if a[13] is None:
-        a[13] = '0.00'
+    if a[8] is None:
+        a[8] = '0.00'
 
-    input = Orders(Status='00', Jo=nextjo, Load=a[1], Order=a[2], Company=company, Location=None, Booking=a[4],
-                   BOL=a[3], Container=a[5],
-                   Date=a[8], Driver=None, Company2=company2, Time=a[9], Date2=a[11], Time2=a[12], Seal=a[14],
-                   Pickup=a[6], Delivery=None,
-                   Amount=a[13], Path=None, Original=None, Description=None, Chassis=None, Detention='0',
+    input = Orders(Status='00', Jo=nextjo, Load=None, Order=a[1], Company=company, Location=None, Booking=a[3],
+                   BOL=a[2], Container=a[4],
+                   Date=a[6], Driver=None, Company2=company2, Time=None, Date2=a[7], Time2=None, Seal=None,
+                   Pickup=a[5], Delivery=None,
+                   Amount=a[8], Path=None, Original=None, Description=None, Chassis=None, Detention='0',
                    Storage='0',
-                   Release=0, Shipper=a[0], Type=a[15], Time3=None, Bid=idb, Lid=idl, Did=idd, Label='FileUpload',
+                   Release=0, Shipper=a[0], Type=a[9], Time3=None, Bid=idb, Lid=idl, Did=idd, Label='FileUpload',
                    Dropblock1=newdrop1, Dropblock2=newdrop2, Commodity=None, Packing=None, Links=None, Hstat=0, Istat=0,
                    Proof=None,Invoice=None,Gate=None,Package=None,Manifest=None,Scache=0,Pcache=0,Icache=0,Mcache=0,Pkcache=0)
     db.session.add(input)
@@ -2047,3 +2046,73 @@ def get_invo_data(invo, holdvec):
                     err.append(f'Have no Invoice to Receive Against for JO={invojo}')
 
     return invo, holdvec, err
+
+def Orders_Form_Update(oder):
+    modata = Orders.query.get(oder)
+    vals = ['order', 'bol', 'booking', 'container', 'pickup',
+            'date', 'date2', 'amount', 'ctype']
+    a = list(range(len(vals)))
+    for i, v in enumerate(vals):
+        a[i] = request.values.get(v)
+        if a[i]:
+            a[i] = a[i].strip()
+
+    shipper = request.values.get('shipper')
+    modata.Shipper = shipper
+    modata.Order = a[0]
+    modata.BOL = a[1]
+    modata.Booking = a[2]
+    modata.Container = a[3]
+    modata.Pickup = a[4]
+    modata.Type = a[8]
+    try:
+        modata.Date = a[5]
+    except:
+        modata.Date = today
+    try:
+        modata.Date2 = a[6]
+    except:
+        modata.Date2 = today
+    modata.Amount = d2s(a[7])
+    try:
+        modata.Label = f'{modata.Jo} {a[0]} {modata.Amount}'
+    except:
+        modata.Label = f'{modata.Jo}'
+    db.session.commit()
+
+def Orders_Drop_Update(oder):
+    modata = Orders.query.get(oder)
+
+    dropblock1 = request.values.get('dropblock1')
+    dropblock2 = request.values.get('dropblock2')
+
+    idl, newdrop1, company = testdrop(dropblock1)
+    idd, newdrop2, company2 = testdrop(dropblock2)
+
+    if idl == 0:
+        company = dropupdate(dropblock1)
+        newdrop1 = dropblock1
+        lid = Drops.query.filter(Drops.Entity == company).first()
+        idl = lid.id
+
+    if idd == 0:
+        company2 = dropupdate(dropblock2)
+        newdrop2 = dropblock2
+        did = Drops.query.filter(Drops.Entity == company2).first()
+        idd = did.id
+
+    modata.Company2 = company2
+    modata.Company = company
+    modata.Dropblock2 = newdrop2
+    modata.Dropblock1 = newdrop1
+    bid = People.query.filter(People.Company == modata.Shipper).first()
+    if bid is not None:
+        modata.Bid = bid.id
+    modata.Lid = idl
+    modata.Did = idd
+
+    hstat = modata.Hstat
+    if hstat == -1:
+        modata.Hstat = 0
+
+    db.session.commit()

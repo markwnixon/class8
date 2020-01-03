@@ -13,7 +13,7 @@ Modifying {{ modata.Jo }}
 <tr>
 <td> <div class="input-group-text">Bill To:</div></td>
 <td colspan="2">
-<select class="form-control" type="text" name="shipper">
+<select class="form-control" type="text" name="shipper" onchange="this.form.submit()">
 <option value='Add New Company'>Add New Company</option>
 {% for data in data5 %}
 <option {% if data.Company == modata.Shipper %} selected {% endif %} value="{{data.Company}}">{{data.Company}}</option>
@@ -59,19 +59,54 @@ Modifying {{ modata.Jo }}
 <td> <div class="input-group-text">Pickup Number:</div></td>
 <td colspan="2"><input class="form-control" type="text" value="{{modata.Pickup}}" name="pickup"></td>
 </tr>
+
+{% set pus = holdvec[4] %}
+{% set thispu = holdvec[6] %}
+{% if pus %}
+    <tr>
+        <td><div class="input-group-text">Previous Load Locs</div></td>
+        <td>
+            <select class="form-control" type="text" name="getpuloc" onchange="this.form.submit()">
+            <option value="">Optional Choose from Previous</option>
+            {% for pu in pus %}
+                <option {% if pu == thispu %} selected {% endif %} value='{{pu}}'>{{pu}}</option>
+            {% endfor %}
+            </select>
+        </td>
+    </tr>
+{% endif %}
+
 <tr>
 <td> <div class="input-group-text" data-toggle="tooltip" title="Enter 1st 3 letters of an existing location and program will load entire address for you on UPDATE">
 Load At:</div></td>
-<td colspan="2"><textarea class="form-control" type="text" name="dropblock1" rows="3">{{modata.Dropblock1}}</textarea></td>
+<td colspan="2"><textarea class="form-control" type="text" name="dropblock1" rows="3">{% if holdvec[8] != 0 %}{{ holdvec[8]}} {% else %} {{modata.Dropblock1}} {% endif %}</textarea></td>
 </tr>
+
 <tr>
 <td> <div class="input-group-text">Load Date:</div></td>
 <td colspan="2"><input class="form-control" type="date" value={{modata.Date}} name="date"></td>
 </tr>
+
+{% set dus = holdvec[5] %}
+{% set thisdu = holdvec[7] %}
+{% if dus %}
+    <tr>
+        <td><div class="input-group-text">Previous Delv Locs</div></td>
+        <td>
+            <select class="form-control" type="text" name="getduloc" onchange="this.form.submit()">
+            <option value="">Optional Choose from Previous</option>
+            {% for du in dus %}
+                <option {% if du == thisdu %} selected {% endif %} value='{{du}}'>{{du}}</option>
+            {% endfor %}
+            </select>
+        </td>
+    </tr>
+{% endif %}
+
 <tr>
 <tr>
 <td> <div class="input-group-text" data-toggle="tooltip" title="Enter 1st 3 letters of an existing location and program will load entire address for you on UPDATE">Deliver To:</div></td>
-<td colspan="2"><textarea class="form-control" type="text" name="dropblock2" rows="3">{{modata.Dropblock2}}</textarea></td>
+<td colspan="2"><textarea class="form-control" type="text" name="dropblock2" rows="3">{% if holdvec[9] != 0 %}{{ holdvec[9]}} {% else %} {{modata.Dropblock2}} {% endif %}</textarea></td>
 </tr>
 <tr>
 <td> <div class="input-group-text">Del Date:</div></td>
