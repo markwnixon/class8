@@ -15,7 +15,7 @@ Enter New Job Information
 <tr>
 <td><div class="input-group-text">Choose Customer:</div></td>
 <td>
-<select class="form-control" type="text" name="shipper">
+<select class="form-control" type="text" name="shipper" onchange="this.form.submit()">
 <option value='1'>Choose Later</option>
 <option value='2'>Add New Now</option>
 {% for data in data5 %}
@@ -62,6 +62,21 @@ Enter New Job Information
 <td><div class="input-group-text">Pickup No.:</div></td>
 <td><input class="form-control" type="text" name="pickup" value=" "></td>
 </tr>
+{% set pus = holdvec[4] %}
+{% set thispu = holdvec[6] %}
+{% if pus %}
+    <tr>
+        <td><div class="input-group-text">Previous Load Locs</div></td>
+        <td>
+            <select class="form-control" type="text" name="getpuloc">
+            <option value="">Optional Choose from Previous</option>
+            {% for pu in pus %}
+                <option {% if pu == thispu %} selected {% endif %} value='{{pu}}'>{{pu}}</option>
+            {% endfor %}
+            </select>
+        </td>
+    </tr>
+{% endif %}
 <tr>
 <td> <div class="input-group-text" data-toggle="tooltip" title="Enter 1st 3 letters of an existing location and program will load entire address for you on UPDATE">Load At:</div></td>
 <td colspan="2"><textarea class="form-control" type="text" name="dropblock1" rows="4">  </textarea></td>

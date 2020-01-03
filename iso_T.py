@@ -189,18 +189,24 @@ def isoT():
 
 
 
-        if modlink == 70 or (modlink == 4 and (newjob is None and thisjob is None and update is None)):
+        if modlink == 4 and (newjob is None and thisjob is None and update is None):
+            upnow = request.values.get('Upload Now')
+            if upnow is not None:
+                err, oid = docuploader('oder')
+                if modlink == 4:
+                    oder = oid
+                    odat = Orders.query.get(oder)
+                    original = odat.Original
+                    if original is not None:
+                        docref = f'tmp/{scac}/data/vorders/' + original
+                        print(oder,docref)
+                    modlink = 1
+                else:
+                    modlink = 0
+
+        if modlink == 70:
             err, oid = docuploader('oder')
-            if modlink == 4:
-                oder = oid
-                odat = Orders.query.get(oder)
-                original = odat.Original
-                if original is not None:
-                    docref = f'tmp/{scac}/data/vorders/' + original
-                    print(oder,docref)
-                modlink = 1
-            else:
-                modlink = 0
+            modlink = 0
 
         if modlink == 71:
             err, oid = docuploader('poof')
@@ -1838,7 +1844,22 @@ def isoT():
                 pufrom = 0
             if deltoc == '2':
                 deltoc = 0
-            holdvec = [shipper, pufrom, deltoc]
+            holdvec[0], holdvec[1], holdvec[2] = shipper, pufrom, deltoc
+            plist=[]
+            dlist=[]
+            oshipper = Orders.query.filter(Orders.Shipper == shipper).all()
+            for tship in oshipper:
+                pu = tship.Company
+                du = tship.Company2
+                if pu not in plist:
+                    plist.append(pu)
+                if du not in dlist:
+                    dlist.append(du)
+            holdvec[4]=plist
+            holdvec[5]=dlist
+            holdvec[6] = request.values.get('getpuloc')
+
+
 
         if thisjob is not None:
             modlink = 0
