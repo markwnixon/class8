@@ -2049,10 +2049,15 @@ def isoT():
                 myo = Orders.query.get(oder)
                 myi = Interchange.query.get(tick)
                 myo.Container = myi.CONTAINER
+                myo.Type = myi.CONTYPE
                 myi.Company = myo.Shipper
                 myi.Jo = myo.Jo
                 bk = myo.Booking
+                if bk is None:
+                    bk = ''
                 bol = myo.BOL
+                if bol is None:
+                    bol = ''
                 if len(bk)<4:
                     crel = bol
                 elif len(bol)<4:
