@@ -300,13 +300,6 @@ def isoT():
                     InterDupThis(tick)
                     PushJobsThis(tick)
 
-                if modlink == 21:
-                    docref, doctxt = doctransfer('pods', 'vproofs', filesel)
-                    myt = Proofs.query.get(poof)
-                    myt.Original = docref
-                    db.session.commit()
-                    modlink = 1
-
         if update is not None and modlink == 2:
             modata = Services.query.get(serv)
             vals = ['service', 'price']
@@ -497,9 +490,6 @@ def isoT():
             db.session.commit()
             # Create invoice code for order
             odata1.Istat = 1
-            myp = Proofs.query.filter(Proofs.Order == odata1.Order).first()
-            if myp is not None:
-                myp.Status = 'Invoiced'
 
             db.session.commit()
 # ____________________________________________________________________________________________________________________E.InvoiceUpdate.Trucking
