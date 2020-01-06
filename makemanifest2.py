@@ -454,6 +454,6 @@ def makemanifestT(odata, pdata1, pdata2, pdata3, tdata, drvdata, cache, jtype, t
     c.save()
     #
     #Now make a cache copy
-    shutil.copy(addpath(file1),addpath(file2)
+    shutil.copy(addpath(file1),addpath(file2))
     print('returning file',file3)
     return file3
