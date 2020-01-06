@@ -1,6 +1,6 @@
 from runmain import db
 from models import Vehicles, Invoices, JO, Income, Orders, Bills, Accounts, Bookings, OverSeas, Autos, People, Interchange, Drivers
-from models import ChalkBoard, Services, TruckJobs
+from models import ChalkBoard, Services
 from flask import render_template, flash, redirect, url_for, session, logging, request
 from CCC_system_setup import myoslist, addpath, usernames, passwords, tpath, companydata, scac
 

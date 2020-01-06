@@ -1,5 +1,5 @@
 
-<div class="d-sm-flex justify-content-between align-self-baseline">
+<div class="d-sm-flex justify-content-around align-self-baseline">
     <div class="p-2">
         <b>Overseas Tables:</b>&nbsp
             <div class="custom-control custom-checkbox custom-control-inline">
@@ -23,6 +23,9 @@
               <label class="custom-control-label" for="defaultInline5">Interchange</label>
             </div>
     </div>
+</div>
+
+<div class="d-sm-flex justify-content-around align-self-baseline">
         <div class="p-0">
     <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="NewJ"
       data-toggle="tooltip" title="Add a NEW JOB from scratch here">   New<br>&nbsp &nbsp Job &nbsp &nbsp  </button>
@@ -44,6 +47,7 @@
     </div>
 </div>
 
+
 <div class="d-sm-flex justify-content-center small">
     <div class="p-0">
         <select class="mdb-select md-form" name="thismuch" onchange="this.form.submit()">
@@ -55,6 +59,7 @@
             <option {% if thismuch == '5' %} selected {% endif %} value='5'>Filter: Show All</option>
         </select>
     </div>
+
     &nbsp; &nbsp;
     <div class="p-0">
         <select class="mdb-select md-form" name="addbox" onchange="this.form.submit()">
