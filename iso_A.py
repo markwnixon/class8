@@ -1,5 +1,5 @@
 from runmain import app, db
-from models import users, ChalkBoard, Interchange, Orders, Proofs, General
+from models import users, ChalkBoard, Interchange, Orders, General
 from models import Services, Drivers, JO, People, OverSeas, Chassis, LastMessage
 from models import Autos, Bookings, Vehicles, Invoices, Income, Accounts, Bills, Drops
 

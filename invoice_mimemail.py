@@ -30,16 +30,17 @@ def invoice_mimemail(order,docref,eprof):
     ebody=request.values.get('edat1')
     newfile = request.values.get('edat6')
     order=order.strip()
-    try:
-        iprof = int(eprof)
-    except:
-        iprof = 0
+
+    lastpath = 'vpackages'
+    if 'INV' in docref:
+        lastpath = 'vinvoice'
+    elif 'Proof' in docref:
+        lastpath = 'vproofs'
+    elif 'Manifest' in docref:
+        lastpath = 'vmanifest'
 
     if newfile != 'none':
-        if iprof > 0:
-            cfrom = addpath(f'tmp/{scac}/data/vpackages/{docref}')
-        else:
-            cfrom = addpath(f'tmp/{scac}/data/vinvoice/{docref}')
+        cfrom = addpath(f'tmp/{scac}/data/{lastpath}/{docref}')
         print(cfrom,newfile)
         shutil.copy(cfrom,newfile)
 

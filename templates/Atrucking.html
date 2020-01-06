@@ -89,18 +89,18 @@
                         {% endif %}
 
                     {% elif modlink==4 and peep==0 %}
-                        {% include 'Trucking_New_or_Mod_Job.html' %}
+                        {% include 'Trucking_Form_New.html' %}
 
                     {% elif mm1==1 %}
-                        {% include 'includes/_manifestpanel.html' %}
+                        {% include 'Trucking_Form_Manifest.html' %}
                     {% elif stamp > 0 %}
                         {% include 'Trucking_Packager.html' %}
 
                     {% elif peep > 0 and modlink > 0 %}
-                        {% include 'People_Table.html' %}
+                        {% include 'Form_People_New.html' %}
 
                     {% elif serv > 0 and modlink > 0 %}
-                        {% include 'Services_Table.html' %}
+                        {% include 'Form_Services_New.html' %}
 
                     {% elif invo > 0 and ldata %}
                         {% include 'Trucking_Invoice_Prep.html' %}
@@ -109,7 +109,7 @@
                         {% include 'Trucking_Receive_Pay.html' %}
 
                     {% elif oder > 0 and modlink == 1 %}
-                        {% include 'Trucking_Jobmod.html' %}
+                        {% include 'Trucking_Form_Mod.html' %}
 
                     {% elif (tick > 0 and modlink == 1) or modlink==20 %}
                         {% include 'Trucking_Tickmod.html' %}
@@ -130,7 +130,11 @@
                         {% if viewtype == 0 %}
                             {% include 'includes/_truckcolorcode.html' %}
                         {% else %}
-                            {% include 'includes/_button_upd_ret.html' %}
+                            {% if viewtype == 'invoice' or viewtype == 'paidinvoice' %}
+                                {% include 'includes/_button_upd_email_ret.html' %}
+                            {% else %}
+                                {% include 'includes/_button_upd_ret.html' %}
+                            {% endif %}
                         {% endif %}
                         {% if lbox == 6 %}
                             <br><b>Unpulled Import Containers</b>
@@ -154,6 +158,7 @@
         </div>
     </div>
 </div>
+<input type = "hidden" name ="viewtype" value= "{{viewtype}}">
 <input type = "hidden" name ="passinvo" value= "{{invo}}">
 <input type = "hidden" name ="launchbox" value= "{{lbox}}">
 <input type = "hidden" name ="lastpr" value= "{{lastpr}}">

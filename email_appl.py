@@ -109,6 +109,18 @@ def etemplate_truck(type,kind,odat):
         emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2, aname]
         return emaildata
 
+
+    elif type == 'paidinvoice':
+        etitle = f'Payment Received on Invoice {odat.Jo} for Completed Order: {od} | {bol} | {con}'
+        ebody = f'Dear {odat.Shipper},\n\nYour payment has been received, and your stamped invoice is attached.\n\nWe greatly appreciate your business.\n\nSincerely,\n\n{signature}'
+        aname = odat.Invoice
+        emailin1 = estatus
+        emailin2 = eaccts
+        emailcc1 = em['info']
+        emailcc2 = em['expo']
+        emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2, aname]
+        return emaildata
+
     elif kind == 6:
         etitle = cdata[2] + ' Quote: ' + jo
         ebody = 'Dear Customer:\n\nYour quote is attached. Please sign and return at your earliest convenience.\n\nWe look forward to doing business with you.\n\nSincerely,\n\n' + \

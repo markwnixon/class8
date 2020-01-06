@@ -1,62 +1,73 @@
 
 <div class="row">
-{% if leftsize > 6 or stamp==1 %}
+{% if modlink ==1 and leftsize == 8 %}
+
+        <div class="col-sm-12" align="center">
+            {% set fdoc = doclist[0] %}
+            {{fdoc}}<br>
+            <embed src="{{fdoc}}" width="90%" height="800px"/>
+        </div>
 
 
+{%  else %}
 
-<div class="col-sm-5" align="center">
-    {% if emaildata %}
-        {% include 'includes/emailprep.html' %}
-    {% elif modlink == 4 %}
-        <br>
-        {% include 'includes/_uploadsourcedocs.html' %}
+            {% if leftsize > 6 or stamp==1 %}
+                <div class="col-sm-5" align="center">
+                            {% if emaildata %}
+                                {% include 'includes/emailprep.html' %}
+                            {% elif modlink == 4 %}
+                                <br>
+                                {% include 'includes/_uploadsourcedocs.html' %}
 
-    {% else %}
-        {% if viewtype == 'manifest' %}
-            {% set ftxt = doclist[0] %}
-            {% set wide = "550px" %}
-            Showing: {{ftxt}}<br>
-            <embed src="{{ftxt}}" width={{wide}} height="800px"/>
-        {% else %}
-            {% set ftxt = doclist[1] %}
+                            {% else %}
+                                {% if viewtype == 'manifest' %}
+                                    {% set ftxt = doclist[0] %}
+                                    {% set wide = "550px" %}
+                                    Showing: {{ftxt}}<br>
+                                    <embed src="{{ftxt}}" width={{wide}} height="800px"/>
+                                {% else %}
+                                    {% set ftxt = doclist[1] %}
 
-        This page left blank intentionally
-        <!--
-        Text version of file {{leftsize}}{{rightsize}}{{mm1}}:<br>
-        <embed src="{{ftxt}}" width="400px" height="650px"/>
-        -->
-        {% endif %}
-    {% endif %}
-</div>
+                                This page left blank intentionally
+                                <!--
+                                Text version of file {{leftsize}}{{rightsize}}{{mm1}}:<br>
+                                <embed src="{{ftxt}}" width="400px" height="650px"/>
+                                -->
+                                {% endif %}
+                            {% endif %}
+                </div>
+
+                <div class="col-sm-7" align="center">
+
+                            {% if rightsize == 4 %}
+                            {% set wide = "550px" %}
+                            {% else %}
+                            {% set wide = "650pm" %}
+                            {% endif %}
+
+                            {% if viewtype == 'gate1' %}
+                                {% set fdoc = doclist[4] %}
+                            {% elif viewtype == 'gate2' %}
+                                {% set fdoc = doclist[5] %}
+                            {% elif viewtype == 'proof' %}
+                                {% set fdoc = doclist[2] %}
+                            {% elif viewtype == 'manifest' %}
+                                {% set fdoc = doclist[3] %}
+                            {% elif viewtype == 'mpack' %}
+                                {% set fdoc = doclist[7] %}
+                            {% elif viewtype == 'gate3' %}
+                                {% set fdoc = doclist[6] %}
+                            {% else %}
+                                {% set fdoc = doclist[0] %}
+                            {% endif %}
+
+                            {% if fdoc != 0 %}
+                                {{fdoc}}<br>
+                                <embed src="{{fdoc}}" width={{wide}} height="800px"/>
+                            {% endif %}
+                </div>
+            {% endif %}
 {% endif %}
-<div class="col-sm-7" align="center">
-
-
-{% if rightsize == 4 %}
-{% set wide = "550px" %}
-{% else %}
-{% set wide = "650pm" %}
-{% endif %}
-{% if viewtype == 'gate1' %}
-    {% set fdoc = doclist[4] %}
-{% elif viewtype == 'gate2' %}
-    {% set fdoc = doclist[5] %}
-{% elif viewtype == 'proof' %}
-    {% set fdoc = doclist[2] %}
-{% elif viewtype == 'manifest' %}
-    {% set fdoc = doclist[3] %}
-{% elif viewtype == 'mpack' %}
-    {% set fdoc = doclist[7] %}
-{% elif viewtype == 'gate3' %}
-    {% set fdoc = doclist[6] %}
-{% else %}
-    {% set fdoc = doclist[0] %}
-{% endif %}
-{% if fdoc != 0 %}
-{{fdoc}}<br>
-<embed src="{{fdoc}}" width={{wide}} height="800px"/>
-{% endif %}
-</div>
 </div>
 
 <input type = "hidden" name ="datatable1" value= "{{dlist[0]}}">

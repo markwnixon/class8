@@ -1,6 +1,6 @@
 from runmain import app, db
 from models import Vehicles, Invoices, JO, Income, Bills, Accounts, OverSeas, Orders, Gledger
-from models import Autos, People, Interchange, Drivers, ChalkBoard, Proofs, Services, Drops
+from models import Autos, People, Interchange, Drivers, ChalkBoard, Services, Drops
 from flask import session, logging, request
 import datetime
 import calendar

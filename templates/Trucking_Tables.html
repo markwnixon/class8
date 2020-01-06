@@ -17,12 +17,12 @@
                 <th style="font-weight:bold">Job Order</th>
                 <th style="font-weight:bold">Bill To Company</th>
                 <th style="font-weight:bold">Order Number</th>
-                <th style="font-weight:bold">Delivery Date</th>
-                <th style="font-weight:bold">Return Date</th>
                 <th style="font-weight:bold">Booking No.</th>
                 <th style="font-weight:bold">Container No.</th>
-                <th style="font-weight:bold">Chk</th>
                 <th style="font-weight:bold">Container Type</th>
+                <th style="font-weight:bold">Chk</th>
+                <th style="font-weight:bold">Delivery Date</th>
+                <th style="font-weight:bold">Return Date</th>
                 <th style="font-weight:bold">Bill of Lading</th>
                 <th style="font-weight:bold">Invoice Amount</th>
                 <th style="font-weight:bold">From Location</th>
@@ -71,12 +71,12 @@
                 <td align="center" class="{{atc1}}">{{ data.Jo }}</td>
                 <td align="center" class="{{atc1}}">{{ data.Shipper[0:18] }}</td>
                 <td align="center" class="{{atc1}}">{{ data.Order }}</td>
-                <td align="center" class="{{atc1}}">{{ data.Date }}</td>
-                <td align="center" class="{{atc1}}">{{ data.Date2 }}</td>
                 <td align="center" class="{{atc1}}">{{ data.Booking }}</td>
                 <td align="center" class="{{atc1}}">{{ data.Container }}</td>
+                <td align="center" class="{{atc1}}">{{ data.Type }}</td>
                 <td align="center" ><input class="align-middle" type="checkbox" name="oder{{data.id}}" value="{{data.id}}"></td>
-                <td align="center" class="{{atc2}}">{{ data.Type }}</td>
+                <td align="center" class="{{atc2}}">{{ data.Date }}</td>
+                <td align="center" class="{{atc2}}">{{ data.Date2 }}</td>
                 <td align="center" class="{{atc2}}">{{ data.BOL }}</td>
                 <td align="right"  class="{{atc2}}">{{ data.Amount }}</td>
                 <td align="center" class="{{atc2}}">{{ data.Company }}</td>

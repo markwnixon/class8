@@ -106,40 +106,6 @@ class Compliance(db.Model):
         self.Date2 = Date2
 
 
-class TruckJobs(db.Model):
-    __tablename__ = 'truckjobs'
-    id = db.Column('id', db.Integer, primary_key=True)
-    Jo = db.Column('Jo', db.String(25))
-    Driver = db.Column('Driver', db.String(25))
-    Truck = db.Column('Truck', db.String(25))
-    Booking = db.Column('Booking', db.String(25))
-    Miles = db.Column('Miles', db.String(25))
-    Cost = db.Column('Cost', db.String(25))
-    Container = db.Column('Container', db.String(25))
-    Seal = db.Column('Seal', db.String(25))
-    Description = db.Column('Description', db.String(400))
-    StartTime = db.Column('StartTime', db.DateTime)
-    EndTime = db.Column('EndTime', db.DateTime)
-    Origin = db.Column('Origin', db.String(25))
-    Destination = db.Column('Destination', db.String(25))
-    Comm = db.Column('Comm', db.Boolean)
-
-    def __init__(self, Jo, Driver, Truck, Booking, Miles, Cost, Container, Seal, Description, StartTime, EndTime, Origin, Destination, Comm):
-        self.Jo = Jo
-        self.Driver = Driver
-        self.Truck = Truck
-        self.Booking = Booking
-        self.Miles = Miles
-        self.Cost = Cost
-        self.Container = Container
-        self.Seal = Seal
-        self.Description = Description
-        self.StartTime = StartTime
-        self.EndTime = EndTime
-        self.Origin = Origin
-        self.Destination = Destination
-        self.Comm = Comm
-
 
 class Interchange(db.Model):
     __tablename__ = 'interchange'
@@ -160,7 +126,7 @@ class Interchange(db.Model):
     Path = db.Column('Path', db.String(50))
     TYPE = db.Column('TYPE', db.String(25))
     Jo = db.Column('Jo', db.String(25))
-    Company = db.Column('Company', db.String(25))
+    Company = db.Column('Company', db.String(50))
 
     def __init__(self, CONTAINER, TRUCK_NUMBER, DRIVER, CHASSIS, Date, RELEASE, GROSS_WT, SEALS, CONTYPE, CARGO_WT, Time, Status, Original, Path, TYPE, Jo, Company):
         self.CONTAINER = CONTAINER
@@ -191,36 +157,6 @@ class LastMessage(db.Model):
         self.User = User
         self.Err = Err
 
-class Proofs(db.Model):
-    __tablename__ = 'proofs'
-    id = db.Column('id', db.Integer, primary_key=True)
-    Status = db.Column('Status', db.String(50))
-    Original = db.Column('Original', db.String(50))
-    Path = db.Column('Path', db.String(50))
-    Company = db.Column('Company', db.String(50))
-    Location = db.Column('Location', db.String(50))
-    Booking = db.Column('Booking', db.String(50))
-    Order = db.Column('Order', db.String(50))
-    BOL = db.Column('BOL', db.String(50))
-    Container = db.Column('Container', db.String(50))
-    Driver = db.Column('Driver', db.String(25))
-    Date = db.Column('Date', db.DateTime)
-    Time = db.Column('Time', db.DateTime)
-
-    def __init__(self, Status, Original, Path, Company, Location, Booking, Order, BOL, Container, Driver, Date, Time):
-        self.Status = Status
-        self.Original = Original
-        self.Path = Path
-        self.Company = Company
-        self.Location = Location
-        self.Booking = Booking
-        self.Order = Order
-        self.BOL = BOL
-        self.Container = Container
-        self.Driver = Driver
-        self.Date = Date
-        self.Time = Time
-
 
 class Orders(db.Model):
     __tablename__ = 'orders'
@@ -237,7 +173,7 @@ class Orders(db.Model):
     BOL = db.Column('BOL', db.String(50))
     Booking = db.Column('Booking', db.String(50))
     Container = db.Column('Container', db.String(50))
-    Driver = db.Column('Driver', db.String(50))
+    Driver = db.Column('Driver', db.String(200))
     Pickup = db.Column('Pickup', db.String(50))
     Delivery = db.Column('Delivery', db.String(50))
     Amount = db.Column('Amount', db.String(50))

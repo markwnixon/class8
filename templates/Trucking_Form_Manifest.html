@@ -1,7 +1,14 @@
 <br>
 <div class="card">
+
 <div class="card-header">
-Create Manifest for Job {{ modata.Jo }}
+    <div class="d-flex justify-content-around align-items-center">
+        <div class="p-0">Create Manifest for Job {{ modata.Jo }}</div>
+        <div class="p-0">
+            <button type="submit" class="btn btn-md btn-green" name="Update">Update</button>
+            <button type="submit" class="btn btn-md btn-elegant" name="Return">Cancel</button>
+        </div>
+    </div>
 </div>
 
 <div class="card-body">
@@ -30,6 +37,7 @@ Create Manifest for Job {{ modata.Jo }}
         </select>
     </td>
 
+
 <tr>
 <td align="right"> <div class="input-group-text">Tag:</div></td> <td><input class="form-control input-sm" type="text" name="tag" value="{{ tdata.Plate }}"></td>
 </tr>
@@ -55,6 +63,11 @@ Create Manifest for Job {{ modata.Jo }}
 </tr>
 
 <tr><td colspan="2">&nbsp</td></tr>
+
+<tr>
+<td  align="right">  <div class="input-group-text">Signature Date:</div></td>
+<td><input  class="form-control input-xsm"  type="date" name="sigdate" value="{{ holdvec[16] }}"></td>
+</tr>
 
 <tr>
 <td  align="right">  <div class="input-group-text">PU Date:</div></td>
@@ -84,6 +97,5 @@ Create Manifest for Job {{ modata.Jo }}
 
 </tbody>
 </table>
-{% include 'includes/_button_upd_ret.html' %}
 </div>
 </div>

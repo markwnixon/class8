@@ -1,5 +1,5 @@
 from runmain import db
-from models import DriverAssign, Gledger, Vehicles, Invoices, JO, Income, Orders,  Accounts, LastMessage, People, Interchange, Drivers, ChalkBoard, Proofs, Services, Drops
+from models import DriverAssign, Gledger, Vehicles, Invoices, JO, Income, Orders, Accounts, LastMessage, People, Interchange, Drivers, ChalkBoard, Services, Drops
 from flask import render_template, flash, redirect, url_for, session, logging, request
 from CCC_system_setup import myoslist, addpath, tpath, companydata, scac
 from InterchangeFuncs import Order_Container_Update, Matched_Now
@@ -27,7 +27,7 @@ def isoT():
         # ____________________________________________________________________________________________________________________B.FormVariables.Trucking
 
         from viewfuncs import parseline, tabdata, tabdataR, popjo, jovec, newjo, timedata, nonone, nononef, init_truck_zero, dropupdate, dropupdate2, dropupdate3
-        from viewfuncs import d2s, stat_update, numcheck, numcheckv, sdiff, calendar7_weeks, viewbuttons, get_ints, containersout, numcheckvec
+        from viewfuncs import d2s, d2sa, stat_update, numcheck, numcheckv, sdiff, calendar7_weeks, viewbuttons, get_ints, containersout, numcheckvec
         from viewfuncs import txtfile, doctransfer, getexpimp, docuploader, dataget_T
         from InterchangeFuncs import InterStrip, InterMatchThis, InterDupThis, PushJobsThis
         from invoice_mimemail import invoice_mimemail
@@ -40,7 +40,7 @@ def isoT():
         pod_path, job_path, int_path = f'processing/pods/', f'processing/tjobs/', f'processing/interchange/'
         oder, poof, tick, serv, peep, invo, cache, modata, modlink, stayslim, invooder, stamp, fdata, csize, invodate, inco, cdat, pb, passdata, vdata, caldays, daylist, weeksum, nweeks = init_truck_zero()
         filesel,docref,doctxt,etitle,ebody,emaildata,stampdata = '','','','','','',''
-        drvdata, bklist, servid, howapp, viewm, viewg = 0, 0, 0, 0, 0, 0
+        drvdata, bklist, servid, howapp, viewm, viewg, viewip = 0, 0, 0, 0, 0, 0, 0
         lastpr = request.values.get('lastpr')
 
         today = datetime.date.today()
@@ -88,7 +88,7 @@ def isoT():
         print('lbox=', lbox)
         viewtype = 0
         doclist = [0]*8
-        holdvec = [0] * 15
+        holdvec = [0] * 20
 
         oder, poof, tick, serv, peep, invo, invooder, cache, modlink = get_ints()
         quot = 0
@@ -99,63 +99,78 @@ def isoT():
             servid = nonone(invoserv)
 
 
-        thisbox = request.values.get('addbox')
-        if thisbox == '1':
+        thisbox1 = request.values.get('addbox')
+        if thisbox1 == '1':
             newjob = 1
-        if thisbox == '2':
+        if thisbox1 == '2':
             addE = 1
-        if thisbox == '3':
+        if thisbox1 == '3':
             addS = 1
-        if thisbox == '4':
+        if thisbox1 == '4':
             copy = 1
-        if thisbox == '5':
+        if thisbox1 == '5':
             mm2 = 1
-        if thisbox == '6':
+        if thisbox1 == '6':
             uploadS = 1
-        if thisbox =='7':
+        if thisbox1 =='7':
             uploadP = 1
 
-        thisbox = request.values.get('editbox')
-        if thisbox == '1':
+        thisbox2 = request.values.get('editbox')
+        if thisbox2 == '1':
             vmod = 1
-        if thisbox == '2':
+        if thisbox2 == '2':
             match = 1
-        if thisbox == '3':
+        if thisbox2 == '3':
             acceptthese = 1
-        if thisbox == '4':
+        if thisbox2 == '4':
             loadc = 1
 
-        thisbox = request.values.get('invobox')
-        if thisbox == '1':
+        thisbox3 = request.values.get('invobox')
+        if thisbox3 == '1':
             minvo = 1
-        if thisbox == '2':
+        if thisbox3 == '2':
             mquot = 1
-        if thisbox == '3':
+        if thisbox3 == '3':
             mpack = 1
-        if thisbox == '4' or passinvo == 4:
+        if thisbox3 == '5':
+            recpay = 1
+        if thisbox3 == '4' or passinvo == 4:
             lbox = 0
             invo = 4
             invo, holdvec, err = get_invo_data(invo, holdvec)
 
-        thisbox = request.values.get('viewbox')
-        if thisbox == '1':
+        thisbox4 = request.values.get('viewbox')
+        if thisbox4 == '1':
             viewo = 1
-        if thisbox == '2':
+        if thisbox4 == '2':
             viewp = 1
-        if thisbox == '3':
+        if thisbox4 == '3':
             viewm = 1
-        if thisbox == '4':
+        if thisbox4 == '4':
             viewg = 1
-        if thisbox == '5':
-            viewa = 1
+        if thisbox4 == '5':
+            viewi = 1
+        if thisbox4 == '6':
+            viewip = 1
 
-        thisbox = request.values.get('xbox')
-        if thisbox == '1':
+        thisbox5 = request.values.get('xbox')
+        if thisbox5 == '1':
             deletehit = 1
-        if thisbox == '2':
+        if thisbox5 == '2':
             uninv = 1
-        if thisbox == '3':
+        if thisbox5 == '3':
             unpay = 1
+
+        thisbox6 = request.values.get('dispbox')
+        if thisbox6 == '1':
+            mm2 = 1
+            #Signature date:
+            holdvec[16] = today_str
+        if thisbox6 == '2':
+            lbox, holdvec, err = container_list(lbox, holdvec)
+        if thisbox6 == '3':
+            lbox = 1
+
 
 
         stamp = request.values.get('stamp')
@@ -497,6 +512,8 @@ def isoT():
 
         if (modlink < 10 and (update is not None or vmod is not None)) or modlink == 0 or match is not None:
             oder, tick, serv, peep, numchecked = numcheck(4, odata, idata, sdata, cdata, 0, ['oder',  'tick', 'serv', 'peep'])
+        else:
+            numchecked = 0
 
         if uploadS is not None:
             if oder > 0  and numchecked == 1:
@@ -563,7 +580,7 @@ def isoT():
                 if update is not None or passoder > 0:
                     modata = Orders.query.get(oder)
                     vals = ['driver', 'truck', 'commodity', 'packing', 'pickup', 'seal', 'date1',
-                            'time1', 'date2','time2', 'desc']
+                            'time1', 'date2','time2', 'desc', 'sigdate']
                     a = list(range(len(vals)))
                     i = 0
                     for v in vals:
@@ -571,6 +588,13 @@ def isoT():
                         print(a[i])
                         i = i+1
                     truck=a[1]
+                    # Check dates:
+                    if a[6] is None:
+                        a[6] = today_str
+                    if a[8] is None:
+                        a[8] = today_str
+                    if a[11] is None:
+                        a[11] = today_str
                     modata.Driver=a[0]
                     modata.Commodity = a[2]
                     modata.Packing = a[3]
@@ -585,6 +609,7 @@ def isoT():
                     cache=cache+1
                     modata.Detention=cache
                     db.session.commit()
+                    holdvec[16] = a[11]
 
                 leftscreen=0
 
@@ -736,7 +761,6 @@ def isoT():
             cache2 = int(odat.Detention)
             cache2 = cache2+1
             docref = f'tmp/{scac}/data/vpackages/P_c{cache2}_{odat.Jo}.pdf'
-            docin = f'tmp/{scac}/data/vorders/P_c{cache2}_{odat.Jo}.pdf'
             try:
                 pdflist=['pdfunite']+packitems+[addpath(docref)]
                 tes = subprocess.check_output(pdflist)
@@ -783,8 +807,8 @@ def isoT():
                 order = odat.Order
                 cache2 = int(odat.Detention)
                 cache2 = cache2 + 1
-                docref = f'tmp/{scac}/data/vorders/P_c{cache2}_{odat.Jo}.pdf'
-                doclist[7] = f'tmp/{scac}/data/vorders/P_c{cache2}_{odat.Jo}.pdf'
+                docref = f'tmp/{scac}/data/vpackages/P_c{cache2}_{odat.Jo}.pdf'
+                doclist[7] = f'tmp/{scac}/data/vpackages/P_c{cache2}_{odat.Jo}.pdf'
                 odat.Detention = str(cache2)
                 db.session.commit()
 
@@ -911,11 +935,10 @@ def isoT():
             leftsize = 8
             modlink = 0
             cache2 = int(odat.Detention)
-            #docin already set in previous area
-            docref = f'tmp/{scac}/data/vorders/P_s' + str(cache2) + '_' + odat.Original
-            odat.Package = docref
+            docin = f'tmp/{scac}/data/vpackages/{odat.Package}'
+            docref = f'tmp/{scac}/data/vpackages/P_c{cache2}_{odat.Jo}.pdf'
+            odat.Package = f'P_c{cache2}_{odat.Jo}.pdf'
             db.session.commit()
-            #stampdata already set in previous area
             from sigdoc import sigdoc
             sigdoc(stampdata, docin, docref)
             cache2 = cache2+1
@@ -1039,11 +1062,13 @@ def isoT():
             oder=request.values.get('passoder')
             oder=nonone(oder)
             odat=Orders.query.get(oder)
-            stamp = 1
+            if stamp == 1:
+                eprof = 1
             leftscreen = 1
             leftsize = 10
             modlink = 0
-            print(odat,invooder)
+
+
             if emailnow is not None or invo > 1:
                 docref = odat.Package
             else:
@@ -1052,21 +1077,37 @@ def isoT():
             jo = odat.Jo
             order = odat.Order
 
-            print('eprof at iso_T 1068 decision tree=', eprof)
 
-            if eprof is None or eprof == 3 or eprof ==5:
-                alink = odat.Links
-                if alink is not None:
-                    alist = json.loads(alink)
-                    for aoder in alist:
-                        thisodat = Orders.query.get(aoder)
-                        thisodat.Istat = 3
+
+            viewtype = request.values.get('viewtype')
+            print(oder, jo, viewtype)
+
+            if viewtype == 'paidinvoice':
+                incdat = Income.query.filter(Income.Jo == jo).first()
+                if incdat is not None:
+                    docref = incdat.Original
+                    print(docref)
+                    if docref is not None:
+                        docref = os.path.basename(docref)
+                        print(docref)
+            else:
+
+                print('eprof at iso_T 1068 decision tree=', eprof)
+
+                if eprof is None or eprof == 3 or eprof ==5:
+                    alink = odat.Links
+                    if alink is not None:
+                        alist = json.loads(alink)
+                        for aoder in alist:
+                            thisodat = Orders.query.get(aoder)
+                            thisodat.Istat = 3
+                            db.session.commit()
+                    else:
+                        odat.Istat = 3
                         db.session.commit()
-                else:
-                    odat.Istat = 3
-                    db.session.commit()
-                gledger_write('invoice',jo,0,0)
+                    gledger_write('invoice',jo,0,0)
 
+            print('mydocref=',docref)
             emailin1 = invoice_mimemail(order, docref, eprof)
             invo = 0
             invooder = 0
@@ -1075,7 +1116,7 @@ def isoT():
 # ____________________________________________________________________________________________________________________E.Email.Trucking
 # ____________________________________________________________________________________________________________________B.Views.Trucking
 
-        if viewo is not None and numchecked == 1:
+        if viewo == 1 and numchecked == 1:
             if oder > 0:
                 modata = Orders.query.get(oder)
                 if modata.Original is not None:
@@ -1095,38 +1136,7 @@ def isoT():
                 else:
                     err.append('There is no source document available for this selection')
 
-        if (viewo is not None or viewp is not None) and numchecked != 1:
-            err.append('Must check exactly one box to use this option')
-
-        if viewi is not None and numchecked == 1:
-            err.append('There is no document available for this selection')
-            if oder > 0:
-                modata = Orders.query.get(oder)
-                try:
-                    docref = modata.Invoice
-                    # Need to check for number of pages as this will tell us if is is a package or an individual invoice
-                    npages = PdfFileReader(open(modata.Invoice, "rb")).getNumPages()
-                    if npages >= 3:
-                        invo = 3
-                    else:
-                        invo = npages
-                    print('This file has', npages)
-                    jo = modata.Jo
-                    order = modata.Order
-                    emaildata = etemplate_truck('invoice',3,modata)
-                    # idat=Invoices.query.filter(Invoices.Jo==modata.Jo).first()
-                    # if idat is not None:
-                    #    docref=idat.Original
-                    leftscreen = 0
-                    leftsize = 8
-                    modlink = 0
-                    invo = 1
-                    invooder = oder
-                    err.append(f'Viewing document {docref}')
-                except:
-                    err.append('No Document Found')
-
-        if viewp is not None and numchecked == 1:
+        if viewp == 1 and numchecked == 1:
             if oder > 0:
                 modata = Orders.query.get(oder)
                 if modata.Proof is not None:
@@ -1139,7 +1149,75 @@ def isoT():
             else:
                 err.append('Must select one job to use this function')
 
-        if viewm and numchecked == 1:
+        if (viewo == 1 or viewp == 1 or viewi == 1 or viewip ==1) and numchecked != 1:
+            err.append('Must check exactly one box to use this option')
+
+        if viewi == 1 and numchecked == 1:
+            if oder > 0:
+                modata = Orders.query.get(oder)
+                try:
+                    docref = f'tmp/{scac}/data/vinvoice/{modata.Invoice}'
+                    emaildata = etemplate_truck('invoice',3,modata)
+                    leftscreen = 0
+                    modlink = 0
+                    invo = 1
+                    invooder = oder
+                    err.append(f'Viewing document {docref}')
+                    viewtype = 'invoice'
+                except:
+                    err.append('There is no document available for this selection')
+
+        if viewip == 1 and numchecked == 1:
+            if oder > 0:
+                modata = Orders.query.get(oder)
+                jo = modata.Jo
+                incdat = Income.query.filter(Income.Jo == jo).first()
+                if incdat is not None:
+                    fname = incdat.Original
+                    if fname is None:
+                        fexist=0
+                    else:
+                        fname = os.path.basename(fname)
+                        docref = f'tmp/{scac}/data/vinvoice/{fname}'
+                        fexist = os.path.isfile(addpath(docref))
+                    if not fexist:
+                        #Need to create the paid invoice
+                        recamount = incdat.Amount
+                        custref = incdat.Ref
+                        recdate = incdat.Date
+                        acctdb = incdat.SubJo
+                        if acctdb is None:
+                            acctdb = 'Undeposited Funds'
+
+                        payment = [d2sa(recamount), custref, recdate, acctdb]
+
+                        ldata = Invoices.query.filter(Invoices.Jo == jo).order_by(Invoices.Ea.desc()).all()
+                        cache = modata.Storage + 1
+                        modata.Storage = cache
+                        db.session.commit()
+                        pdata1 = People.query.filter(People.id == modata.Bid).first()
+                        pdata2 = Drops.query.filter(Drops.id == modata.Lid).first()
+                        pdata3 = Drops.query.filter(Drops.id == modata.Did).first()
+
+                        print(payment)
+
+                        from make_T_invoice import T_invoice
+                        fname = T_invoice(modata, ldata, pdata1, pdata2, pdata3, cache, invodate, payment)
+                        fname = os.path.basename(fname)
+                        docref = f'tmp/{scac}/data/vinvoice/{fname}'
+
+                        incdat.Original = fname
+                        db.session.commit()
+
+                    emaildata = etemplate_truck('paidinvoice',3,modata)
+                    leftscreen = 0
+                    err.append(f'Viewing document {docref}')
+                    viewtype = 'paidinvoice'
+                else:
+                    err.append(f'No payments received against JO {jo}')
+
+
+        if viewm == 1 and numchecked == 1:
             if oder > 0:
                 modata = Orders.query.get(oder)
                 if modata.Manifest is not None:
@@ -1152,7 +1230,7 @@ def isoT():
             else:
                 err.append('Must select one job to use this function')
 
-        if viewg and numchecked == 1:
+        if viewg ==1 and numchecked == 1:
             if oder > 0:
                 odat = Orders.query.get(oder)
                 base = odat.Gate
@@ -1292,6 +1370,7 @@ def isoT():
         if addS is not None and numchecked == 0:
             leftsize = 8
             modlink = 1
+            Services.query.filter( (Services.Service == 'New') & ( Services.Price==0.00 )).delete()
             # We will create a blank line and simply modify that by updating:
             input = Services(Service='New', Price=0.00)
             db.session.add(input)
@@ -1312,14 +1391,18 @@ def isoT():
         if addE is not None and numchecked == 0:
             leftsize = 8
             modlink = 1
+            #Make sure there are no new iputs unused
+            People.query.filter( (People.Company =='') & (People.Temp1 == 'New') & (People.Ptype == 'Trucking') ).delete()
             # We will create a blank line and simply modify that by updating:
-            input = People(Company='New', First=None, Middle=None, Last=None, Addr1=None, Addr2=None, Addr3=None, Idtype=None, Idnumber=None, Telephone=None,
-                           Email=None, Associate1=None, Associate2=None, Date1=today, Date2=None, Original=None, Ptype='Trucking', Temp1=None, Temp2=None, Accountid=None)
+            input = People(Company='New', First=None, Middle=None, Last=None, Addr1='', Addr2='', Addr3='', Idtype=None, Idnumber=None, Telephone='',
+                           Email='', Associate1='', Associate2='', Date1=today, Date2=None, Original=None, Ptype='Trucking', Temp1='New', Temp2=None, Accountid=None)
             db.session.add(input)
             db.session.commit()
-            modata = People.query.filter((People.Company == 'New') &
-                                         (People.Ptype == 'Trucking')).first()
+            modata = People.query.filter((People.Company == 'New') & (People.Temp1 == 'New') & (People.Ptype == 'Trucking') ).first()
             peep = modata.id
+            modata.Company = ''
+            db.session.commit()
+            modata = People.query.get(peep)
             err.append('Enter Data for New Company')
 
         if addE is not None and numchecked > 1:
@@ -1497,14 +1580,10 @@ def isoT():
                     docref = f'tmp/{scac}/data/vinvoice/INV'+invojo+'.pdf'
 
                 odat.Storage = cache
-                idat = Invoices.query.filter(Invoices.Jo == invojo).first()
-                incdat.Original = docref
+                incdat.Original = os.path.basename(docref)
                 hstat = odat.Hstat
                 if hstat == 2 or hstat == 3:
                     odat.Hstat = 4
-                myp = Proofs.query.filter(Proofs.Order == odat.Order).first()
-                if myp is not None:
-                    myp.Status = 'Paid'
                 db.session.commit()
                 leftscreen = 0
                 err.append('Viewing '+docref)
@@ -1779,43 +1858,31 @@ def isoT():
             leftsize = 8
             leftscreen = 0
             docref = None
+            holdvec=['']*20
+            holdvec[16] = today_str
+            holdvec[17] = today_str
+            holdvec[18] = '500.00'
 
         if newjob is None and modlink == 4:
+            holdvec = [''] * 20
             cdata = People.query.filter(People.Ptype == 'Trucking').order_by(People.Company).all()
-            leftsize = 8
             leftscreen = 0
             shipper = request.values.get('shipper')
             pufrom = request.values.get('thislcomp')
             deltoc = request.values.get('thisdcomp')
-
-            if shipper == '0':
-                shipper = a[0]
-            if pufrom == '0':
-                pufrom = a[0]
-            if deltoc == '0':
-                deltoc = a[0]
-
-            if shipper == '2' or pufrom == '2' or deltoc == '2':
-                input = People(Company='New', First=None, Middle=None, Last=None, Addr1=None, Addr2=None, Addr3=None, Idtype=None, Idnumber=None, Telephone=None,
-                               Email=None, Associate1=None, Associate2=None, Date1=today, Date2=None, Original=None, Ptype='Trucking', Temp1=None, Temp2=None, Accountid=None)
-                db.session.add(input)
-                db.session.commit()
-                modata = People.query.filter((People.Company == 'New')
-                                             & (People.Ptype == 'Trucking')).first()
-                peep = modata.id
-            if shipper == '2':
-                shipper = 0
-            if pufrom == '2':
-                pufrom = 0
-            if deltoc == '2':
-                deltoc = 0
             holdvec[0], holdvec[1], holdvec[2] = shipper, pufrom, deltoc
             plist=[]
             delist=[]
             oshipper = Orders.query.filter(Orders.Shipper == shipper).all()
             for tship in oshipper:
-                pu = tship.Company.strip()
-                du = tship.Company2.strip()
+                try:
+                    pu = tship.Company.strip()
+                except:
+                    pu = tship.Company
+                try:
+                    du = tship.Company2.strip()
+                except:
+                    du = tship.Company2
                 if pu not in plist:
                     plist.append(pu)
                 if du not in delist:
@@ -1832,6 +1899,17 @@ def isoT():
                 oship = Orders.query.filter( (Orders.Shipper == shipper) & (Orders.Company2 == holdvec[7]) ).first()
                 if oship is not None:
                     holdvec[9] = oship.Dropblock2
+            vals = ['order', 'bol', 'booking', 'container', 'ctype', 'pickup',
+                    'date', 'date2', 'amount']
+            a = list(range(len(vals)))
+            for i, v in enumerate(vals):
+                a[i] = request.values.get(v)
+                if a[i]:
+                    a[i] = a[i].strip()
+                    itap = i+10
+                    holdvec[itap] = a[i]
+            amt = request.values.get('amount')
+            holdvec[18] = d2sa(amt)
 
 
 
@@ -1843,6 +1921,8 @@ def isoT():
             cdata = People.query.filter(People.Ptype == 'Trucking').order_by(People.Company).all()
             oder = modata.id
             leftscreen = 1
+
+        print('copy here',copy,numchecked,oder, viewip)
 # ____________________________________________________________________________________________________________________E.Newjob.Trucking
         if copy is not None:
             now = datetime.datetime.now().strftime('%I:%M %p')
@@ -1864,6 +1944,7 @@ def isoT():
                                Icache=0,Mcache=0,Pkcache=0)
                 db.session.add(input)
                 db.session.commit()
+                err.append(f'Added new Order for {myo.Shipper} with JO {nextjo}')
             else:
                 err.append('Must check one box for this function to work')
 
@@ -1963,25 +2044,29 @@ def isoT():
             if numchecked == 0:
                 Matched_Now()
 
-            if oder > 0 and poof > 0 and numchecked == 2:
-                myo = Orders.query.get(oder)
-                myp = Proofs.query.get(poof)
-                myp.Order = myo.Order
-                myp.Driver = myo.Driver
-                myp.Container = myo.Container
-                myp.Booking = myo.Booking
-                myp.Date = myo.Date
-                myp.Time = myo.Time
-                myo.BOL = myp.BOL
-                if myo.Status == '00':
-                    myo.Status = '10'
-                myp.Status = 'Matched'
-                db.session.commit()
-
             if oder > 0 and tick > 0 and numchecked == 2:
                 myo = Orders.query.get(oder)
                 myi = Interchange.query.get(tick)
                 myo.Container = myi.CONTAINER
+                myi.Company = myo.Shipper
+                myi.Jo = myo.Jo
+                bk = myo.Booking
+                bol = myo.BOL
+                if len(bk)<4:
+                    crel = bol
+                elif len(bol)<4:
+                    crel = bk
+                else:
+                    crel = bk
+                rel = myi.RELEASE
+                if len(rel)<4:
+                    myi.RELEASE = crel
+                if len(bk)<4 and len(rel)>4:
+                        myo.Booking = rel
+                if len(bol)<4 and len(rel)>4:
+                        myo.BOL = rel
+
+
                 db.session.commit()
 
             if tick > 0 and numchecked == 1:
@@ -2026,7 +2111,10 @@ def isoT():
     else:
         from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero, dataget_T
         username = session['username'].capitalize()
-        edat = LastMessage.query.filter(LastMessage.User==username).first()
+        try:
+            edat = LastMessage.query.filter(LastMessage.User==username).first()
+        except:
+            input = LastMessage(User = username, Err='No Message')
         if edat is not None:
             try:
                 err = json.loads(edat.Err)

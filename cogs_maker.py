@@ -21,7 +21,7 @@ import re
 import mysql.connector
 
 from remote_db_connect import db
-from models import Autos, FELBills
+from models import Autos
 
 start= datetime.date(2019, 1, 1)
 end= datetime.date(2019, 1, 29)

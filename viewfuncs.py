@@ -43,6 +43,18 @@ def d2s(instr):
         outstr=instr
     return outstr
 
+def d2sa(instr):
+    try:
+        instr=instr.replace('$','').replace(',','')
+    except:
+        instr=str(instr)
+    try:
+        infloat=float(instr)
+        outstr="%0.2f" % infloat
+    except:
+        outstr='0.00'
+    return outstr
+
 def d1s(instr):
     try:
         instr=instr.replace('$','').replace(',','')
@@ -1303,7 +1315,7 @@ def global_inv(odata,odervec):
 
 
 def make_new_order():
-    sdate = request.values.get('dstart')
+    sdate = request.values.get('date')
     if sdate is None:
         sdate = today.strftime('%Y-%m-%d')
 
@@ -1346,14 +1358,13 @@ def make_new_order():
         else:
             idd = 0
 
-    if a[8] is None:
-        a[8] = '0.00'
+    amt = d2sa(a[8])
 
     input = Orders(Status='00', Jo=nextjo, Load=None, Order=a[1], Company=company, Location=None, Booking=a[3],
                    BOL=a[2], Container=a[4],
                    Date=a[6], Driver=None, Company2=company2, Time=None, Date2=a[7], Time2=None, Seal=None,
                    Pickup=a[5], Delivery=None,
-                   Amount=a[8], Path=None, Original=None, Description=None, Chassis=None, Detention='0',
+                   Amount=amt, Path=None, Original=None, Description=None, Chassis=None, Detention='0',
                    Storage='0',
                    Release=0, Shipper=a[0], Type=a[9], Time3=None, Bid=idb, Lid=idl, Did=idd, Label='FileUpload',
                    Dropblock1=newdrop1, Dropblock2=newdrop2, Commodity=None, Packing=None, Links=None, Hstat=0, Istat=0,
@@ -1462,7 +1473,7 @@ def docuploader(dbase):
 def dataget_T(thismuch, dlist, lbox):
     # 0=order,#2=interchange,#3=people/services
     today = datetime.date.today()
-    stopdate = today-datetime.timedelta(days=60)
+    stopdate = today-datetime.timedelta(days=180)
     odata = 0
     idata = 0
     fdata = 0
@@ -1508,7 +1519,26 @@ def dataget_T(thismuch, dlist, lbox):
             fdata = Trucklog.query.all()
     elif thismuch == '5':
         if dlist[0] == 'on':
-            odata = Orders.query.filter(Orders.Istat<4).all()
+            odata = Orders.query.filter( (Orders.Istat<4) & (Orders.Istat>1) ).all()
+        if dlist[2] == 'on':
+            idata = Interchange.query.filter(
+                (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()
+        if lbox == 2:
+            fdata = DriverAssign.query.filter(DriverAssign.Hours != None).all()
+        elif lbox==1 or lbox==3 or lbox == 4:
+            fdata = Trucklog.query.all()
+    elif thismuch == '6':
+        if dlist[0] == 'on':
+            odata = Orders.query.filter( (Orders.Date > stopdate) & (Orders.Hstat==0) ).all()
+        if dlist[2] == 'on':
+            idata = Interchange.query.filter((Interchange.Date > stopdate) | (Interchange.Status != 'IO')).all()
+        if lbox == 2:
+            fdata = DriverAssign.query.filter(DriverAssign.Hours != None).all()
+        elif lbox==1 or lbox==3 or lbox == 4:
+            fdata = Trucklog.query.all()
+    elif thismuch == '7':
+        if dlist[0] == 'on':
+            odata = Orders.query.filter( (Orders.Date > stopdate) & (Orders.Hstat==1) ).all()
         if dlist[2] == 'on':
             idata = Interchange.query.filter(
                 (Interchange.Date > stopdate) | (Interchange.Status == 'AAAAAA')).all()

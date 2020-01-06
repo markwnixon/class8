@@ -1,5 +1,5 @@
 from runmain import db
-from models import Vehicles, Invoices, JO, Income, Orders, Bills, Accounts, Bookings, OverSeas, Autos, People, Interchange, Drivers, ChalkBoard, Proofs,Services, Drops
+from models import Vehicles, Invoices, JO, Income, Orders, Bills, Accounts, Bookings, OverSeas, Autos, People, Interchange, Drivers, ChalkBoard, Services, Drops
 from flask import render_template, flash, redirect, url_for, session, logging, request
 
 import numpy as np

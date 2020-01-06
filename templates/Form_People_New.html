@@ -1,8 +1,15 @@
 <br>
 <div class="card">
 <div class="card-header">
-Enter Customer Information
+        <div class="d-flex justify-content-around align-items-center">
+        <div class="p-0">Enter Customer Information</div>
+        <div class="p-0">
+            <button type="submit" class="btn btn-md btn-green" name="Update">Update</button>
+            <button type="submit" class="btn btn-md btn-elegant" name="Return">Cancel</button>
+        </div>
+    </div>
 </div>
+
 <div class="card-body">
 <table class="table table-condensed table-hover">
 <tbody>
@@ -39,7 +46,6 @@ Enter Customer Information
 <td colspan="2"><input class="form-control" type="date" name="date1" value={{modata.Date1}}></td>
 </tr>
 </tbody></table>
-    {% include 'includes/_button_upd_ret.html' %}
 </div>
 </div>
 <input type = "hidden" name ="peep" value= {{peep}}>

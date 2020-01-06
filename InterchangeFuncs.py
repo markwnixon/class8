@@ -1,5 +1,5 @@
 from runmain import db
-from models import OverSeas, Orders, People, Interchange, Proofs, Bookings
+from models import OverSeas, Orders, People, Interchange, Bookings
 from flask import session, request
 from viewfuncs import d2s, stat_update
 import datetime
@@ -306,9 +306,12 @@ def Order_Container_Update(oder):
     idata=Interchange.query.filter( (Interchange.RELEASE==booking) | (Interchange.CONTAINER==container)).all()
     for idat in idata:
         type=idat.TYPE
+        print(odat.Shipper)
         idat.Company=odat.Shipper
         idat.Jo=odat.Jo
         hstat=odat.Hstat
+        if hstat is None:
+            hstat = 0
         if 'Out' in type and hstat<1:
             odat.Hstat = 1
             db.session.commit()

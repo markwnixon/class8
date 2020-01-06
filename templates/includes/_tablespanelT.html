@@ -45,8 +45,10 @@
             <option {% if thismuch == '2' %} selected {% endif %} value='2'>Filter: Last 120 Days</option>
             <option {% if thismuch == '3' %} selected {% endif %} value='3'>Filter: Uninvoiced</option>
             <option {% if thismuch == '4' %} selected {% endif %} value='4'>Filter: Unrecorded Inv</option>
-            <option {% if thismuch == '5' %} selected {% endif %} value='5'>Filter: Unpaid Inv</option>
-            <option {% if thismuch == '6' %} selected {% endif %} value='6'>Filter: Show All</option>
+            <option {% if thismuch == '5' %} selected {% endif %} value='5'>Filter: Unpaid Invoices</option>
+            <option {% if thismuch == '6' %} selected {% endif %} value='6'>Filter: Unpulled Containers</option>
+            <option {% if thismuch == '7' %} selected {% endif %} value='7'>Filter: Containers Out</option>
+            <option {% if thismuch == '8' %} selected {% endif %} value='8'>Filter: Show All</option>
         </select>
     </div>
     &nbsp; &nbsp;
@@ -57,7 +59,6 @@
             <option value="2">New Customer</option>
             <option value="3">New Services</option>
             <option value="4">New from Copy</option>
-            <option value="5">Make Manifest</option>
             <option value="6">Upload Source</option>
             <option value="7">Upload Proof</option>
         </select>
@@ -79,6 +80,7 @@
             <option value="1">Invoice Editor</option>
             <option value="2">Quote Editor</option>
             <option value="3">Package Editor</option>
+            <option value="5">Receive Payment</option>
             <option value="4">Receive by Account</option>
         </select>
     </div>
@@ -105,6 +107,16 @@
     </div>
     &nbsp; &nbsp;
     <div class="p-0">
+        <select class="mdb-select md-form" name="dispbox" onchange="this.form.submit()">
+            <option value="" disabled selected>Dispatch</option>
+            <option value="1">Make Manifest</option>
+            <option value="2">Containers</option>
+            <option value="3">Assign Drivers</option>
+            <option value="4">Dispatch Center</option>
+        </select>
+    </div>
+    &nbsp; &nbsp;
+    <div class="p-0">
         <select class="mdb-select md-form" name="launchbox" onchange="this.form.submit()">
             <option value="" disabled selected>Trucking Tasks</option>
             <option value="1">Assign Drivers</option>
@@ -118,19 +130,6 @@
         </select>
     </div>
     &nbsp; &nbsp;
-    <div class="p-0">
-        <select class="mdb-select md-form" name="vidbox" onchange="this.form.submit()">
-            <option value="" disabled selected>Truck Tutorials</option>
-            <option value="1">Overview</option>
-            <option value="2">Truck Tables</option>
-            <option value="3">Work Flow Example</option>
-            <option value="4">Making New Jobs</option>
-            <option value="5">Modifying Jobs</option>
-            <option value="6">Invoicing and Quotes</option>
-            <option value="7">Trucking Tasks</option>
-            <option value="8">Deleting Items</option>
-        </select>
-    </div>
 </div>
 
 

@@ -18,6 +18,7 @@ def makeTmanifest(odata, pdata1, pdata2, pdata3, tdata, cache):
     file1=f'tmp/{scac}/data/vmanifest/Manifest'+joborder+'.pdf'
     file2=f'tmp/{scac}/data/vmanifest/Manifest'+joborder+'c'+str(cache)+'.pdf'
     today = datetime.datetime.today().strftime('%m/%d/%Y')
+    sigdate = request.values.get('sigdate')
     type=joborder[1]
     if invodate is None or invodate==0:
         invodate=today
@@ -297,7 +298,7 @@ def makeTmanifest(odata, pdata1, pdata2, pdata3, tdata, cache):
     y=dateline-dh-bump
     c.drawCentredString(x,y,joborder)
     x=avg(rtm-75,rtm-150)
-    c.drawCentredString(x,y,invodate)
+    c.drawCentredString(x,y,sigdate)
 
     c.setFont('Helvetica',9,leading=None)
 

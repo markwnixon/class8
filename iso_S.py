@@ -1,5 +1,5 @@
 from runmain import db
-from models import Vehicles, Storage, Invoices, JO, Income, Orders, Bills, Accounts, Bookings, OverSeas, Autos, People, Interchange, Drivers, ChalkBoard, Proofs, Services
+from models import Vehicles, Storage, Invoices, JO, Income, Orders, Bills, Accounts, Bookings, OverSeas, Autos, People, Interchange, Drivers, ChalkBoard, Services
 from flask import render_template, flash, redirect, url_for, session, logging, request
 
 from viewfuncs import popjo, jovec, timedata, nonone, nononef, numcheck, newjo, init_storage_zero, init_storage_blank, sdiff, money12

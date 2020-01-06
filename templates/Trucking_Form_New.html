@@ -1,23 +1,25 @@
 <br>
 <div class="card">
 <div class="card-header">
-Enter New Job Information
+    <div class="d-flex justify-content-around align-items-center">
+        <div class="p-0">Enter New Job Information</div>
+        <div class="p-0">
+            <button type="submit" class="btn btn-md btn-green" name="ThisJob">Create Job</button>
+            <button type="submit" class="btn btn-md btn-elegant" name="Return">&nbsp; Cancel &nbsp;</button>
+        </div>
+    </div>
 </div>
+
 <div class="card-body">
 
 
 <table class="table table-condensed table-hover">
 <tbody>
 <tr>
-<td><div class="input-group-text">Job Start Date:</div></td>
-<td><input class="form-control" type="date" name="dstart" value="{{today}}"></td>
-</tr>
-<tr>
 <td><div class="input-group-text">Choose Customer:</div></td>
 <td>
 <select class="form-control" type="text" name="shipper" onchange="this.form.submit()">
-<option value='1'>Choose Later</option>
-<option value='2'>Add New Now</option>
+<option value='Choose Later'>Choose Later</option>
 {% for data in data5 %}
 <option value="{{data.Company}}" {% if data.Company == holdvec[0] %} selected {% endif %}> {{data.Company}} </option>
 {% endfor %}</select>
@@ -25,42 +27,42 @@ Enter New Job Information
 </tr>
 <tr>
 <td><div class="input-group-text">Order:</div></td>
-<td><input class="form-control" type="text" name="order" value=" "></td>
+<td><input class="form-control" type="text" name="order" value="{{ holdvec[10] }}"></td>
 </tr>
 <tr>
 <td><div class="input-group-text">Bill of Lading:</div></td>
-<td><input class="form-control" type="text" name="bol" value=" "></td>
+<td><input class="form-control" type="text" name="bol" value="{{ holdvec[11] }}"></td>
 </tr>
 <tr>
 <td><div class="input-group-text">Booking:</div></td>
-<td><input class="form-control" type="text" name="booking" value=" "></td>
+<td><input class="form-control" type="text" name="booking" value="{{ holdvec[12] }}"></td>
 </tr>
 <tr>
 <td><div class="input-group-text">Container:</div></td>
-<td><input class="form-control" type="text" name="container" value=" "></td>
+<td><input class="form-control" type="text" name="container" value="{{ holdvec[13] }}"></td>
 </tr>
 <tr>
 <td> <div class="input-group-text">Containerized:</div></td>
 <td>
 <select class="form-control" type="text" name="ctype">
-<option    value='None'> None </option>
-<option    value='53FT Dry'> 53FT Dry </option>
-<option    value='20FT STD'> 20FT STD </option>
-<option   selected  value='40FT STD'> 40FT STD </option>
-<option   value='40FT HC'> 40FT HC </option>
-<option   value='40FT OT'> 40FT OT </option>
-<option   value='40FT REF'> 40FT REF </option>
-<option   value='45FT STD'> 45FT STD </option>
-<option   value='45FT HC'> 45FT HC </option>
-<option   value='LCL'> LCL </option>
-<option   value='RORO'> RORO </option>
+<option     value='None'> None </option>
+<option  {% if holdvec[14] == '53FT Dry' %} selected {% endif %} value='53FT Dry'> 53FT Dry </option>
+<option  {% if holdvec[14] == '20FT STD' %} selected {% endif %}value='20FT STD'> 20FT STD </option>
+<option  {% if holdvec[14] == '40FT STD' %} selected {% endif %} selected  value='40FT STD'> 40FT STD </option>
+<option  {% if holdvec[14] == '40FT HC' %} selected {% endif %} value='40FT HC'> 40FT HC </option>
+<option  {% if holdvec[14] == '40FT OT' %} selected {% endif %} value='40FT OT'> 40FT OT </option>
+<option  {% if holdvec[14] == '40FT REF' %} selected {% endif %} value='40FT REF'> 40FT REF </option>
+<option  {% if holdvec[14] == '45FT STD' %} selected {% endif %} value='45FT STD'> 45FT STD </option>
+<option  {% if holdvec[14] == '45FT HC' %} selected {% endif %} value='45FT HC'> 45FT HC </option>
+<option  {% if holdvec[14] == 'LCL' %} selected {% endif %} value='LCL'> LCL </option>
+<option  {% if holdvec[14] == 'RORO' %} selected {% endif %} value='RORO'> RORO </option>
 
 </select>
 </td>
 </tr>
 <tr>
 <td><div class="input-group-text">Pickup No.:</div></td>
-<td><input class="form-control" type="text" name="pickup" value=" "></td>
+<td><input class="form-control" type="text" name="pickup" value="{{ holdvec[15] }}"></td>
 </tr>
 
 {% set pus = holdvec[4] %}
@@ -87,7 +89,7 @@ Enter New Job Information
 
 <tr>
 <td><div class="input-group-text">Load Date:</div></td>
-<td><input class="form-control" type="date" name="date" value="{{today}}"></td>
+<td><input class="form-control" type="date" name="date" value="{{ holdvec[16] }}"></td>
 </tr>
 {% set dus = holdvec[5] %}
 {% set thisdu = holdvec[7] %}
@@ -110,19 +112,14 @@ Enter New Job Information
 </tr>
 <tr>
 <td><div class="input-group-text">Deliver Date:</div></td>
-<td><input class="form-control" type="date" name="date2" value="{{today}}"></td>
+<td><input class="form-control" type="date" name="date2" value="{{holdvec[17]}}"></td>
 </tr>
 <tr>
 <td><div class="input-group-text">Job Base Charge:</div></td>
-<td><input class="form-control" type="text" name="amount" value="905.00"></td>
+<td><input class="form-control" type="text" name="amount" value="{{ holdvec[18] }}"></td>
 </tr>
 <tr>
-<tr>
-<td colspan="2">
-<button type="submit" class="btn btn-green" name="ThisJob">Create Job</button>
-<button type="submit" class="btn btn-elegant" name="Return">&nbsp; Cancel &nbsp;</button>
-</td>
-</tr></tbody></table>
+</tbody></table>
 
 </div>
 </div>

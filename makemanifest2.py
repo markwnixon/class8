@@ -1,3 +1,5 @@
+from flask import request
+
 def makemanifestT(odata, pdata1, pdata2, pdata3, tdata, drvdata, cache, jtype, time1, time2, commodity, packing, bol):
     #pdata1:Bid (Bill To)
     #pdata2:Lid (Load At)
@@ -22,7 +24,14 @@ def makemanifestT(odata, pdata1, pdata2, pdata3, tdata, drvdata, cache, jtype, t
     file1, file2 ,file3 = manfile(joborder,cache)
     today = datetime.datetime.today().strftime('%m/%d/%Y')
     type=joborder[1]
-    invodate=today
+    try:
+        invodate = request.values.get('sigdate')
+        invodate = datetime.datetime.strptime(invodate,'%Y-%m-%d')
+        invodate = invodate.strftime('%m/%d/%Y')
+        if invodate is None:
+            invodate=today
+    except:
+        invodate = today
 
     qnote, note, bank, us, lab, logoi = bankdata('FC')
 
