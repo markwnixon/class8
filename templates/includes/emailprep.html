@@ -5,7 +5,11 @@
 {% set etitle = emaildata[0] %}
 {% set ebody = emaildata[1] %}
 {% set attachname = emaildata[6] %}
-{% set eprof = holdvec[0] %}
+{% if holdvec %}
+    {% set eprof = holdvec[0] %}
+{% else %}
+    {% set eprof = 0 %}
+{% endif %}
 <br>
 
 <div class="card">
