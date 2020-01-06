@@ -980,13 +980,13 @@ def make_global_job(msg,sequence,sessionph):
                 nextjo = newjo('T', sdate)
 
                 input = Orders(Status='A0', Jo=nextjo, Load=None, Order=nextjo, Company=company, Location=None, Booking=book,
-                               BOL=None, Container='TBD',
-                               Date=today, Driver=sessionph, Company2=company2, Time=None, Date2=today, Time2=None, Seal=None,
-                               Pickup=None, Delivery=None,
-                               Amount='275.00', Path=None, Original=None, Description=None, Chassis=None, Detention='0',
-                               Storage='0',
-                               Release=0, Shipper=pdat1.Company, Type=None, Time3=None, Bid=pdat1.id, Lid=lid, Did=did,
-                               Label=None, Dropblock1=drop1, Dropblock2=drop2, Commodity=None, Packing=None)
+                               BOL=None, Container='TBD',Date=today, Driver=sessionph, Company2=company2, Time=None, Date2=today, Time2=None, Seal=None,
+                               Pickup=None, Delivery=None,Amount='275.00', Path=None, Original=None, Description=None, Chassis=None, Detention='0',
+                               Storage='0',Release=0, Shipper=pdat1.Company, Type=None, Time3=None, Bid=pdat1.id, Lid=lid, Did=did,
+                               Label=None, Dropblock1=drop1, Dropblock2=drop2, Commodity=None, Packing=None,
+                               Links=None, Hstat=-1,Istat=-1, Proof=None, Invoice=None, Gate=None, Package=None, Manifest=None, Scache=0,
+                               Pcache=0,Icache=0, Mcache=0, Pkcache=0
+                               )
                 db.session.add(input)
                 db.session.commit()
 
@@ -1266,7 +1266,10 @@ def msg_analysis(msg, sessionph, medialist):
             input = Orders(Status='A0', Jo=jo, Load=None, Order=jo, Company=None, Location=None, Booking=booking, BOL=None, Container=container,
                            Date=today, Driver=None, Company2=None, Time=None, Date2=today, Time2=None, Seal=None, Pickup=None, Delivery=None,
                            Amount=None, Path=None, Original=None, Description=None, Chassis=None, Detention='0', Storage='0',
-                           Release=0, Shipper=customer, Type=None, Time3=None, Bid=pid, Lid=None, Did=None, Label=None, Dropblock1=None, Dropblock2=None, Commodity=None, Packing=None)
+                           Release=0, Shipper=customer, Type=None, Time3=None, Bid=pid, Lid=None, Did=None, Label=None, Dropblock1=None, Dropblock2=None, Commodity=None, Packing=None,
+                           Links=Nonr, Hstat=-1,Istat=-1, Proof=None, Invoice=None, Gate=None, Package=None, Manifest=None, Scache=0,
+                           Pcache=0,Icache=0, Mcache=0, Pkcache=0
+                           )
             db.session.add(input)
             db.session.commit()
 
