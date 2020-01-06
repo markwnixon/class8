@@ -167,6 +167,7 @@ def isoT():
             #Signature date:
             holdvec[16] = today_str
         if thisbox6 == '2':
+            lbox = 6
             lbox, holdvec, err = container_list(lbox, holdvec)
         if thisbox6 == '3':
             lbox = 1
@@ -199,8 +200,8 @@ def isoT():
                 fdata = DriverAssign.query.filter(DriverAssign.Hours != None).all()
             if lbox == 3:
                 lbox, holdvec, err = driver_payroll(lbox, holdvec)
-            if lbox == 6:
-                lbox, holdvec, err = container_list(lbox, holdvec)
+            #if lbox == 6:
+                #lbox, holdvec, err = container_list(lbox, holdvec)
 
 
 
