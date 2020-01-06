@@ -269,7 +269,7 @@ def makemanifestT(odata, pdata1, pdata2, pdata3, tdata, drvdata, cache, jtype, t
     bump=2.5
     tb=bump*2
 
-    c=canvas.Canvas(addpath(file1), pagesize=letter)
+    c=canvas.Canvas(file1, pagesize=letter)
     c.setLineWidth(1)
 
     c.drawImage(logoi, 185, 650, mask='auto')
@@ -454,6 +454,6 @@ def makemanifestT(odata, pdata1, pdata2, pdata3, tdata, drvdata, cache, jtype, t
     c.save()
     #
     #Now make a cache copy
-    shutil.copy(addpath(file1),addpath(file2))
+    shutil.copy(file1,file2)
     print('returning file',file3)
     return file3
