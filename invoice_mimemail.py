@@ -78,8 +78,11 @@ def invoice_mimemail(order,docref,eprof):
         attachment.close()
         os.remove(newfile)
 
-    print('username=',username,password)
+
+
     server = smtplib.SMTP(ourserver)
+
+    print('username=',username,password,ourserver)
     #server.connect(ourserver, 465)
     #server.ehlo()
     server.starttls()

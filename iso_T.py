@@ -1005,32 +1005,32 @@ def isoT():
             odat = Orders.query.get(invooder)
             alink = odat.Links
             if alink is not None:
-                alist = json.loads(alink)
-                print(alist)
-                for aoder in alist:
-                    thisodat = Orders.query.get(aoder)
-                    jo = thisodat.Jo
+                try:
+                    alist = json.loads(alink)
+                    for aoder in alist:
+                        thisodat = Orders.query.get(aoder)
+                        jo = thisodat.Jo
+                        gledger_write('invoice', jo, 0, 0)
+                        thisodat.Istat = 2
+                        db.session.commit()
+                except:
+                    odat.Links = None
+                    jo = odat.Jo
                     gledger_write('invoice', jo, 0, 0)
-                    thisodat.Istat = 2
+                    odat.Istat = 2
                     db.session.commit()
-                modlink = 0
-                invo = 0
-                invooder = 0
-                stamp = 0
-                inco = 0
-                oder = 0
-
             else:
                 jo = odat.Jo
                 gledger_write('invoice',jo,0,0)
                 odat.Istat = 2
                 db.session.commit()
-                modlink = 0
-                invo = 0
-                invooder = 0
-                stamp = 0
-                inco = 0
-                oder = 0
+
+            modlink = 0
+            invo = 0
+            invooder = 0
+            stamp = 0
+            inco = 0
+            oder = 0
 
 
         # This area for receiving money--cannot mass receive funds off the list
