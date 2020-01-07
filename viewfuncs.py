@@ -67,6 +67,13 @@ def d1s(instr):
         outstr=instr
     return outstr
 
+def stripper(input):
+    try:
+        new = input.strip()
+    except:
+        new = ''
+    return new
+
 def testdrop(dblock):
     idret = 0
     xtest = 'xxx'

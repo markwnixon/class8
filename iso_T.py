@@ -745,20 +745,20 @@ def isoT():
             oder=request.values.get('passoder')
             oder=nonone(oder)
             odat=Orders.query.get(oder)
+            viewtype = 'packages'
+            print('packages with eprof',eprof)
 
             packitems, stampdata, err = packmake(odat, eprof)
             print('My stampdata is', stampdata)
 
-            cache2 = int(odat.Detention)
-            cache2 = cache2+1
+            cache2 = int(odat.Pkcache)
+            odat.Pkcache = cache2 + 1
             docref = f'tmp/{scac}/data/vpackages/P_c{cache2}_{odat.Jo}.pdf'
+            odat.Package = f'P_c{cache2}_{odat.Jo}.pdf'
+            db.session.commit()
             try:
                 pdflist=['pdfunite']+packitems+[addpath(docref)]
                 tes = subprocess.check_output(pdflist)
-                odat.Package = f'P_c{cache2}_{odat.Jo}.pdf'
-                odat.Detention = cache2
-                db.session.commit()
-                print('docref=', docref)
                 leftscreen = 0
                 stampstring = json.dumps(stampdata)
                 print('stampstring=', stampstring)
@@ -789,18 +789,18 @@ def isoT():
             if oder > 0:
                 fexist = [0] * 5
                 dockind = ['Source', 'Proofs', 'Invoice', 'Gate']
-                viewtype = 'mpack'
+                viewtype = 'packages'
                 leftscreen = 0
                 stamp = 1
                 odat = Orders.query.get(oder)
                 company = odat.Shipper
                 jo = odat.Jo
                 order = odat.Order
-                cache2 = int(odat.Detention)
+                cache2 = int(odat.Pkcache)
                 cache2 = cache2 + 1
                 docref = f'tmp/{scac}/data/vpackages/P_c{cache2}_{odat.Jo}.pdf'
                 doclist[7] = f'tmp/{scac}/data/vpackages/P_c{cache2}_{odat.Jo}.pdf'
-                odat.Detention = str(cache2)
+                odat.Pkcache = cache2
                 db.session.commit()
 
                 stampstring = odat.Status
@@ -925,18 +925,18 @@ def isoT():
             leftscreen = 0
             leftsize = 8
             modlink = 0
-            cache2 = int(odat.Detention)
+            cache2 = int(odat.Pkcache)
             docin = f'tmp/{scac}/data/vpackages/{odat.Package}'
             docref = f'tmp/{scac}/data/vpackages/P_c{cache2}_{odat.Jo}.pdf'
             odat.Package = f'P_c{cache2}_{odat.Jo}.pdf'
             db.session.commit()
             from sigdoc import sigdoc
             sigdoc(stampdata, docin, docref)
-            cache2 = cache2+1
-            odat.Detention = str(cache2)
+            odat.Pkcache = cache2 + 1
             db.session.commit()
             # Already have email data from previous area
             invo = 3
+            viewtype = 'packages'
 
 
 # ____________________________________________________________________________________________________________________E.Package.Trucking
@@ -1051,29 +1051,22 @@ def isoT():
 
         if emailnow is not None or emailinvo is not None:
             oder=request.values.get('passoder')
+            viewtype = request.values.get('viewtype')
             oder=nonone(oder)
             odat=Orders.query.get(oder)
-            if stamp == 1:
-                eprof = 1
+            jo = odat.Jo
+            order = odat.Order
+
             leftscreen = 1
             leftsize = 10
             modlink = 0
 
-
-            if emailnow is not None or invo > 1:
-                docref = odat.Package
-            else:
-                docref = odat.Invoice
-
-            jo = odat.Jo
-            order = odat.Order
-
-
-
-            viewtype = request.values.get('viewtype')
             print(oder, jo, viewtype)
 
-            if viewtype == 'paidinvoice':
+            if viewtype == 'packages':
+                docref = odat.Package
+
+            elif viewtype == 'paidinvoice':
                 incdat = Income.query.filter(Income.Jo == jo).first()
                 if incdat is not None:
                     docref = incdat.Original
@@ -1081,11 +1074,15 @@ def isoT():
                     if docref is not None:
                         docref = os.path.basename(docref)
                         print(docref)
+
+            elif viewtype == 'invoice':
+                docref = odat.Invoice
+
             else:
 
                 print('eprof at iso_T 1068 decision tree=', eprof)
 
-                if eprof is None or eprof == 3 or eprof ==5:
+                if eprof == 3 or eprof ==5:
                     alink = odat.Links
                     if alink is not None:
                         alist = json.loads(alink)

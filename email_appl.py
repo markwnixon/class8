@@ -13,6 +13,7 @@ import os
 from CCC_system_setup import websites, passwords, companydata
 from CCC_system_setup import usernames as em
 from models import People, Orders
+from viewfuncs import stripper
 
 def etemplate_truck(type,kind,odat):
     cdata = companydata()
@@ -21,16 +22,15 @@ def etemplate_truck(type,kind,odat):
     order = odat.Order
     signature = cdata[2] + '\n' + cdata[5] + '\n' + cdata[6] + '\n' + cdata[7]
 
-    if 'eprof' in type or 'invoice' in type:
+    print('templated to:',type, kind)
+
+    if 'eprof' in type or 'invoice' in type or 'packages' in type:
         od, bol, con = odat.Order, odat.BOL, odat.Container
-        try:
-            od, bol, con = od.strip(), bol.strip(), con.strip()
-        except:
-            print('Some objects are None')
+        od, bol, con = stripper(od), stripper(bol), stripper(con)
         dblk = odat.Dropblock2.splitlines()
         pdat = People.query.get(key)
         estatus, epod, eaccts = pdat.Email, pdat.Associate1, pdat.Associate2
-        estatus, epod, eaccts = estatus.strip(), epod.strip(), eaccts.strip()
+        estatus, epod, eaccts = stripper(estatus), stripper(epod), stripper(eaccts)
 
     if type == 'eprof1':
         etitle = f'Update on Order: {od} | {bol} | {con}'
@@ -114,6 +114,17 @@ def etemplate_truck(type,kind,odat):
         etitle = f'Payment Received on Invoice {odat.Jo} for Completed Order: {od} | {bol} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nYour payment has been received, and your stamped invoice is attached.\n\nWe greatly appreciate your business.\n\nSincerely,\n\n{signature}'
         aname = odat.Invoice
+        emailin1 = estatus
+        emailin2 = eaccts
+        emailcc1 = em['info']
+        emailcc2 = em['expo']
+        emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2, aname]
+        return emaildata
+
+    elif type == 'packages':
+        etitle = f'Package for {odat.Jo} and Completed Order: {od} | {bol} | {con}'
+        ebody = f'Dear {odat.Shipper},\n\nAn invoice package is enclosed for your review.\n\nWe greatly appreciate your business.\n\nSincerely,\n\n{signature}'
+        aname = odat.Package
         emailin1 = estatus
         emailin2 = eaccts
         emailcc1 = em['info']
