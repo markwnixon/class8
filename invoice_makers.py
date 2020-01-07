@@ -7,7 +7,7 @@ import re
 import os
 import subprocess
 from CCC_system_setup import myoslist, addpath, scac
-from viewfuncs import chassismatch, stat_update, dropupdate2, dropupdate3, getexpimp
+from viewfuncs import chassismatch, stat_update, dropupdate2, dropupdate3, getexpimp, stripper
 import json
 
 today = datetime.date.today()
@@ -21,7 +21,7 @@ def multi_inv(odata, odervec, chas):
         qty, d1, d2 = chassismatch(myo)
         myo.Links = json.dumps(odervec)
         Invoices.query.filter(Invoices.Jo == myo.Jo).delete()
-        myo.Status = stat_update(myo.Status, '1', 1)
+        myo.Istat = 1
         db.session.commit()
 
     for oder in odervec:
@@ -66,11 +66,9 @@ def multi_inv(odata, odervec, chas):
             db.session.commit()
             myo = Orders.query.get(oder)
 
-        cache = myo.Storage+1
-        c1 = myo.Company
-        c2 = myo.Company2
-        c1 = c1.strip()
-        c2 = c2.strip()
+        cache = myo.Icache
+        c1, c2 = myo.Company, myo.Company2
+        c1, c2 = stripper(c1), stripper(c2)
 
         if chas != 1:
             # Make sure all invoices have the required parts
@@ -105,18 +103,15 @@ def multi_inv(odata, odervec, chas):
         pdata3 = Drops.query.filter(Drops.id == myo.Did).first()
         from make_T_invoice import T_invoice
         T_invoice(myo, ldata, pdata1, pdata2, pdata3, cache, today, 0)
-        if cache > 1:
-            docref = f'tmp/{scac}/data/vinvoice/INV'+myo.Jo+'c'+str(cache)+'.pdf'
-        else:
-            docref = f'tmp/{scac}/data/vinvoice/INV'+myo.Jo+'.pdf'
+        docref = f'tmp/{scac}/data/vinvoice/INV'+myo.Jo+'c'+str(cache)+'.pdf'
 
         for ldatl in ldata:
             ldatl.Pid = pdata1.id
             ldatl.Original = docref
             db.session.commit()
 
-        myo.Path = docref
-        myo.Storage = cache
+        myo.Invoice = os.path.basename(docref)
+        myo.Icache = cache+1
         db.session.commit()
 # Now all the invoices are created.  Next pack them up and create a single master invoice.
     keydata = [0]*len(odervec)
@@ -137,33 +132,26 @@ def multi_inv(odata, odervec, chas):
         if dtest2 > date2:
             date2 = dtest2
         idat = Invoices.query.filter(Invoices.Jo == odat.Jo).order_by(Invoices.Ea.desc()).first()
-        c1 = odat.Company
-        c1 = c1.strip()
-        c2 = odat.Company2
-        c2 = c2.strip()
+        c1, c2 = odat.Company, odat.Company2
+        c1, c2 = stripper(c1), stripper(c2)
         descr = 'From ' + c1 + ' to ' + c2
         keydata[jx] = [odat.Jo, odat.Booking, odat.Container, idat.Total, descr]
         grandtotal = grandtotal+float(idat.Total)
         print(keydata[jx])
         # put together the file paperwork
 
-    file1 = f'tmp/{scac}/data/vinvoice/P_' + 'test.pdf'
-    cache2 = int(odat.Detention)
-    cache2 = cache2+1
-    docref = f'tmp/{scac}/data/vinvoice/P_c'+str(cache2)+'_' + order + '.pdf'
+    file1 = f'tmp/{scac}/data/vpackages/P_' + 'test.pdf'
+    cache2 = int(odat.Pkcache)
+    docref = f'tmp/{scac}/data/vpackages/P_c'+str(cache2)+'_' + order + '.pdf'
+    odat.Pkcache = cache2 + 1
 
     for jx, ix in enumerate(odervec):
         odat = Orders.query.get(ix)
-        odat.Location = docref
+        odat.Package = os.path.basename(docref)
         db.session.commit()
 
     import make_TP_invoice
     make_TP_invoice.main(file1, keydata, grandtotal, pdata1, date1, date2)
-
-    invooder = oder
-    leftscreen = 0
-    leftsize = 8
-    modlink = 0
 
     filegather = ['pdfunite', addpath(file1)]
     for ix in odervec:
@@ -172,8 +160,5 @@ def multi_inv(odata, odervec, chas):
 
     filegather.append(addpath(docref))
     tes = subprocess.check_output(filegather)
-
-    odat.Detention = cache2
-    db.session.commit()
 
     return docref

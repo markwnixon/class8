@@ -130,7 +130,7 @@
                         {% if viewtype == 0 %}
                             {% include 'includes/_truckcolorcode.html' %}
                         {% else %}
-                            {% if viewtype == 'invoice' or viewtype == 'paidinvoice' %}
+                            {% if viewtype == 'invoice' or viewtype == 'paidinvoice' or viewtype == 'invopackage' %}
                                 {% include 'includes/_button_upd_email_ret.html' %}
                             {% else %}
                                 {% include 'includes/_button_upd_ret.html' %}

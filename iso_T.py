@@ -978,7 +978,6 @@ def isoT():
             leftscreen = 0
             leftsize = 8
             modlink = 0
-            invo = 3
 
             filegather = ['pdfunite', addpath(file1)]
             cdata = companydata()
@@ -998,6 +997,7 @@ def isoT():
             db.session.commit()
             emaildata = etemplate_truck2('invoice',2,odat)
             invo = 3
+            viewtype = 'packages'
 # ____________________________________________________________________________________________________________________E.Package2.Trucking
 # ____________________________________________________________________________________________________________________B.Email.Trucking
         # With loginvo we are recording invoice in ledger, but manually taking the invoice to customer
@@ -1039,6 +1039,8 @@ def isoT():
             jo = odat.Jo
             inc = Income.query.filter(Income.Jo==jo).first()
             acctdb = inc.SubJo
+            if acctdb is None:
+                acctdb = 'Undeposited Funds'
             gledger_write('income',jo,acctdb,0)
             odat.Istat = 4
             db.session.commit()
@@ -1063,7 +1065,7 @@ def isoT():
 
             print(oder, jo, viewtype)
 
-            if viewtype == 'packages':
+            if viewtype == 'packages' or viewtype == 'invopackage':
                 docref = odat.Package
 
             elif viewtype == 'paidinvoice':
@@ -1485,12 +1487,13 @@ def isoT():
 
                 incdat = Income.query.filter(Income.Jo == invojo).first()
                 if incdat is None:
-                    print('incdat is none"')
+                    print('incdat is none')
                     err.append('Creating New Payment on Jo')
                     paydesc = 'Receive payment on Invoice ' + invojo
                     recamount = ldat.Total
 
                     recdate = datetime.date.today()
+                    acctdb = 'Undeposited Funds'
 
                     print('acctdb=',acctdb)
                     input = Income(Jo=odat.Jo, SubJo=acctdb, Pid=odat.Bid, Description=paydesc,
@@ -1617,7 +1620,7 @@ def isoT():
 # ____________________________________________________________________________________________________________________E.PaymentHistory.Trucking
 # ____________________________________________________________________________________________________________________B.Invoice.Trucking and Quotes
         if (minvo is not None and oder > 0) and numchecked > 1:
-            err.append('Could not create multi-job invoice')
+            err.append('Creating Multi-Job Invoice')
             odata = Orders.query.all()
             odervec = numcheckv(odata)
             invooder = odervec[0]
@@ -1633,14 +1636,8 @@ def isoT():
                         thesematch = 0
 
             if thesematch == 1:
-                print('Selections Matched')
-
-                if 'Global' in shipco:
-                    print('Selections are Global')
-                    docref = multi_inv(odata, odervec, 1)
-                else:
-                    print('Multi-Invoice Requested')
-                    docref = multi_inv(odata, odervec, 1)
+                print('Multi_Invoice Selections Matched')
+                docref = multi_inv(odata, odervec, 1)
             else:
                 err.append('Shippers Not Matched')
 
@@ -1652,6 +1649,7 @@ def isoT():
                 err.append(f'Viewing {docref}')
                 emaildata = etemplate_truck('invoice',5,myo)
                 invo = 2
+                viewtype = 'invopackage'
 
         if ((minvo is not None and oder > 0 and numchecked == 1) or invoupdate is not None) or ((mquot is not None and oder > 0 and numchecked ==1 ) or quotupdate is not None):
 

@@ -24,7 +24,7 @@ def etemplate_truck(type,kind,odat):
 
     print('templated to:',type, kind)
 
-    if 'eprof' in type or 'invoice' in type or 'packages' in type:
+    if 'eprof' in type or 'invoice' in type or 'packages' in type or 'invopack' in type:
         od, bol, con = odat.Order, odat.BOL, odat.Container
         od, bol, con = stripper(od), stripper(bol), stripper(con)
         dblk = odat.Dropblock2.splitlines()
@@ -123,6 +123,17 @@ def etemplate_truck(type,kind,odat):
 
     elif type == 'packages':
         etitle = f'Package for {odat.Jo} and Completed Order: {od} | {bol} | {con}'
+        ebody = f'Dear {odat.Shipper},\n\nAn invoice package is enclosed for your review.\n\nWe greatly appreciate your business.\n\nSincerely,\n\n{signature}'
+        aname = odat.Package
+        emailin1 = estatus
+        emailin2 = eaccts
+        emailcc1 = em['info']
+        emailcc2 = em['expo']
+        emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2, aname]
+        return emaildata
+
+    elif type == 'invopackage':
+        etitle = f'Invoice Package for {odat.Jo}'
         ebody = f'Dear {odat.Shipper},\n\nAn invoice package is enclosed for your review.\n\nWe greatly appreciate your business.\n\nSincerely,\n\n{signature}'
         aname = odat.Package
         emailin1 = estatus
