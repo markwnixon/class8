@@ -1636,7 +1636,7 @@ def isoT():
                         thesematch = 0
 
             if thesematch == 1:
-                print('Multi_Invoice Selections Matched')
+                print('l_Invoice Selections Matched')
                 docref = multi_inv(odata, odervec, 1)
             else:
                 err.append('Shippers Not Matched')

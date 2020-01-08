@@ -109,30 +109,46 @@ def Remove_Dup_Jobs():
 
 
 def Matched_Now():
-    odata=Orders.query.filter( (Orders.Status.contains('A')) | (Orders.Status.contains('0')) | (Orders.Status.contains('1')) ).all()
+    odata=Orders.query.filter( Orders.Hstat < 2) ).all()
     for data in odata:
         container=data.Container
         if container is None:
             container='TBD'
-        idat=Interchange.query.filter((Interchange.Status=='IO') & ( (Interchange.RELEASE==data.Booking) | (Interchange.CONTAINER==data.Container) ) ).first()
-        idatO=Interchange.query.filter((Interchange.Status=='BBBBBB') & ( (Interchange.RELEASE==data.Booking) | (Interchange.CONTAINER==data.Container) ) ).first()
+        idata=Interchange.query.filter((Interchange.Status=='IO') & ( (Interchange.RELEASE==data.Booking) | (Interchange.CONTAINER==data.Container) ) ).first()
+        #Must guard against import containers with same booking/bol
+        if idata is not None:
+            ilen = len(idata)
+            if ilen > 1:
+                idat = Interchange.query.filter((Interchange.Status == 'IO') & (Interchange.CONTAINER == data.Container) ).first()
+            else:
+                idat = idata[0]
+        else:
+            idat = None
+
+        idataO = Interchange.query.filter((Interchange.Status == 'BBBBBB') & (
+                    (Interchange.RELEASE == data.Booking) | (Interchange.CONTAINER == data.Container))).first()
+        # Must guard against import containers with same booking/bol
+        if idataO is not None:
+            ilen = len(idataO)
+        if ilen > 1:
+            idatO = Interchange.query.filter(
+                (Interchange.Status == 'BBBBBB') & (Interchange.CONTAINER == data.Container)).first()
+        else:
+            idatO = idataO[0]
+        else:
+            idatO = None
+
         if idat is not None:
-            status=data.Status
-            bit1=status[0]
-            if bit1=='A' or bit1=='0' or bit1=='1':
-                newstatus=stat_update(status,'2',0)
-                data.Status=newstatus
-                db.session.commit()
+            hstat=data.Hstat
+            if hstat < 2:
+                data.Hstat = 2
             if container=='TBD':
                 data.Container=idat.CONTAINER
                 db.session.commit()
         elif idatO is not None:
-            status=data.Status
-            bit1=status[0]
-            if bit1=='A' or bit1=='0' or bit1=='1':
-                newstatus=stat_update(status,'1',0)
-                data.Status=newstatus
-                db.session.commit()
+            hstat=data.Hstat
+            if hstat < 2:
+                data.Hstat = 1
             if container=='TBD':
                 data.Container=idatO.CONTAINER
                 db.session.commit()
@@ -141,14 +157,12 @@ def Matched_Now():
             if idat2 is not None:
                 type=idat2.TYPE
                 if 'Out' in type:
-                    status=data.Status
-                    bit1=status[0]
-                    if bit1=='0':
-                        newstatus=stat_update(status,'1',0)
-                        data.Status=newstatus
+                    hstat = data.Hstat
+                    if hstat == 0:
+                        data.Hstat = 1
                         con=data.Container
                         if con is None or len(con<10):
-                            data.Container=idat.RELEASE
+                            data.Container=idat.CONTAINER
                         db.session.commit()
 
     #idata=Interchange.query.filter(~Interchange.Jo.contains('F')).all()
