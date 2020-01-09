@@ -156,7 +156,7 @@ def multi_inv(odata, odervec, chas):
     filegather = ['pdfunite', addpath(file1)]
     for ix in odervec:
         odat = Orders.query.get(ix)
-        filegather.append(addpath(odat.Path))
+        filegather.append(addpath(f'tmp/{scac}/data/vinvoice/{odat.Invoice}'))
 
     filegather.append(addpath(docref))
     tes = subprocess.check_output(filegather)
