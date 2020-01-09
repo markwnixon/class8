@@ -55,12 +55,14 @@ def get_date(data):
 
 def get_subject(data):
     subject = 'none'
+    mid = 'none'
     for response_part in data:
         if isinstance(response_part, tuple):
             part = response_part[1].decode('utf-8')
             msg = email.message_from_string(part)
             subject=msg['Subject']
-    return subject
+            mid = msg['Message-ID']
+    return subject, mid
 
 def get_from(data):
     for response_part in data:
@@ -108,6 +110,7 @@ def hard_decode(raw):
     ebody=''
     efrom=''
     edate=''
+    mid=''
     for line in rawl:
         test = line[0:5]
         line = re.sub(r'[^\x00-\x7F]+', ' ', line)
@@ -118,6 +121,11 @@ def hard_decode(raw):
             subject = subject.replace('Fwd:','')
             subject = subject.strip()
             print(f'Subject:{subject}')
+        if 'Message-ID' in line:
+            mid = line.split('Message-ID:')[1]
+            mid = mid.replace('Fwd:', '')
+            mid = mid.strip()
+            print(f'MID:{mid}')
         if 'From' in test and '@' in line and 'firsteagle' not in line and 'onestop' not in line:
             print('efrom',line)
             efrom = line.split('From:')[1]
@@ -138,7 +146,7 @@ def hard_decode(raw):
             if len(line)>0:
                 ebody=ebody+line+'\n'
     #print(f'ebody={ebody}')
-    return subject,efrom,edate,ebody
+    return subject,efrom,edate,ebody,mid
 
 
 def add_quote_emails():
@@ -150,8 +158,8 @@ def add_quote_emails():
     con.login(username, password)
     con.select('INBOX')
     result, data = con.search(None,'ALL')
-    msgs = get_emails(data, con)
-    #msgs = get_emails(search_from_date('TO', usernames['quot'], con, datefrom), con)
+    #msgs = get_emails(data, con)
+    msgs = get_emails(search_from_date('TO', usernames['quot'], con, datefrom), con)
 
     for j, msg in enumerate(msgs):
         raw = email.message_from_bytes(msg[0][1])
@@ -160,52 +168,56 @@ def add_quote_emails():
             body = body.decode('utf-8')
             getdate = get_date(msg)
             thisfrom = get_from(msg)
-            subject = get_subject(msg)
-            print(f'For email {j}: Status OK')
+            subject, mid = get_subject(msg)
+            print(f'For email {j}: Status OK {mid}')
             # Check to see if this is a forwarded message in which case use a hard decode:
             if 'Fwd:' in subject or 'Fwd=' in subject:
                 print(f'For email {j}: Fwd Message Use Hard Decode')
-                subject, thisfrom, getdate, body = hard_decode(raw)
+                subject, thisfrom, getdate, body, mid = hard_decode(raw)
 
         except:
             print(f'For email {j}: Decode failed')
-            subject, thisfrom, getdate, body = hard_decode(raw)
+            subject, thisfrom, getdate, body, mid = hard_decode(raw)
 
-        if getdate is not None:
-            print('getdate=',getdate)
-            datep = date_y4.findall(getdate)
-            if datep:
-                print(datep)
-                test = datep[0]
-                print(test)
-                print(test[0])
-                print(datep[0][0])
-                date = f'{datep[0][0]} {datep[0][1]} {datep[0][2]}'
-            else:
-                date = getdate[4:16]
-                date = date.strip()
-            print(date)
-            n = datetime.datetime.strptime(date, "%d %b %Y")
-            newdate = datetime.date(n.year, n.month, n.day)
+        if 're:' in subject.lower():
+            print('This is a response, do not add to database')
         else:
-            newdate = datetime.date.today()
 
-        body = compact(body)
-        if len(body) > 500:
-            body = body[0:500]
+            if getdate is not None:
+                print('getdate=',getdate)
+                datep = date_y4.findall(getdate)
+                if datep:
+                    print(datep)
+                    test = datep[0]
+                    print(test)
+                    print(test[0])
+                    print(datep[0][0])
+                    date = f'{datep[0][0]} {datep[0][1]} {datep[0][2]}'
+                else:
+                    date = getdate[4:16]
+                    date = date.strip()
+                print(date)
+                n = datetime.datetime.strptime(date, "%d %b %Y")
+                newdate = datetime.date(n.year, n.month, n.day)
+            else:
+                newdate = datetime.date.today()
 
-        if len(thisfrom) > 45:
-            thisfrom = thisfrom[0:45]
+            body = compact(body)
+            if len(body) > 500:
+                body = body[0:500]
 
-        if len(subject) > 90:
-            subject = subject[0:90]
+            if len(thisfrom) > 200:
+                thisfrom = thisfrom[0:200]
+
+            if len(subject) > 200:
+                subject = subject[0:200]
 
 
-        qdat = Quotes.query.filter((Quotes.Title == subject) & (Quotes.From==thisfrom) & (Quotes.Date==newdate)).first()
-        if qdat is None:
-            input = Quotes(Date=newdate,From=thisfrom,Title=subject,Body=body,Response=None,Amount=None,Location=None,Status=0,Responder=None,RespDate=None,Start='Seagirt Marine Terminal, Baltimore, MD')
-            db.session.add(input)
-            db.session.commit()
+            qdat = Quotes.query.filter(Quotes.Mid == mid).first()
+            if qdat is None:
+                input = Quotes(Date=newdate,From=thisfrom,Subject=subject,Mid=mid,Body=body,Person=None,Response=None,Amount=None,Location=None,Status=0,Responder=None,RespDate=None,Start='Seagirt Marine Terminal, Baltimore, MD')
+                db.session.add(input)
+                db.session.commit()
 
 
 def extract_values(obj, key):
@@ -426,6 +438,7 @@ def isoQuote():
         updatebid = request.values.get('Update')
         updateE = request.values.get('UpdateE')
         returnhit = request.values.get('Return')
+        bidname = request.values.get('bidname')
         bidthis = request.values.get('bidthis')
         bidthis = d2s(bidthis)
         locfrom = request.values.get('locfrom')
@@ -493,6 +506,7 @@ def isoQuote():
                     qdat.Location = locto
                     qdat.From = emailto
                     qdat.Amount = bidthis
+                    qdat.Person = bidname
                     qdat.Responder = username
                     qdat.RespDate = respondnow
                     qdat.Status = 1
@@ -506,7 +520,7 @@ def isoQuote():
                     quot=0
 
 
-                print('Running Directions:',locfrom,locto,bidthis,taskbox,quot)
+                print('Running Directions:',locfrom,locto,bidthis,bidname,taskbox,quot)
                 try:
                     ####################################  Directions Section  ######################################
                     miles, hours, lats, lons, dirdata, tot_dist, tot_dura = get_directions(locfrom,locto)
@@ -645,15 +659,19 @@ def isoQuote():
                     #Set the email data:
                     etitle = f'{cdata[0]} Quote to {locto} from {locfrom}'
                     if qdat is not None:
-                        customer = friendly(qdat.From)
+                        customer = qdat.Person
+                        if customer is None:
+                            customer = friendly(emailto)
                     else:
                         customer = friendly(emailto)
+                    qdat.Person = customer
+                    db.session.commit()
                     ebody = f'Hello {customer}, \n\n<br><br>{cdata[0]} is pleased to offer a quote of <b>${bidthis}</b> for this load to {locto}.\nThe quote is inclusive of tolls, fuel, and 2 hrs of load time.  Additional accessorial charges may apply and are priced according the following table:\n\n'
                     ebody = ebody + maketable()
                     emailin1 = request.values.get('edat2')
                     if updatego is None:
                         emailin1 = emailonly(emailto)
-                    emailin2 = None
+                    emailin2 = ''
                     emailcc1 = usernames['info']
                     emailcc2 = usernames['expo']
                     emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2]
@@ -661,11 +679,7 @@ def isoQuote():
                     #Set the email data:
                     if updatebid is not None or updatego is not None:
                         etitle = f'{cdata[0]} Quote to {locto} from {locfrom}'
-                        if qdat is not None:
-                            customer = friendly(qdat.From)
-                        else:
-                            customer = friendly(emailto)
-                        ebody = f'Hello {customer}, \n\n<br><br>{cdata[0]} is pleased to offer a quote of <b>${bidthis}</b> for this load to {locto}.\nThe quote is inclusive of tolls, fuel, and 2 hrs of load time.  Additional accessorial charges may apply and are priced according the following table:\n\n'
+                        ebody = f'Hello {bidname}, \n\n<br><br>{cdata[0]} is pleased to offer a quote of <b>${bidthis}</b> for this load to {locto}.\nThe quote is inclusive of tolls, fuel, and 2 hrs of load time.  Additional accessorial charges may apply and are priced according the following table:\n\n'
                         ebody = ebody + maketable()
                     else:
                         etitle = request.values.get('edat0')

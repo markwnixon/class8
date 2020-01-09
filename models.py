@@ -348,8 +348,10 @@ class Quotes(db.Model):
     id = db.Column('id', db.Integer, primary_key=True)
     Date = db.Column('Date', db.DateTime)
     From = db.Column('From', db.String(200))
-    Title = db.Column('Title', db.String(200))
+    Subject = db.Column('Subject', db.String(200))
     Body = db.Column('Body', db.String(500))
+    Mid = db.Column('Mid', db.String(100))
+    Person = db.Column('Person', db.String(100))
     Response = db.Column('Response', db.String(500))
     Amount = db.Column('Amount', db.String(45))
     Location = db.Column('Location', db.String(200))
@@ -358,10 +360,10 @@ class Quotes(db.Model):
     RespDate = db.Column('RespDate', db.DateTime)
     Start = db.Column('Start', db.String(45))
 
-    def __init__(self, Date, From, Title, Body, Response, Amount, Location, Status, Responder, RespDate, Start):
+    def __init__(self, Date, From, Subject, Body, Response, Amount, Location, Status, Responder, RespDate, Start, Mid, Person):
         self.Date = Date
         self.From = From
-        self.Title = Title
+        self.Subject = Subject
         self.Body = Body
         self.Response = Response
         self.Amount = Amount
@@ -370,6 +372,8 @@ class Quotes(db.Model):
         self.Responder = Responder
         self.RespDate = RespDate
         self.Start = Start
+        self.Mid = Mid
+        self.Person = Person
 
 class Drivers(db.Model):
     __tablename__ = 'drivers'

@@ -40,10 +40,10 @@
                 {% if data.id == quot|int %}
                     {% set atc1="red text-white font-weight-bold" %}
                 {% endif %}
-                {% if data.Title|length > 40 %}
-                    {% set tit = data.Title[0:39] %}
+                {% if data.Subject|length > 40 %}
+                    {% set tit = data.Subject[0:39] %}
                 {% else %}
-                    {% set tit = data.Title %}
+                    {% set tit = data.Subject %}
                 {% endif %}
 
                 {% if data.Location %}

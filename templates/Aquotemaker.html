@@ -168,10 +168,14 @@
                   <td> <div class="input-group-text">Bid/Override</div></td>
                   <td colspan="2"><textarea class="form-control" type="text" name="bidthis" rows="1">{{bidthis}}</textarea></td>
              </tr>
+              <tr>
+                  <td> <div class="input-group-text">Salutation Name</div></td>
+                  <td colspan="2"><textarea class="form-control" type="text" name="bidname" rows="1">{{qdat.Person}}</textarea></td>
+             </tr>
              <tr>
              <td colspan = '2'>
                  <button type="submit" class="btn btn-elegant btn-sm" name="GetQuote">Get<br>Quote</button>
-                 <button type="submit" class="btn btn-elegant btn-sm" name="Update">Update<br>Bid</button>
+                 <button type="submit" class="btn btn-elegant btn-sm" name="Update">Update<br>Bid/Name</button>
                  <button type="submit" class="btn btn-green btn-sm" name="UpdateE">Update<br>Email</button>
                  <button type="submit" class="btn btn-green btn-sm" name="Email">Email<br>Quote</button>
                  <button type="submit" class="btn btn-blue btn-sm" name="Return">Return To<br>Table</button>
@@ -187,8 +191,8 @@
             </div>
             <div class="card-body" align=""left">
                 {% if qdat %}
-                    From:  {{ qdat.From|safe }}<br><br>
-                    Title:  {{ qdat.Title|safe }}<br><br>
+                    From:  {{ qdat.From|safe }}<br>
+                    Title:  {{ qdat.Subject|safe }}<br><br>
                     {{ qdat.Body|safe }}
                 {% endif %}
             </div>
