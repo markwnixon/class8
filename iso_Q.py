@@ -98,7 +98,6 @@ def compact(body):
             if 'Forwarded Message' in line or 'Subject:' in line or 'Date:' in line or 'To:' in line or 'CC:' in line or 'From:' in line or 'Content-Type' in line or 'Content-Transfer' in line:
                 print('Line from FWD Preamble')
             else:
-                print('line:',line)
                 newbody = newbody + line +'\n' + '<br>'
     return newbody
 
