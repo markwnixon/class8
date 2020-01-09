@@ -2,10 +2,11 @@ from runmain import app, db
 from flask import render_template, flash, redirect, url_for, session, logging, request
 from requests import get
 from CCC_system_setup import apikeys
-from CCC_system_setup import myoslist, addpath, tpath, companydata, usernames, passwords, scac, imap_url, accessorials
+from CCC_system_setup import myoslist, addpath, tpath, companydata, usernames, passwords, scac, imap_url, accessorials, signoff
 from viewfuncs import d2s, d1s
 import imaplib, email
 import math
+import re
 
 import datetime
 from models import Quotes
@@ -15,6 +16,7 @@ API_KEY_GEO = apikeys['gkey']
 API_KEY_DIS = apikeys['dkey']
 cdata = companydata()
 
+date_y4=re.compile(r'([1-9]|0[1-9]|[12][0-9]|3[01]) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{4})')
 
 def roundup(x):
     return int(math.ceil(x / 10.0)) * 10
@@ -89,8 +91,15 @@ def compact(body):
     newbody = ''
     blines = body.splitlines()
     for line in blines:
+        #Remove non-ascii characters
+        line = re.sub(r'[^\x00-\x7F]+', ' ', line)
+        line = re.sub(r'=[A-Z,0-9][A-Z,0-9]', '', line)
         if len(line.strip())>1:
-            newbody = newbody + line +'\n'
+            if 'Forwarded Message' in line or 'Subject:' in line or 'Date:' in line or 'To:' in line or 'CC:' in line or 'From:' in line or 'Content-Type' in line or 'Content-Transfer' in line:
+                print('Line from FWD Preamble')
+            else:
+                print('line:',line)
+                newbody = newbody + line +'\n' + '<br>'
     return newbody
 
 def hard_decode(raw):
@@ -102,12 +111,16 @@ def hard_decode(raw):
     edate=''
     for line in rawl:
         test = line[0:5]
+        line = re.sub(r'[^\x00-\x7F]+', ' ', line)
+        line = re.sub(r'=[A-Z,0-9][A-Z,0-9]', '', line)
+        line = line.replace('=09','')
         if 'Subj' in test:
             subject = line.split('Subject:')[1]
             subject = subject.replace('Fwd:','')
             subject = subject.strip()
             print(f'Subject:{subject}')
-        if 'From' in test and 'firsteagle' not in line:
+        if 'From' in test and '@' in line and 'firsteagle' not in line and 'onestop' not in line:
+            print('efrom',line)
             efrom = line.split('From:')[1]
             efrom = efrom.strip()
             print(f'From:{efrom}')
@@ -150,13 +163,29 @@ def add_quote_emails():
             thisfrom = get_from(msg)
             subject = get_subject(msg)
             print(f'For email {j}: Status OK')
+            # Check to see if this is a forwarded message in which case use a hard decode:
+            if 'Fwd:' in subject or 'Fwd=' in subject:
+                print(f'For email {j}: Fwd Message Use Hard Decode')
+                subject, thisfrom, getdate, body = hard_decode(raw)
+
         except:
             print(f'For email {j}: Decode failed')
             subject, thisfrom, getdate, body = hard_decode(raw)
 
         if getdate is not None:
-            date = getdate[4:16]
-            date = date.strip()
+            print('getdate=',getdate)
+            datep = date_y4.findall(getdate)
+            if datep:
+                print(datep)
+                test = datep[0]
+                print(test)
+                print(test[0])
+                print(datep[0][0])
+                date = f'{datep[0][0]} {datep[0][1]} {datep[0][2]}'
+            else:
+                date = getdate[4:16]
+                date = date.strip()
+            print(date)
             n = datetime.datetime.strptime(date, "%d %b %Y")
             newdate = datetime.date(n.year, n.month, n.day)
         else:
@@ -263,9 +292,9 @@ def maketable():
     bdata = bdata + '<table>\n'
     for key,value in accessorials.items():
         ##print(key, value[0], value[1])
-        bdata = bdata + f'<tr><td>{key}</td><td>{value[0]}</td><td>${value[1]}</td></tr>\n'
+        bdata = bdata + f'<tr><td><font size="+0">{key}&nbsp;</font></td><td><font size="+0">{value[0]}&nbsp;</font></td><td><font size="+0">${value[1]}&nbsp;</font></td></tr>\n'
     bdata = bdata + '</table><br><br>'
-    bdata = bdata + '<em>Please do not hesitate to call or email the First Eagle quote team<br>301-516-3000<br>Ask for Mark or Nadav<br></em>'
+    bdata = bdata + f'<em>{signoff}</em>'
 
     return bdata
 
@@ -457,7 +486,7 @@ def isoQuote():
                 if updatego is not None or updatebid is not None or emailgo is not None or updateE is not None:
                     locto = request.values.get('locto')
                     if locto is None:
-                        locto = '505 Hampton Park Blvd, Capitol Heights, MD  20743'
+                        locto = 'Capitol Heights, MD  20743'
                     locfrom = request.values.get('locfrom')
                     emailto = request.values.get('edat2')
                     respondnow = datetime.datetime.now()
@@ -656,7 +685,7 @@ def isoQuote():
             quot = request.values.get('optradio')
             if quot is not None:
                 qdat = Quotes.query.get(quot)
-            locto = '505 Hampton Park Blvd, Capitol Heights, MD  20743'
+            locto = 'Capitol Heights, MD  20743'
             locfrom = 'Baltimore Seagirt'
             etitle = f'{cdata[0]} Quote for Drayage to {locto} from {locfrom}'
             if qdat is not None:
@@ -691,7 +720,7 @@ def isoQuote():
 
         username = session['username'].capitalize()
         qdat=None
-        locto = '505 Hampton Park Blvd, Capitol Heights, MD  20743'
+        locto = 'Capitol Heights, MD  20743'
         locfrom = 'Baltimore Seagirt'
         etitle = f'{cdata[0]} Quote for Drayage to {locto} from {locfrom}'
         ebody = f'Regirgitation from the input'
@@ -717,7 +746,7 @@ def isoQuote():
         timedata = []
         distdata = []
         add_quote_emails()
-        thismuch = 1
+        thismuch = '1'
         taskbox = 0
         quot=0
 
