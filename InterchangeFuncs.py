@@ -109,34 +109,13 @@ def Remove_Dup_Jobs():
 
 
 def Matched_Now():
-    odata=Orders.query.filter( Orders.Hstat < 2) ).all()
+    odata=Orders.query.filter(Orders.Hstat < 2).all()
     for data in odata:
         container=data.Container
         if container is None:
             container='TBD'
-        idata=Interchange.query.filter((Interchange.Status=='IO') & ( (Interchange.RELEASE==data.Booking) | (Interchange.CONTAINER==data.Container) ) ).first()
-        #Must guard against import containers with same booking/bol
-        if idata is not None:
-            ilen = len(idata)
-            if ilen > 1:
-                idat = Interchange.query.filter((Interchange.Status == 'IO') & (Interchange.CONTAINER == data.Container) ).first()
-            else:
-                idat = idata[0]
-        else:
-            idat = None
-
-        idataO = Interchange.query.filter((Interchange.Status == 'BBBBBB') & (
-                    (Interchange.RELEASE == data.Booking) | (Interchange.CONTAINER == data.Container))).first()
-        # Must guard against import containers with same booking/bol
-        if idataO is not None:
-            ilen = len(idataO)
-        if ilen > 1:
-            idatO = Interchange.query.filter(
-                (Interchange.Status == 'BBBBBB') & (Interchange.CONTAINER == data.Container)).first()
-        else:
-            idatO = idataO[0]
-        else:
-            idatO = None
+        idat = Interchange.query.filter((Interchange.Status=='IO') & ( (Interchange.RELEASE==data.Booking) | (Interchange.CONTAINER==data.Container) ) ).first()
+        idatO = Interchange.query.filter((Interchange.Status == 'BBBBBB') & ((Interchange.RELEASE == data.Booking) | (Interchange.CONTAINER == data.Container))).first()
 
         if idat is not None:
             hstat=data.Hstat
