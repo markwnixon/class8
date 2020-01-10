@@ -367,10 +367,18 @@ def writechecks(bdat, pdat, cache, sbdata, links):
     c.drawString(ltm+20, memoline3-dl*2-22, addr2)
     c.drawString(ltm+20, memoline3-dl*2-44, pufrom)
 
+    acct = bdat.bAccount
+    comp = bdat.Co
+    if acct is None:
+        acct = ' '
+    if comp is None:
+        comp = ' '
+
+
     if nbills == 1:
         if btype == 'Expense':
-            c.drawString(ltm+230, mlev11, 'Expensed Account Name: '+bdat.bAccount + ' (' + bdat.Co + ')')
-            c.drawString(ltm+230, mlev21, 'Expensed Account Name: '+bdat.bAccount + ' (' + bdat.Co + ')')
+            c.drawString(ltm+230, mlev11, 'Expensed Account Name: '+ acct + ' (' + comp + ')')
+            c.drawString(ltm+230, mlev21, 'Expensed Account Name: '+ acct + ' (' + comp + ')')
             mlev21 = mlev21-2*dl
             mlev11 = mlev11-2*dl
 
@@ -394,8 +402,8 @@ def writechecks(bdat, pdat, cache, sbdata, links):
         s3 = ltm+380
         s4 = ltm+480
         if btype == 'Expense':
-            c.drawString(ltm+230, mlev11, 'Expensed Account Name: '+bdat.bAccount + ' (' + bdat.Co + ')')
-            c.drawString(ltm+230, mlev21, 'Expensed Account Name: '+bdat.bAccount + ' (' + bdat.Co + ')')
+            c.drawString(ltm+230, mlev11, 'Expensed Account Name: '+ acct + ' (' + comp + ')')
+            c.drawString(ltm+230, mlev21, 'Expensed Account Name: '+ acct + ' (' + comp + ')')
             mlevtop = mlev21-2*dl
             mlevbot = mlev11-2*dl
         c.setFont('Helvetica-Bold', 12, leading=None)
