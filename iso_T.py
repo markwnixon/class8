@@ -20,7 +20,7 @@ import json
 
 def isoT():
 
-    from viewfuncs import erud, testdrop, make_new_order, driver_assignments, driver_payroll, container_list, get_invo_data, Orders_Form_Update, Orders_Drop_Update
+    from viewfuncs import erud, testdrop, make_new_order, driver_assignments, driver_payroll, container_list, get_invo_data, Orders_Form_Update, Orders_Drop_Update, loginvo_m
     from blend_pdf import blendticks
 
     if request.method == 'POST':
@@ -908,7 +908,7 @@ def isoT():
                     thisprofile = 'eprof'+eprof
                     kind=0
                 else:
-                    thisprofile = 'invoice'
+                    thisprofile = 'packages'
                     kind=2
                 emaildata = etemplate_truck(thisprofile,kind,odat)
                 invo = 3
@@ -993,8 +993,6 @@ def isoT():
             filegather.append(addpath(docref))
             tes = subprocess.check_output(filegather)
 
-            odat.Detention = cache2
-            db.session.commit()
             emaildata = etemplate_truck2('invoice',2,odat)
             invo = 3
             viewtype = 'packages'
@@ -1003,28 +1001,7 @@ def isoT():
         # With loginvo we are recording invoice in ledger, but manually taking the invoice to customer
         if loginvo is not None:
             odat = Orders.query.get(invooder)
-            alink = odat.Links
-            if alink is not None:
-                try:
-                    alist = json.loads(alink)
-                    for aoder in alist:
-                        thisodat = Orders.query.get(aoder)
-                        jo = thisodat.Jo
-                        gledger_write('invoice', jo, 0, 0)
-                        thisodat.Istat = 2
-                        db.session.commit()
-                except:
-                    odat.Links = None
-                    jo = odat.Jo
-                    gledger_write('invoice', jo, 0, 0)
-                    odat.Istat = 2
-                    db.session.commit()
-            else:
-                jo = odat.Jo
-                gledger_write('invoice',jo,0,0)
-                odat.Istat = 2
-                db.session.commit()
-
+            loginvo_m(odat,2)
             modlink = 0
             invo = 0
             invooder = 0
@@ -1058,12 +1035,7 @@ def isoT():
             odat=Orders.query.get(oder)
             jo = odat.Jo
             order = odat.Order
-
-            leftscreen = 1
-            leftsize = 10
-            modlink = 0
-
-            print(oder, jo, viewtype)
+            print('viewtype=',viewtype)
 
             if viewtype == 'packages' or viewtype == 'invopackage':
                 docref = odat.Package
@@ -1080,28 +1052,17 @@ def isoT():
             elif viewtype == 'invoice':
                 docref = odat.Invoice
 
-            else:
-
-                print('eprof at iso_T 1068 decision tree=', eprof)
-
-                if eprof == 3 or eprof ==5:
-                    alink = odat.Links
-                    if alink is not None:
-                        alist = json.loads(alink)
-                        for aoder in alist:
-                            thisodat = Orders.query.get(aoder)
-                            thisodat.Istat = 3
-                            db.session.commit()
-                    else:
-                        odat.Istat = 3
-                        db.session.commit()
-                    gledger_write('invoice',jo,0,0)
+            if viewtype == 'invopackage' or viewtype == 'invoice' or eprof == 3 or eprof == 5:
+                loginvo_m(odat, 3)
 
             print('mydocref=',docref)
             emailin1 = invoice_mimemail(order, docref, eprof)
             invo = 0
             invooder = 0
             stamp = 0
+            leftscreen = 1
+            leftsize = 10
+            modlink = 0
             err.append(f'Successful email to: {emailin1}')
 # ____________________________________________________________________________________________________________________E.Email.Trucking
 # ____________________________________________________________________________________________________________________B.Views.Trucking
@@ -1645,6 +1606,10 @@ def isoT():
                 leftscreen = 0
                 invo = 2
                 leftsize = 8
+                for oder in odervec:
+                    myo = Orders.query.get(oder)
+                    myo.Links = json.dumps(odervec)
+                    db.session.commit()
                 err.append(f'Multi-Invoice:{json.dumps(odervec)}')
                 err.append(f'Viewing {docref}')
                 emaildata = etemplate_truck('invoice',5,myo)
@@ -1831,6 +1796,7 @@ def isoT():
                     order = modata.Order
                 if (minvo is not None and oder > 0 and numchecked == 1) or invoupdate is not None:
                     emaildata = etemplate_truck('invoice',6,modata)
+                    viewtype = 'invoice'
                 else:
                     emaildata = etemplate_truck('quote',6,modata)
                 #invo = 1

@@ -8,6 +8,7 @@ import os
 import shutil
 import subprocess
 import img2pdf
+import json
 from CCC_system_setup import addpath, scac, tpath
 
 today=datetime.date.today()
@@ -2153,3 +2154,32 @@ def Orders_Drop_Update(oder):
         modata.Hstat = 0
 
     db.session.commit()
+
+def loginvo_m(odat,ix):
+    #if ix = 2 we are not emailing
+    #if ix = 3 we ARE emailing
+    from gledger_write import gledger_write
+    alink = odat.Links
+    print(ix,alink)
+    if alink is not None:
+        if 1 == 1:
+            alist = json.loads(alink)
+            for aoder in alist:
+                aoder = nonone(aoder)
+                thisodat = Orders.query.get(aoder)
+                print(aoder,thisodat.Istat)
+                jo = thisodat.Jo
+                gledger_write('invoice', jo, 0, 0)
+                thisodat.Istat = ix
+                db.session.commit()
+        if 1 == 2:
+            odat.Links = None
+            jo = odat.Jo
+            gledger_write('invoice', jo, 0, 0)
+            odat.Istat = ix
+            db.session.commit()
+    else:
+        jo = odat.Jo
+        gledger_write('invoice', jo, 0, 0)
+        odat.Istat = ix
+        db.session.commit()
