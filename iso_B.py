@@ -317,6 +317,10 @@ def isoB(indat):
                         co=modata.Co
                         jo=modata.Jo
                         ccode=jo[0]
+                        if co is None:
+                            co = ccode
+                        if jo is None:
+                            ccode = co[0]
                         if co != ccode:
                             # Have to change all the Gledger items with old jo to new jo
                             Gledger.query.filter(Gledger.Tcode==jo).delete()
