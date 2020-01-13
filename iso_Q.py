@@ -158,8 +158,8 @@ def add_quote_emails():
     con.login(username, password)
     con.select('INBOX')
     result, data = con.search(None,'ALL')
-    #msgs = get_emails(data, con)
-    msgs = get_emails(search_from_date('TO', usernames['quot'], con, datefrom), con)
+    msgs = get_emails(data, con)
+    #msgs = get_emails(search_from_date('TO', 'ALL', con, datefrom), con)
 
     for j, msg in enumerate(msgs):
         raw = email.message_from_bytes(msg[0][1])
@@ -169,19 +169,20 @@ def add_quote_emails():
             getdate = get_date(msg)
             thisfrom = get_from(msg)
             subject, mid = get_subject(msg)
-            print(f'For email {j}: Status OK {mid}')
+            #print(f'For email {j}: Status OK {mid}')
             # Check to see if this is a forwarded message in which case use a hard decode:
             if 'Fwd:' in subject or 'Fwd=' in subject:
                 print(f'For email {j}: Fwd Message Use Hard Decode')
                 subject, thisfrom, getdate, body, mid = hard_decode(raw)
 
         except:
-            print(f'For email {j}: Decode failed')
+            #print(f'For email {j}: Decode failed')
             subject, thisfrom, getdate, body, mid = hard_decode(raw)
 
-        if 're:' in subject.lower():
-            print('This is a response, do not add to database')
+        if 'RE:' in subject or 'Re:' in subject:
+            print(f'Subject {subject} is a response, do not add to database')
         else:
+            print(f'Preparing to add {subject} to database')
 
             if getdate is not None:
                 print('getdate=',getdate)
