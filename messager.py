@@ -1189,7 +1189,7 @@ def msg_analysis(msg, sessionph, medialist):
                     pid = pdat.id
                     sequence = sequence.replace('J2', 'J3')
                     putjo(sequence, jo, sessionph)
-                    appendline([customer, str(pid)], sessionph)waly
+                    appendline([customer, str(pid)], sessionph)
                     newmsg = f'Customer Added\n*{customer}*'
                     newmsg = newmsg + '\nEnter customer details:\n<street address>\n<city-state-zip>\n<phone>\n<email>'
                     newmsg = newmsg + '\nEnter *NO* to opt out\n\nOne item per line\nLeave blank as needed.'
