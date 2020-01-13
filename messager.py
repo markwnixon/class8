@@ -1189,7 +1189,7 @@ def msg_analysis(msg, sessionph, medialist):
                     pid = pdat.id
                     sequence = sequence.replace('J2', 'J3')
                     putjo(sequence, jo, sessionph)
-                    appendline([customer, str(pid)], sessionph)
+                    appendline([customer, str(pid)], sessionph)waly
                     newmsg = f'Customer Added\n*{customer}*'
                     newmsg = newmsg + '\nEnter customer details:\n<street address>\n<city-state-zip>\n<phone>\n<email>'
                     newmsg = newmsg + '\nEnter *NO* to opt out\n\nOne item per line\nLeave blank as needed.'
@@ -1267,7 +1267,7 @@ def msg_analysis(msg, sessionph, medialist):
                            Date=today, Driver=None, Company2=None, Time=None, Date2=today, Time2=None, Seal=None, Pickup=None, Delivery=None,
                            Amount=None, Path=None, Original=None, Description=None, Chassis=None, Detention='0', Storage='0',
                            Release=0, Shipper=customer, Type=None, Time3=None, Bid=pid, Lid=None, Did=None, Label=None, Dropblock1=None, Dropblock2=None, Commodity=None, Packing=None,
-                           Links=Nonr, Hstat=-1,Istat=-1, Proof=None, Invoice=None, Gate=None, Package=None, Manifest=None, Scache=0,
+                           Links=None, Hstat=-1,Istat=-1, Proof=None, Invoice=None, Gate=None, Package=None, Manifest=None, Scache=0,
                            Pcache=0,Icache=0, Mcache=0, Pkcache=0
                            )
             db.session.add(input)
