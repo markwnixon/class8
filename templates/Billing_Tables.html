@@ -128,8 +128,10 @@
             {% for data in data2 %}
                 {% if data.Middle == 'Copy' %}
                     {% set atc="amber font-weight-bold text-center" %}
-                {% else %}
+                {% elif data.First %}
                     {% set atc = "font-weight-bold " + data.First + "-text text-center" %}
+                {% else %}
+                    {% set atc = " blue font-weight-bold " + 'white' + "-text text-center" %}
                 {% endif %}
                                 <tr>
                                     <td class="{{atc}}">{{data.id}}</td>
