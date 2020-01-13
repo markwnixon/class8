@@ -157,7 +157,7 @@ def add_quote_emails():
     con = imaplib.IMAP4_SSL(imap_url)
     con.login(username, password)
     con.select('INBOX')
-    result, data = con.search(None,'ALL')
+    result, data = con.search(None,(f'since {datefrom}'))
     msgs = get_emails(data, con)
     #msgs = get_emails(search_from_date('TO', 'ALL', con, datefrom), con)
 
