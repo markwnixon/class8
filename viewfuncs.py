@@ -1,5 +1,5 @@
 from runmain import db
-from models import Trucklog, DriverAssign, Invoices, JO, Income, Bills, Accounts, Bookings, OverSeas, Autos, People, Interchange, Drivers, ChalkBoard, Orders, Drops, Services, Quotes
+from models import Trucklog, DriverAssign, Invoices, JO, Income, Bills, Accounts, Bookings, OverSeas, Autos, People, Interchange, Drivers, ChalkBoard, Orders, Drops, Services, Quotes, Divisions
 from flask import session, logging, request
 import datetime
 import calendar
@@ -9,10 +9,12 @@ import shutil
 import subprocess
 import img2pdf
 import json
-from CCC_system_setup import addpath, scac, tpath
+from CCC_system_setup import addpath, scac, tpath, companydata
 
 today=datetime.date.today()
 today_str = today.strftime('%Y-%m-%d')
+cdata = companydata()
+jbcode = cdata[10]+'T'
 
 def nodollar(infloat):
     outstr="%0.2f" % infloat
@@ -294,12 +296,8 @@ def newjo(jtype,sdate):
         month='Y'
     if month=='12':
         month='Z'
-    if jtype=='J':
-        nextjo='JA'+month+day2+year[3]+eval
-    else:
-        charco = scac[0]
-        charco = charco.replace('O','K')
-        nextjo= charco+jtype+month+day2+year[3]+eval
+
+    nextjo = jtype+month+day2+year[3]+eval
     input2 = JO(jo=nextjo, nextid=0, date=sdate, status=1)
     db.session.add(input2)
     lv.nextid=nextid+1
@@ -1324,11 +1322,9 @@ def global_inv(odata,odervec):
 
 def make_new_order():
     sdate = request.values.get('date')
-    if sdate is None:
+    if sdate == '':
         sdate = today.strftime('%Y-%m-%d')
-
-    jtype = 'T'
-    nextjo = newjo(jtype, sdate)
+    nextjo = newjo(jbcode, sdate)
 
     vals = ['shipper', 'order', 'bol', 'booking', 'container', 'pickup',
             'date', 'date2', 'amount', 'ctype', 'dropblock1', 'dropblock2']
@@ -1386,6 +1382,68 @@ def make_new_order():
     return oid,nextjo
 
 
+def make_new_bill():
+    sdate = request.values.get('bdate')
+    if sdate == '':
+        sdate = today_str
+
+    thiscomp = request.values.get('thiscomp')
+    cdat = People.query.filter((People.Company == thiscomp) & (
+            (People.Ptype == 'Vendor') | (People.Ptype == 'TowCo'))).first()
+    if cdat is not None:
+        acomp = cdat.Company
+        cid = cdat.Accountid
+        aid = cdat.id
+        acdat = Accounts.query.filter(Accounts.id == cid).first()
+        if acdat is not None:
+            baccount = acdat.Name
+            category = acdat.Category
+            subcat = acdat.Subcategory
+            descript = acdat.Description
+            btype = acdat.Type
+        else:
+            category = 'NAY'
+            subcat = 'NAY'
+            descript = ''
+            btype = ''
+            baccount = ''
+    else:
+        acomp = None
+        aid = None
+        category = 'NAY'
+        subcat = 'NAY'
+        descript = ''
+        btype = ''
+        baccount = ''
+
+    cco = request.values.get('ctype')
+    if len(cco) != 1:
+        cco = 'X'
+    baccount = request.values.get('billacct')
+
+    bamt = request.values.get('bamt')
+    bamt = d2s(bamt)
+    ddate = request.values.get('ddate')
+    if ddate == '':
+        ddate = today_str
+    bdesc = request.values.get('bdesc')
+
+    nextjo = newjo(cco+'B', today_str)
+
+    account = request.values.get('crataccount')
+
+    print('sdate=',sdate)
+    input = Bills(Jo=nextjo, Pid=aid, Company=acomp, Memo='', Description=bdesc, bAmount=bamt, Status='Unpaid',
+                  Cache=0, Original=None,Ref='', bDate=sdate, pDate=today, pAmount='0.00', pMulti=None, pAccount=account, bAccount=baccount,
+                  bType=btype,bCat=category, bSubcat=subcat, Link=None, User=None, Co=cco, Temp1=None, Temp2=None, Recurring=0,
+                  dDate=ddate, pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0)
+
+    db.session.add(input)
+    db.session.commit()
+    bdat = Bills.query.filter(Bills.Jo == nextjo).first()
+
+    return bdat.id, nextjo
+
 
 
 
@@ -1395,6 +1453,52 @@ def allowed_file(filename):
 
 def docuploader(dbase):
     err = []
+
+    if dbase == 'bill':
+        bill = request.values.get('bill')
+        bill = nonone(bill)
+        bdat = Bills.query.get(bill)
+        if bdat is not None:
+            base = bdat.Jo
+            cache = bdat.Cache
+        else:
+            bill, jo = make_new_bill()
+            bdat = Bills.query.get(bill)
+            if bdat is not None:
+                base = bdat.Jo
+                cache = bdat.Cache
+
+        file = request.files['sourceupload']
+        if file.filename == '':
+            err.append('No file selected for uploading')
+
+        print(file.filename)
+
+        if file and allowed_file(file.filename):
+            name, ext = os.path.splitext(file.filename)
+            filename1 = f'Source_{base}{ext}'
+            filename2 = f'Source_{base}_c{str(cache)}.pdf'
+            output1 = addpath(tpath(dbase,filename1))
+            output2 = addpath(tpath(dbase,filename2))
+            if ext != '.pdf':
+                try:
+                    file.save(output1)
+                    with open(output2, "wb") as f:
+                        f.write(img2pdf.convert(output1))
+                    os.remove(output1)
+                except:
+                    filename2 = filename1
+            else:
+                file.save(output2)
+            err.append(f'Source uploaded as {filename2}')
+            bdat.Original = filename2
+            bdat.cache = cache + 1
+            db.session.commit()
+        else:
+            print('file not uploaded')
+            err.append('Allowed file types are txt, pdf, png, jpg, jpeg, gif')
+        return err, bill
+
 
     if dbase == 'oder':
         oder = request.values.get('passoder')
@@ -1586,6 +1690,30 @@ def dataget_Q(thismuch):
         qdata = Quotes.query.filter( (Quotes.Status != -1) & (Quotes.Date > stopdate) ).all()
 
     return qdata
+
+def dataget_B(thismuch,co):
+    today = datetime.date.today()
+    bdata = 0
+    vdata = 0
+    if co == 'X':
+        newco = ''
+        ddata = Divisions.query.all()
+        for ddat in ddata:
+            newcoc = newco+ddat.Co
+        co = newco
+    if thismuch == '1':
+        stopdate = today-datetime.timedelta(days=60)
+        bdata = Bills.query.filter( (Bills.Co.contains(co)) & (Bills.bDate > stopdate) ).all()
+    elif thismuch == '2':
+        stopdate = today-datetime.timedelta(days=120)
+        bdata = Bills.query.filter( (Bills.Co.contains(co)) & (Bills.bDate > stopdate) ).all()
+    else:
+        stopdate = today - datetime.timedelta(days=10)
+        bdata = Bills.query.all()
+
+    vdata = People.query.filter( (People.Ptype=='Vendor') & (People.Idtype.contains(co)) ).all()
+
+    return bdata,vdata
 
 
 def erud(err):
@@ -2183,3 +2311,33 @@ def loginvo_m(odat,ix):
         gledger_write('invoice', jo, 0, 0)
         odat.Istat = ix
         db.session.commit()
+
+def hv_capture(ilist):
+    hvhere = [0]*18
+    for ib,il in enumerate(ilist):
+        hvhere[ib] = request.values.get(il)
+
+    return hvhere
+
+def get_def_bank(bdat):
+    coo = bdat.Co
+    pdat = Accounts.query.filter( (Accounts.Co == coo) & (Accounts.Type == 'Bank')).first()
+    if pdat is not None:
+        pacct = pdat.Name
+    else:
+        pacct = 'No Bank'
+    print('The Paying Acct',pacct)
+    return pacct
+
+def next_check(pacct,bid):
+    bdat = Bills.query.filter( (Bills.pAccount == pacct) & (Bills.Ref != None) & (Bills.id != bid) ).order_by(Bills.id.desc()).first()
+    if bdat is not None:
+        cknum = bdat.Ref
+        print('Last Number Recorded is:',cknum)
+        try:
+            cknum = str(int(cknum)+1)
+        except:
+            cknum = '0000'
+    else:
+        cknum = '0000'
+    return cknum

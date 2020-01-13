@@ -623,11 +623,11 @@ def Calculator():
 def Billing():
     from iso_B import isoB
     #from CCC_system_setup import klist
-    bdata, cdata, bill, peep, err, modata, adata, acdata, expdata, modlink, caldays, daylist, weeksum, nweeks, addjobselect, jobdata, modal, dlist, fdata, today, cdat, pb, critday, vdata, leftscreen, docref, doctxt, leftsize, cache, filesel = isoB(0)
+    username, divdat, hv, bdata, cdata, bill, peep, err, modata, adata, acdata, expdata, modlink, caldays, daylist, weeksum, nweeks, addjobselect, jobdata, modal, dlist, fdata, today, cdat, pb, critday, vdata, leftscreen, docref, doctxt, leftsize, cache, filesel = isoB(0)
     rightsize = 12-leftsize
     return render_template('Abilling.html', cmpdata=cmpdata, scac=scac, data1=bdata, data2=cdata, bill=bill, peep=peep, err=err, modata=modata, acdata=acdata, modlink=modlink,
                            caldays=caldays, daylist=daylist, weeksum=weeksum, nweeks=nweeks, cdata=cdata, addjobselect=addjobselect, jobdata=jobdata, modal=modal, dlist=dlist,
-                           fdata=fdata, today=today, cdat=cdat, pb=pb, critday=critday, vdata=vdata, expdata=expdata,
+                           fdata=fdata, today=today, cdat=cdat, pb=pb, critday=critday, vdata=vdata, expdata=expdata, hv = hv, divdat=divdat, username=username,
                            leftscreen=leftscreen, docref=docref, doctxt=doctxt, leftsize=leftsize, rightsize=rightsize, cache=cache, filesel=filesel)
 # ____________________________________________________________________________________________________________________E.Billing
 

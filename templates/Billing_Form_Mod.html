@@ -1,0 +1,177 @@
+{% include 'includes/_controlpanelheader.html' %}
+<br>
+<div class="card">
+<div class="card-header">
+        <div class="d-flex justify-content-around align-items-center">
+        <div class="p-0">Modify Bill Information for {{ modata.Jo }}</div>
+        <div class="p-0">
+            <button type="submit" class="btn btn-md btn-green" name="Update">Update</button>
+            <button type="submit" class="btn btn-md btn-elegant" name="Return">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div class="card-body">
+
+<table class="table table-condensed table-hover">
+<tbody>
+{% set ifxfer=modata.bType %}
+
+{% if ifxfer=='XFER' %}
+                <tr>
+                <td><div class="input-group-text">From Account:</div></td>
+                <td>
+                <select class="form-control" type="text" name="fromacct">
+                <option value='0'>Choose Later</option>
+                {% for data in acdata %}
+                <option value="{{data.Name}}" {% if modata.Account == data.Name %} selected {% endif %} > {{data.Name}} </option>
+                {% endfor %}</select>
+                </td>
+                </tr>
+                <tr>
+                <td><div class="input-group-text">To Account:</div></td>
+                <td>
+                <select class="form-control" type="text" name="toacct">
+                <option value='0'>Choose Later</option>
+                {% for data in acdata %}
+                <option value="{{data.Name}}" {% if modata.Company == data.Name %} selected {% endif %} > {{data.Name}} </option>
+                {% endfor %}</select>
+                </td>
+                </tr>
+                <tr>
+                <td><div class="input-group-text">Amount:</div></td>
+                <td><input class="form-control" type="text" name="pamt" value="{{modata.pAmount}}"></td>
+                </tr>
+                <tr>
+                <td><div class="input-group-text"> Pay Reference:</div></td>
+                <td><input class="form-control" type="text" name="bref" value="{{modata.Ref}}"></td>
+                </tr>
+                <tr>
+                <td><div class="input-group-text">Paid Date:</div></td>
+                <td><input class="form-control" type="date" name="pdate" value={{modata.pDate}}></td>
+                </tr>
+                <tr>
+                <td><div class="input-group-text">Check Memo:</div></td>
+                <td><input class="form-control" type="text" name="ckmemo" value="{{modata.Memo}}"></td>
+                </tr>
+                <tr>
+                <td><div class="input-group-text">Description:</div></td>
+                <td><textarea class="form-control" type="text" name="bdesc" rows="3">{{modata.Description}}</textarea></td>
+                </tr>
+
+{% else %}
+
+                {% if pb == 1 %}
+                            <tr>
+                            <td><div class="input-group-text">Paid Amount:</div></td>
+                            <td><input class="form-control" type="text" name="pamt" value="{{modata.pAmount}}"></td>
+                            </tr>
+                            <tr>
+                            <td><div class="input-group-text">From Account:</div></td>
+                            <td>
+                            <select class="form-control" type="text" name="account" onchange="this.form.submit()">
+                            <option value='0'>Choose Later</option>
+                            {% for data in acdata %}
+                            <option value="{{data.Name}}" {% if modata.pAccount == data.Name %} selected {% endif %} > {{data.Name}} </option>
+                            {% endfor %}</select>
+                            </td>
+                            </tr>
+                            <tr>
+                            <td><div class="input-group-text"> Pay Ref/Check#:</div></td>
+                            <td><input class="form-control" type="text" name="bref" value="{{modata.Ref}}"></td>
+                            </tr>
+                            <tr>
+                            <td><div class="input-group-text">Check Memo:</div></td>
+                            <td><input class="form-control" type="text" name="ckmemo" value="{{modata.Memo}}"></td>
+                            </tr>
+                            <tr>
+                            <td><div class="input-group-text">Paid Date:</div></td>
+                            <td><input class="form-control" type="date" name="pdate" value={{modata.pDate}}></td>
+                            </tr>
+
+                {% endif %}
+
+                <tr>
+                    <td>    <div class="input-group-text">From Vendor:</div>    </td>
+                    <td>
+                            <select class="form-control" type="text" name="thiscomp" >
+                                    <option selected value='1'>Choose Later</option>
+                                    {% for data in data2 %}
+                                        <option value="{{data.Company}}" {% if modata.Company == data.Company %} selected {% endif %}> {{data.Company}} </option>
+                                    {% endfor %}
+                            </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>    <div class="input-group-text">Bill for Company:</div>   </td>
+                    <td>
+                            <select class="form-control" type="text" name="ctype" onchange="this.form.submit()">
+                                <option value = 'Pick '>  Select Default Company/Division </option>
+                                    {% for div in divdat %}
+                                        <option {% if modata.Co== div.Co %} selected {% endif %} value='{{ div.Co }}'>  {{ div.Name }} (Code {{ div.Co }}) </option>
+                                    {% endfor %}
+                            </select>
+                    </td>
+                </tr>
+                <tr>
+                <td><div class="input-group-text">{{modata.Co}} Exp Account:</div></td>
+                <td>
+                <select class="form-control" type="text" name="billacct">
+                <option selected value='1'>Choose Later</option>
+                {% for data in expdata %}
+                <option {% if modata.bAccount == data.Name %} selected {% endif %} value="{{data.Name}}" > {{data.Name}} </option>
+                {% endfor %}</select>
+                </td>
+                </tr>
+                <tr>
+                <td><div class="input-group-text">Bill Amount:</div></td>
+                <td><input class="form-control" type="text" name="bamt" value="{{modata.bAmount}}"></td>
+                </tr>
+                       <tr>
+                <td><div class="input-group-text">Bill Date:</div></td>
+                <td><input class="form-control" type="date" name="bdate" value={{modata.bDate}}></td>
+                </tr>
+                <tr>
+                <td><div class="input-group-text">Due Date:</div></td>
+                <td><input class="form-control" type="date" name="ddate" value={{modata.dDate}}></td>
+                </tr>
+                <tr>
+                <td><div class="input-group-text">Bill Description:</div></td>
+                <td><textarea class="form-control" type="text" name="bdesc" rows="3">{{modata.Description}}</textarea></td>
+                </tr>
+
+                {% if pb != 1 %}
+                            <tr>
+                            <td><div class="input-group-text">Paid Amount:</div></td>
+                            <td><input class="form-control" type="text" name="pamt" value="{{modata.pAmount}}"></td>
+                            </tr>
+                            <tr>
+                            <td><div class="input-group-text">From Account:</div></td>
+                            <td>
+                            <select class="form-control" type="text" name="account" onchange="this.form.submit()">
+                            <option value='0'>Choose Later</option>
+                            {% for data in acdata %}
+                            <option value="{{data.Name}}" {% if modata.pAccount == data.Name %} selected {% endif %} > {{data.Name}} </option>
+                            {% endfor %}</select>
+                            </td>
+                            </tr>
+                            <tr>
+                            <td><div class="input-group-text"> Pay Ref/Check#:</div></td>
+                            <td><input class="form-control" type="text" name="bref" value="{{modata.Ref}}"></td>
+                            </tr>
+                            <tr>
+                            <td><div class="input-group-text">Check Memo:</div></td>
+                            <td><input class="form-control" type="text" name="ckmemo" value="{{modata.Memo}}"></td>
+                            </tr>
+                            <tr>
+                            <td><div class="input-group-text">Paid Date:</div></td>
+                            <td><input class="form-control" type="date" name="pdate" value={{modata.pDate}}></td>
+                            </tr>
+                {% endif %}
+{% endif %}
+</tbody></table>
+</div>
+</div>
+<input type = "hidden" name ="bill" value= {{bill}}>
+<input type = "hidden" name ="modlink" value= {{modlink}}>
+<input type = "hidden" name ="peep" value= {{peep}}>

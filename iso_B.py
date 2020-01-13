@@ -1,12 +1,13 @@
 from runmain import app, db
 from models import Vehicles, Invoices, JO, Income, Bills, Accounts, OverSeas, Orders, Gledger
-from models import Autos, People, Interchange, Drivers, ChalkBoard, Services, Drops
+from models import Autos, People, Interchange, Drivers, ChalkBoard, Services, Drops, Divisions, LastMessage
 from flask import session, logging, request
 import datetime
 import calendar
 import re
 import os
 import shutil
+import json
 from CCC_system_setup import myoslist, addpath, addtxt, scac
 
 
@@ -15,29 +16,22 @@ def isoB(indat):
     if request.method == 'POST':
 
         from viewfuncs import tabdata, tabdataR, popjo, jovec, timedata, nonone, nononef, nons, numcheck, newjo, init_billing_zero, init_billing_blank
-        from viewfuncs import sdiff, calendar7_weeks, txtfile, numcheckvec, d2s
+        from viewfuncs import sdiff, calendar7_weeks, txtfile, numcheckvec, d2s, erud, dataget_B, hv_capture, docuploader, get_def_bank, next_check
         username = session['username'].capitalize()
         bill_path = 'processing/bills'
         bill, peep, cache, modata, modlink, fdata, adata, cdat, pb, passdata, vdata, caldays, daylist, weeksum, nweeks = init_billing_zero()
         filesel, docref, search11, search12, search13, search14, search21, search22, bType, bClass = init_billing_blank()
-        billhold = 0
-        acdata = 0
-        expdata = 0
-        username = session['username'].capitalize()
+        expdata, addjobselect, jobdata, modal, viewck = 0, 0, 0, 0, 0
+
+        hv = [0]*20
+        divdat = Divisions.query.all()
 
         monlvec = ['January', 'February', 'March', 'April', 'May', 'June',
                    'July', 'August', 'September', 'October', 'November', 'December']
         monsvec = ['Jan', 'Feb', 'Mar', 'Apr', 'May',
                    'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-
-        leftscreen = 1
-        err = ['All is well', ' ', ' ', ' ', ' ']
-        ldata = None
+        err = []
         today = datetime.datetime.today().strftime('%Y-%m-%d')
-        leftsize = 10
-        addjobselect = 0
-        jobdata = 0
-        modal = 0
         docref = ' '
         doctxt = ' '
         if indat == 'stay' or indat == 0:
@@ -73,6 +67,7 @@ def isoB(indat):
         datatable2 = request.values.get('datatable2')
         dlist = [datatable1, datatable2]
 
+
         copy = request.values.get('copy')
         copy12 = request.values.get('copy12')
         qpay = request.values.get('qpay')
@@ -80,12 +75,87 @@ def isoB(indat):
         bill = request.values.get('bill')
         cache = request.values.get('cache')
         peep = request.values.get('peep')
+        uploadS = request.values.get('UploadS')
 
         modlink = nonone(modlink)
         bill = nonone(bill)
         peep = nonone(peep)
+
+        thismuch = request.values.get('thismuch')
+        if thismuch is not None:
+            hv[1] = thismuch
+        else:
+            hv[1] = request.values.get('passthismuch')
+
+        thisbox0 = request.values.get('codiv')
+        if thisbox0 is not None:
+            hv[0] = thisbox0
+        else:
+            hv[0] = request.values.get('passco')
+
+
+        thisbox1 = request.values.get('addbox')
+        if thisbox1 == '1':
+            newbill = 1
+        if thisbox1 == '2':
+            addE = 1
+        if thisbox1 == '3':
+            copy = 1
+        if thisbox1 == '4':
+            copy12 = 1
+        if thisbox1 == '5':
+            uploadS = 1
+
+
+        thisbox2 = request.values.get('editbox')
+        if thisbox2 == '1':
+            vmod = 1
+        if thisbox2 == '2':
+            match = 1
+        if thisbox2 == '3':
+            acceptthese = 1
+        if thisbox2 == '4':
+            loadc = 1
+
+        thisbox3 = request.values.get('invobox')
+        if thisbox3 == '1':
+            qpay = 1
+        if thisbox3 == '2':
+            paybill = 1
+        if thisbox3 == '3':
+            paybill2 = 1
+        if thisbox3 == '4':
+            printck = 1
+
+        thisbox4 = request.values.get('viewbox')
+        if thisbox4 == '1':
+            viewo = 1
+        if thisbox4 == '2':
+            viewck = 1
+
+        thisbox5 = request.values.get('xbox')
+        if thisbox5 == '1':
+            deletehit = 1
+        if thisbox5 == '2':
+            unpay = 1
+
+        thisbox6 = request.values.get('dispbox')
+        if thisbox6 == '1':
+            mm2 = 1
+            #Signature date:
+            holdvec[16] = today_str
+        if thisbox6 == '2':
+            lbox = 6
+            lbox, holdvec, err = container_list(lbox, holdvec)
+        if thisbox6 == '3':
+            lbox = 1
        # if modlink==9 or modlink==8:
        #     peephold=peep
+
+        if modlink == 4 or modlink == 8:
+            leftscreen = 0
+        else:
+            leftscreen = 1
 
         if returnhit is not None:
             modlink = 0
@@ -176,7 +246,7 @@ def isoB(indat):
 
             input = Bills(Jo=billno, Pid=aid, Company=cdat.Company, Memo='', Description=bdesc, bAmount=bamt, Status='Paid', Cache=0, Original='',
                              Ref=bref, bDate=sdate, pDate=today, pAmount=bamt, pMulti=None, pAccount=account, bAccount=baccount, bType=btype,
-                             bCat=bcat, bSubcat=bsubcat, Link=pufrom, User=username, Co='F', Temp1=None, Temp2=str(towid), Recurring=0, dDate=today, pAmount2='0.00', pDate2=None)
+                             bCat=bcat, bSubcat=bsubcat, Link=pufrom, User=username, Co='F', Temp1=None, Temp2=str(towid), Recurring=0, dDate=today, pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0)
 
             db.session.add(input)
             db.session.commit()
@@ -186,16 +256,37 @@ def isoB(indat):
             bill = modata.id
             leftscreen = 1
             leftsize = 10
-            err = ['All is well', ' ', ' ', ' ',  ' ']
             bdata = Bills.query.order_by(Bills.bDate).all()
             cdata = People.query.filter((People.Ptype == 'Vendor') | (
                 People.Ptype == 'TowCo')).order_by(People.Company).all()
             modlink = 12
 # ____________________________________________________________________________________________________________________E.QuickBillPayTowing
 
+        print('yes here with modlink=', modlink)
 
+        if modlink == 4 and (newbill is None and thisbill is None and update is None):
+            upnow = request.values.get('uploadnow')
+            if upnow is not None:
+                err, oid = docuploader('bill')
+                if modlink == 4:
+                    bill = oid
+                    bdat = Bills.query.get(bill)
+                    bdat.User = username
+                    original = bdat.Original
+                    if original is not None:
+                        docref = f'tmp/{scac}/data/vbills/' + original
+                        print(bill,docref)
+                    modlink = 7
+                else:
+                    modlink = 0
+
+        if modlink == 70:
+            print('Got to bill uploader')
+            err, oid = docuploader('bill')
+            modlink = 0
 # ____________________________________________________________________________________________________________________B.UpdateDatabasesSection
         if (update is not None and modlink == 1) or modlink == 9 or modlink == 8 or modlink == 7 or modlink == 6:
+            print('Yes Here')
             if bill > 0:
                 modata = Bills.query.get(bill)
                 ifxfer = modata.bType
@@ -222,42 +313,38 @@ def isoB(indat):
                     modata.Ref = a[3]
                     modata.User = username
                     modata.Company = a[1]
-                    err[3] = 'Modification to Xfer ' + modata.Jo + ' completed.'
+                    err.append('Modification to Xfer ' + modata.Jo + ' completed.')
 
                 else:
 
-                    filesel = request.values.get('FileSel')
-                    fdata = myoslist(bill_path)
-                    fdata.sort()
                     leftsize = 8
                     leftscreen = 0
-                    if update is not None and filesel != '1' and filesel != '':
-                        month_name = modata.bDate.strftime('%B')
-                        cache = modata.Cache
-                        cache = cache+1
-                        newfile = modata.Company+'_'+month_name+str(bill)+'c'+str(cache)+'.pdf'
-                        docold = bill_path+'/'+filesel
-                        docref = f'tmp/{scac}/data/vbills/'+newfile
-                        try:
-                            shutil.move(addpath(docold), addpath(docref))
-                            shutil.move(addtxt(docold), addtxt(docref))
-                        except:
-                            err[4] = 'File already moved'
-                        modata.Original = docref
-                        modata.Cache = cache
-                    elif filesel != '1' and filesel != '':
-                        docref = bill_path+'/'+filesel
-                    else:
-                        docref = modata.Original
-
                     if update is None:
+
                         pbill = request.values.get('pbill')
                         pb = nonone(pbill)
                         bval = request.values.get('ctype')
+                        print('Updat is None so running this sequence')
                         if bval is not None:
                             modata.Co = bval
                             db.session.commit()
                             expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co.contains(bval))).all()
+                        pacct = request.values.get('account')
+                        print(pacct)
+                        pcheck = next_check(pacct,modata.id)
+                        modata.pAccount = pacct
+                        modata.Ref = pcheck
+                        db.session.commit()
+                        docref = f'tmp/{scac}/data/vbills/{modata.Original}'
+                        if os.path.isfile(addpath(docref)):
+                            leftscreen = 0
+                            err.append(f'Paying Bill {modata.Jo}')
+                        else:
+                            leftscreen = 1
+                            err.append(f'Paying Bill {modata.Jo}')
+                            err.append('Bill has no source document')
+                        modata = Bills.query.get(bill)
+
                     else:
 
                         vals = ['bdesc', 'bamt', 'bdate', 'pamt', 'pdate', 'account',
@@ -300,7 +387,11 @@ def isoB(indat):
 
                         modata.User = username
                         modata.Co = a[8]
-                        modata.Original = docref
+                        cache = modata.Cache
+                        base = modata.Jo
+                        filename2 = f'Source_{base}_c{str(cache)}.pdf'
+                        docref = f'tmp/{scac}/data/vbills/{filename2}'
+                        modata.Original = filename2
                         acctname = a[11]
                         acctco = a[8]
                         modata.bAccount = acctname
@@ -310,12 +401,15 @@ def isoB(indat):
                             modata.bCat = acdat1.Category
                             modata.bSubcat = acdat1.Subcategory
                             modata.Recurring = acdat1.id
-
-                        # err[3]= 'Modification to Bill No ' + modata.Jo + ' completed.
                         db.session.commit()
                         # Check that JO still consistent with modification
                         co=modata.Co
                         jo=modata.Jo
+                        #Check to see if uploaded file and created JO before inputting data...need to update the JO
+                        if jo[0] == 'X':
+                            jo = co+jo[1:]
+                            modata.Jo = jo
+                            db.session.commit()
                         ccode=jo[0]
                         if co is None:
                             co = ccode
@@ -358,8 +452,14 @@ def isoB(indat):
                 modata.Email = a[5]
                 modata.Date1 = a[6]
                 modata.Idtype = a[7]
+                diva = Divisions.query.filter(Divisions.Co == a[7]).first()
+                if diva is not None:
+                    modata.First = diva.Color
                 aname = a[8]
-                aname = aname.strip()
+                if aname is not None:
+                    aname = aname.strip()
+                else:
+                    aname = ''
                 modata.Associate1 = aname
                 aadat = Accounts.query.filter((Accounts.Name == aname) & (Accounts.Co == a[7])).first()
                 if aadat is not None:
@@ -369,10 +469,10 @@ def isoB(indat):
                     modata.Temp2 = aadat.Subcategory
                     modata.Idtype = aadat.Co
                 db.session.commit()
-                err = [' ', ' ', 'Continue New Entry for Entity ID ' + str(modata.id), ' ',  ' ']
+                err.append('Continue New Entry for Entity ID ' + str(modata.id))
+
                 if update is not None:
-                    err = [' ', ' ', 'Modification to Entity ID ' +
-                           str(modata.id) + ' completed.', ' ',  ' ']
+                    err.append('Modification to Entity ID ' + str(modata.id) + ' completed.')
                     print('modlink value',modlink)
                     # if modlink=8 then we are updating vendor while entering a new bill, time to transition back to the bill
                     if modlink == 8:
@@ -383,6 +483,12 @@ def isoB(indat):
                                 # Set account defaults for this vendor
                             ccode = cdat.Idtype
                             expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co == ccode)).all()
+                            print('Color Here',ccode)
+                            diva = Divisions.query.filter(Divisions.Co == ccode).first()
+                            if diva is not None:
+                                modata.First = diva.Color
+                                db.session.commit()
+                        peep = 0
 
                     else:
                         modlink = 0
@@ -394,13 +500,6 @@ def isoB(indat):
                         db.session.commit()
                         expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co.contains(bval))).all()
 
-                if modlink == 8:
-                    filesel = request.values.get('FileSel')
-                    fdata = myoslist(bill_path)
-                    fdata.sort()
-                    leftsize = 8
-                    leftscreen = 0
-                    docref = bill_path+'/'+filesel
 
                 # And now update the crossover to Storage in case the Company info changed:
                 cross = Bills.query.filter(Bills.Pid == peep)
@@ -414,12 +513,11 @@ def isoB(indat):
                 leftscreen = 1
                 indat = '0'
 
+            print('leftscreen on exit',leftscreen)
+
 # ____________________________________________________________________________________________________________________B.UpdateDatabasesSection
 
-        bdata = Bills.query.order_by(Bills.bDate).all()
-        cdata = People.query.filter((People.Ptype == 'Vendor') | (
-            People.Ptype == 'TowCo')).order_by(People.Company).all()
-
+        bdata, cdata = dataget_B(hv[1],hv[0])
 # ____________________________________________________________________________________________________________________B.SearchFilters
 
         if modlink < 5:
@@ -427,25 +525,65 @@ def isoB(indat):
         else:
             numchecked = 0
 
+        if uploadS is not None:
+            print('Using uploadS')
+            if bill > 0  and numchecked == 1:
+                bdat = Bills.query.get(bill)
+                jo = bdat.Jo
+                cache = bdat.Cache
+                filename2 = f'Source_{jo}_c{str(cache)}.pdf'
+                err.append(f'File uploaded as {filename2}')
+                #Provide a file name for the upload and store message:
+                edat = LastMessage.query.filter(LastMessage.User == username).first()
+                if edat is not None:
+                    edat.Err = json.dumps(err)
+                    db.session.commit()
+                else:
+                    input = LastMessage(User=username, Err=json.dumps(err))
+                    db.session.add(input)
+                    db.session.commit()
 
+                modlink = 70
+                leftscreen = 1
+                mm3 = 0
+            else:
+                err.append('No Bill Selected for Source Upload')
+                err.append('Select One Box')
 # ____________________________________________________________________________________________________________________E.SearchFilters
 
 
 # ____________________________________________________________________________________________________________________B.Viewers
-        if viewo is not None and numchecked == 1:
-            err = [' ', ' ', 'There is no document available for this selection', ' ',  ' ']
+        if viewo == 1 and numchecked == 1:
             if bill > 0:
                 modata = Bills.query.get(bill)
+                viewtype = 'source'
+                hv[2] = viewtype
                 if modata.Original is not None:
                     if len(modata.Original) > 5:
-                        docref = modata.Original
+                        docref = f'tmp/{scac}/data/vbills/{modata.Original}'
                         leftscreen = 0
                         leftsize = 8
                         modlink = 0
-                        err = [' ', ' ', 'Viewing document '+docref, ' ',  ' ']
+                        err.append('Viewing document '+docref)
 
-        if viewo is not None and numchecked != 1:
-            err = ['Must check exactly one box to use this option', ' ', ' ', ' ',  ' ']
+        if viewo == 1 and numchecked != 1:
+            err.append('Must check exactly one box to view source file')
+
+        if viewck == 1 and numchecked == 1:
+            if bill > 0:
+                modata = Bills.query.get(bill)
+                viewtype = 'check'
+                hv[2] = viewtype
+                if modata.Code1 is not None:
+                    if len(modata.Code1) > 5:
+                        docref = f'tmp/{scac}/data/vchecks/{modata.Code1}'
+                        leftscreen = 0
+                        leftsize = 8
+                        modlink = 0
+                        err.append('Viewing check '+docref)
+
+        if viewck == 1 and numchecked != 1:
+            err.append('Must check exactly one box to view checks')
 
 # ____________________________________________________________________________________________________________________E.Viewers
 # ____________________________________________________________________________________________________________________B.Modify Entries
@@ -486,16 +624,16 @@ def isoB(indat):
                 expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co==co)).all()
                 leftsize = 8
                 leftscreen = 0
-                docref = modata.Original
+                docref = f'tmp/{scac}/data/vbills/{modata.Original}'
                 modlink = 7
                 if vmod is not None:
-                    err = [' ', ' ', 'There is no document available for this selection', ' ',  ' ']
+                    err.append('There is no document available for this selection')
                     if modata.Original is not None:
                         if len(modata.Original) > 5:
                             leftscreen = 0
-                            docref = modata.Original
+                            docref = f'tmp/{scac}/data/vbills/{modata.Original}'
                             doctxt = txtfile(docref)
-                            err = ['All is well', ' ', ' ', ' ',  ' ']
+                            err.append('All is well')
 
             if peep > 0:
                 modata = People.query.get(peep)
@@ -510,7 +648,7 @@ def isoB(indat):
                 expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co.contains(co))).all()
                 # peephold=peep
                 if vmod is not None:
-                    err = [' ', ' ', 'There is no document available for this selection', ' ',  ' ']
+                    err.append('There is no document available for this selection')
 
         # Modification coming from calendar
         if modify2 is not None:
@@ -525,47 +663,33 @@ def isoB(indat):
         if addE is not None:
             leftsize = 8
             modlink = 9
+            # Remove any new starts that were not completed
+            People.query.filter(People.Ptype=='NewVendor').delete()
             # We will create a blank line and simply modify that by updating:
-            input = People(Company='New', First=None, Middle=None, Last=None, Addr1=None, Addr2=None, Addr3=None, Idtype=None, Idnumber=None, Telephone=None,
-                           Email=None, Associate1=None, Associate2=None, Date1=today, Date2=None, Original=None, Ptype='Vendor', Temp1=None, Temp2=None, Accountid=None)
+            input = People(Company='', First=None, Middle=None, Last=None, Addr1='', Addr2='', Addr3='', Idtype=None, Idnumber='', Telephone='',
+                           Email='', Associate1=None, Associate2=None, Date1=today, Date2=None, Original=None, Ptype='NewVendor', Temp1=None, Temp2=None, Accountid=None)
             db.session.add(input)
             db.session.commit()
-            modata = People.query.filter((People.Company == 'New') &
-                                         (People.Ptype == 'Vendor')).first()
+            modata = People.query.filter(People.Ptype == 'NewVendor').first()
             peep = modata.id
-            # peephold=peep
-            billhold = bill
-            if bill > 0:
-                filesel = request.values.get('FileSel')
-                if filesel != '1':
-                    fdata = myoslist(bill_path)
-                    fdata.sort()
-                    leftsize = 8
-                    leftscreen = 0
-                    docref = bill_path+'/'+filesel
-            err = [' ', ' ', 'Enter Data for New Entity', ' ',  ' ']
+            err.append('Enter Data for New Entity')
             expdata = Accounts.query.filter(Accounts.Type == 'Expense').all()
 
         if addE2 is not None:
             leftsize = 8
             modlink = 8
             # We will create a blank line and simply modify that by updating:
-            input = People(Company='New', First=None, Middle=None, Last=None, Addr1=None, Addr2=None, Addr3=None, Idtype=None, Idnumber=None, Telephone=None,
-                           Email=None, Associate1=None, Associate2=None, Date1=today, Date2=None, Original=None, Ptype='Vendor', Temp1=None, Temp2=None, Accountid=None)
+            hlist = hv_capture(['thiscomp','ctype','billacct','bamt','bdate','ddate','bdesc'])
+            hv = hv[0:2]+hlist
+            print(hv)
+            # We will create a blank line and simply modify that by updating:
+            input = People(Company='', First=None, Middle=None, Last=None, Addr1='', Addr2='', Addr3='', Idtype=None, Idnumber='', Telephone='',
+                           Email='', Associate1=None, Associate2=None, Date1=today, Date2=None, Original=None, Ptype='NewVendor', Temp1=None, Temp2=None, Accountid=None)
             db.session.add(input)
             db.session.commit()
-            modata = People.query.filter((People.Company == 'New') &
-                                         (People.Ptype == 'Vendor')).first()
+            modata = People.query.filter(People.Ptype == 'NewVendor').first()
             peep = modata.id
-            # peephold=peep
-            filesel = request.values.get('FileSel')
-            if filesel != '1':
-                fdata = myoslist(bill_path)
-                fdata.sort()
-                leftsize = 8
-                leftscreen = 0
-                docref = bill_path+'/'+filesel
-            err = [' ', ' ', 'Enter Data for New Entity', ' ',  ' ']
+            err.append('Enter Data for New Entity')
             expdata = Accounts.query.filter(Accounts.Type == 'Expense').all()
 
 # ____________________________________________________________________________________________________________________E.Add Entries
@@ -582,7 +706,7 @@ def isoB(indat):
                         for dat in adata:
                             dat.Status = 'Novo'
                 except:
-                    err[0] = 'Delete problem'
+                    err.append('Delete problem')
                 jo = bdat.Jo
                 Gledger.query.filter(Gledger.Tcode==jo).delete()
                 Bills.query.filter(Bills.id == bill).delete()
@@ -598,7 +722,7 @@ def isoB(indat):
                 People.Ptype == 'TowCo')).order_by(People.Company).all()
 
         if deletehit is not None and numchecked == 0:
-            err = [' ', ' ', 'Must have at least one item checked to use this option', ' ',  ' ']
+            err.append('Must have at least one item checked to use this option')
 # ____________________________________________________________________________________________________________________E.Delete an Entry
 # ____________________________________________________________________________________________________________________B.NewXfer.Billing
         if newxfer is not None:
@@ -606,7 +730,7 @@ def isoB(indat):
             leftsize = 8
             leftscreen = 0
             docref = ''
-            vdata = [' ', ' ', '0.00', today]
+            vdata = ['0.00', today]
 
         if newxfer is None and modlink == 3:
             leftsize = 8
@@ -615,7 +739,7 @@ def isoB(indat):
 
             fromacct = request.values.get('fromacct')
             toacct = request.values.get('toacct')
-            vdata = [' ', ' ', '0.00', today]
+            vdata = ['0.00', today]
 
         if thisxfer is not None:
             modlink = 0
@@ -636,9 +760,9 @@ def isoB(indat):
             bref = request.values.get('bref')
             bamt = d2s(bamt)
 
-            input = Bills(Jo=billno, Pid=0, Company=toacct, Memo=ckmemo, Description=bdesc, bAmount=bamt, Status='Paid', Cache=0, Original=docref,
+            input = Bills(Jo=billno, Pid=0, Company=toacct, Memo=ckmemo, Description=bdesc, bAmount=bamt, Status='Paid', Cache=0, Original=None,
                              Ref=bref, bDate=sdate, pDate=sdate, pAmount=bamt, pMulti=None, pAccount=fromacct, bAccount=baccount, bType=btype,
-                             bCat=bclass, bSubcat='', Link=None, User=username, Co=None, Temp1=None, Temp2=None, Recurring=0, dDate=today, pAmount2='0.00', pDate2=None)
+                             bCat=bclass, bSubcat='', Link=None, User=username, Co=None, Temp1=None, Temp2=None, Recurring=0, dDate=today, pAmount2='0.00', pDate2=None, Code1=None, Code2=None)
 
             db.session.add(input)
             db.session.commit()
@@ -657,10 +781,11 @@ def isoB(indat):
             bill = modata.id
             leftscreen = 1
             leftsize = 10
-            err = ['All is well', ' ', ' ', ' ',  ' ']
+            err.append('All is well')
             bdata = Bills.query.order_by(Bills.bDate).all()
-# ____________________________________________________________________________________________________________________E.NewXfer.Billing
-        if copy is not None:
+        # ____________________________________________________________________________________________________________________E.NewXfer.Billing
+        if copy == 1:
+            print('yes copy')
             if bill > 0 and numchecked == 1:
                 # sdate=today.strftime('%Y-%m-%d')
                 bdat = Bills.query.get(bill)
@@ -668,10 +793,23 @@ def isoB(indat):
                 nextdate = thisdate + datetime.timedelta(days=30)
                 input = Bills(Jo=bdat.Jo, Pid=bdat.Pid, Company=bdat.Company, Memo=bdat.Memo, Description=bdat.Description, bAmount=bdat.bAmount, Status=bdat.Status, Cache=0, Original=bdat.Original,
                                  Ref=bdat.Ref, bDate=nextdate, pDate=None, pAmount='0.00', pMulti=None, pAccount=bdat.pAccount, bAccount=bdat.bAccount, bType=bdat.bType,
-                                 bCat=bdat.bCat, bSubcat=bdat.bSubcat, Link=None, User=username, Co=bdat.Co, Temp1=None, Temp2='Copy', Recurring=0, dDate=today, pAmount2='0.00', pDate2=None)
+                                 bCat=bdat.bCat, bSubcat=bdat.bSubcat, Link=None, User=username, Co=bdat.Co, Temp1=None, Temp2='Copy', Recurring=0, dDate=today, pAmount2='0.00', pDate2=None, Code1=None, Code2=None)
 
                 db.session.add(input)
                 db.session.commit()
+
+            elif peep > 0 and numchecked == 1:
+                # sdate=today.strftime('%Y-%m-%d')
+                pdat = People.query.get(peep)
+                input = People(Company=pdat.Company, First=pdat.First, Middle='Copy', Last=None, Addr1=pdat.Addr1, Addr2=pdat.Addr2, Addr3=pdat.Addr3,
+                               Idtype=pdat.Idtype, Idnumber=pdat.Idnumber, Telephone=pdat.Telephone,
+                               Email=pdat.Email, Associate1=pdat.Associate1, Associate2=pdat.Associate2, Date1=today, Date2=None, Original=None,
+                               Ptype='Vendor', Temp1=pdat.Temp1, Temp2=pdat.Temp2, Accountid=pdat.Accountid)
+                db.session.add(input)
+                db.session.commit()
+
+            else:
+                err.append('Must select one item to use this function')
 
         if copy12 is not None:
             if bill > 0 and numchecked == 1:
@@ -681,21 +819,14 @@ def isoB(indat):
                 year = thisdate.year
                 month = thisdate.month
                 day = thisdate.day
-                cco = bdat.Co
+                jtype = bdat.Co+'B'
                 while month < 12:
                     month = month+1
                     nextdate = datetime.datetime(year, month, day)
-
-                    nextjo = newjo(cco, today)
-                    clet = nextjo[1]
-                    nextjomod=nextjo.replace('KT','KB').replace('JA','JB')
-                    jdat=JO.query.filter(JO.jo==nextjo)
-                    jdat.jo=nextjomod
-                    db.session.commit()
-
-                    input = Bills(Jo=nextjomod, Pid=bdat.Pid, Company=bdat.Company, Memo=bdat.Memo, Description=bdat.Description, bAmount=bdat.bAmount, Status=bdat.Status, Cache=0, Original=bdat.Original,
+                    nextjo = newjo(jtype, today)
+                    input = Bills(Jo=nextjo, Pid=bdat.Pid, Company=bdat.Company, Memo=bdat.Memo, Description=bdat.Description, bAmount=bdat.bAmount, Status=bdat.Status, Cache=0, Original=bdat.Original,
                                      Ref=bdat.Ref, bDate=nextdate, pDate=None, pAmount='0.00', pMulti=None, pAccount=bdat.pAccount, bAccount=bdat.bAccount, bType=bdat.bType,
-                                     bCat=bdat.bCat, bSubcat=bdat.bSubcat, Link=None, User=username, Co=bdat.Co, Temp1=None, Temp2='Copy', Recurring=0, dDate=today, pAmount2='0.00', pDate2=None)
+                                     bCat=bdat.bCat, bSubcat=bdat.bSubcat, Link=None, User=username, Co=bdat.Co, Temp1=None, Temp2='Copy', Recurring=0, dDate=today, pAmount2='0.00', pDate2=None, Code1 = None, Code2=None)
 
                     db.session.add(input)
                     db.session.commit()
@@ -709,35 +840,24 @@ def isoB(indat):
                 bdat.pAmount = bdat.bAmount
                 bdat.Temp2 = ''
                 bdat.Status = 'Paid'
+                pacct = bdat.pAccount
+                if pacct is None:
+                    pacct = get_def_bank(bdat)
+                elif pacct == '0' or pacct == '1' or pacct == 0 or pacct == 1:
+                    pacct = get_def_bank(bdat)
+                bdat.pAccount = pacct
                 db.session.commit()
 # ____________________________________________________________________________________________________________________B.NewJob
         if newbill is not None:
-            err = ['Select Source Document from List']
-            fdata = myoslist(bill_path)
-            fdata.sort()
+            err.append('Select Source Document from List')
             modlink = 4
             leftsize = 8
             leftscreen = 0
-            if len(fdata) > 0:
-                bill1 = fdata[0]
-                docref = bill_path+'/'+bill1
-            else:
-                docref = ''
             expdata = Accounts.query.filter(Accounts.Type == 'Expense').all()
 
-        print('modlink=',modlink)
         if newbill is None and (modlink == 4 or modlink == 44):
-            filesel = request.values.get('FileSel')
-            fdata = myoslist(bill_path)
-            fdata.sort()
             leftsize = 8
             leftscreen = 0
-            if filesel != '1':
-                ftxt = txtfile(filesel)
-                docref = bill_path+'/'+filesel
-                doctxt = bill_path+'/'+ftxt
-            else:
-                docref = None
 
             if modlink == 4:
                 thiscompany = request.values.get('thiscomp')
@@ -754,6 +874,7 @@ def isoB(indat):
                 if cchg != ccode:
                     ccode = cchg
                     cdat.Idtype = cchg
+
 
                 expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co == ccode)).all()
 
@@ -823,91 +944,50 @@ def isoB(indat):
                 descript = ''
                 btype = ''
                 baccount = ''
+                docref = f'tmp/{scac}/data/vbills/' + newfile
 
-            filesel = request.values.get('FileSel')
-            fdata = myoslist(bill_path)
-            fdata.sort()
-            if filesel != '1':
-                ftxt = txtfile(filesel)
-                doctxt = bill_path+'/'+ftxt
-                docold = bill_path+'/'+filesel
-                month_name = datetime.datetime.strptime(sdate, "%Y-%m-%d").strftime('%B')
-                newfile = thiscomp+'_'+month_name+'.pdf'
-                docref = f'tmp/{scac}/data/vbills/'+newfile
-                try:
-                    shutil.move(addpath(docold), addpath(docref))
-                    shutil.move(addtxt(docold), addtxt(docref))
-                except OSError:
-                    print('File already moved')
-            else:
-                docref = None
-
-            billno = f'{scac}_Bill_XFER'
             bdesc = request.values.get('bdesc')
             bamt = request.values.get('bamt')
             bamt = d2s(bamt)
             bcomp = request.values.get('bcomp')
             cco = request.values.get('ctype')
-            nextjo = newjo(cco, today)
-            clet = nextjo[1]
-            nextjomod=nextjo.replace('KT','KB').replace('JA','JB')
-            jdat=JO.query.filter(JO.jo==nextjo)
-            jdat.jo=nextjomod
-            db.session.commit()
+            print(f'Getting nextjo with {cco} and {today}')
+            nextjo = newjo(cco+'B', today)
             account = request.values.get('crataccount')
             baccount = request.values.get('billacct')
+            bfile = os.path.basename(docref)
 
-            input = Bills(Jo=nextjomod, Pid=aid, Company=acomp, Memo='', Description=bdesc, bAmount=bamt, Status='Unpaid', Cache=0, Original=docref,
+            input = Bills(Jo=nextjo, Pid=aid, Company=acomp, Memo='', Description=bdesc, bAmount=bamt, Status='Unpaid', Cache=0, Original=bfile,
                              Ref='', bDate=sdate, pDate=today, pAmount='0.00', pMulti=None, pAccount=account, bAccount=baccount, bType=btype,
-                             bCat=category, bSubcat=subcat, Link=None, User=username, Co=cco, Temp1=None, Temp2=None, Recurring=0, dDate=today, pAmount2='0.00', pDate2=None)
+                             bCat=category, bSubcat=subcat, Link=None, User=username, Co=cco, Temp1=None, Temp2=None, Recurring=0, dDate=today, pAmount2='0.00', pDate2=None, Code1 = None, Code2=None, CkCache=0)
 
             db.session.add(input)
             db.session.commit()
             from gledger_write import gledger_write
-            gledger_write('newbill',nextjomod,baccount,account)
+            gledger_write('newbill',nextjo,baccount,account)
 
 
             # reget because we need the bill unique id number in the document
-            modata = Bills.query.filter(Bills.Jo == nextjomod).first()
+            modata = Bills.query.filter(Bills.Jo == nextjo).first()
             csize = People.query.filter((People.Ptype == 'Vendor') | (
                 People.Ptype == 'TowCo')).order_by(People.Company).all()
             bill = modata.id
             leftscreen = 1
             leftsize = 10
-            err = ['All is well', ' ', ' ', ' ',  ' ']
+            err.append('All is well')
             bdata = Bills.query.order_by(Bills.bDate).all()
 # ____________________________________________________________________________________________________________________E.New Bill
         if unpay is not None:
-            bill = nonone(unpay)
-            myb = Bills.query.get(bill)
-            myb.Status = 'Unpaid'
-            Gledger.query.filter((Gledger.Tcode == myb.Jo) & (Gledger.Type == 'AP')).delete()
-            input = ChalkBoard(Jo=myb.Jo, creator=username,
-                               comments='Auto Message Bill Unpaid', status=1)
-            db.session.add(input)
-            db.session.commit()
-            calendar = 1
-
-
-
-
-
+            if numchecked == 1 and bill > 0:
+                myb = Bills.query.get(bill)
+                myb.Status = 'Unpaid'
+                Gledger.query.filter((Gledger.Tcode == myb.Jo) & (Gledger.Type == 'AP')).delete()
+                err.append(f'Unpay Bill {myb.Jo} and remove from register')
+            else:
+                err.append('Must select one Bill to Unpay')
 
         if paybill is not None or paybill2 is not None:
-            err = [' ', ' ', ' ', ' ',  ' ']
             exit = 0
-            fdata = myoslist(bill_path)
-            fdata.sort()
-
-            if paybill2 is not None:
-                bill = nonone(paybill2)
-                numchecked = 1
-                billno = f'{scac}_Bill_{str(bill)}'
-                input = ChalkBoard(Jo=billno, creator=username, register_date = today,
-                                   comments='Auto Message Bill Pay Started')
-                db.session.add(input)
-                db.session.commit()
-                calendar = 1
 
             if numchecked == 1 and bill > 0:
                 myb = Bills.query.get(bill)
@@ -915,15 +995,22 @@ def isoB(indat):
                 if status != 'Paid':
                     myb.pDate = today
                     myb.pAmount = myb.bAmount
-                    acct = myb.pAccount
-                    if acct is None or len(acct) < 4:
-                        myb.pAccount = 'FEL CitiBank'
+                    pacct = myb.pAccount
+                    if pacct is None:
+                        pacct = get_def_bank(myb)
+                    elif len(pacct) < 4:
+                        pacct = get_def_bank(myb)
+                    myb.pAccount = pacct
+                    # Get the next check in line for this account:
+                    cknum = next_check(pacct,myb.id)
+                    myb.Ref = cknum
+
                     myb.Status = 'Paying'
                     db.session.commit()
                     co = myb.Co
                     expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co.contains(co))).all()
                 else:
-                    err[0] = 'Bill for single bill pay has been paid already'
+                    err.append('Bill for single bill pay has been paid already')
                     exit = 1
 
             if numchecked > 1 and bill > 0:
@@ -943,7 +1030,7 @@ def isoB(indat):
                             total = total+amt
                             bill_ids.append(data.id)
                         except:
-                            err[1] = 'Some checked bills of multi-pay already paid'
+                            err.append('Some checked bills of multi-pay already paid')
                             exit = 1
                 if exit == 0 and nbill > 1:
                     # Create link code
@@ -952,10 +1039,12 @@ def isoB(indat):
                     masterbill = bill_ids[0]
                     myb = Bills.query.get(masterbill)
                     masterref = myb.Ref
-                    masteracct = myb.Account
+                    masteracct = myb.pAccount
                     masterdesc = ''
                     masterpid = myb.Pid
                     masterpayee = myb.Company
+                    co = myb.Co
+                    expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co.contains(co))).all()
                     if masteracct is None or len(masteracct) < 4:
                         masteracct = 'Industrial Bank'
                     for bill in bill_ids:
@@ -975,27 +1064,38 @@ def isoB(indat):
                         myb.pAmount = myb.bAmount
                         myb.pMulti = "{:.2f}".format(total)
                         myb.Ref = masterref
-                        myb.Account = masteracct
+                        myb.pAccount = masteracct
                         myb.Description = masterdesc
                         myb.Pid = masterpid
                         myb.Company = masterpayee
                         db.session.commit()
+                        jo = myb.Jo
                         from gledger_write import gledger_write
                         gledger_write('paybill',jo,myb.bAccount,myb.pAccount)
 
             if numchecked == 0 or bill == 0:
-                err[4] = 'Must check at least one bill for this selection'
+                err.append('Must check at least one bill for this selection')
+                err.append(f'Numchecked = {numchecked}')
                 exit = 1
 
             if exit == 0:
                 modlink = 7
                 leftsize = 8
                 modata = Bills.query.get(bill)
+                docref = f'tmp/{scac}/data/vbills/{modata.Original}'
+                if os.path.isfile(addpath(docref)):
+                    leftscreen = 0
+                    err.append(f'Paying Bill {modata.Jo}')
+                else:
+                    leftscreen = 1
+                    err.append(f'Paying Bill {modata.Jo}')
+                    err.append('Bill has no source document')
                 pb = 1
             else:
-                err[2] = 'Could not complete billpay'
-                leftside = 10
+                err.append('Could not complete billpay')
+                leftside = 8
                 modlink = 0
+                leftscreen = 1
 
             bdata = Bills.query.order_by(Bills.bDate).all()
 
@@ -1044,20 +1144,23 @@ def isoB(indat):
                     sbdata = 0
 
                 if exit == 0:
-                    cache = bdat.Cache
-                    if cache is None or cache == 0:
-                        cache = 1
-                    cache = cache+1
-                    bdat.Cache = cache
-                    cknum = 'Ck'+str(bdat.id)+'_R_'+bdat.Ref
-                    docref = f'tmp/{scac}/data/vchecks/'+cknum+'c'+str(cache)+'.pdf'
+                    ckcache = bdat.CkCache
+                    if ckcache is None or ckcache == 0:
+                        ckcache = 1
+                    last_ckfile = f'Check_{bdat.Jo}_{bdat.Ref}_c{str(ckcache-1)}.pdf'
+                    ckfile = f'Check_{bdat.Jo}_{bdat.Ref}_c{str(ckcache)}.pdf'
+                    docref = f'tmp/{scac}/data/vchecks/{ckfile}'
+                    bdat.Code1 = ckfile
+                    ckcache = ckcache+1
+                    bdat.CkCache = ckcache
                     pamount = bdat.pAmount
                     if pamount == '0.00':
                         bdat.pAmount = bdat.bAmount
-                        db.session.commit()
+                    db.session.commit()
 
                     from writechecks import writechecks
-                    writechecks(bdat, pdat, cache, sbdata, links)
+
+                    writechecks(bdat, pdat, docref, sbdata, links)
                     modlink = 6
                     leftsize = 8
                     leftscreen = 0
@@ -1070,16 +1173,22 @@ def isoB(indat):
                         from gledger_write import gledger_write
                         gledger_write('paybill',bdat.Jo,bdat.bAccount,bdat.pAccount)
                     else:
-                        err[0] = 'No Account for Fund Withdrawal'
+                        err.append('No Account for Fund Withdrawal')
 
                     bdata = Bills.query.order_by(Bills.bDate).all()
                     cdata = People.query.filter((People.Ptype == 'Vendor') | (People.Ptype == 'TowCo') | (
                         People.Ptype == 'Overseas')).order_by(People.Company).all()
                     modata = Bills.query.get(bill)
                     pb = 1
+                    #Attempt to remove the previous cache copy:
+                    try:
+                        last_file = addpath(f'tmp/{scac}/data/vchecks/{last_ckfile}')
+                        os.remove(last_file)
+                    except:
+                        print(f'Could nor remove {last_file}')
 
             else:
-                err[1] = 'Must select exactly 1 Bill box to use this option.'
+                err.append('Must select exactly 1 Bill box to use this option.')
 
 
 # ____________________________________________________________________________________________________________________B.Matching
@@ -1092,8 +1201,7 @@ def isoB(indat):
                 myo.Description = myp.Associate1
                 db.session.commit()
             if numchecked != 2:
-                err[1] = 'Must select exactly 2 boxes to use this option.'
-                err[0] = ' '
+                err.append('Must select exactly 2 boxes to use this option.')
 # ____________________________________________________________________________________________________________________E.Matching
 # ____________________________________________________________________________________________________________________B.Calendar.Billing
         if calendar is not None or calupdate is not None:
@@ -1132,12 +1240,13 @@ def isoB(indat):
         else:
             leftsize = 10
     else:
-
+        err = []
+        hv = [0]*20
+        hv[0] = 'X'
+        hv[1] = '1'
+        username = session['username'].capitalize()
         # ____________________________________________________________________________________________________________________B.BillingNotPost
-        from viewfuncs import init_tabdata, timedata, nonone, init_billing_zero, init_billing_blank, nononef
-        bdata = Bills.query.order_by(Bills.bDate).all()
-        cdata = People.query.filter((People.Ptype == 'Vendor') | (
-            People.Ptype == 'TowCo')).order_by(People.Company).all()
+        from viewfuncs import init_tabdata, timedata, nonone, init_billing_zero, init_billing_blank, nononef, erud, dataget_B
         today = datetime.datetime.today().strftime('%Y-%m-%d')
         bill, peep, cache, modata, modlink, fdata, adata, cdat, pb, passdata, vdata, caldays, daylist, weeksum, nweeks = init_billing_zero()
         filesel = ''
@@ -1151,16 +1260,15 @@ def isoB(indat):
         jobdata = 0
         modal = 0
         expdata = 0
+        divdat = Divisions.query.all()
 
-        err = ['All is well', ' ', ' ', ' ',  ' ']
+        err.append('All is well')
     leftsize = 8
     rightsize = 12 - leftsize
     today = datetime.date.today()
     critday = datetime.date.today()+datetime.timedelta(days=7)
     acdata = Accounts.query.filter((Accounts.Type == 'Bank') | (Accounts.Type == 'CC')).all()
-    bdata = Bills.query.order_by(Bills.bDate).all()
-    if docref is not None:
-        docref = docref.replace('tmp/vbills', f'tmp/{scac}/data/vbills')
-    if doctxt is not None:
-        doctxt = doctxt.replace('tmp/vbills', f'tmp/{scac}/data/vbills')
-    return bdata, cdata, bill, peep, err, modata, adata, acdata, expdata, modlink, caldays, daylist, weeksum, nweeks, addjobselect, jobdata, modal, dlist, fdata, today, cdat, pb, critday, vdata, leftscreen, docref, doctxt, leftsize, cache, filesel
+    bdata, cdata = dataget_B(hv[1],hv[0])
+    err = erud(err)
+
+    return username, divdat, hv, bdata, cdata, bill, peep, err, modata, adata, acdata, expdata, modlink, caldays, daylist, weeksum, nweeks, addjobselect, jobdata, modal, dlist, fdata, today, cdat, pb, critday, vdata, leftscreen, docref, doctxt, leftsize, cache, filesel

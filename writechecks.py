@@ -10,14 +10,11 @@ from viewfuncs import dollar
 from CCC_system_setup import addpath, scac
 
 
-def writechecks(bdat, pdat, cache, sbdata, links):
+def writechecks(bdat, pdat, file1, sbdata, links):
 
     today = datetime.datetime.today().strftime('%m/%d/%Y')
     nbills = 1
-
-    cknum = 'Ck'+str(bdat.id)+'_R_'+bdat.Ref
-    file1 = addpath(f'tmp/{scac}/data/vchecks/'+cknum+'.pdf')
-    file2 = addpath(f'tmp/{scac}/data/vchecks/'+cknum+'c'+str(cache)+'.pdf')
+    file1 = addpath(file1)
 
     if links == 0:
         amt = bdat.pAmount
@@ -29,7 +26,7 @@ def writechecks(bdat, pdat, cache, sbdata, links):
         amount = float(amt)
 
     #billno = 'Bk:'+bdat.bCat
-    billno = bdat.id
+    billno = bdat.Jo
 
     # Create the Check Date:
     billdate = bdat.pDate
@@ -216,7 +213,7 @@ def writechecks(bdat, pdat, cache, sbdata, links):
 
     c.drawString(30, 660, amount_text)
 
-    image = addpath(f'tmp/{scac}/pics/Norma350.jpg')
+    image = addpath(f'tmp/{scac}/pics/ck_sigfile.png')
     c.drawImage(image, 374, 587, width=200, height=40)
 
     c.setFont('Helvetica', 12, leading=None)
@@ -275,8 +272,8 @@ def writechecks(bdat, pdat, cache, sbdata, links):
         c.line(i, m7, i, m9)
 
     p1 = n1
-    p2 = n5-20
-    vlines2at = [ltm, p1+30, p2, rtm]
+    p2 = n5-60
+    vlines2at = [ltm, n1, p2, rtm]
     for i in vlines2at:
         c.line(i, m4, i, m6)
         c.line(i, m10, i, m12)
@@ -443,7 +440,4 @@ def writechecks(bdat, pdat, cache, sbdata, links):
 
     c.showPage()
     c.save()
-
-    # Now make a cache copy
-    shutil.copy(file1, file2)
     return

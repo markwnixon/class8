@@ -27,7 +27,11 @@ def etemplate_truck(type,kind,odat):
     if 'eprof' in type or 'invoice' in type or 'packages' in type or 'invopack' in type:
         od, bol, con = odat.Order, odat.BOL, odat.Container
         od, bol, con = stripper(od), stripper(bol), stripper(con)
-        dblk = odat.Dropblock2.splitlines()
+        dblk = odat.Dropblock2
+        if dblk is not None:
+            dblk = dblk.splitlines()
+        else:
+            dblk = ['','','','','']
         pdat = People.query.get(key)
         estatus, epod, eaccts = pdat.Email, pdat.Associate1, pdat.Associate2
         estatus, epod, eaccts = stripper(estatus), stripper(epod), stripper(eaccts)

@@ -1,0 +1,54 @@
+
+<div class="row">
+{% if modlink == 7 and leftsize == 8 %}
+
+        <div class="col-sm-12" align="center">
+            {% set fdoc = docref %}
+            {{fdoc}}<br>
+            <embed src="{{fdoc}}" width="90%" height="800px"/>
+        </div>
+
+
+{%  else %}
+
+            {% if leftsize > 6 or stamp==1 %}
+                <div class="col-sm-5" align="center">
+                            {% if emaildata %}
+                                {% include 'includes/emailprep.html' %}
+                            {% elif modlink == 4 or modlink == 8 %}
+                                <br>
+                                {% include 'includes/_uploadsourcedocs.html' %}
+
+                            {% else %}
+
+                                This page left blank intentionally
+                                <!--
+                                Text version of file {{leftsize}}{{rightsize}}{{mm1}}:<br>
+                                <embed src="{{ftxt}}" width="400px" height="650px"/>
+                                -->
+                            {% endif %}
+                </div>
+
+                <div class="col-sm-7" align="center">
+
+                            {% if rightsize == 4 %}
+                            {% set wide = "550px" %}
+                            {% else %}
+                            {% set wide = "650pm" %}
+                            {% endif %}
+
+                            {% set fdoc = docref %}
+
+                            {% if fdoc != 0 %}
+                                {{fdoc}}<br>
+                                <embed src="{{fdoc}}" width={{wide}} height="800px"/>
+                            {% endif %}
+                </div>
+            {% endif %}
+{% endif %}
+</div>
+
+<input type = "hidden" name ="datatable1" value= "{{dlist[0]}}">
+<input type = "hidden" name ="datatable2" value= "{{dlist[1]}}">
+<input type = "hidden" name ="datatable3" value= "{{dlist[2]}}">
+<input type = "hidden" name ="datatable4" value= "{{dlist[3]}}">

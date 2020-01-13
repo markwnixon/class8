@@ -318,7 +318,7 @@ def isoC():
         err=['All is well', ' ', ' ', ' ',  ' ']
         actype = ''
 
-    fdata = myoslist('vunknown')
+    fdata = myoslist('data/vunknown')
     fdata.sort()
     doctxt=os.path.splitext(docref)[0] + '.txt'
     leftsize = 8

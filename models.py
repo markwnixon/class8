@@ -343,6 +343,19 @@ class Gledger(db.Model):
         self.Recorded=Recorded
         self.Reconciled=Reconciled
 
+class Divisions(db.Model):
+    __tablename__ = 'divisions'
+    id = db.Column('id', db.Integer, primary_key=True)
+    Name = db.Column('Name', db.String(45))
+    Co = db.Column('Co', db.String(45))
+    Color = db.Column('Color', db.String(45))
+
+    def __init__(self, Name, Co, Color):
+        self.Name = Name
+        self.Co = Co
+        self.Color = Color
+
+
 class Quotes(db.Model):
     __tablename__ = 'quotes'
     id = db.Column('id', db.Integer, primary_key=True)
@@ -892,7 +905,7 @@ class Income(db.Model):
 class Bills(db.Model):
     __tablename__ = 'bills'
     id = db.Column('id', db.Integer, primary_key=True)
-    Jo = db.Column('JO', db.String(25))
+    Jo = db.Column('Jo', db.String(25))
     Pid = db.Column('Pid', db.Integer)
     Company = db.Column('Company', db.String(50))
     Memo = db.Column('Memo', db.String(50))
@@ -920,8 +933,11 @@ class Bills(db.Model):
     dDate = db.Column('dDate', db.DateTime)
     pAmount2 = db.Column('pAmount2', db.String(20))
     pDate2 = db.Column('pDate2', db.DateTime)
+    Code1 = db.Column('Code1', db.String(45))
+    Code2 = db.Column('Code2', db.String(45))
+    CkCache = db.Column('CkCache', db.Integer)
 
-    def __init__(self, Jo, Pid, Company, Memo, Description, bAmount, Status, Cache, Original, Ref, bDate, pDate, pAmount, pMulti, pAccount, bAccount, bType, bCat, bSubcat, Link, User, Co, Temp1, Temp2, Recurring, dDate, pAmount2, pDate2):
+    def __init__(self, Jo, Pid, Company, Memo, Description, bAmount, Status, Cache, Original, Ref, bDate, pDate, pAmount, pMulti, pAccount, bAccount, bType, bCat, bSubcat, Link, User, Co, Temp1, Temp2, Recurring, dDate, pAmount2, pDate2, Code1, Code2, CkCache):
         self.Jo = Jo
         self.Pid = Pid
         self.Company = Company
@@ -950,6 +966,9 @@ class Bills(db.Model):
         self.dDate = dDate
         self.pAmount2 = pAmount2
         self.pDate2 = pDate2
+        self.Code1 = Code1
+        self.Code2 = Code2
+        self.CkCache = CkCache
 
     def Bal(self):
         try:

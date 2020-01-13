@@ -1,0 +1,78 @@
+<br>
+{% include 'includes/_controlpanelheader.html' %}
+<br>
+<div class="card">
+<div class="card-header">
+        <div class="d-flex justify-content-around align-items-center">
+        <div class="p-0">Enter New Vendor Information</div>
+        <div class="p-0">
+            <button type="submit" class="btn btn-md btn-green" name="Update">Update</button>
+            <button type="submit" class="btn btn-md btn-elegant" name="Return">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div class="card-body">
+<table class="table table-condensed table-hover">
+<tbody>
+
+<tr>
+<td> <div class="input-group-text" align="right">Company/Person Name:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="company" value="{{modata.Company}}"></td>
+</tr>
+<tr>
+<td><div class="input-group-text">Default Bill To:</div></td>
+<td>
+<select class="form-control" type="text" name="ctype" onchange="this.form.submit()">
+<option value = 'Pick '>  Select Default Company/Division </option>
+{% for div in divdat %}
+<option {% if modata.Idtype == div.Co %} selected {% endif %} value='{{ div.Co }}'>  {{ div.Name }} (Code {{ div.Co }}) </option>
+{% endfor %}
+
+</select>
+</td>
+</tr>
+<tr>
+<td><div class="input-group-text"><b>Code {{modata.Idtype}}</b> &nbsp; Bill Accounts:</div></td>
+<td>
+<select class="form-control" type="text" name="billacct" >
+<option selected value='1'>Choose Later</option>
+{% for exp in expdata %}
+<option {% if modata.Associate1 == exp.Name %} selected {% endif %} value="{{exp.Name}}" > {{exp.Name}} </option>
+{% endfor %}</select>
+</td>
+</tr>
+<tr>
+<td align="right"> <div class="input-group-text">Address Line1:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="addr1" value="{{modata.Addr1}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Address Line2:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="addr2" value="{{modata.Addr2}}"></td>
+</tr>
+
+<tr>
+<td> <div class="input-group-text">Account Number:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="tid" value="{{modata.Idnumber}}"></td>
+</tr>
+<tr>
+<td align="right"> <div class="input-group-text">Telephone:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="tel" value="{{modata.Telephone}}"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Email:</div></td>
+<td colspan="2"><input class="form-control" type="text" name="email" value="{{modata.Email}}"></td>
+</tr>
+
+<tr>
+{% if modata.Date1 is none %} {% set date1=today %} {% else %} {% set date1=modata.Date1 %} {% endif %}
+<td> <div class="input-group-text">Date:</div></td>
+<td colspan="2"><input class="form-control" type="date" name="date1" value={{date1}}></td>
+</tr>
+</tbody></table>
+</div>
+</div>
+<input type = "hidden" name ="peep" value= {{peep}}>
+<input type = "hidden" name ="shipper" value= "{{hv[0]}}">
+<input type = "hidden" name ="thislcomp" value= "{{hv[1]}}">
+<input type = "hidden" name ="thisdcomp" value= "{{hv[2]}}">

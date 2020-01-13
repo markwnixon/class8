@@ -1,3 +1,6 @@
+
+<br>
+<b>Billing Data:</b> &nbsp
 <div class="custom-control custom-checkbox custom-control-inline">
   <input type="checkbox" class="custom-control-input" id="defaultInline1" {% if dlist[0]=='on' %} checked {% endif %} name="datatable1" onchange="this.form.submit()">
   <label class="custom-control-label" for="defaultInline1">Bills</label>
@@ -5,4 +8,93 @@
 <div class="custom-control custom-checkbox custom-control-inline">
   <input type="checkbox" class="custom-control-input" id="defaultInline2" {% if dlist[1]=='on' %} checked {% endif %} name="datatable2" onchange="this.form.submit()">
   <label class="custom-control-label" for="defaultInline2">Vendors</label>
+</div>
+<br>
+<div class="d-sm-flex justify-content-around align-self-baseline">
+        <div class="p-0">
+
+    <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="NewB"
+      data-toggle="tooltip" title="Add a NEW BILL from scratch here">   New<br>&nbsp &nbsp Bill &nbsp &nbsp  </button>
+->
+          <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="Vmod"
+        data-toggle="tooltip" title="MODIFY Bill/Vendor information associated with any selected item">Modify<br>Item</button>
+->
+              <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="PayB"
+        data-toggle="tooltip" title="Pay Selected Single Bill">Pay<br>Bill</button>
+->
+            <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="Prt"
+        data-toggle="tooltip" title="Print Checks for Bills (can also Modifies Bill Payments">Print<br>Checks</button>
+    </div>
+</div>
+
+
+{% set thismuch = hv[1] %}
+
+<div class="d-sm-flex justify-content-center small">
+    <div class="p-0">
+        <select class="mdb-select md-form" name="thismuch" onchange="this.form.submit()">
+            <option value="" disabled selected>Filter Table</option>
+            <option {% if thismuch == '1' %} selected {% endif %} value='1'>Filter: Last 60 Days</option>
+            <option {% if thismuch == '2' %} selected {% endif %} value='2'>Filter: Last 120 Days</option>
+            <option {% if thismuch == '3' %} selected {% endif %} value='3'>Filter: Unreconciled</option>
+            <option {% if thismuch == '4' %} selected {% endif %} value='4'>Filter: Reconciled</option>
+            <option {% if thismuch == '8' %} selected {% endif %} value='8'>Filter: Show All</option>
+        </select>
+    </div>
+    &nbsp; &nbsp;
+    <div class="p-0">
+        <select class="mdb-select md-form" name="codiv" onchange="this.form.submit()">
+            <option value="" disabled selected>Company/Division</option>
+                {% for div in divdat %}
+                    <option value="{{ div.Co }}" {% if hv[0] == div.Co %} selected {% endif %}>{{ div.Name }}</option>
+                {% endfor %}
+            <option value="X" {% if hv[0] == 'X' %} selected {% endif %} >All Divisions</option>
+        </select>
+    </div>
+    &nbsp; &nbsp;
+    <div class="p-0">
+        <select class="mdb-select md-form" name="addbox" onchange="this.form.submit()">
+            <option value="" disabled selected>Add & Upload</option>
+            <option value="1">New Bill</option>
+            <option value="2">New Vendor</option>
+            <option value="3">New from Copy</option>
+            <option value="4">Copy to All Remaining Months</option>
+            <option value="5">Upload Source</option>
+        </select>
+    </div>
+    &nbsp; &nbsp;
+    <div class="p-0">
+        <select class="mdb-select md-form" name="editbox" onchange="this.form.submit()">
+            <option value="" disabled selected>Edit & Connect</option>
+            <option value="1">Edit Item</option>
+            <option value="2">Match Items</option>
+            <option value="3">Accept Items</option>
+        </select>
+    </div>
+    &nbsp; &nbsp;
+    <div class="p-0">
+        <select class="mdb-select md-form" name="invobox" onchange="this.form.submit()">
+            <option value="" disabled selected>Money In and Out</option>
+            <option value="1">Quick Pay</option>
+            <option value="2">Pay Bill</option>
+            <option value="3">Multi-Bill Pay</option>
+            <option value="4">Print Check</option>
+        </select>
+    </div>
+    &nbsp; &nbsp;
+    <div class="p-0">
+        <select class="mdb-select md-form" name="viewbox" onchange="this.form.submit()">
+            <option value="" disabled selected>View Documents</option>
+            <option value="1">Source File</option>
+            <option value="2">View Check</option>
+        </select>
+    </div>
+    &nbsp; &nbsp;
+    <div class="p-0">
+        <select class="mdb-select md-form" name="xbox" onchange="this.form.submit()">
+            <option value="" disabled selected>Undo/Delete</option>
+            <option value="1">Delete Item</option>
+            <option value="2">Undo Bill Payment</option>
+        </select>
+    </div>
 </div>

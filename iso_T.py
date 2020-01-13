@@ -34,6 +34,8 @@ def isoT():
         from invoice_makers import multi_inv
         from gledger_write import gledger_write
         err=[]
+        codata = companydata()
+        jbcode = codata[10]+'T'
 
         # Zero and blank items for default
         username = session['username'].capitalize()
@@ -781,7 +783,8 @@ def isoT():
                 for i in range(7):
                     emaildata[i] = request.values.get('edat' + str(i))
 
-
+        if (mpack is not None and numchecked == 0):
+            err.append('Must Select at Least One Job for this Option')
         if (mpack is not None and numchecked == 1):
             if eprof is not None:
                 oder = request.values.get('passoder')
@@ -904,18 +907,25 @@ def isoT():
                     pdflist = ['pdfunite'] + packitems + [addpath(docref)]
                     tes = subprocess.check_output(pdflist)
 
-                if eprof is not None:
-                    thisprofile = 'eprof'+eprof
-                    kind=0
+                    if eprof is not None:
+                        thisprofile = 'eprof'+eprof
+                        kind=0
+                    else:
+                        thisprofile = 'packages'
+                        kind=2
+                    emaildata = etemplate_truck(thisprofile,kind,odat)
+                    invo = 3
+                    doclist[0] = docref
                 else:
-                    thisprofile = 'packages'
-                    kind=2
-                emaildata = etemplate_truck(thisprofile,kind,odat)
-                invo = 3
+                    err.append('No documents available for this selection')
+                    viewtype, mpack, stamp, leftscreen = 0, 0, 0, 1
 
 
             else:
                 err.append('Must Select One Job to Use this Function')
+                viewtype, mpack, stamp, leftscreen = 0, 0, 0, 1
+
+            print("on exit docref is ", docref)
 
         if stampnow is not None:
             # if stampnow is called the document will already be recreated as a blank for here
@@ -960,7 +970,7 @@ def isoT():
                 grandtotal = grandtotal+float(idat.Total)
                 # put together the file paperwork
             print('scac', scac)
-            file1 = f'tmp/{scac}/data/vinvoice/P_' + 'test.pdf'
+            #file1 = f'tmp/{scac}/data/vinvoice/P_' + 'test.pdf'
             print('file1here=',file1)
             cache2 = int(odat.Detention)
             cache2 = cache2+1
@@ -1030,6 +1040,9 @@ def isoT():
 
         if emailnow is not None or emailinvo is not None:
             oder=request.values.get('passoder')
+            if emailinvo is not None:
+                oder = invooder
+            print('oderhere=',oder)
             viewtype = request.values.get('viewtype')
             oder=nonone(oder)
             odat=Orders.query.get(oder)
@@ -1618,7 +1631,6 @@ def isoT():
 
         if ((minvo is not None and oder > 0 and numchecked == 1) or invoupdate is not None) or ((mquot is not None and oder > 0 and numchecked ==1 ) or quotupdate is not None):
 
-            err.append('Cannot make invoice: Billing ok, Load ok, Delivery ok')
             # First time through: have an order to invoice
             if oder > 0:
                 invooder = oder
@@ -1880,8 +1892,7 @@ def isoT():
             now = datetime.datetime.now().strftime('%I:%M %p')
             if oder > 0 and numchecked == 1:
                 sdate = today.strftime('%Y-%m-%d')
-                jtype = 'T'
-                nextjo = newjo(jtype, sdate)
+                nextjo = newjo(jbcode, sdate)
                 myo = Orders.query.get(oder)
                 load = myo.Company[0:1]+nextjo[-5:]
                 order = myo.Company[0:1]+nextjo[-5:]
