@@ -91,6 +91,8 @@ def isoT():
         viewtype = 0
         doclist = [0]*8
         holdvec = [0] * 20
+        if dlist[1] == 'on':
+            Services.query.filter((Services.Service == 'New') & (Services.Price == 0.00)).delete()
 
         oder, poof, tick, serv, peep, invo, invooder, cache, modlink = get_ints()
         quot = 0
@@ -990,8 +992,8 @@ def isoT():
             modlink = 0
 
             filegather = ['pdfunite', addpath(file1)]
-            cdata = companydata()
-            etitle = cdata[2]+' Invoices:'
+            codata = companydata()
+            etitle = codata[2]+' Invoices:'
             #Prepare for email, but at this point only created invoice
             for i in odervec:
                 odat = Orders.query.get(i)
@@ -1404,14 +1406,13 @@ def isoT():
                 jo = odat.Jo
                 Gledger.query.filter(Gledger.Tcode==jo).delete()
                 Orders.query.filter(Orders.id == oder).delete()
-            if poof > 0:
-                Proofs.query.filter(Proofs.id == poof).delete()
             if tick > 0:
                 Interchange.query.filter(Interchange.id == tick).delete()
             if peep > 0:
                 People.query.filter(People.id == peep).delete()
             if serv > 0:
                 Services.query.filter(Services.id == serv).delete()
+                sdata = Services.query.order_by(Services.Price.desc()).all()
 
             db.session.commit()
 
@@ -1432,7 +1433,7 @@ def isoT():
 
             invojo = odat.Jo
             co = invojo[0]
-            acdata = Accounts.query.filter((Accounts.Type=='Bank') & (Accounts.Co == co)).all()
+            acdata = Accounts.query.filter((Accounts.Type=='Bank') & (Accounts.Co == co)).order_by(Accounts.Name).all()
             bklist = ['Cash', 'Mcheck', 'Mremit']
             for adat in acdata:
                 bklist.append(adat.Name)

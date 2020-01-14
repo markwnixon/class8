@@ -7,7 +7,7 @@
 
 {% set etype = 'Quote' %}
 
-{% if taskbox == 1 %}
+{% if taskbox == 1 or taskbox == 5%}
         <div class="col-sm-4" align="left">
             {% include 'includes/emailprep.html' %}
             <div class="card" align=""left">
@@ -129,7 +129,7 @@
 
 {% endif %}
 
-{% if taskbox != 1 %}
+{% if taskbox != 1 and taskbox != 5 %}
     <br>
     <div class="col-sm-4" align="left">
     <br><br>
@@ -170,7 +170,7 @@
              </tr>
               <tr>
                   <td> <div class="input-group-text">Salutation Name</div></td>
-                  <td colspan="2"><textarea class="form-control" type="text" name="bidname" rows="1">{{qdat.Person}}</textarea></td>
+                  <td colspan="2"><textarea class="form-control" type="text" name="bidname" rows="1">{{bidname}}</textarea></td>
              </tr>
              <tr>
              <td colspan = '2'>

@@ -478,7 +478,7 @@ def isoQuote():
             db.session.commit()
             taskbox = 0
 
-        if taskbox == 1:
+        if taskbox == 1 or taskbox == 5:
             if quot>0 and qdat is not None:
                 locto = qdat.Location
                 if locto is None:
@@ -490,10 +490,17 @@ def isoQuote():
                     emailto = qdat.From
                     qdat.From = emailto
                     db.session.commit()
+            else:
+                comdata = companydata()
+                locto = comdata[6]
+                emailto = usernames['expo']
 
-            if quot > 0:
-                locfrom = qdat.Start
-                if locfrom is None:
+            if quot > 0 or taskbox == 5:
+                if qdat is not None:
+                    locfrom = qdat.Start
+                    if locfrom is None:
+                        locfrom = 'Seagirt Marine Terminal, Baltimore, MD 21224'
+                else:
                     locfrom = 'Seagirt Marine Terminal, Baltimore, MD 21224'
 
                 if updatego is not None or updatebid is not None or emailgo is not None or updateE is not None:
@@ -503,19 +510,21 @@ def isoQuote():
                     locfrom = request.values.get('locfrom')
                     emailto = request.values.get('edat2')
                     respondnow = datetime.datetime.now()
-                    qdat.Start = locfrom
-                    qdat.Location = locto
-                    qdat.From = emailto
-                    qdat.Amount = bidthis
-                    qdat.Person = bidname
-                    qdat.Responder = username
-                    qdat.RespDate = respondnow
-                    qdat.Status = 1
-                    db.session.commit()
+                    if taskbox == 1:
+                        qdat.Start = locfrom
+                        qdat.Location = locto
+                        qdat.From = emailto
+                        qdat.Amount = bidthis
+                        qdat.Person = bidname
+                        qdat.Responder = username
+                        qdat.RespDate = respondnow
+                        qdat.Status = 1
+                        db.session.commit()
 
                 if emailgo is not None:
-                    qdat.Status = 2
-                    db.session.commit()
+                    if taskbox == 1:
+                        qdat.Status = 2
+                        db.session.commit()
                     emaildata = sendquote(bidthis)
                     taskbox=0
                     quot=0
@@ -636,7 +645,7 @@ def isoQuote():
 
 
                     biddata = [d2s(roundup(bid)),d2s(roundup(std_bid)),d2s(roundup(cma_bid))]
-                    if updatego is not None or quotbut is not None:
+                    if updatego is not None or quotbut is not None or (taskbox == 5 and updatebid is None):
                         bidthis = d2s(roundup(bid))
 
                 except:
@@ -644,6 +653,7 @@ def isoQuote():
                     biddata = None
                     newdirdata = None
                     bidthis = None
+                    bidname = None
                     ex_drv = 27.41
                     ex_fuel = .48
                     ex_toll = 24.00
@@ -666,6 +676,7 @@ def isoQuote():
                     else:
                         customer = friendly(emailto)
                     qdat.Person = customer
+                    bidname = customer
                     db.session.commit()
                     ebody = f'Hello {customer}, \n\n<br><br>{cdata[0]} is pleased to offer a quote of <b>${bidthis}</b> for this load to {locto}.\nThe quote is inclusive of tolls, fuel, and 2 hrs of load time.  Additional accessorial charges may apply and are priced according the following table:\n\n'
                     ebody = ebody + maketable()
@@ -716,6 +727,7 @@ def isoQuote():
             biddata = None
             newdirdata = None
             bidthis = None
+            bidname = None
 
 
             ex_drv = 27.41
@@ -748,6 +760,7 @@ def isoQuote():
         biddata = None
         newdirdata = None
         bidthis = None
+        bidname = None
 
         ex_drv = 27.41
         ex_fuel = .48
@@ -766,4 +779,4 @@ def isoQuote():
 
     qdata = dataget_Q(thismuch)
     print(quot)
-    return costdata, biddata, expdata, timedata, distdata, emaildata, locto, locfrom, newdirdata, qdata, bidthis, taskbox, thismuch, quot, qdat
+    return bidname, costdata, biddata, expdata, timedata, distdata, emaildata, locto, locfrom, newdirdata, qdata, bidthis, taskbox, thismuch, quot, qdat
