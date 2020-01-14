@@ -162,7 +162,7 @@ class Orders(db.Model):
     __tablename__ = 'orders'
     id = db.Column('id', db.Integer, primary_key=True)
     Status = db.Column('Status', db.String(200))
-    Jo = db.Column('JO', db.String(25))
+    Jo = db.Column('Jo', db.String(25))
     Load = db.Column('Load', db.String(50))
     Order = db.Column('Order', db.String(50))
     Bid = db.Column('Bid', db.Integer)
