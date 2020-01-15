@@ -86,6 +86,7 @@ def isoT():
         passinvo = request.values.get('passinvo')
         passinvo = nonone(passinvo)
         print('passinvo=',passinvo)
+        umi = request.values.get('UpdateMultiInvoice')
 
         print('lbox=', lbox)
         viewtype = 0
@@ -101,6 +102,25 @@ def isoT():
         if invoserv is not None:
             invoupdate = '1'
             servid = nonone(invoserv)
+
+        if umi is not None:
+            #Redoing our multi-invoice with new values
+            newbase = request.values.get('newbaseamount')
+            newchas = request.values.get('newchasamount')
+            newchas = d2s(newchas)
+            newbase = d2s(newbase)
+            holdvec[3] = newbase
+            holdvec[4] = newchas
+            minvo = 1
+            oder = request.values.get('passoder')
+            oder = nonone(oder)
+            if oder == 0:
+                oder = invooder
+            print(oder,invooder)
+            odat = Orders.query.get(oder)
+            odervec = json.loads(odat.Links)
+            print('UMI present',newbase,newchas,oder,odervec)
+
 
 
         thisbox1 = request.values.get('addbox')
@@ -744,7 +764,7 @@ def isoT():
             return packitems, stampdata, err
 
 # ____________________________________________________________________________________________________________________B.Package.Trucking
-        if reorder is not None or stampnow is not None or eprof is not None:
+        if (reorder is not None or stampnow is not None or eprof is not None) and emailnow is None:
 
             oder=request.values.get('passoder')
             oder=nonone(oder)
@@ -778,7 +798,7 @@ def isoT():
                 holdvec[0] = eprof
                 thisprofile = 'eprof' + eprof
                 kind = 0
-                emaildata = etemplate_truck(thisprofile, kind, odat)
+                emaildata = etemplate_truck('package', thisprofile, odat)
                 print('myemaildata:', thisprofile,emaildata)
             else:
                 emaildata = [0] * 7
@@ -787,7 +807,7 @@ def isoT():
 
         if (mpack is not None and numchecked == 0):
             err.append('Must Select at Least One Job for this Option')
-        if (mpack is not None and numchecked == 1):
+        if (mpack is not None and numchecked == 1) and emailnow is None:
             if eprof is not None:
                 oder = request.values.get('passoder')
                 oder = nonone(oder)
@@ -911,11 +931,11 @@ def isoT():
 
                     if eprof is not None:
                         thisprofile = 'eprof'+eprof
-                        kind=0
+                        viewtype = 'packages'
                     else:
-                        thisprofile = 'packages'
-                        kind=2
-                    emaildata = etemplate_truck(thisprofile,kind,odat)
+                        viewtype = 'packages'
+                        thisprofile = 0
+                    emaildata = etemplate_truck(viewtype, thisprofile, odat)
                     invo = 3
                     doclist[0] = docref
                 else:
@@ -954,7 +974,7 @@ def isoT():
 # ____________________________________________________________________________________________________________________E.Package.Trucking
 # ____________________________________________________________________________________________________________________B.Package2.Trucking
 
-        if mpack is not None and numchecked > 1:
+        if (mpack is not None and numchecked > 1) and emailnow is None:
             err.append('Combining Documents for Summary Invoice')
             odervec = numcheckv(odata)
             keydata = [0]*len(odervec)
@@ -1005,7 +1025,7 @@ def isoT():
             filegather.append(addpath(docref))
             tes = subprocess.check_output(filegather)
 
-            emaildata = etemplate_truck2('invoice',2,odat)
+            emaildata = etemplate_truck('invoice', 0 , odat)
             invo = 3
             viewtype = 'packages'
 # ____________________________________________________________________________________________________________________E.Package2.Trucking
@@ -1033,20 +1053,16 @@ def isoT():
             gledger_write('income',jo,acctdb,0)
             odat.Istat = 4
             db.session.commit()
-            modlink = 0
-            invo = 0
-            invooder = 0
-            stamp = 0
-            inco = 0
-            oder = 0
+            modlink, invo, invooder, oder, stamp, inco = 0, 0, 0, 0, 0, 0
 
         if emailnow is not None or emailinvo is not None:
             oder=request.values.get('passoder')
-            if emailinvo is not None:
-                oder = invooder
-            print('oderhere=',oder)
+            oder = nonone(oder)
+            if oder == 0:
+                oder = request.values.get('invooder')
+            print('oderhere=',oder,invooder)
             viewtype = request.values.get('viewtype')
-            oder=nonone(oder)
+
             odat=Orders.query.get(oder)
             jo = odat.Jo
             order = odat.Order
@@ -1067,17 +1083,12 @@ def isoT():
             elif viewtype == 'invoice':
                 docref = odat.Invoice
 
-            if viewtype == 'invopackage' or viewtype == 'invoice' or eprof == 3 or eprof == 5:
+            if viewtype == 'invopackage' or viewtype == 'invoice' or eprof == '3' or eprof == '5':
                 loginvo_m(odat, 3)
 
             print('mydocref=',docref)
             emailin1 = invoice_mimemail(order, docref, eprof)
-            invo = 0
-            invooder = 0
-            stamp = 0
-            leftscreen = 1
-            leftsize = 10
-            modlink = 0
+            invo, invooder, oder, stamp, modlink, viewtype, leftscreen= 0, 0, 0, 0, 0, 0, 1
             err.append(f'Successful email to: {emailin1}')
 # ____________________________________________________________________________________________________________________E.Email.Trucking
 # ____________________________________________________________________________________________________________________B.Views.Trucking
@@ -1123,7 +1134,7 @@ def isoT():
                 modata = Orders.query.get(oder)
                 try:
                     docref = f'tmp/{scac}/data/vinvoice/{modata.Invoice}'
-                    emaildata = etemplate_truck('invoice',3,modata)
+                    emaildata = etemplate_truck('invoice',0,modata)
                     leftscreen = 0
                     modlink = 0
                     invo = 1
@@ -1175,7 +1186,7 @@ def isoT():
                         incdat.Original = fname
                         db.session.commit()
 
-                    emaildata = etemplate_truck('paidinvoice',3,modata)
+                    emaildata = etemplate_truck('paidinvoice',0,modata)
                     leftscreen = 0
                     err.append(f'Viewing document {docref}')
                     viewtype = 'paidinvoice'
@@ -1550,9 +1561,12 @@ def isoT():
                 hstat = odat.Hstat
                 if hstat == 2 or hstat == 3:
                     odat.Hstat = 4
+                odat.Istat = 4
                 db.session.commit()
                 leftscreen = 0
                 err.append('Viewing '+docref)
+                emaildata = etemplate_truck('paidinvoice', 0, odat)
+                viewtype = 'paidinvoice'
 
         if recpay is not None and (oder == 0 or numchecked != 1):
             err.append('Invalid selections')
@@ -1594,15 +1608,21 @@ def isoT():
                 modlink = 7
 # ____________________________________________________________________________________________________________________E.PaymentHistory.Trucking
 # ____________________________________________________________________________________________________________________B.Invoice.Trucking and Quotes
-        if (minvo is not None and oder > 0) and numchecked > 1:
+        if ((minvo is not None and oder > 0) and numchecked > 1) or umi is not None:
             err.append('Creating Multi-Job Invoice')
-            odata = Orders.query.all()
-            odervec = numcheckv(odata)
+
+            if umi is None:
+                odata = Orders.query.all()
+                odervec = numcheckv(odata)
+
             invooder = odervec[0]
 
             thesematch = 1
             for j, oder in enumerate(odervec):
                 myo = Orders.query.get(oder)
+                if umi is not None:
+                    myo.Amount = newbase
+                    db.session.commit()
                 if j == 0:
                     shipco = myo.Shipper
                 else:
@@ -1612,7 +1632,13 @@ def isoT():
 
             if thesematch == 1:
                 print('l_Invoice Selections Matched')
-                docref = multi_inv(odata, odervec, 1)
+                ichas = 1
+                if umi is not None:
+                    if newchas == '0.00':
+                        ichas = 0
+                else:
+                    newchas = 0
+                docref = multi_inv(odata, odervec, ichas, newchas)
             else:
                 err.append('Shippers Not Matched')
 
@@ -1626,7 +1652,7 @@ def isoT():
                     db.session.commit()
                 err.append(f'Multi-Invoice:{json.dumps(odervec)}')
                 err.append(f'Viewing {docref}')
-                emaildata = etemplate_truck('invoice',5,myo)
+                emaildata = etemplate_truck('invopackage',0,myo)
                 invo = 2
                 viewtype = 'invopackage'
 
@@ -1808,10 +1834,10 @@ def isoT():
                     jo = modata.Jo
                     order = modata.Order
                 if (minvo is not None and oder > 0 and numchecked == 1) or invoupdate is not None:
-                    emaildata = etemplate_truck('invoice',6,modata)
+                    emaildata = etemplate_truck('invoice',0,modata)
                     viewtype = 'invoice'
                 else:
-                    emaildata = etemplate_truck('quote',6,modata)
+                    emaildata = etemplate_truck('quote',0,modata)
                 #invo = 1
         if minvo is not None and oder == 0:
             err.append('Must select a job to create/edit invoice')
@@ -1886,8 +1912,6 @@ def isoT():
             cdata = People.query.filter(People.Ptype == 'Trucking').order_by(People.Company).all()
             oder = modata.id
             leftscreen = 1
-
-        print('copy here',copy,numchecked,oder, viewip)
 # ____________________________________________________________________________________________________________________E.Newjob.Trucking
         if copy is not None:
             now = datetime.datetime.now().strftime('%I:%M %p')

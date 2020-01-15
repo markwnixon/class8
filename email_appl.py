@@ -10,33 +10,32 @@ from email.mime.text import MIMEText
 import ntpath
 import shutil
 import os
-from CCC_system_setup import websites, passwords, companydata
+from CCC_system_setup import websites, passwords, companydata, scac
 from CCC_system_setup import usernames as em
 from models import People, Orders
 from viewfuncs import stripper
 
-def etemplate_truck(type,kind,odat):
+def etemplate_truck(viewtype,eprof,odat):
     cdata = companydata()
-    key = odat.Bid
+    bid = odat.Bid
     jo = odat.Jo
     order = odat.Order
     signature = cdata[2] + '\n' + cdata[5] + '\n' + cdata[6] + '\n' + cdata[7]
 
-    print('templated to:',type, kind)
+    print('templated to:',viewtype,eprof)
 
-    if 'eprof' in type or 'invoice' in type or 'packages' in type or 'invopack' in type:
-        od, bol, con = odat.Order, odat.BOL, odat.Container
-        od, bol, con = stripper(od), stripper(bol), stripper(con)
-        dblk = odat.Dropblock2
-        if dblk is not None:
-            dblk = dblk.splitlines()
-        else:
-            dblk = ['','','','','']
-        pdat = People.query.get(key)
-        estatus, epod, eaccts = pdat.Email, pdat.Associate1, pdat.Associate2
-        estatus, epod, eaccts = stripper(estatus), stripper(epod), stripper(eaccts)
+    od, bol, con = odat.Order, odat.BOL, odat.Container
+    od, bol, con = stripper(od), stripper(bol), stripper(con)
+    dblk = odat.Dropblock2
+    if dblk is not None:
+        dblk = dblk.splitlines()
+    else:
+        dblk = ['','','','','']
+    pdat = People.query.get(bid)
+    estatus, epod, eaccts = pdat.Email, pdat.Associate1, pdat.Associate2
+    estatus, epod, eaccts = stripper(estatus), stripper(epod), stripper(eaccts)
 
-    if type == 'eprof1':
+    if eprof== 'eprof1':
         etitle = f'Update on Order: {od} | {bol} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nOur trucker is at the delivery site:\n\t\t{dblk[0]}\n\t\t{dblk[1]}\n\t\t{dblk[2]}\nWe will send a POD as soon as one can be obtained.\n\nSincerely,\n\n{signature}'
         aname = 'none'
@@ -47,7 +46,7 @@ def etemplate_truck(type,kind,odat):
         emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2, aname]
         return emaildata
 
-    elif type == 'eprof2':
+    elif eprof == 'eprof2':
         etitle = f'Update on Order: {od} | {bol} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nThe subject container has been pulled from the port. Delivery is scheduled for {odat.Date2} to:\n\t\t{dblk[0]}\n\t\t{dblk[1]}\n\t\t{dblk[2]}\nWe will send a POD as soon as delivery is complete.\n\nSincerely,\n\n{signature}'
         aname = odat.Gate
@@ -58,10 +57,11 @@ def etemplate_truck(type,kind,odat):
         emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2, aname]
         return emaildata
 
-    elif type == 'eprof3':
+    elif eprof == 'eprof3':
         etitle = f'Invoice for Completed Order: {od} | {bol} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nThe subject order has been completed, and your invoice for services is attached.\n\nWe greatly appreciate your business.\n\nSincerely,\n\n{signature}'
         aname = odat.Invoice
+        aname = aname.replace('INV', 'Invoice_')
         emailin1 = estatus
         emailin2 = eaccts
         emailcc1 = em['info']
@@ -69,7 +69,7 @@ def etemplate_truck(type,kind,odat):
         emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2, aname]
         return emaildata
 
-    elif type == 'eprof4':
+    elif eprof == 'eprof4':
         etitle = f'Proof for Completed Order: {od} | {bol} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nThe subject order has been completed, and your proof of delivery is attached.\n\nPlease do not hesitate to respond if you have any quesitons.\n\nSincerely,\n\n{signature}'
         aname = odat.Proof
@@ -80,7 +80,7 @@ def etemplate_truck(type,kind,odat):
         emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2, aname]
         return emaildata
 
-    elif type == 'eprof5':
+    elif eprof == 'eprof5':
         etitle = f'Invoice & Proof for Completed Order: {od} | {bol} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nThe subject order has been completed, and your invoice with proof of delivery is attached.\n\nPlease do not hesitate to respond if you have any quesitons.\n\nSincerely,\n\n{signature}'
         aname = f'Package_{odat.Jo}.pdf'
@@ -91,7 +91,7 @@ def etemplate_truck(type,kind,odat):
         emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2, aname]
         return emaildata
 
-    elif type == 'eprof6':
+    elif eprof == 'eprof6':
         etitle = f'Invoice Package for Completed Order: {od} | {bol} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nThe subject order has been completed, and your invoice package is attached.\n\nPlease do not hesitate to respond if you have any quesitons.\n\nSincerely,\n\n{signature}'
         aname = f'Package_{odat.Jo}.pdf'
@@ -102,10 +102,11 @@ def etemplate_truck(type,kind,odat):
         emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2, aname]
         return emaildata
 
-    elif type == 'invoice':
+    elif viewtype == 'invoice':
         etitle = f'Invoice for Completed Order: {od} | {bol} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nThe subject order has been completed, and your invoice for services is attached.\n\nWe greatly appreciate your business.\n\nSincerely,\n\n{signature}'
         aname = odat.Invoice
+        aname = aname.replace('INV','Invoice_')
         emailin1 = estatus
         emailin2 = eaccts
         emailcc1 = em['info']
@@ -114,10 +115,11 @@ def etemplate_truck(type,kind,odat):
         return emaildata
 
 
-    elif type == 'paidinvoice':
+    elif viewtype == 'paidinvoice':
         etitle = f'Payment Received on Invoice {odat.Jo} for Completed Order: {od} | {bol} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nYour payment has been received, and your stamped invoice is attached.\n\nWe greatly appreciate your business.\n\nSincerely,\n\n{signature}'
         aname = odat.Invoice
+        aname = aname.replace('INV', 'Paid_Invoice_')
         emailin1 = estatus
         emailin2 = eaccts
         emailcc1 = em['info']
@@ -125,9 +127,9 @@ def etemplate_truck(type,kind,odat):
         emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2, aname]
         return emaildata
 
-    elif type == 'packages':
-        etitle = f'Package for {odat.Jo} and Completed Order: {od} | {bol} | {con}'
-        ebody = f'Dear {odat.Shipper},\n\nAn invoice package is enclosed for your review.\n\nWe greatly appreciate your business.\n\nSincerely,\n\n{signature}'
+    elif viewtype == 'packages':
+        etitle = f'{scac} Invoice Package for Completed Order: {od} | {bol} | {con}'
+        ebody = f'Dear {odat.Shipper},\n\nAn invoice package is enclosed for your review.\nWe greatly appreciate your business.\n\nSincerely,\n\n{signature}'
         aname = odat.Package
         emailin1 = estatus
         emailin2 = eaccts
@@ -136,9 +138,9 @@ def etemplate_truck(type,kind,odat):
         emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2, aname]
         return emaildata
 
-    elif type == 'invopackage':
-        etitle = f'Invoice Package for {odat.Jo}'
-        ebody = f'Dear {odat.Shipper},\n\nAn invoice package is enclosed for your review.\n\nWe greatly appreciate your business.\n\nSincerely,\n\n{signature}'
+    elif viewtype == 'invopackage':
+        etitle = f'{scac} Invoice Package {odat.Package}'
+        ebody = f'Dear {odat.Shipper},\n\nAn invoice package is enclosed for your review.\nWe greatly appreciate your business.\n\nSincerely,\n\n{signature}'
         aname = odat.Package
         emailin1 = estatus
         emailin2 = eaccts
@@ -147,29 +149,17 @@ def etemplate_truck(type,kind,odat):
         emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2, aname]
         return emaildata
 
-    elif kind == 6:
+    elif viewtype == 'quote':
         etitle = cdata[2] + ' Quote: ' + jo
         ebody = 'Dear Customer:\n\nYour quote is attached. Please sign and return at your earliest convenience.\n\nWe look forward to doing business with you.\n\nSincerely,\n\n' + \
                 cdata[3] + '\n\n\n' + cdata[4] + '\n' + cdata[2] + '\n' + cdata[5] + '\n' + cdata[6] + '\n' + cdata[7]
-    elif kind == 5:
-        etitle = cdata[2] + ' Invoice'
-        ebody = 'Dear Global:\n\nYour invoice summary is attached. Please remit payment at your earliest convenience.\n\nThank you for your business- we appreciate it very much.\n\nSincerely,\n\n' + \
-                cdata[3] + '\n\n\n' + cdata[4] + '\n' + cdata[2] + '\n' + cdata[5] + '\n' + cdata[6] + '\n' + cdata[7]
-    elif kind == 4:
-        etitle = cdata[2] + ' Invoice: ' + jo + ' for Order: ' + order
-        ebody = 'Dear Customer:\n\nYour invoice is attached. Please remit payment at your earliest convenience.\n\nThank you for your business- we appreciate it very much.\n\nSincerely,\n\n' + \
-                cdata[3] + '\n\n\n' + cdata[4] + '\n' + cdata[2] + '\n' + cdata[5] + '\n' + cdata[6] + '\n' + cdata[7]
-    elif kind == 3:
-        etitle = cdata[2] + ' Invoice: ' + jo + ' for Order: ' + order
-        ebody = 'Dear Customer:\n\nYour invoice is attached. Please remit payment at your earliest convenience.\n\nThank you for your business- we appreciate it very much.\n\nSincerely,\n\n' + \
-                cdata[3] + '\n\n\n' + cdata[4] + '\n' + cdata[2] + '\n' + cdata[5] + '\n' + cdata[6] + '\n' + cdata[7]
-    elif kind == 2:
-        etitle = cdata[2] + ' Invoice: ' + jo + ' for Order: ' + order
-        ebody = 'Dear Customer:\n\nYour invoice package is attached. Please remit payment at your earliest convenience.\n\nThank you for your business- we appreciate it very much.\n\nSincerely,\n\n' + \
-                cdata[3] + '\n\n\n' + cdata[4] + '\n' + cdata[2] + '\n' + cdata[5] + '\n' + cdata[6] + '\n' + cdata[7]
+
+    else:
+        etitle = 'Unknown'
+        ebody = 'Could not determine the type of package being emailed here.'
 
     try:
-        pdat = People.query.get(key)
+        pdat = People.query.get(bid)
         emailin1 = str(pdat.Email)
     except:
         emailin1 = 'Not Found'

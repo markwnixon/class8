@@ -7,13 +7,13 @@ import re
 import os
 import subprocess
 from CCC_system_setup import myoslist, addpath, scac
-from viewfuncs import chassismatch, stat_update, dropupdate2, dropupdate3, getexpimp, stripper
+from viewfuncs import chassismatch, stat_update, dropupdate2, dropupdate3, getexpimp, stripper, d2s
 import json
 
 today = datetime.date.today()
 
 
-def multi_inv(odata, odervec, chas):
+def multi_inv(odata, odervec, chas, newchas):
     # First create all the invoices for these specific jobs
     for oder in odervec:
         myo = Orders.query.get(oder)
@@ -79,16 +79,19 @@ def multi_inv(odata, odervec, chas):
             db.session.add(input)
             db.session.commit()
 
-        # If chassis to be added then we have to add those fee in:
+        # If chassis to be added then we have to add those fees in:
         if chas == 1:
             mys = Services.query.filter(Services.Service == 'Chassis Fees').first()
             descript = 'Days of Chassis'
-            price = float(mys.Price)
+            if newchas == 0:
+                price = float(mys.Price)
+            else:
+                price = float(newchas)
             chassis_amount = price*qty
             haul_amount = float(myo.Amount)
             total = haul_amount+chassis_amount
             input = Invoices(Jo=myo.Jo, SubJo=None, Pid=bid, Service=mys.Service, Description=descript,
-                             Ea=mys.Price, Qty=qty, Amount=chassis_amount, Total=total, Date=today, Original=None, Status='New')
+                             Ea=d2s(price), Qty=qty, Amount=chassis_amount, Total=total, Date=today, Original=None, Status='New')
             db.session.add(input)
             db.session.commit()
             descript = 'From ' + c1 + ' to ' + c2
