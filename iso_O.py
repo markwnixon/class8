@@ -19,6 +19,7 @@ from func_cal import calmodalupdate
 from dockmaker import dockm
 
 cdata = companydata()
+jbcode = cdata[10] + 'O'
 
 def dataget_O(thismuch, dlist):
     # 0=order,#1=proofs,#2=interchange,#3=people/services
@@ -1234,9 +1235,7 @@ def isoO():
             sdate = request.values.get('dstart')
             if sdate is None:
                 sdate = today.strftime('%Y-%m-%d')
-
-            jtype = 'O'
-            nextjo = newjo(jtype, sdate)
+            nextjo = newjo(jbcode, sdate)
             vals = ['movetype', 'direction', 'commodity', 'pod', 'pol', 'origin', 'pudate', 'ctype', 'booking', 'commolist', 'estimate',
                     'charge', 'billto', 'exporter', 'consignee', 'notify', 'frfor', 'precarry', 'container', 'driver', 'seal', 'description', 'retdate']
             a = list(range(len(vals)))
@@ -1300,8 +1299,7 @@ def isoO():
 
             if ship > 0 and numchecked == 1:
                 sdate = today.strftime('%Y-%m-%d')
-                jtype = 'O'
-                nextjo = newjo(jtype, sdate)
+                nextjo = newjo(jbcode, sdate)
                 mys = OverSeas.query.get(ship)
                 input = OverSeas(Jo=nextjo, Pid=mys.Pid, MoveType=mys.MoveType, Direction=mys.Direction, Commodity=mys.Commodity, Pod=mys.Pod,
                                  Pol=mys.Pol, Origin=mys.Origin, PuDate=sdate, ContainerType=mys.ContainerType, Booking='', CommoList=0, ExportID=mys.ExportID,
