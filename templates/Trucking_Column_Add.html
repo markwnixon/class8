@@ -1,0 +1,31 @@
+
+<div class="card">
+    <div class="card-header">
+Add Information to Selected Items and Columns
+            <div class="d-sm-flex justify-content-between small">
+                <div class="p-0">
+            <button type="submit" class="btn btn-md btn-blue" name="UpdateColumn">Update</button>
+            <button type="submit" class="btn btn-md btn-elegant" name="Return">Cancel</button>
+                </div>
+            </div>
+    </div>
+    <div class="card-body">
+        <table>
+        <tr>
+                <td><div class="input-group-text">Select Column:</div></td>
+        <td>
+                <select class="form-control" type="text" name="colname" >
+                    <option disabled>Choose Column</option>
+                    <option {% if holdvec[3] == 'Chassis' %} selected {% endif %} value="Chassis" > Chassis </option>
+                    <option {% if holdvec[3] == 'Commodity' %} selected {% endif %} value="Commodity" > Commodity </option>
+                    <option {% if holdvec[3] == 'Packing' %} selected {% endif %} value="Packing" > Packing </option>
+                </select>
+        </td>
+        </tr>
+        <tr>
+            <td><div class="input-group-text">Text to Insert:</div></td>
+            <td><input class="form-control" type="text" name="coltext" value="{{ holdvec[4] }}"></td>
+        </tr>
+        </table>
+    </div>
+</div>

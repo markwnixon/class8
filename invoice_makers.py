@@ -30,6 +30,9 @@ def multi_inv(odata, odervec, chas, newchas):
         shipper = myo.Shipper
         jo = myo.Jo
         bid = myo.Bid
+        chassis = myo.Chassis
+        if 'GBL' in chassis: chas = 0
+
 
         lid = myo.Lid
         if lid is None or lid == 0:

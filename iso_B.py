@@ -977,10 +977,12 @@ def isoB(indat):
             err.append('All is well')
             bdata = Bills.query.order_by(Bills.bDate).all()
 # ____________________________________________________________________________________________________________________E.New Bill
-        if unpay is not None:
+        if unpay == 1:
             if numchecked == 1 and bill > 0:
                 myb = Bills.query.get(bill)
                 myb.Status = 'Unpaid'
+                myb.pAmount = '0.00'
+                db.session.commit()
                 Gledger.query.filter((Gledger.Tcode == myb.Jo) & (Gledger.Type == 'AP')).delete()
                 err.append(f'Unpay Bill {myb.Jo} and remove from register')
             else:

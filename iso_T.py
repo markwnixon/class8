@@ -87,6 +87,7 @@ def isoT():
         passinvo = nonone(passinvo)
         print('passinvo=',passinvo)
         umi = request.values.get('UpdateMultiInvoice')
+        umc = request.values.get('UpdateColumn')
 
         print('lbox=', lbox)
         viewtype = 0
@@ -121,6 +122,27 @@ def isoT():
             odervec = json.loads(odat.Links)
             print('UMI present',newbase,newchas,oder,odervec)
 
+        if umc is not None:
+            #Replacing text in columns
+            colname = request.values.get('colname')
+            coltext = request.values.get('coltext')
+            holdvec[3] = colname
+            holdvec[4] = coltext
+            oder = request.values.get('passoder')
+            oder = nonone(oder)
+            if oder == 0:
+                oder = invooder
+            print(oder,invooder)
+            odat = Orders.query.get(oder)
+            odervec = json.loads(odat.Links)
+            print('UMC present',colname,coltext,oder,odervec)
+            for oder in odervec:
+                od = Orders.query.get(oder)
+                if colname == 'Chassis': od.Chassis = coltext
+                if colname == 'Chassis': od.BOL = coltext
+                if colname == 'Commodity': od.Commodity = coltext
+                if colname == 'Packing': od.Packing = coltext
+                db.session.commit()
 
 
         thisbox1 = request.values.get('addbox')
@@ -148,6 +170,8 @@ def isoT():
             acceptthese = 1
         if thisbox2 == '4':
             loadc = 1
+        if thisbox2 == '5':
+            viewtype = 'columnadd'
 
         thisbox3 = request.values.get('invobox')
         if thisbox3 == '1':
@@ -662,7 +686,7 @@ def isoT():
                 mm2 = 0
 
         # Need this comment
-        if unpay is not None:
+        if unpay == 1:
             odat = Orders.query.get(oder)
             odat.Istat = 3
             if odat.Hstat == 4:
@@ -1607,6 +1631,21 @@ def isoT():
                 leftsize = 8
                 modlink = 7
 # ____________________________________________________________________________________________________________________E.PaymentHistory.Trucking
+
+        if ((viewtype == 'columnadd' and oder > 0) and numchecked >= 1) or umc is not None:
+            odata = Orders.query.all()
+            odervec = numcheckv(odata)
+            for oder in odervec:
+                myo = Orders.query.get(oder)
+                myo.Links = json.dumps(odervec)
+                db.session.commit()
+
+        else:
+            err.append('Must select one or more jobs for this function')
+            viewtype = 0
+
+
+
 # ____________________________________________________________________________________________________________________B.Invoice.Trucking and Quotes
         if ((minvo is not None and oder > 0) and numchecked > 1) or umi is not None:
             err.append('Creating Multi-Job Invoice')
@@ -1970,19 +2009,21 @@ def isoT():
 
         if loadc == 1:
             if oder > 0:
-                myo = Orders.query.get(oder)
-                hstat = myo.Hstat
-                istat = myo.Istat
-                if hstat != 4:
-                    if istat == 4:
-                        myo.Hstat = 4
-                        err.append('Load Completion Status Updated to Complete with Pay')
+                odervec = numcheckv(odata)
+                for oder in odervec:
+                    myo = Orders.query.get(oder)
+                    hstat = myo.Hstat
+                    istat = myo.Istat
+                    if hstat != 4:
+                        if istat == 4:
+                            myo.Hstat = 4
+                            err.append(f'Invoice Status for {myo.Jo} Updated to Paid Complete')
+                        else:
+                            myo.Hstat = 3
+                            err.append(f'Haul Status for {myo.Jo} Updated to Complete')
+                        db.session.commit()
                     else:
-                        myo.Hstat = 3
-                        err.append('Load Completion Status Updated to Manaully Set Complete')
-                    db.session.commit()
-                else:
-                    err.append('Load already has paid & complete status')
+                        err.append(f'Load {myo.Jo} already has paid & complete status')
             else:
                 err.append('Must check at least one box')
 
