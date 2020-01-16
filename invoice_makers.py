@@ -31,6 +31,11 @@ def multi_inv(odata, odervec, chas, newchas):
         jo = myo.Jo
         bid = myo.Bid
         chassis = myo.Chassis
+        if chassis is None:
+            chassis = 'NoNum'
+            myo.Chassis = chassis
+            db.session.commit()
+
         if 'GBL' in chassis: chas = 0
 
 
