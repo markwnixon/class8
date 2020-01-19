@@ -215,7 +215,6 @@ def isoT():
             mm2 = 1
             #Signature date:
             holdvec[16] = today_str
-            viewtype = 'manifest'
         if thisbox6 == '2':
             lbox = 6
             lbox, holdvec, err = container_list(lbox, holdvec)
@@ -1634,17 +1633,17 @@ def isoT():
                 modlink = 7
 # ____________________________________________________________________________________________________________________E.PaymentHistory.Trucking
 
-        if viewtype == 'columnadd' or umc is not None:
-            if (oder > 0 and numchecked >= 1) or umc is not None:
-                odata = Orders.query.all()
-                odervec = numcheckv(odata)
-                for oder in odervec:
-                    myo = Orders.query.get(oder)
-                    myo.Links = json.dumps(odervec)
-                    db.session.commit()
+        if ((viewtype == 'columnadd' and oder > 0) and numchecked >= 1) or umc is not None:
+            odata = Orders.query.all()
+            odervec = numcheckv(odata)
+            for oder in odervec:
+                myo = Orders.query.get(oder)
+                myo.Links = json.dumps(odervec)
+                db.session.commit()
 
-            else:
-                err.append('Must select one or more jobs for this function')
+        else:
+            err.append('Must select one or more jobs for this function')
+            viewtype = 0
 
 
 
@@ -1970,7 +1969,7 @@ def isoT():
                                Type=myo.Type, Time3=None, Bid=myo.Bid, Lid=myo.Lid, Did=myo.Did, Label=myo.Label, Dropblock1=myo.Dropblock1,
                                Dropblock2=myo.Dropblock2, Commodity=myo.Commodity,Packing=myo.Packing, Links=myo.Links, Hstat=-1,
                                Istat=-1,Proof=None,Invoice=None,Gate=None,Package=None,Manifest=None,Scache=0,Pcache=0,
-                               Icache=0,Mcache=0,Pkcache=0, QBi=0)
+                               Icache=0,Mcache=0,Pkcache=0)
                 db.session.add(input)
                 db.session.commit()
                 err.append(f'Added new Order for {myo.Shipper} with JO {nextjo}')
