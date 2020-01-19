@@ -335,7 +335,9 @@ def knight_parse():
                                 Time2=obj.get("Time2"), Seal=obj.get("Seal"), Pickup=obj.get("Pickup"), Delivery=obj.get("Delivery"),
                                 Amount=obj.get('Amount'), Path=None, Original=obj.get('Original'), Description=obj.get("Description"),
                                 Chassis=obj.get('Chassis'), Detention=obj.get('Detention'), Storage=obj.get('Storage'), Release=obj.get('Release'),
-                                Shipper=obj.get('Shipper'), Type=obj.get('Type'), Time3=None, Bid=None, Lid=lid, Did=did, Label='', Dropblock1='',Dropblock2='')
+                                Shipper=obj.get('Shipper'), Type=obj.get('Type'), Time3=None, Bid=None, Lid=lid, Did=did, Label='', Dropblock1='',Dropblock2='',
+                                Commodity=None, Packing=None, Links=None, Hstat=-1, Istat=-1, Proof=None, Invoice=None, Gate=None, Package=None, Manifest=None, Scache=0,
+                                Pcache=0, Icache=0, Mcache=0, Pkcache=0, QBi=0)
 
 
 

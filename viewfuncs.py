@@ -1372,7 +1372,8 @@ def make_new_order():
                    Storage='0',
                    Release=0, Shipper=a[0], Type=a[9], Time3=None, Bid=idb, Lid=idl, Did=idd, Label='FileUpload',
                    Dropblock1=newdrop1, Dropblock2=newdrop2, Commodity=None, Packing=None, Links=None, Hstat=0, Istat=0,
-                   Proof=None,Invoice=None,Gate=None,Package=None,Manifest=None,Scache=0,Pcache=0,Icache=0,Mcache=0,Pkcache=0)
+                   Proof=None,Invoice=None,Gate=None,Package=None,Manifest=None,Scache=0,Pcache=0,Icache=0,Mcache=0,
+                   Pkcache=0, QBi=0)
     db.session.add(input)
     db.session.commit()
 
@@ -1436,7 +1437,7 @@ def make_new_bill():
     input = Bills(Jo=nextjo, Pid=aid, Company=acomp, Memo='', Description=bdesc, bAmount=bamt, Status='Unpaid',
                   Cache=0, Original=None,Ref='', bDate=sdate, pDate=today, pAmount='0.00', pMulti=None, pAccount=account, bAccount=baccount,
                   bType=btype,bCat=category, bSubcat=subcat, Link=None, User=None, Co=cco, Temp1=None, Temp2=None, Recurring=0,
-                  dDate=ddate, pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0)
+                  dDate=ddate, pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0)
 
     db.session.add(input)
     db.session.commit()

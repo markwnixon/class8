@@ -1,5 +1,9 @@
 from runmain import db
 
+class class8(object):
+    'An Automated Workflow and Accounting Software Package for Logistics'
+    version = '1.0'
+
 def nodollar(infloat):
     outstr = "%0.2f" % infloat
     return outstr
@@ -211,12 +215,13 @@ class Orders(db.Model):
     Icache = db.Column('icache', db.Integer)
     Mcache = db.Column('mcache', db.Integer)
     Pkcache = db.Column('pkcache', db.Integer)
+    QBi = db.Column('QBi', db.Integer)
 
     def __init__(self, Status, Jo, Load, Order, Company, Location, BOL, Booking, Container, Driver, Pickup,
                  Delivery, Amount, Date, Time, Date2, Time2, Time3, Path, Original, Description, Chassis,
                  Detention, Storage, Release, Company2, Seal, Shipper, Type, Bid, Lid, Did, Label, Dropblock1,
                  Dropblock2, Commodity, Packing, Links, Hstat, Istat, Proof, Invoice, Gate, Package, Manifest,
-                 Scache, Pcache, Icache, Mcache, Pkcache):
+                 Scache, Pcache, Icache, Mcache, Pkcache, QBi):
         self.Status = Status
         self.Jo = Jo
         self.Load = Load
@@ -266,6 +271,7 @@ class Orders(db.Model):
         self.Icache = Icache
         self.Mcache = Mcache
         self.Pkcache = Pkcache
+        self.QBi = QBi
 
 
 class Drops(db.Model):
@@ -936,8 +942,9 @@ class Bills(db.Model):
     Code1 = db.Column('Code1', db.String(45))
     Code2 = db.Column('Code2', db.String(45))
     CkCache = db.Column('CkCache', db.Integer)
+    QBi = db.Column('QBi', db.Integer)
 
-    def __init__(self, Jo, Pid, Company, Memo, Description, bAmount, Status, Cache, Original, Ref, bDate, pDate, pAmount, pMulti, pAccount, bAccount, bType, bCat, bSubcat, Link, User, Co, Temp1, Temp2, Recurring, dDate, pAmount2, pDate2, Code1, Code2, CkCache):
+    def __init__(self, Jo, Pid, Company, Memo, Description, bAmount, Status, Cache, Original, Ref, bDate, pDate, pAmount, pMulti, pAccount, bAccount, bType, bCat, bSubcat, Link, User, Co, Temp1, Temp2, Recurring, dDate, pAmount2, pDate2, Code1, Code2, CkCache, QBi):
         self.Jo = Jo
         self.Pid = Pid
         self.Company = Company
@@ -969,6 +976,7 @@ class Bills(db.Model):
         self.Code1 = Code1
         self.Code2 = Code2
         self.CkCache = CkCache
+        self.QBi = QBi
 
     def Bal(self):
         try:
@@ -1001,8 +1009,9 @@ class Accounts(db.Model):
     Subcategory = db.Column('Subcategory', db.String(45))
     Taxrollup = db.Column('Taxrollup', db.String(45))
     Co = db.Column('Co', db.String(2))
+    QBmap = db.Column('QBmap', db.String(100))
 
-    def __init__(self, Name, Balance, AcctNumber, Routing, Payee, Type, Description, Category, Subcategory, Taxrollup, Co):
+    def __init__(self, Name, Balance, AcctNumber, Routing, Payee, Type, Description, Category, Subcategory, Taxrollup, Co, QBmap):
         self.Name = Name
         self.Balance = Balance
         self.AcctNumber = AcctNumber
@@ -1014,3 +1023,4 @@ class Accounts(db.Model):
         self.Subcategory = Subcategory
         self.Taxrollup = Taxrollup
         self.Co = Co
+        self.QBmap = QBmap

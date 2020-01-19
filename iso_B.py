@@ -8,7 +8,11 @@ import re
 import os
 import shutil
 import json
-from CCC_system_setup import myoslist, addpath, addtxt, scac
+from CCC_system_setup import myoslist, addpath, addtxt, scac, companydata
+
+compdata = companydata()
+billexpcode = compdata[10]+'B'
+billxfrcode = compdata[10]+'X'
 
 
 def isoB(indat):
@@ -17,6 +21,8 @@ def isoB(indat):
 
         from viewfuncs import tabdata, tabdataR, popjo, jovec, timedata, nonone, nononef, nons, numcheck, newjo, init_billing_zero, init_billing_blank
         from viewfuncs import sdiff, calendar7_weeks, txtfile, numcheckvec, d2s, erud, dataget_B, hv_capture, docuploader, get_def_bank, next_check
+        from gledger_write import gledger_write
+
         username = session['username'].capitalize()
         bill_path = 'processing/bills'
         bill, peep, cache, modata, modlink, fdata, adata, cdat, pb, passdata, vdata, caldays, daylist, weeksum, nweeks = init_billing_zero()
@@ -227,35 +233,28 @@ def isoB(indat):
 
             # Create the new database entry for the source document
             sdate = adat.Date2
-            try:
-                billno = f'{scac}_Bill_{str(aid)}'
-            except:
-                aid = 0
-                billno = f'{scac}_Bill_{str(aid)}'
-            ckmemo = 'Towing for Horizon Motors Car Purchase'
+            ckmemo = 'Towing for Dealership Car Purchase'
             bamt = d2s(adat.TowCost)
-            bcomp = request.values.get('bcomp')
             bref = ''
             btype= 'Expense'
             bcat = 'Direct'
             bsubcat = 'Overseas'
-            cco = 'F'
-            account = 'FEL CitiBank'
+            account = compdata[9]
             baccount = 'Towing Costs'
-            #jobdata = OverSeas.query.filter(OverSeas.Status != 'Complete').all()
+            nextjo = newjo(billexpcode, today)
 
-            input = Bills(Jo=billno, Pid=aid, Company=cdat.Company, Memo='', Description=bdesc, bAmount=bamt, Status='Paid', Cache=0, Original='',
+            input = Bills(Jo=nextjo, Pid=aid, Company=cdat.Company, Memo=ckmemo, Description=bdesc, bAmount=bamt, Status='Paid', Cache=0, Original='',
                              Ref=bref, bDate=sdate, pDate=today, pAmount=bamt, pMulti=None, pAccount=account, bAccount=baccount, bType=btype,
-                             bCat=bcat, bSubcat=bsubcat, Link=pufrom, User=username, Co='F', Temp1=None, Temp2=str(towid), Recurring=0, dDate=today, pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0)
+                             bCat=bcat, bSubcat=bsubcat, Link=pufrom, User=username, Co=compdata[10], Temp1=None, Temp2=str(towid), Recurring=0, dDate=today,
+                             pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0)
 
             db.session.add(input)
             db.session.commit()
 
-            modata = Bills.query.filter(Bills.Jo == billno).first()
+            modata = Bills.query.filter(Bills.Jo == nextjo).first()
             csize = People.query.filter(People.Ptype == 'TowCo').order_by(People.Company).all()
             bill = modata.id
             leftscreen = 1
-            leftsize = 10
             bdata = Bills.query.order_by(Bills.bDate).all()
             cdata = People.query.filter((People.Ptype == 'Vendor') | (
                 People.Ptype == 'TowCo')).order_by(People.Company).all()
@@ -422,15 +421,9 @@ def isoB(indat):
                             modata.Jo=jo
                             db.session.commit()
                         print('line302:',modata.Jo,modata.bAccount,modata.pAccount)
-                        from gledger_write import gledger_write
                         gledger_write('newbill',modata.Jo,modata.bAccount,modata.pAccount)
 
                 if modal == 1:
-                    billno = f'{scac}_Bill_{str(tid)}'
-                    input = ChalkBoard(Jo=billno, creator=username,
-                                       comments='Auto Message Bill Paid', status=1)
-                    db.session.add(input)
-                    db.session.commit()
                     calendar = 1
                     modlink = 0
 
@@ -752,7 +745,8 @@ def isoB(indat):
             toacct = request.values.get('toacct')
             btype = 'XFER'
             bclass = 'Non Expense'
-            billno = f'{scac}_Bill_XFER'
+            nextjo = newjo(billxfrcode, today)
+
             ckmemo = request.values.get('ckmemo')
             bdesc = request.values.get('bdesc')
             baccount = request.values.get('baccount')
@@ -760,43 +754,36 @@ def isoB(indat):
             bref = request.values.get('bref')
             bamt = d2s(bamt)
 
-            input = Bills(Jo=billno, Pid=0, Company=toacct, Memo=ckmemo, Description=bdesc, bAmount=bamt, Status='Paid', Cache=0, Original=None,
+            input = Bills(Jo=nextjo, Pid=0, Company=toacct, Memo=ckmemo, Description=bdesc, bAmount=bamt, Status='Paid', Cache=0, Original=None,
                              Ref=bref, bDate=sdate, pDate=sdate, pAmount=bamt, pMulti=None, pAccount=fromacct, bAccount=baccount, bType=btype,
-                             bCat=bclass, bSubcat='', Link=None, User=username, Co=None, Temp1=None, Temp2=None, Recurring=0, dDate=today, pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0)
+                             bCat=bclass, bSubcat='', Link=None, User=username, Co=None, Temp1=None, Temp2=None, Recurring=0, dDate=today,
+                             pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0)
 
             db.session.add(input)
             db.session.commit()
 
-            modata = Bills.query.filter(Bills.Jo == 'New Xfer').first()
-            billno = f'{scac}_Bill_{str(modata.id)}'
-            modata.Jo = billno
-            db.session.commit()
-
-            from gledger_write import gledger_write
-            gledger_write('xfer',billno,fromacct,toacct)
-
-
-            modata = Bills.query.filter(Bills.Jo == billno).first()
+            modata = Bills.query.filter(Bills.Jo == nextjo).first()
+            gledger_write('xfer',nextjo,fromacct,toacct)
             csize = People.query.filter(People.Ptype == 'Vendor').order_by(People.Company).all()
             bill = modata.id
             leftscreen = 1
-            leftsize = 10
             err.append('All is well')
             bdata = Bills.query.order_by(Bills.bDate).all()
         # ____________________________________________________________________________________________________________________E.NewXfer.Billing
         if copy == 1:
-            print('yes copy')
             if bill > 0 and numchecked == 1:
                 # sdate=today.strftime('%Y-%m-%d')
                 bdat = Bills.query.get(bill)
                 thisdate = bdat.bDate
                 nextdate = thisdate + datetime.timedelta(days=30)
-                input = Bills(Jo=bdat.Jo, Pid=bdat.Pid, Company=bdat.Company, Memo=bdat.Memo, Description=bdat.Description, bAmount=bdat.bAmount, Status=bdat.Status, Cache=0, Original=bdat.Original,
+                nextjo = newjo(billexpcode, today)
+                input = Bills(Jo=nextjo, Pid=bdat.Pid, Company=bdat.Company, Memo=bdat.Memo, Description=bdat.Description, bAmount=bdat.bAmount, Status=bdat.Status, Cache=0, Original=bdat.Original,
                                  Ref=bdat.Ref, bDate=nextdate, pDate=None, pAmount='0.00', pMulti=None, pAccount=bdat.pAccount, bAccount=bdat.bAccount, bType=bdat.bType,
-                                 bCat=bdat.bCat, bSubcat=bdat.bSubcat, Link=None, User=username, Co=bdat.Co, Temp1=None, Temp2='Copy', Recurring=0, dDate=today, pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0)
-
+                                 bCat=bdat.bCat, bSubcat=bdat.bSubcat, Link=None, User=username, Co=bdat.Co, Temp1=None, Temp2='Copy', Recurring=0, dDate=today, pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0)
                 db.session.add(input)
                 db.session.commit()
+
+                gledger_write('newbill', nextjo, bdat.bAccount, bdat.pAccount)
 
             elif peep > 0 and numchecked == 1:
                 # sdate=today.strftime('%Y-%m-%d')
@@ -819,19 +806,17 @@ def isoB(indat):
                 year = thisdate.year
                 month = thisdate.month
                 day = thisdate.day
-                jtype = bdat.Co+'B'
                 while month < 12:
                     month = month+1
                     nextdate = datetime.datetime(year, month, day)
-                    nextjo = newjo(jtype, today)
+                    nextjo = newjo(billexptype, today)
                     input = Bills(Jo=nextjo, Pid=bdat.Pid, Company=bdat.Company, Memo=bdat.Memo, Description=bdat.Description, bAmount=bdat.bAmount, Status=bdat.Status, Cache=0, Original=bdat.Original,
                                      Ref=bdat.Ref, bDate=nextdate, pDate=None, pAmount='0.00', pMulti=None, pAccount=bdat.pAccount, bAccount=bdat.bAccount, bType=bdat.bType,
-                                     bCat=bdat.bCat, bSubcat=bdat.bSubcat, Link=None, User=username, Co=bdat.Co, Temp1=None, Temp2='Copy', Recurring=0, dDate=today, pAmount2='0.00', pDate2=None, Code1 = None, Code2=None, CkCache=0)
-
+                                     bCat=bdat.bCat, bSubcat=bdat.bSubcat, Link=None, User=username, Co=bdat.Co, Temp1=None, Temp2='Copy', Recurring=0, dDate=today, pAmount2='0.00', pDate2=None, Code1 = None, Code2=None, CkCache=0, QBi=0)
                     db.session.add(input)
                     db.session.commit()
-                    from gledger_write import gledger_write
-                    gledger_write('newbill',nextjomod,bdat.bAccount,bdat.pAccount)
+
+                    gledger_write('newbill',nextjo,bdat.bAccount,bdat.pAccount)
 
         if qpay is not None:
             if bill > 0 and numchecked == 1:
@@ -959,11 +944,11 @@ def isoB(indat):
 
             input = Bills(Jo=nextjo, Pid=aid, Company=acomp, Memo='', Description=bdesc, bAmount=bamt, Status='Unpaid', Cache=0, Original=bfile,
                              Ref='', bDate=sdate, pDate=today, pAmount='0.00', pMulti=None, pAccount=account, bAccount=baccount, bType=btype,
-                             bCat=category, bSubcat=subcat, Link=None, User=username, Co=cco, Temp1=None, Temp2=None, Recurring=0, dDate=today, pAmount2='0.00', pDate2=None, Code1 = None, Code2=None, CkCache=0)
+                             bCat=category, bSubcat=subcat, Link=None, User=username, Co=cco, Temp1=None, Temp2=None, Recurring=0, dDate=today,
+                             pAmount2='0.00', pDate2=None, Code1 = None, Code2=None, CkCache=0, QBi=0)
 
             db.session.add(input)
             db.session.commit()
-            from gledger_write import gledger_write
             gledger_write('newbill',nextjo,baccount,account)
 
 
@@ -1072,7 +1057,6 @@ def isoB(indat):
                         myb.Company = masterpayee
                         db.session.commit()
                         jo = myb.Jo
-                        from gledger_write import gledger_write
                         gledger_write('paybill',jo,myb.bAccount,myb.pAccount)
 
             if numchecked == 0 or bill == 0:
@@ -1172,7 +1156,6 @@ def isoB(indat):
 
                     pacct=bdat.pAccount
                     if pacct is not None and pacct != '0':
-                        from gledger_write import gledger_write
                         gledger_write('paybill',bdat.Jo,bdat.bAccount,bdat.pAccount)
                     else:
                         err.append('No Account for Fund Withdrawal')

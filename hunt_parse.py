@@ -77,7 +77,11 @@ def huntparse():
                 input = Orders(Status='A0', Jo=nextjo, Load=load,Order=load, Company=None,Location=None,Booking=None,BOL=None,Container=None,
                                Date=None,Driver=None,Company2=None, Time=None, Date2=None, Time2=None, Seal=None, Pickup=None, Delivery=None,
                                Amount=None, Path=None, Original=file2, Description='Load Broker Line Haul', Chassis=None, Detention='0', Storage='0',
-                               Release=0, Shipper='JB Hunt', Type=None, Time3=None, Bid=0, Lid=0, Did=0, Label=None, Dropblock1=None,Dropblock2=None)
+                               Release=0, Shipper='JB Hunt', Type=None, Time3=None, Bid=0, Lid=0, Did=0, Label=None, Dropblock1=None,Dropblock2=None,
+                               Commodity=None, Packing=None, Links=None, Hstat=-1,
+                               Istat=-1, Proof=None, Invoice=None, Gate=None, Package=None, Manifest=None, Scache=0,
+                               Pcache=0, Icache=0, Mcache=0, Pkcache=0, QBi=0
+                               )
                 db.session.add(input)
                 db.session.commit()
                 o=Orders.query.filter(Orders.Jo==nextjo).first()
