@@ -1633,17 +1633,18 @@ def isoT():
                 modlink = 7
 # ____________________________________________________________________________________________________________________E.PaymentHistory.Trucking
 
-        if ((viewtype == 'columnadd' and oder > 0) and numchecked >= 1) or umc is not None:
-            odata = Orders.query.all()
-            odervec = numcheckv(odata)
-            for oder in odervec:
-                myo = Orders.query.get(oder)
-                myo.Links = json.dumps(odervec)
-                db.session.commit()
+        if viewtype == 'columnadd' or umc is not None:
+            if oder > 0 and numchecked >= 1:
+                odata = Orders.query.all()
+                odervec = numcheckv(odata)
+                for oder in odervec:
+                    myo = Orders.query.get(oder)
+                    myo.Links = json.dumps(odervec)
+                    db.session.commit()
 
-        else:
-            err.append('Must select one or more jobs for this function')
-            viewtype = 0
+            else:
+                err.append('Must select one or more jobs for this function')
+                viewtype = 0
 
 
 
