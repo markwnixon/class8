@@ -31,12 +31,12 @@
             </td>
         </tr>
         <tr>
-            <td><div class="input-group-text">Bill for Company:</div></td>
+            <td><div class="input-group-text">{{ cdat.Idtype }} Bill for Company:</div></td>
             <td>
                 <select class="form-control" type="text" name="ctype" onchange="this.form.submit()">
                     <option value = 'Pick '>  Select Default Company/Division </option>
-                    {% for div in divdat %}
-                            <option {% if cdat.Idtype == div.Co %} selected {% endif %} value='{{ div.Co }}'>  {{ div.Name }} (Code {{ div.Co }}) </option>
+                    {% for divt in divdat %}
+                            <option {% if cdat.Idtype == divt.Co %} selected {% endif %} value='{{ divt.Co }}'>  {{ divt.Name }} (Code {{ divt.Co }}) </option>
                     {% endfor %}
                 </select>
             </td>
@@ -57,15 +57,15 @@
         </tr>
         <tr>
             <td><div class="input-group-text">Bill Date:</div></td>
-            <td><input class="form-control" type="date" name="bdate" value="{{vdata[3]}}"></td>
+            <td><input class="form-control" type="date" name="bdate" value="{{vdata[0]}}"></td>
         </tr>
         <tr>
             <td><div class="input-group-text">Due Date:</div></td>
-            <td><input class="form-control" type="date" name="ddate" value="{{vdata[3]}}"></td>
+            <td><input class="form-control" type="date" name="ddate" value="{{vdata[1]}}"></td>
         </tr>
         <tr>
             <td><div class="input-group-text">Bill Description:</div></td>
-            <td><textarea class="form-control" type="text" name="bdesc" rows="3">{{vdata[0]}}</textarea></td>
+            <td><textarea class="form-control" type="text" name="bdesc" rows="3">{{vdata[3]}}</textarea></td>
         </tr>
     </tbody>
 </table>

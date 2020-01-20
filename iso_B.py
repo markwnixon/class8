@@ -111,6 +111,8 @@ def isoB(indat):
             copy12 = 1
         if thisbox1 == '5':
             uploadS = 1
+        if thisbox1 == '6':
+            newxfer = 1
 
 
         thisbox2 = request.values.get('editbox')
@@ -718,21 +720,28 @@ def isoB(indat):
             err.append('Must have at least one item checked to use this option')
 # ____________________________________________________________________________________________________________________E.Delete an Entry
 # ____________________________________________________________________________________________________________________B.NewXfer.Billing
-        if newxfer is not None:
+        if newxfer == 1:
             modlink = 3
-            leftsize = 8
+            err.append('Select Source Document from List')
             leftscreen = 0
-            docref = ''
-            vdata = ['0.00', today]
+            expdata = Accounts.query.filter((Accounts.Type == 'Bank') | (Accounts.Type == 'Equity')).order_by(Accounts.Name).all()
+            vdata = [today, today, '', '']
 
         if newxfer is None and modlink == 3:
-            leftsize = 8
-            leftscreen = 0
-            docref = ''
 
-            fromacct = request.values.get('fromacct')
-            toacct = request.values.get('toacct')
-            vdata = ['0.00', today]
+            leftscreen = 0
+            bdate = request.values.get('bdate')
+            ddate = request.values.get('bdate')
+            xamt = request.values.get('xamt')
+            new_desc = request.values.get('desc')
+            xferfrom = request.values.get('fromacct')
+            xferto = request.values.get('toacct')
+            if xamt is None:
+                xamt = '0.00'
+            vdata = [bdate, ddate, xamt, new_desc, xferfrom, xferto]
+            print(vdata)
+            expdata = Accounts.query.filter((Accounts.Type == 'Bank') | (Accounts.Type == 'Equity')).order_by(
+                Accounts.Name).all()
 
         if thisxfer is not None:
             modlink = 0
@@ -743,19 +752,20 @@ def isoB(indat):
 
             fromacct = request.values.get('fromacct')
             toacct = request.values.get('toacct')
+            xamt = request.values.get('xamt')
+            xamt = d2s(xamt)
+            xdesc = request.values.get('xdesc')
             btype = 'XFER'
             bclass = 'Non Expense'
             nextjo = newjo(billxfrcode, today)
 
             ckmemo = request.values.get('ckmemo')
-            bdesc = request.values.get('bdesc')
             baccount = request.values.get('baccount')
-            bamt = request.values.get('bamt')
             bref = request.values.get('bref')
             bamt = d2s(bamt)
 
-            input = Bills(Jo=nextjo, Pid=0, Company=toacct, Memo=ckmemo, Description=bdesc, bAmount=bamt, Status='Paid', Cache=0, Original=None,
-                             Ref=bref, bDate=sdate, pDate=sdate, pAmount=bamt, pMulti=None, pAccount=fromacct, bAccount=baccount, bType=btype,
+            input = Bills(Jo=nextjo, Pid=0, Company=toacct, Memo=ckmemo, Description=xdesc, bAmount=xamt, Status='Paid', Cache=0, Original=None,
+                             Ref=bref, bDate=sdate, pDate=sdate, pAmount=xamt, pMulti=None, pAccount=fromacct, bAccount=baccount, bType=btype,
                              bCat=bclass, bSubcat='', Link=None, User=username, Co=None, Temp1=None, Temp2=None, Recurring=0, dDate=today,
                              pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0)
 
@@ -764,7 +774,6 @@ def isoB(indat):
 
             modata = Bills.query.filter(Bills.Jo == nextjo).first()
             gledger_write('xfer',nextjo,fromacct,toacct)
-            csize = People.query.filter(People.Ptype == 'Vendor').order_by(People.Company).all()
             bill = modata.id
             leftscreen = 1
             err.append('All is well')
@@ -832,22 +841,33 @@ def isoB(indat):
                     pacct = get_def_bank(bdat)
                 bdat.pAccount = pacct
                 db.session.commit()
+
 # ____________________________________________________________________________________________________________________B.NewJob
         if newbill is not None:
             err.append('Select Source Document from List')
             modlink = 4
-            leftsize = 8
             leftscreen = 0
-            expdata = Accounts.query.filter(Accounts.Type == 'Expense').all()
+            expdata = Accounts.query.filter((Accounts.Type == 'Expense') | (Accounts.Type == 'CC')).order_by(Accounts.Name).all()
+            vdata = [today, today, '', '']
+
+
 
         if newbill is None and (modlink == 4 or modlink == 44):
             leftsize = 8
             leftscreen = 0
+            bdate = request.values.get('bdate')
+            ddate = request.values.get('bdate')
 
             if modlink == 4:
                 thiscompany = request.values.get('thiscomp')
                 cdat = People.query.filter((People.Company == thiscompany) & (
                     (People.Ptype == 'Vendor') | (People.Ptype == 'TowCo'))).first()
+                print(cdat.Idtype)
+                ddat = Divisions.query.filter(Divisions.Co==cdat.Idtype).first()
+                if ddat is not None:
+                    err.append(f'Loading data for {thiscompany} Defaults')
+                    err.append(f'Bill for {cdat.Idtype}: {ddat.Name}')
+
             else:
                 modlink = 4 #reset the vondor feed back to bill feed
 
@@ -856,11 +876,10 @@ def isoB(indat):
                 # Set account defaults for this vendor
                 ccode = cdat.Idtype
                 cchg = request.values.get('ctype')
-                if cchg != ccode:
-                    ccode = cchg
-                    cdat.Idtype = cchg
-
-
+                ddat = Divisions.query.filter(Divisions.Co ==cchg).first()
+                if ddat is not None:
+                    cdat.Idtype = ddat.Co
+                    ccode = ddat.Co
                 expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co == ccode)).all()
 
             # Get information from previous bill paid by the vendor
@@ -883,15 +902,20 @@ def isoB(indat):
                             new_memo = last_memo.replace(x, monlvec[k])
                     last_amt = d2s(ldat.bAmount)
                     # last_date=datetime.datetime.strptime(ldat.bDate,"%Y-%m-%d")+datetime.timedelta(days=30)
-                    last_date = ldat.bDate+datetime.timedelta(days=30)
-                    next_date = last_date.strftime("%Y-%m-%d")
-                    vdata = [new_desc, new_memo, last_amt, next_date]
-                    # vmemo=ldat.Memo
+
+                    last_date = ldat.bDate
+                    if last_date is not None:
+                        last_date = last_date.strftime("%Y-%m-%d")
+                        err.append(f'The last bill to this vendor was written on {last_date} for ${last_amt}')
+                    else:
+                        last_date = 'None'
+                        err.append(f'No Bills Recorded for this Vendor')
+                    vdata = [bdate, ddate, last_amt, new_desc]
                 else:
                     # if not then get the category info from the vendor data
-                    vdata = ['X', 'X', '0.00', today]
+                    vdata = [bdate, ddate, '0.00', '']
             else:
-                expdata = Accounts.query.all()
+                expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co == ccode)).all()
 
         if thisbill is not None:
             modlink = 0

@@ -108,6 +108,7 @@ def gledger_write(bus,jo,acctdb,acctcr):
             db.session.add(input2)
             db.session.commit()
 
+        print('bus=',bus)
         if bus=='newbill':
             bdat=Bills.query.filter(Bills.Jo==jo).first()
             amt=int(float(bdat.bAmount)*100)
@@ -120,7 +121,7 @@ def gledger_write(bus,jo,acctdb,acctcr):
             adb=Accounts.query.filter((Accounts.Name==acctdb) & (Accounts.Co ==cc)).first() #the expense account
             acr=Accounts.query.filter((Accounts.Name==acctcr) & (Accounts.Co ==cc)).first() #the asset account
 
-            gdat = Gledger.query.filter((Gledger.Tcode==jo) &  (Gledger.Type=='ED')).first()
+            gdat = Gledger.query.filter((Gledger.Tcode==jo) & (Gledger.Type=='ED')).first()
             if gdat is not None:
                 gdat.Debit=amt
                 gdat.Recorded=dt
@@ -128,6 +129,7 @@ def gledger_write(bus,jo,acctdb,acctcr):
                 input1 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=co,Sid=pid,Type='ED',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
                 db.session.add(input1)
             db.session.commit()
+
             gdat = Gledger.query.filter((Gledger.Tcode==jo) &  (Gledger.Type=='EC')).first()
             if gdat is not None:
                 gdat.Credit=amt

@@ -547,7 +547,7 @@ def init_billing_zero():
     cdat=0
     pb=0
     passdata=0
-    vdata=0
+    vdata=[0]*8
     caldays=0
     daylist=0
     weeksum=0
