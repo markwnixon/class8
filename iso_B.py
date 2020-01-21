@@ -756,16 +756,11 @@ def isoB(indat):
             xamt = d2s(xamt)
             xdesc = request.values.get('xdesc')
             btype = 'XFER'
-            bclass = 'Non Expense'
+            bclass = 'Non-Expense'
             nextjo = newjo(billxfrcode, today)
 
-            ckmemo = request.values.get('ckmemo')
-            baccount = request.values.get('baccount')
-            bref = request.values.get('bref')
-            bamt = d2s(bamt)
-
-            input = Bills(Jo=nextjo, Pid=0, Company=toacct, Memo=ckmemo, Description=xdesc, bAmount=xamt, Status='Paid', Cache=0, Original=None,
-                             Ref=bref, bDate=sdate, pDate=sdate, pAmount=xamt, pMulti=None, pAccount=fromacct, bAccount=baccount, bType=btype,
+            input = Bills(Jo=nextjo, Pid=0, Company=toacct, Memo=None, Description=xdesc, bAmount=xamt, Status='Paid', Cache=0, Original=None,
+                             Ref=None, bDate=sdate, pDate=sdate, pAmount=xamt, pMulti=None, pAccount=fromacct, bAccount=toacct, bType=btype,
                              bCat=bclass, bSubcat='', Link=None, User=username, Co=None, Temp1=None, Temp2=None, Recurring=0, dDate=today,
                              pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0)
 
