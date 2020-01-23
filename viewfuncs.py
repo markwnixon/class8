@@ -77,6 +77,19 @@ def stripper(input):
         new = ''
     return new
 
+def hasinput(input):
+    if input is None:
+        return 0
+    elif isinstance(input,str):
+        input = input.strip()
+        if input == '' or input == 'None' or input == 'none':
+            return 0
+    elif isinstance(input,int):
+        if input == 0:
+            return 0
+    else:
+        return 1
+
 def testdrop(dblock):
     idret = 0
     xtest = 'xxx'
@@ -91,18 +104,17 @@ def testdrop(dblock):
             xtest = 'sea'
         ddata = Drops.query.all()
         for ddat in ddata:
-            entity = ddat.Entity
-            entity = entity.strip()
+            entity = stripper(ddat.Entity)
             scomp = entity[0:3]
             scomp = scomp.lower()
             print(sfind,scomp)
             if sfind == scomp or xtest == scomp:
                 idret = ddat.id
-                a1 = nons(ddat.Entity)
-                a2 = nons(ddat.Addr1)
-                a3 = nons(ddat.Addr2)
-                a4 = nons(ddat.Phone)
-                a5 = nons(ddat.Email)
+                a1 = stripper(ddat.Entity)
+                a2 = stripper(ddat.Addr1)
+                a3 = stripper(ddat.Addr2)
+                a4 = stripper(ddat.Phone)
+                a5 = stripper(ddat.Email)
                 newdrop = a1 + '\n' + a2 + '\n' + a3 + '\n' + a4 + '\n' + a5
                 company = a1
                 print('Found:',a1,a2,a3,a4,a5)
@@ -111,15 +123,14 @@ def testdrop(dblock):
 
 def dropupdate(dropblock):
     droplist=dropblock.splitlines()
-    avec=[' ']*5
+    avec=['']*5
     for j,drop in enumerate(droplist):
-        if j<5:
-            avec[j]=drop
+        avec[j]=stripper(drop)
     entity=avec[0]
     addr1=avec[1]
     edat=Drops.query.filter((Drops.Entity==entity) & (Drops.Addr1==addr1)).first()
     if edat is None:
-        input = Drops(Entity=avec[0],Addr1=avec[1],Addr2=avec[2],Phone=avec[3],Email=avec[4])
+        input = Drops(Entity=entity,Addr1=addr1,Addr2=avec[2],Phone=avec[3],Email=avec[4])
         db.session.add(input)
         db.session.commit()
     return entity
@@ -128,15 +139,14 @@ def dropupdate2(bid):
     pdat = People.query.filter(People.id == bid).first()
     if pdat is not None:
         droplist = [pdat.Company,pdat.Addr1,pdat.Addr2,pdat.Email,pdat.Telephone]
-        avec=[' ']*5
+        avec=['']*5
         for j,drop in enumerate(droplist):
-            if j<5:
-                avec[j]=drop
+            avec[j]=stripper(drop)
         entity=avec[0]
         addr1=avec[1]
         edat=Drops.query.filter((Drops.Entity==entity) & (Drops.Addr1==addr1)).first()
         if edat is None:
-            input = Drops(Entity=avec[0],Addr1=avec[1],Addr2=avec[2],Phone=avec[3],Email=avec[4])
+            input = Drops(Entity=entity,Addr1=addr1,Addr2=avec[2],Phone=avec[3],Email=avec[4])
             db.session.add(input)
             db.session.commit()
 
@@ -2220,10 +2230,7 @@ def Orders_Form_Update(oder):
             'date', 'date2', 'amount', 'ctype']
     a = list(range(len(vals)))
     for i, v in enumerate(vals):
-        a[i] = request.values.get(v)
-        if a[i]:
-            a[i] = a[i].strip()
-
+        a[i] = stripper(request.values.get(v))
     shipper = request.values.get('shipper')
     modata.Shipper = shipper
     modata.Order = a[0]
@@ -2270,6 +2277,8 @@ def Orders_Drop_Update(oder):
 
     modata.Company2 = company2
     modata.Company = company
+
+    print(f'my new drop 2:{newdrop2}')
     modata.Dropblock2 = newdrop2
     modata.Dropblock1 = newdrop1
     bid = People.query.filter(People.Company == modata.Shipper).first()

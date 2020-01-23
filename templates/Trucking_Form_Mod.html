@@ -86,7 +86,7 @@
 <tr>
 <td> <div class="input-group-text" data-toggle="tooltip" title="Enter 1st 3 letters of an existing location and program will load entire address for you on UPDATE">
 Load At:</div></td>
-<td colspan="2"><textarea class="form-control" type="text" name="dropblock1" rows="3">{% if holdvec[8] != 0 %}{{ holdvec[8]}} {% else %} {{modata.Dropblock1}} {% endif %}</textarea></td>
+<td colspan="2"><textarea class="form-control" type="text" name="dropblock1" rows="3">{% if holdvec[8] != 0 %}{{holdvec[8]}}{% else %}{{modata.Dropblock1}}{% endif %}</textarea></td>
 </tr>
 
 <tr>
@@ -113,7 +113,7 @@ Load At:</div></td>
 <tr>
 <tr>
 <td> <div class="input-group-text" data-toggle="tooltip" title="Enter 1st 3 letters of an existing location and program will load entire address for you on UPDATE">Deliver To:</div></td>
-<td colspan="2"><textarea class="form-control" type="text" name="dropblock2" rows="3">{% if holdvec[9] != 0 %}{{ holdvec[9]}} {% else %} {{modata.Dropblock2}} {% endif %}</textarea></td>
+<td colspan="2"><textarea class="form-control" type="text" name="dropblock2" rows="3">{% if holdvec[9] != 0 %}{{holdvec[9]}}{% else %}{{modata.Dropblock2}}{% endif %}</textarea></td>
 </tr>
 <tr>
 <td> <div class="input-group-text">Del Date:</div></td>
