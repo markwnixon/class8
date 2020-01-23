@@ -24,8 +24,15 @@ def etemplate_truck(viewtype,eprof,odat):
 
     print('templated to:',viewtype,eprof)
 
-    od, bol, con = odat.Order, odat.BOL, odat.Container
-    od, bol, con = stripper(od), stripper(bol), stripper(con)
+    od, bol, con, bk = odat.Order, odat.BOL, odat.Container, odat.Booking
+    od, bol, con, bk = stripper(od), stripper(bol), stripper(con), stripper(bk)
+    if bol is None:
+        keyval = bk
+    else:
+        if len(bol)< 5:
+            keyval = bk
+        else:
+            keyval = bol
     dblk = odat.Dropblock2
     if dblk is not None:
         dblk = dblk.splitlines()
@@ -36,7 +43,7 @@ def etemplate_truck(viewtype,eprof,odat):
     estatus, epod, eaccts = stripper(estatus), stripper(epod), stripper(eaccts)
 
     if eprof== 'eprof1':
-        etitle = f'Update on Order: {od} | {bol} | {con}'
+        etitle = f'Update on Order: {od} | {keyval} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nOur trucker is at the delivery site:\n\t\t{dblk[0]}\n\t\t{dblk[1]}\n\t\t{dblk[2]}\nWe will send a POD as soon as one can be obtained.\n\nSincerely,\n\n{signature}'
         aname = 'none'
         emailin1 = estatus
@@ -47,7 +54,7 @@ def etemplate_truck(viewtype,eprof,odat):
         return emaildata
 
     elif eprof == 'eprof2':
-        etitle = f'Update on Order: {od} | {bol} | {con}'
+        etitle = f'Update on Order: {od} | {keyval} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nThe subject container has been pulled from the port. Delivery is scheduled for {odat.Date2} to:\n\t\t{dblk[0]}\n\t\t{dblk[1]}\n\t\t{dblk[2]}\nWe will send a POD as soon as delivery is complete.\n\nSincerely,\n\n{signature}'
         aname = odat.Gate
         emailin1 = estatus
@@ -58,7 +65,7 @@ def etemplate_truck(viewtype,eprof,odat):
         return emaildata
 
     elif eprof == 'eprof3':
-        etitle = f'Invoice for Completed Order: {od} | {bol} | {con}'
+        etitle = f'Invoice for Completed Order: {od} | {keyval} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nThe subject order has been completed, and your invoice for services is attached.\n\nWe greatly appreciate your business.\n\nSincerely,\n\n{signature}'
         aname = odat.Invoice
         aname = aname.replace('INV', 'Invoice_')
@@ -70,7 +77,7 @@ def etemplate_truck(viewtype,eprof,odat):
         return emaildata
 
     elif eprof == 'eprof4':
-        etitle = f'Proof for Completed Order: {od} | {bol} | {con}'
+        etitle = f'Proof for Completed Order: {od} | {keyval} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nThe subject order has been completed, and your proof of delivery is attached.\n\nPlease do not hesitate to respond if you have any quesitons.\n\nSincerely,\n\n{signature}'
         aname = odat.Proof
         emailin1 = estatus
@@ -81,7 +88,7 @@ def etemplate_truck(viewtype,eprof,odat):
         return emaildata
 
     elif eprof == 'eprof5':
-        etitle = f'Invoice & Proof for Completed Order: {od} | {bol} | {con}'
+        etitle = f'Invoice & Proof for Completed Order: {od} | {keyval} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nThe subject order has been completed, and your invoice with proof of delivery is attached.\n\nPlease do not hesitate to respond if you have any quesitons.\n\nSincerely,\n\n{signature}'
         aname = f'Package_{odat.Jo}.pdf'
         emailin1 = estatus
@@ -92,7 +99,7 @@ def etemplate_truck(viewtype,eprof,odat):
         return emaildata
 
     elif eprof == 'eprof6':
-        etitle = f'Invoice Package for Completed Order: {od} | {bol} | {con}'
+        etitle = f'Invoice Package for Completed Order: {od} | {keyval} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nThe subject order has been completed, and your invoice package is attached.\n\nPlease do not hesitate to respond if you have any quesitons.\n\nSincerely,\n\n{signature}'
         aname = f'Package_{odat.Jo}.pdf'
         emailin1 = estatus
@@ -103,7 +110,7 @@ def etemplate_truck(viewtype,eprof,odat):
         return emaildata
 
     elif viewtype == 'invoice':
-        etitle = f'Invoice for Completed Order: {od} | {bol} | {con}'
+        etitle = f'Invoice for Completed Order: {od} | {keyval} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nThe subject order has been completed, and your invoice for services is attached.\n\nWe greatly appreciate your business.\n\nSincerely,\n\n{signature}'
         aname = odat.Invoice
         aname = aname.replace('INV','Invoice_')
@@ -116,7 +123,7 @@ def etemplate_truck(viewtype,eprof,odat):
 
 
     elif viewtype == 'paidinvoice':
-        etitle = f'Payment Received on Invoice {odat.Jo} for Completed Order: {od} | {bol} | {con}'
+        etitle = f'Payment Received on Invoice {odat.Jo} for Completed Order: {od} | {keyval} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nYour payment has been received, and your stamped invoice is attached.\n\nWe greatly appreciate your business.\n\nSincerely,\n\n{signature}'
         aname = odat.Invoice
         aname = aname.replace('INV', 'Paid_Invoice_')
@@ -128,7 +135,7 @@ def etemplate_truck(viewtype,eprof,odat):
         return emaildata
 
     elif viewtype == 'packages':
-        etitle = f'{scac} Invoice Package for Completed Order: {od} | {bol} | {con}'
+        etitle = f'{scac} Invoice Package for Completed Order: {od} | {keyval} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nAn invoice package is enclosed for your review.\nWe greatly appreciate your business.\n\nSincerely,\n\n{signature}'
         aname = odat.Package
         emailin1 = estatus
