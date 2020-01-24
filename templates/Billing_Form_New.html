@@ -16,7 +16,7 @@
 </div>
 
 <div class="card-body">
-
+{%  set vendors = hv[5] %}
 
 <table class="table table-condensed table-hover">
     <tbody>
@@ -25,8 +25,8 @@
             <td>
                 <select class="form-control" type="text" name="thiscomp" onchange="this.form.submit()">
                 <option selected value='1'>Choose Later</option>
-                {% for data in cdata %}
-                <option {% if cdat.Company == data.Company %} selected {% endif %} value="{{data.Company}}" > {{data.Company}} </option>
+                {% for vendor in vendors %}
+                <option {% if hv[7] == vendor %} selected {% endif %} value="{{vendor}}" > {{vendor}} </option>
                 {% endfor %}</select>
             </td>
         </tr>
@@ -36,11 +36,12 @@
                 <select class="form-control" type="text" name="ctype" onchange="this.form.submit()">
                     <option value = 'Pick '>  Select Default Company/Division </option>
                     {% for divt in divdat %}
-                            <option {% if cdat.Idtype == divt.Co %} selected {% endif %} value='{{ divt.Co }}'>  {{ divt.Name }} (Code {{ divt.Co }}) </option>
+                            <option {% if hv[8] == divt.Co %} selected {% endif %} value='{{ divt.Co }}'>  {{ divt.Name }} (Code {{ divt.Co }}) </option>
                     {% endfor %}
                 </select>
             </td>
         </tr>
+        {% if hv[9] != 'No' %}
         <tr>
             <td><div class="input-group-text">{{cdat.Idtype}} Exp Account:</div></td>
             <td>
@@ -51,6 +52,7 @@
                 {% endfor %}</select>
             </td>
         </tr>
+        {% endif %}
         <tr>
             <td><div class="input-group-text">Bill Amount:</div></td>
             <td><input class="form-control" type="text" name="bamt" value="{{vdata[2]}}"></td>

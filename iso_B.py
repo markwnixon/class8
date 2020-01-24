@@ -20,7 +20,7 @@ def isoB(indat):
     if request.method == 'POST':
 
         from viewfuncs import tabdata, tabdataR, popjo, jovec, timedata, nonone, nononef, nons, numcheck, newjo, init_billing_zero, init_billing_blank
-        from viewfuncs import sdiff, calendar7_weeks, txtfile, numcheckvec, d2s, erud, dataget_B, hv_capture, docuploader, get_def_bank, next_check
+        from viewfuncs import sdiff, calendar7_weeks, txtfile, numcheckvec, d2s, erud, dataget_B, hv_capture, docuploader, get_def_bank, next_check, vendorlist, stripper
         from gledger_write import gledger_write
 
         username = session['username'].capitalize()
@@ -842,6 +842,8 @@ def isoB(indat):
             err.append('Select Source Document from List')
             modlink = 4
             leftscreen = 0
+            narrow = 1
+            hv[5], hv[6] = vendorlist(narrow)
             expdata = Accounts.query.filter((Accounts.Type == 'Expense') | (Accounts.Type == 'CC')).order_by(Accounts.Name).all()
             vdata = [today, today, '', '']
 
@@ -852,19 +854,37 @@ def isoB(indat):
             leftscreen = 0
             bdate = request.values.get('bdate')
             ddate = request.values.get('bdate')
+            bamt = request.values.get('bamt')
+            bdesc = request.values.get('bdesc')
+            narrow = 1
+            hv[5], hv[6] = vendorlist(narrow)
 
             if modlink == 4:
                 thiscompany = request.values.get('thiscomp')
-                cdat = People.query.filter((People.Company == thiscompany) & (
-                    (People.Ptype == 'Vendor') | (People.Ptype == 'TowCo'))).first()
-                print(cdat.Idtype)
-                ddat = Divisions.query.filter(Divisions.Co==cdat.Idtype).first()
-                if ddat is not None:
-                    err.append(f'Loading data for {thiscompany} Defaults')
-                    err.append(f'Bill for {cdat.Idtype}: {ddat.Name}')
+                if '(Credit Card)' not in thiscompany:
+                    cdat = People.query.filter((People.Company == thiscompany) & (
+                        (People.Ptype == 'Vendor') | (People.Ptype == 'TowCo'))).first()
+                    hv[7] = cdat.Company
+                    hv[8] = cdat.Idtype
+                    ddat = Divisions.query.filter(Divisions.Co==cdat.Idtype).first()
+                    if ddat is not None:
+                        err.append(f'Loading data for {thiscompany} Defaults')
+                        err.append(f'Bill for {cdat.Idtype}: {ddat.Name}')
+                else:
+                    # This section for case of bill to credit card account
+                    cdat = None
+                    if thiscompany is not None:
+                        ccacct = thiscompany.replace(' (Credit Card)','')
+                        ccacct = stripper(ccacct)
+                        ccdat = Accounts.query.filter( (Accounts.Name == ccacct) & (Accounts.Type == 'CC') ).first()
+                        if ccdat is not None:
+                            hv[7] = thiscompany
+                            hv[8] = ccdat.Co
+                            hv[9] = 'No'
 
             else:
                 modlink = 4 #reset the vondor feed back to bill feed
+                cdat = None
 
             if cdat is not None:
                 print(cdat.Company, peep, cdat.Idtype, cdat.Associate1)
@@ -908,9 +928,11 @@ def isoB(indat):
                     vdata = [bdate, ddate, last_amt, new_desc]
                 else:
                     # if not then get the category info from the vendor data
-                    vdata = [bdate, ddate, '0.00', '']
+                    vdata = [bdate, ddate, bamt, bdesc]
             else:
+                ccode = hv[8]
                 expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co == ccode)).all()
+                vdata = [bdate, ddate, bamt, bdesc]
 
         if thisbill is not None:
             modlink = 0
@@ -948,7 +970,6 @@ def isoB(indat):
                 descript = ''
                 btype = ''
                 baccount = ''
-                docref = f'tmp/{scac}/data/vbills/' + newfile
 
             bdesc = request.values.get('bdesc')
             bamt = request.values.get('bamt')
@@ -959,9 +980,8 @@ def isoB(indat):
             nextjo = newjo(cco+'B', today)
             account = request.values.get('crataccount')
             baccount = request.values.get('billacct')
-            bfile = os.path.basename(docref)
 
-            input = Bills(Jo=nextjo, Pid=aid, Company=acomp, Memo='', Description=bdesc, bAmount=bamt, Status='Unpaid', Cache=0, Original=bfile,
+            input = Bills(Jo=nextjo, Pid=aid, Company=acomp, Memo='', Description=bdesc, bAmount=bamt, Status='Unpaid', Cache=0, Original=None,
                              Ref='', bDate=sdate, pDate=today, pAmount='0.00', pMulti=None, pAccount=account, bAccount=baccount, bType=btype,
                              bCat=category, bSubcat=subcat, Link=None, User=username, Co=cco, Temp1=None, Temp2=None, Recurring=0, dDate=today,
                              pAmount2='0.00', pDate2=None, Code1 = None, Code2=None, CkCache=0, QBi=0)
@@ -1271,8 +1291,8 @@ def isoB(indat):
     rightsize = 12 - leftsize
     today = datetime.date.today()
     critday = datetime.date.today()+datetime.timedelta(days=7)
-    acdata = Accounts.query.filter((Accounts.Type == 'Bank') | (Accounts.Type == 'CC')).all()
     bdata, cdata = dataget_B(hv[1],hv[0])
+    acdata = Accounts.query.filter((Accounts.Type == 'Bank') | (Accounts.Type == 'CC')).order_by(Accounts.Name).all()
     err = erud(err)
 
     return username, divdat, hv, bdata, cdata, bill, peep, err, modata, adata, acdata, expdata, modlink, caldays, daylist, weeksum, nweeks, addjobselect, jobdata, modal, dlist, fdata, today, cdat, pb, critday, vdata, leftscreen, docref, doctxt, leftsize, cache, filesel

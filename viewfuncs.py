@@ -1704,8 +1704,6 @@ def dataget_Q(thismuch):
 
 def dataget_B(thismuch,co):
     today = datetime.date.today()
-    bdata = 0
-    vdata = 0
     if co == 'X':
         newco = ''
         ddata = Divisions.query.all()
@@ -1722,7 +1720,7 @@ def dataget_B(thismuch,co):
         stopdate = today - datetime.timedelta(days=10)
         bdata = Bills.query.all()
 
-    vdata = People.query.filter( (People.Ptype=='Vendor') & (People.Idtype.contains(co)) ).all()
+    vdata = People.query.filter( (People.Ptype=='Vendor') & (People.Idtype.contains(co)) ).order_by(People.Company).all()
 
     return bdata,vdata
 
@@ -2351,3 +2349,22 @@ def next_check(pacct,bid):
     else:
         cknum = '0000'
     return cknum
+
+def vendorlist(narrow):
+    vendors = []
+    if narrow == 1:
+        vdata = People.query.filter(People.Ptype == 'Vendor').order_by(People.Company).all()
+        for vdat in vdata:
+            vendors.append(vdat.Company)
+        ccdata = Accounts.query.filter(Accounts.Type == 'CC').order_by(Accounts.Name).all()
+        for ccdat in ccdata:
+            vendors.append(ccdat.Name + ' (Credit Card)')
+        vendors.sort()
+        return vendors, 'Exp'
+    if narrow == 2:
+        vendors = []
+        ccdata = Accounts.query.filter(Accounts.Type == 'CC').order_by(Accounts.Name).all()
+        for ccdat in ccdata:
+            vendors.append(ccdat.Name + ' (Credit Card)')
+        vendors.sort()
+        return vendors, 'CC'
