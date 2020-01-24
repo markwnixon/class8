@@ -141,7 +141,7 @@ def etemplate_truck(viewtype,eprof,odat):
         emailin1 = estatus
         emailin2 = eaccts
         emailcc1 = em['info']
-        emailcc2 = em['expo']8
+        emailcc2 = em['expo']
         emaildata = [etitle, ebody, emailin1, emailin2, emailcc1, emailcc2, aname]
         return emaildata
 
