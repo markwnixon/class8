@@ -942,7 +942,7 @@ def isoB(indat):
             if sdate is None or sdate == '':
                 sdate = today
 
-            thiscomp = request.values.get('thiscomp')
+            thiscompany = request.values.get('thiscomp')
             cdat = People.query.filter((People.Company == thiscompany) & (
                 (People.Ptype == 'Vendor') | (People.Ptype == 'TowCo'))).first()
             if cdat is not None:
