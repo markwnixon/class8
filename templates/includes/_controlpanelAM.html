@@ -1,23 +1,22 @@
 <div class="card">
   <div class="card-header">
-  Create, Modify, and Delete Accounts
-  </div>
-  <div class="card-body" align="center">
-    <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="NewA"
+  Create, Modify, and Delete Accounts <br>
+          <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="NewA"
       data-toggle="tooltip" title="Create a New Account">New<br>Account</button>
     <button type="submit" class="btn btn-group-small btn-mdb-color my-small-btn" name="Qmod"
       data-toggle="tooltip" title="Modify Form Data associated with an Account">Modify<br>Account</button>
+      <button type="submit" class="btn btn-group-small btn-mdb-color my-small-btn" name="Shared"
+      data-toggle="tooltip" title="Mark account as apportioned across company/divisions">Shared<br>Account</button>
     <button type="submit" class="btn btn-group-small btn-danger my-small-btn" name="Delete"
-      data-toggle="tooltip" title="Select an Account to be DELETED">DELETE<br>Item</button>
-      <button type="submit" class="btn btn-group-small btn-blue my-small-btn" name="Return"
-          data-toggle="tooltip" title="Return and Reset Values"> Return<br>To Tables</button>
+      data-toggle="tooltip" title="Select an Account to be DELETED">DELETE<br>Account</button>
+  </div>
+  <div class="card-body" align="center">
       <select class="form-control" type="text" name="actype" onchange="this.form.submit()">
          <option value='Show All Accounts' {% if companyon == 'Show All Accounts' %} selected {% endif %}>Show All Accounts</option>
-         <option value='One Stop Logistics' {% if companyon == 'One Stop Logistics' %} selected {% endif %}>One Stop Logistics</option>
-         <option value='Jays Auto' {% if companyon == 'Jays Auto' %} selected {% endif %}>Jays Auto</option>
-         {% for data in acdata %}
-         <option {% if companyon == data.Name %} selected {% endif %}  value="{{data.Name}}"> {{data.Co}}:&nbsp&nbsp  {{data.Name}} </option>
+         {% for div in divdata %}
+         <option value='{{ div.Co }}' {% if companyon == div.Co %} selected {% endif %}>{{div.Name}}</option>
          {% endfor %}
+      <option value='Show Shared Accounts' {% if companyon == 'Show Shared Accounts' %} selected {% endif %}>Show Shared Accounts</option>
       </select>
   </div>
 </div>

@@ -1,5 +1,6 @@
 from runmain import db
 from models import Trucklog, DriverAssign, Invoices, JO, Income, Bills, Accounts, Bookings, OverSeas, Autos, People, Interchange, Drivers, ChalkBoard, Orders, Drops, Services, Quotes, Divisions
+from models import Taxmap, QBaccounts, Accttypes
 from flask import session, logging, request
 import datetime
 import calendar
@@ -84,9 +85,13 @@ def hasinput(input):
         input = input.strip()
         if input == '' or input == 'None' or input == 'none':
             return 0
+        else:
+            return 1
     elif isinstance(input,int):
         if input == 0:
             return 0
+        else:
+            return 1
     else:
         return 1
 
@@ -1705,22 +1710,27 @@ def dataget_Q(thismuch):
 def dataget_B(thismuch,co):
     today = datetime.date.today()
     if co == 'X':
-        newco = ''
-        ddata = Divisions.query.all()
-        for ddat in ddata:
-            newcoc = newco+ddat.Co
-        co = newco
-    if thismuch == '1':
-        stopdate = today-datetime.timedelta(days=60)
-        bdata = Bills.query.filter( (Bills.Co.contains(co)) & (Bills.bDate > stopdate) ).all()
-    elif thismuch == '2':
-        stopdate = today-datetime.timedelta(days=120)
-        bdata = Bills.query.filter( (Bills.Co.contains(co)) & (Bills.bDate > stopdate) ).all()
+        if thismuch == '1':
+            stopdate = today-datetime.timedelta(days=60)
+            bdata = Bills.query.filter(Bills.bDate > stopdate).all()
+        elif thismuch == '2':
+            stopdate = today - datetime.timedelta(days=120)
+            bdata = Bills.query.filter(Bills.bDate > stopdate).all()
+        else:
+            stopdate = today - datetime.timedelta(days=10)
+            bdata = Bills.query.all()
+        vdata = People.query.filter(People.Ptype == 'Vendor').order_by(People.Company).all()
     else:
-        stopdate = today - datetime.timedelta(days=10)
-        bdata = Bills.query.all()
-
-    vdata = People.query.filter( (People.Ptype=='Vendor') & (People.Idtype.contains(co)) ).order_by(People.Company).all()
+        if thismuch == '1':
+            stopdate = today-datetime.timedelta(days=60)
+            bdata = Bills.query.filter( (Bills.Co.contains(co)) & (Bills.bDate > stopdate) ).all()
+        elif thismuch == '2':
+            stopdate = today-datetime.timedelta(days=120)
+            bdata = Bills.query.filter( (Bills.Co.contains(co)) & (Bills.bDate > stopdate) ).all()
+        else:
+            stopdate = today - datetime.timedelta(days=10)
+            bdata = Bills.query.all()
+            vdata = People.query.filter( (People.Ptype=='Vendor') & (People.Idtype.contains(co)) ).order_by(People.Company).all()
 
     return bdata,vdata
 
@@ -2368,3 +2378,69 @@ def vendorlist(narrow):
             vendors.append(ccdat.Name + ' (Credit Card)')
         vendors.sort()
         return vendors, 'CC'
+
+def get_tmap(atype, btype):
+    print('atype is', atype)
+    adat = Accttypes.query.filter(Accttypes.Name.contains(atype)).first()
+    ttype = stripper(adat.Taxtype)
+    if btype == 'Direct':
+        ttype = 'COGS'
+    if ttype == 'Equity':
+        ttype = 'Liabilities'
+    print('ttype is',ttype)
+    tdat = Taxmap.query.filter((Taxmap.Category.contains(ttype)) | Taxmap.Name.contains(ttype)).all()
+    return tdat
+
+def get_qmap(atype, btype):
+    print('qmap atype btype=', atype,btype)
+    if btype == 'Direct':
+        atype = 'Cost of Goods Sold'
+    if atype == 'Cash' or atype == 'Assets':
+        atype = 'Asset'
+    qdat = QBaccounts.query.filter(QBaccounts.Type.contains(atype)).all()
+    return qdat
+
+def check_shared(co1,co2name, err):
+
+    adat1 = Accounts.query.filter( (Accounts.Co == co1) & (Accounts.Name.contains('Due to')) & (Accounts.Name.contains(co2name)) ).first()
+    if adat1 is not None:
+        err.append(f'Account {adat1.Name} exists')
+        return adat1.id, err
+    else:
+        #create the account:
+        acctname = f'Due to {co2name}'
+        acctdesc = f'Created automatically from account share setup'
+        input = Accounts(Name=acctname, Balance=0.00, AcctNumber=None, Routing=None, Payee=None,
+                         Type='Current Liability', Description=acctdesc, Category='Liabilities', Subcategory='Current Liabilities',
+                         Taxrollup=None, Co=co1, QBmap=None, Shared=None)
+        db.session.add(input)
+        db.session.commit()
+        adatnew = Accounts.query.filter((Accounts.Co == co1) & (Accounts.Name.contains('Due to')) & (
+            Accounts.Name.contains(co2name))).first()
+        if adatnew is not None:
+            err.append(f'Account {adatnew.Name} created successfully')
+            return adatnew.id, err
+        else:
+            return 0, err.append('Problem with shared account creation')
+
+def check_mirror_exp(co,oid,oName,err):
+    adat = Accounts.query.filter( (Accounts.Co == co) & (Accounts.Name == oName) ).first()
+    if adat is not None:
+        err.append(f'Mirror account in code {co} exists: {adat.Name}')
+        return adat.id, err
+    else:
+        #create the required account
+        adat1 = Accounts.query.get(oid)
+        acctdesc = 'Mirror account created automatically from share setup'
+        input = Accounts(Name=oName, Balance=0.00, AcctNumber=None, Routing=None, Payee=None,
+                         Type=adat1.Type, Description=acctdesc, Category=adat1.Category, Subcategory=adat1.Subcategory,
+                         Taxrollup=adat1.Taxrollup, Co=co, QBmap=adat1.QBmap, Shared=None)
+        db.session.add(input)
+        db.session.commit()
+        adatnew = Accounts.query.filter( (Accounts.Co == co) & (Accounts.Name == oName) ).first()
+        if adatnew is not None:
+            err.append(f'Account {adatnew.Name} created successfully')
+            return adatnew.id, err
+        else:
+            return 0, err.append('Problem with shared account creation')
+

@@ -161,6 +161,62 @@ class LastMessage(db.Model):
         self.User = User
         self.Err = Err
 
+class QBaccounts(db.Model):
+    __tablename__='qbaccounts'
+    id = db.Column('id', db.Integer, primary_key=True)
+    Name = db.Column('Name', db.String(99))
+    Type = db.Column('Type', db.String(99))
+    Sub1 = db.Column('Sub1', db.String(99))
+    Sub2 = db.Column('Sub2', db.String(99))
+    Co = db.Column('Co', db.String(5))
+
+    def __init__(self, Name, Type, Sub1, Sub2, Co):
+        self.Name = Name
+        self.Type = Type
+        self.Sub1 = Sub1
+        self.Sub2 = Sub2
+        self.Co = Co
+
+class Taxmap(db.Model):
+    __tablename__='taxmap'
+    id = db.Column('id', db.Integer, primary_key=True)
+    Name = db.Column('Name', db.String(99))
+    Form = db.Column('Form', db.String(99))
+    Category = db.Column('Category', db.String(99))
+
+    def __init__(self, Name, Form, Category):
+        self.Name = Name
+        self.Form = Form
+        self.Category = Category
+
+class Accttypes(db.Model):
+    __tablename__='accounttypes'
+    id = db.Column('id', db.Integer, primary_key=True)
+    Name = db.Column('Name', db.String(99))
+    Taxtype = db.Column('Taxtype', db.String(99))
+    Category = db.Column('Category', db.String(99))
+    Subcategory = db.Column('Subcategory', db.String(99))
+
+    def __init__(self, Name, Taxtype, Category, Subcategory):
+        self.Name = Name
+        self.Taxtype = Taxtype
+        self.Category = Category
+        self.Subcategory = Subcategory
+
+class Focusareas(db.Model):
+    __tablename__='focusareas'
+    id = db.Column('id', db.Integer, primary_key=True)
+    Name = db.Column('Name', db.String(45))
+    Income = db.Column('Income', db.String(45))
+    Expenses = db.Column('Expenses', db.String(45))
+    Co = db.Column('Co', db.String(10))
+
+    def __init__(self, Name, Income, Expenses, Co):
+        self.Name = Name
+        self.Income = Income
+        self.Expenses = Expenses
+        self.Co = Co
+
 
 class Orders(db.Model):
     __tablename__ = 'orders'
@@ -355,11 +411,14 @@ class Divisions(db.Model):
     Name = db.Column('Name', db.String(45))
     Co = db.Column('Co', db.String(45))
     Color = db.Column('Color', db.String(45))
+    Apportion = db.Column('Apportion', db.String(45))
 
-    def __init__(self, Name, Co, Color):
+
+    def __init__(self, Name, Co, Color, Apportion):
         self.Name = Name
         self.Co = Co
         self.Color = Color
+        self.Apportion = Apportion
 
 
 class Quotes(db.Model):
@@ -1007,11 +1066,12 @@ class Accounts(db.Model):
     Description = db.Column('Description', db.String(100))
     Category = db.Column('Category', db.String(45))
     Subcategory = db.Column('Subcategory', db.String(45))
-    Taxrollup = db.Column('Taxrollup', db.String(45))
+    Taxrollup = db.Column('Taxrollup', db.String(200))
     Co = db.Column('Co', db.String(2))
-    QBmap = db.Column('QBmap', db.String(100))
+    QBmap = db.Column('QBmap', db.String(200))
+    Shared = db.Column('Shared', db.String(200))
 
-    def __init__(self, Name, Balance, AcctNumber, Routing, Payee, Type, Description, Category, Subcategory, Taxrollup, Co, QBmap):
+    def __init__(self, Name, Balance, AcctNumber, Routing, Payee, Type, Description, Category, Subcategory, Taxrollup, Co, QBmap, Shared):
         self.Name = Name
         self.Balance = Balance
         self.AcctNumber = AcctNumber
@@ -1024,3 +1084,4 @@ class Accounts(db.Model):
         self.Taxrollup = Taxrollup
         self.Co = Co
         self.QBmap = QBmap
+        self.Shared = Shared

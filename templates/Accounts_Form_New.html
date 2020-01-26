@@ -1,0 +1,147 @@
+<br>
+<div class="card">
+<div class="card-header">
+    <div class="d-flex justify-content-around align-items-center">
+        <div class="p-0">Enter Account Information</div>
+        <div class="p-0">
+            <button type="submit" class="btn btn-md btn-green" name="Update">Update</button>
+            <button type="submit" class="btn btn-md btn-elegant" name="Return">&nbsp; Cancel &nbsp;</button>
+        </div>
+    </div>
+</div>
+
+<div class="card-body">
+
+
+<table class="table table-condensed table-hover">
+<tbody>
+<tr>
+<td> <div class="input-group-text">Name:</div></td>
+<td colspan="2"><input class="form-control" type="text" value="{{modata.Name}}" name="acctname"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Company:</div></td>
+<td>
+<select class="form-control" type="text" name="acctco">
+    <option  selected disabled > Choose Company/Division </option>
+     {% for div in divdata %}
+     <option value='{{ div.Co }}' {% if modata.Co == div.Co %} selected {% endif %}>{{div.Name}}</option>
+     {% endfor %}
+</select>
+</td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Type:</div></td>
+<td>
+<select class="form-control" type="text" name="accttype" onchange="this.form.submit()">
+<option  selected disabled > Choose Account Type </option>
+{% for atyp in atypes %}
+    <option  {% if modata.Type == atyp.Name %} selected {% endif %} value='{{ atyp.Name }}'> {{ atyp.Name }} </option>
+{% endfor %}
+</select>
+</td>
+</tr>
+{% if modata.Type=='Expense' %}
+<tr>
+<td> <div class="input-group-text">Expense Category:</div></td>
+<td>
+<select class="form-control" type="text" name="acctcat" onchange="this.form.submit()">
+<option  {% if modata.Category == 'Choose' %} selected {% endif %} value='Choose'> Choose </option>
+<option  {% if modata.Category == 'G-A' %} selected {% endif %} value='G-A'> General and Administrative </option>
+<option  {% if modata.Category == 'Direct' %} selected {% endif %} value='Direct'> Direct to Focus Area </option>
+</select>
+</td>
+</tr>
+{% endif %}
+
+{% if modata.Type=='Expense' and modata.Category=='G-A' %}
+<tr>
+<td> <div class="input-group-text">G-A Expense Type:</div></td>
+<td>
+<select class="form-control" type="text" name="acctsub" onchange="this.form.submit()">
+
+{% for gax in gmap %}
+<option  {% if modata.Subcategory == gax.Name %} selected {% endif %} value="{{gax.Name}}"> {{gax.Name}} </option>
+{% endfor %}
+</select>
+</td>
+</tr>
+{% endif %}
+
+{% if modata.Type=='Expense' and modata.Category=='Direct' %}
+<tr>
+<td> <div class="input-group-text">Direct Expense Type:</div></td>
+<td>
+<select class="form-control" type="text" name="acctsub">
+    {% if fmap %}
+            {% for fax in fmap %}
+                <option  {% if modata.Category == fax.Name %} selected {% endif %} value='{{ fax.Name }}'> {{ fax.Name }}</option>
+            {% endfor %}
+    {% else %}
+            <option disabled> Select Focus Area for Expense </option>
+    {% endif %}
+</select>
+</td>
+</tr>
+{% endif %}
+<tr>
+<td> <div class="input-group-text">AcctNumber:</div></td>
+<td colspan="2"><input class="form-control" type="text" value="{{modata.AcctNumber}}" name="acctnumb"></td>
+</tr>
+{% if modata.Type == 'Bank'%}
+<tr>
+<td> <div class="input-group-text">Routing:</div></td>
+<td colspan="2"><input class="form-control" type="text" value="{{modata.Routing}}" name="acctrout"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Payee:</div></td>
+<td colspan="2"><input class="form-control" type="text" value="{{modata.Payee}}" name="acctpaye"></td>
+</tr>
+{% endif %}
+<tr>
+<td> <div class="input-group-text">Description:</div></td>
+<td colspan="2"><input class="form-control" type="text" value="{{modata.Description}}" name="acctdesc"></td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Tax Mapping:</div></td>
+<td colspan="2">
+<select class="form-control" type="text" name="accttax">
+    {% if tmap %}
+            <option selected disabled> Select Tax Mapping </option>
+            {% for tax in tmap %}
+                <option  {% if modata.Taxrollup == tax.Category+':'+tax.Name %} selected {% endif %} value='{{tax.Category}}:{{tax.Name}}'>{{tax.Category}}:{{tax.Name}}</option>
+            {% endfor %}
+    {% else %}
+            <option selected disabled> Select Tax Mapping </option>
+    {% endif %}
+</select>
+</td>
+</tr>
+<tr>
+<td> <div class="input-group-text">Quickbooks Mapping:</div></td>
+<td colspan="2">
+<select class="form-control" type="text" name="qbmap">
+    {% if qmap %}
+        <option seleccted disabled> Select Quickbooks Mapping </option>
+            {% for qax in qmap %}
+                {%  set qstring = qax.Name %}
+                {% if qax.Sub1 %}
+                            {% set qstring = qstring + ':' + qax.Sub1 %}
+                                    {% if qax.Sub2 %}
+                                        {% set qstring = qstring + ':' + qax.Sub2 %}
+                                    {% endif %}
+                            {% endif %}
+                <option  {% if modata.QBmap == qstring %} selected {% endif %} value='{{qstring}}'>{{qstring}}</option>
+            {% endfor %}
+    {% else %}
+            <option selected disabled> Select Quickbooks Mapping </option>
+    {% endif %}
+</select>
+
+</td>
+</tr>
+
+</tbody></table>
+
+</div>
+</div>

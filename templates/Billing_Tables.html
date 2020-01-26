@@ -40,6 +40,7 @@
             {% for data in data1 %}
                 {% if data.Temp2=='Copy' %}
                     {% set act="amber font-weight-bold text-center" %}
+                    {% set alt="amber font-weight-bold text-left" %}
                 {% elif data.Status[0] == 'P' and data.Bal() != '0.00' %}
                     {% set act="blue-text font-weight-bold text-center" %}
                 {% elif data.Status[0] == 'P' %}
@@ -110,15 +111,15 @@
             <tr>
                 <th class="{{atc}}">ID</th>
                 <th class="{{atc}}">Type</th>
+                <th class="{{atc}}">ExpCo</th>
                 <th class="{{atc}}">Chk</th>
-                <th class="{{atc}}">ExpenseAccount</th>
                 <th class="{{atc}}">Entity (Payee)</th>
+                <th class="{{atc}}">ExpenseAccount</th>
                 <th class="{{atc}}">Addr1</th>
                 <th class="{{atc}}">Addr2</th>
                 <th class="{{atc}}">Phone</th>
                 <th class="{{atc}}">Email</th>
                 <th class="{{atc}}">ExpType</th>
-                <th class="{{atc}}">ExpCo</th>
                 <th class="{{atc}}">ExpCat</th>
                 <th class="{{atc}}">ExpSubcat</th>
                 <th class="{{atc}}">ExpAccountID</th>
@@ -126,25 +127,34 @@
         </thead>
         <tbody>
             {% for data in data2 %}
+                {% set comp = data.Company %}
+                {% if comp %}
+                    {% if comp|length >20 %}
+                        {% set comp  = comp[0:20] %}
+                    {% endif %}
+                {% endif %}
                 {% if data.Middle == 'Copy' %}
                     {% set atc="amber font-weight-bold text-center" %}
+                    {% set atl="amber font-weight-bold text-center" %}
                 {% elif data.First %}
                     {% set atc = "font-weight-bold " + data.First + "-text text-center" %}
+                    {% set atl = "font-weight-bold " + data.First + "-text text-left" %}
                 {% else %}
                     {% set atc = " blue font-weight-bold " + 'white' + "-text text-center" %}
+                    {% set atl = " blue font-weight-bold " + 'white' + "-text text-left" %}
                 {% endif %}
                                 <tr>
                                     <td class="{{atc}}">{{data.id}}</td>
                                     <td class="{{atc}}">{{ data.Ptype }}</td>
+                                    <td class="{{atc}}">{{ data.Idtype }}</td>
                                     <td align="center"><input class="align-middle" type="checkbox" name="peep{{data.id}}" value="{{data.id}}"></td>
-                                    <td class="{{atc}}">{{ data.Associate1 }}</td>
-                                    <td class="{{atc}}">{{ data.Company }}</td>
-                                    <td class="{{atc}}">{{ data.Addr1}}</td>
-                                    <td class="{{atc}}">{{ data.Addr2}}</td>
+                                    <td class="{{atl}}">{{ comp }}</td>
+                                    <td class="{{atl}}">{{ data.Associate1 }}</td>
+                                    <td class="{{atl}}">{{ data.Addr1}}</td>
+                                    <td class="{{atl}}">{{ data.Addr2}}</td>
                                     <td class="{{atc}}">{{ data.Telephone}}</td>
                                     <td class="{{atc}}">{{ data.Email}}</td>
                                     <td class="{{atc}}">{{ data.Associate2 }}</td>
-                                    <td class="{{atc}}">{{ data.Idtype }}</td>
                                     <td class="{{atc}}">{{ data.Temp1 }}</td>
                                     <td class="{{atc}}">{{ data.Temp2 }}</td>
                                     <td class="{{atc}}">{{ data.Accountid }}</td>

@@ -234,10 +234,11 @@ def IncomeMaint():
 def AccountMaint():
 
     from iso_AM import isoAM
-    odata, oder, err, modata, modlink, leftscreen, leftsize, today, now, scdata, companyon = isoAM()
+    odata, oder, err, modata, modlink, leftscreen, leftsize, today, now, scdata, companyon, divdata, atypes, tmap, fmap, qmap, gmap, colordict = isoAM()
     rightsize = 12-leftsize
     return render_template('Aaccountmaint.html', cmpdata=cmpdata, scac=scac, data1=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
-                           leftsize=leftsize, rightsize=rightsize, scdata=scdata, companyon=companyon)
+                           leftsize=leftsize, rightsize=rightsize, scdata=scdata, companyon=companyon, divdata = divdata, colordata = colordict,
+                           atypes=atypes, tmap=tmap, fmap=fmap, qmap=qmap, gmap=gmap)
 
 
 @app.route('/General', methods=['GET', 'POST'])

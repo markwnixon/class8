@@ -21,7 +21,7 @@ def isoB(indat):
 
         from viewfuncs import tabdata, tabdataR, popjo, jovec, timedata, nonone, nononef, nons, numcheck, newjo, init_billing_zero, init_billing_blank
         from viewfuncs import sdiff, calendar7_weeks, txtfile, numcheckvec, d2s, erud, dataget_B, hv_capture, docuploader, get_def_bank, next_check, vendorlist, stripper
-        from gledger_write import gledger_write
+        from gledger_write import gledger_write, gledger_app_write
 
         username = session['username'].capitalize()
         bill_path = 'processing/bills'
@@ -844,7 +844,7 @@ def isoB(indat):
             leftscreen = 0
             narrow = 1
             hv[5], hv[6] = vendorlist(narrow)
-            expdata = Accounts.query.filter((Accounts.Type == 'Expense') | (Accounts.Type == 'CC')).order_by(Accounts.Name).all()
+            expdata = Accounts.query.filter((Accounts.Type == 'Expense') | (Accounts.Type == 'Credit Card')).order_by(Accounts.Name).all()
             vdata = [today, today, '', '']
 
 
@@ -856,6 +856,7 @@ def isoB(indat):
             ddate = request.values.get('bdate')
             bamt = request.values.get('bamt')
             bdesc = request.values.get('bdesc')
+            comp = request.values.get('ctype')
             narrow = 1
             hv[5], hv[6] = vendorlist(narrow)
 
@@ -863,13 +864,18 @@ def isoB(indat):
                 thiscompany = request.values.get('thiscomp')
                 if '(Credit Card)' not in thiscompany:
                     cdat = People.query.filter((People.Company == thiscompany) & (
-                        (People.Ptype == 'Vendor') | (People.Ptype == 'TowCo'))).first()
-                    hv[7] = cdat.Company
-                    hv[8] = cdat.Idtype
-                    ddat = Divisions.query.filter(Divisions.Co==cdat.Idtype).first()
-                    if ddat is not None:
-                        err.append(f'Loading data for {thiscompany} Defaults')
-                        err.append(f'Bill for {cdat.Idtype}: {ddat.Name}')
+                        (People.Ptype == 'Vendor') | (People.Ptype == 'TowCo')) ).first()
+                    if cdat is not None:
+                        hv[7] = cdat.Company
+                        hv[8] = comp
+                        if comp != cdat.Idtype:
+                            err.append(f'**Warning** this is not the default company for this vendor')
+                        ddat = Divisions.query.filter(Divisions.Co==cdat.Idtype).first()
+                        if ddat is not None:
+                            err.append(f'Loading data for {thiscompany} Defaults')
+                            err.append(f'Bill for {cdat.Idtype}: {ddat.Name}')
+                    else:
+                        err.append(f'This company {thiscompany} not found in database')
                 else:
                     # This section for case of bill to credit card account
                     cdat = None
@@ -990,6 +996,18 @@ def isoB(indat):
             db.session.commit()
             gledger_write('newbill',nextjo,baccount,account)
 
+            # Check if shared account:
+            adat = Accounts.query.filter(Accounts.Name == baccount).first()
+            if adat is not None:
+                shared = adat.Shared
+                if isinstance(shared,str):
+                    divid, fromtoid, tofromid, mirrorid = json.loads(shared)
+                    print('found idlist', divid,fromtoid, tofromid, mirrorid)
+                    ddat = Divisions.query.get(divid)
+                    apportion = float(ddat.Apportion)
+                    appamt = float(bamt)*apportion
+                    gledger_app_write('app1',nextjo, cco, fromtoid, mirrorid, appamt)
+                    gledger_app_write('app2',nextjo, ddat.Co, mirrorid, tofromid, appamt)
 
             # reget because we need the bill unique id number in the document
             modata = Bills.query.filter(Bills.Jo == nextjo).first()
@@ -1007,7 +1025,9 @@ def isoB(indat):
                 myb.Status = 'Unpaid'
                 myb.pAmount = '0.00'
                 db.session.commit()
-                Gledger.query.filter((Gledger.Tcode == myb.Jo) & (Gledger.Type == 'AP')).delete()
+                Gledger.query.filter((Gledger.Tcode == myb.Jo) & (Gledger.Type == 'PD')).delete()
+                Gledger.query.filter((Gledger.Tcode == myb.Jo) & (Gledger.Type == 'PC')).delete()
+                db.session.commit()
                 err.append(f'Unpay Bill {myb.Jo} and remove from register')
             else:
                 err.append('Must select one Bill to Unpay')
@@ -1125,8 +1145,6 @@ def isoB(indat):
             bdata = Bills.query.order_by(Bills.bDate).all()
 
         if printck is not None or modlink == 6 or modlink == 12 or paynmake is not None or indat != '0':
-            fdata = myoslist(bill_path)
-            fdata.sort()
             if paynmake is not None:
                 bill = nonone(paynmake)
                 bdat = Bills.query.get(bill)
@@ -1145,6 +1163,7 @@ def isoB(indat):
             if (numchecked == 1 and bill > 0) or modlink == 6 or modlink == 12:
                 exit = 0
                 bdat = Bills.query.get(bill)
+
                 ifxfer = bdat.bType
                 if ifxfer == 'XFER':
                     acct_to = bdat.Company
@@ -1192,9 +1211,9 @@ def isoB(indat):
                     co = bdat.Co
                     expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co.contains(co))).all()
                     db.session.commit()
-
-                    pacct=bdat.pAccount
+                    pacct = bdat.pAccount
                     if pacct is not None and pacct != '0':
+                        print('paying bill from',bdat.pAccount)
                         gledger_write('paybill',bdat.Jo,bdat.bAccount,bdat.pAccount)
                     else:
                         err.append('No Account for Fund Withdrawal')
