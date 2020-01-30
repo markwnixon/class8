@@ -1970,7 +1970,7 @@ def isoT():
                                Type=myo.Type, Time3=None, Bid=myo.Bid, Lid=myo.Lid, Did=myo.Did, Label=myo.Label, Dropblock1=myo.Dropblock1,
                                Dropblock2=myo.Dropblock2, Commodity=myo.Commodity,Packing=myo.Packing, Links=myo.Links, Hstat=-1,
                                Istat=-1,Proof=None,Invoice=None,Gate=None,Package=None,Manifest=None,Scache=0,Pcache=0,
-                               Icache=0,Mcache=0,Pkcache=0)
+                               Icache=0,Mcache=0,Pkcache=0, QBi=0)
                 db.session.add(input)
                 db.session.commit()
                 err.append(f'Added new Order for {myo.Shipper} with JO {nextjo}')

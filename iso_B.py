@@ -867,7 +867,10 @@ def isoB(indat):
                         (People.Ptype == 'Vendor') | (People.Ptype == 'TowCo')) ).first()
                     if cdat is not None:
                         hv[7] = cdat.Company
-                        hv[8] = comp
+                        if comp == 'Pick' or comp is None:
+                            hv[8] = cdat.Idtype
+                        else:
+                            hv[8] = comp
                         if comp != cdat.Idtype:
                             err.append(f'**Warning** this is not the default company for this vendor')
                         ddat = Divisions.query.filter(Divisions.Co==cdat.Idtype).first()
@@ -889,11 +892,10 @@ def isoB(indat):
                             hv[9] = 'No'
 
             else:
-                modlink = 4 #reset the vondor feed back to bill feed
+                modlink = 4 #reset the vendor feed back to bill feed
                 cdat = None
 
             if cdat is not None:
-                print(cdat.Company, peep, cdat.Idtype, cdat.Associate1)
                 # Set account defaults for this vendor
                 ccode = cdat.Idtype
                 cchg = request.values.get('ctype')

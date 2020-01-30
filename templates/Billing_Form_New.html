@@ -34,9 +34,9 @@
             <td><div class="input-group-text">{{ cdat.Idtype }} Bill for Company:</div></td>
             <td>
                 <select class="form-control" type="text" name="ctype" onchange="this.form.submit()">
-                    <option value = 'Pick '>  Select Default Company/Division </option>
+                    <option value = 'Pick'>  Select Default Company/Division </option>
                     {% for divt in divdat %}
-                            <option {% if hv[8] == divt.Co %} selected {% endif %} value='{{ divt.Co }}'>  {{ divt.Name }} (Code {{ divt.Co }}) </option>
+                            <option {% if hv[8] == divt.Co %} selected {% endif %} value="{{ divt.Co }}">  {{ divt.Name }} (Code {{ divt.Co }}) </option>
                     {% endfor %}
                 </select>
             </td>

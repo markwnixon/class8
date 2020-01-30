@@ -109,7 +109,14 @@
     {% if tmap %}
             <option selected disabled> Select Tax Mapping </option>
             {% for tax in tmap %}
-                <option  {% if modata.Taxrollup == tax.Category+':'+tax.Name %} selected {% endif %} value='{{tax.Category}}:{{tax.Name}}'>{{tax.Category}}:{{tax.Name}}</option>
+                {% if tax.Name and tax.Category %}
+                    {% set taxname = tax.Category+':' + tax.Name %}
+                {% elif tax.Category %}
+                    {% set taxname = tax.Category %}
+                {% elif tax.Name %}
+                    {% set taxname = tax.Name %}
+                {% endif %}
+                <option  {% if modata.Taxrollup == taxname %} selected {% endif %} value='{{taxname}}'>{{taxname}}</option>
             {% endfor %}
     {% else %}
             <option selected disabled> Select Tax Mapping </option>

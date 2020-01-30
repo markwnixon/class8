@@ -2382,13 +2382,16 @@ def vendorlist(narrow):
 def get_tmap(atype, btype):
     print('atype is', atype)
     adat = Accttypes.query.filter(Accttypes.Name.contains(atype)).first()
-    ttype = stripper(adat.Taxtype)
+    if adat is not None:
+        ttype = stripper(adat.Taxtype)
+    else:
+        ttype = 'Not Tax Related'
     if btype == 'Direct':
         ttype = 'COGS'
     if ttype == 'Equity':
         ttype = 'Liabilities'
     print('ttype is',ttype)
-    tdat = Taxmap.query.filter((Taxmap.Category.contains(ttype)) | Taxmap.Name.contains(ttype)).all()
+    tdat = Taxmap.query.filter( (Taxmap.Category.contains(ttype)) | (Taxmap.Name.contains(ttype)) ).all()
     return tdat
 
 def get_qmap(atype, btype):

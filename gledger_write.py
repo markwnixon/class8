@@ -140,7 +140,12 @@ def gledger_write(bus,jo,acctdb,acctcr):
             amt=int(float(bdat.bAmount)*100)
             pid=bdat.Pid
             cdat=People.query.get(pid)
-            co=cdat.Company
+            if cdat is not None:
+                co=cdat.Company
+            else:
+                co = 'Not There'
+                print('Problem finding vendor')
+
             acctcr = 'Accounts Payable'
             print(acctdb,cc)
 
