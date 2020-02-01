@@ -61,7 +61,6 @@ def isoIncM():
         modify   =  request.values.get('Qmod')
         vmod   =  request.values.get('Vmod')
         viewo     =  request.values.get('View')
-        print    =  request.values.get('Print')
         returnhit = request.values.get('Return')
         deletehit = request.values.get('Delete')
         delfile = request.values.get('DELF')
@@ -164,10 +163,9 @@ def isoIncM():
         if depojo is None or acdeposit != acctsel:
             acdat = Accounts.query.filter(Accounts.Name==acctsel).first()
             if acdat is not None:
-                cofor=acdat.Co
+                cofor=acdat.Co + 'D'
                 todayyf = datetime.datetime.today().strftime('%Y-%m-%d')
                 nextjo = newjo(cofor, todayyf)
-                depojo =nextjo.replace('KT','KD').replace('JA','JD')
                 jdat=JO.query.filter(JO.jo==nextjo).first()
                 jdat.jo=depojo
                 depdata = [acctsel,cofor,depojo]
@@ -206,6 +204,7 @@ def isoIncM():
                     gledger_write('deposit',depojo,acctsel,0)
 
                 else:
+                    print(odervec)
                     cache,docref=reportmaker('deposit',odervec)
 
                 leftscreen = 0

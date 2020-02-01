@@ -17,8 +17,8 @@ def depositcalcs(odervec):
 
     for oder in odervec:
         myo = Income.query.get(oder)
-        ref = myo.Ref
-        odata = Income.query.filter(Income.Ref == ref).all()
+        jo = myo.Jo
+        odata = Income.query.filter(Income.Jo == jo).all()
         for odat in odata:
             jo = odat.Jo
             pid = int(odat.Pid)

@@ -14,7 +14,15 @@
       <select class="form-control" type="text" name="actype" onchange="this.form.submit()">
          <option value='Show All Accounts' {% if companyon == 'Show All Accounts' %} selected {% endif %}>Show All Accounts</option>
          {% for div in divdata %}
-         <option value='{{ div.Co }}' {% if companyon == div.Co %} selected {% endif %}>{{div.Name}}</option>
+         <option value='{{ div.Co }}' {% if companyon == div.Co %} selected {% endif %}>All Accounts for {{div.Name}}</option>
+         {% endfor %}
+          {% for div in divdata %}
+              {% for fmax in fmap %}
+                    {% if fmax.Co == div.Co %}
+                        {% set comboname = div.Co + ':' + fmax.Name %}
+                        <option value='{{ comboname }}' {% if companyon == comboname %} selected {% endif %}>Income/Expense for {{comboname}}</option>
+                   {% endif %}
+              {% endfor %}
          {% endfor %}
       <option value='Show Shared Accounts' {% if companyon == 'Show Shared Accounts' %} selected {% endif %}>Show Shared Accounts</option>
       </select>

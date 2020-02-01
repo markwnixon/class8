@@ -423,7 +423,13 @@ def isoB(indat):
                             modata.Jo=jo
                             db.session.commit()
                         print('line302:',modata.Jo,modata.bAccount,modata.pAccount)
-                        gledger_write('newbill',modata.Jo,modata.bAccount,modata.pAccount)
+                        ck_check = modata.bType
+                        if ck_check != 'Credit Card':
+                            gledger_write('newbill',modata.Jo,modata.bAccount,modata.pAccount)
+                        else:
+                            gledger_write('xfer', modata.Jo, modata.bAccount, modata.pAccount)
+                            err.append(f'Ledger xfer for {modata.Jo} to {modata.bAccount} from {modata.pAccount}')
+
 
                 if modal == 1:
                     calendar = 1
@@ -477,7 +483,7 @@ def isoB(indat):
                         if cdat is not None:
                                 # Set account defaults for this vendor
                             ccode = cdat.Idtype
-                            expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co == ccode)).all()
+                            expdata = Accounts.query.filter( ((Accounts.Type == 'Expense') & (Accounts.Co == ccode)) | ((Accounts.Type == 'Credit Card') & (Accounts.Co == ccode)) ).order_by(Accounts.Name).all()
                             print('Color Here',ccode)
                             diva = Divisions.query.filter(Divisions.Co == ccode).first()
                             if diva is not None:
@@ -493,7 +499,8 @@ def isoB(indat):
                     if bval is not None:
                         modata.Idtype = bval
                         db.session.commit()
-                        expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co.contains(bval))).all()
+                        ccode = bval
+                        expdata = Accounts.query.filter( ((Accounts.Type == 'Expense') & (Accounts.Co == ccode)) | ((Accounts.Type == 'Credit Card') & (Accounts.Co == ccode)) ).order_by(Accounts.Name).all()
 
 
                 # And now update the crossover to Storage in case the Company info changed:
@@ -616,7 +623,7 @@ def isoB(indat):
                 db.session.commit()
                 modata = Bills.query.get(bill)
 
-                expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co==co)).all()
+                expdata = Accounts.query.filter( ((Accounts.Type == 'Expense') & (Accounts.Co == co)) | ((Accounts.Type == 'Credit Card') & (Accounts.Co == co)) ).order_by(Accounts.Name).all()
                 leftsize = 8
                 leftscreen = 0
                 docref = f'tmp/{scac}/data/vbills/{modata.Original}'
@@ -640,7 +647,7 @@ def isoB(indat):
                     db.session.commit()
                     modata = People.query.get(peep)
 
-                expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co.contains(co))).all()
+                expdata = Accounts.query.filter( ((Accounts.Type == 'Expense') & (Accounts.Co == co)) | ((Accounts.Type == 'Credit Card') & (Accounts.Co == co)) ).order_by(Accounts.Name).all()
                 # peephold=peep
                 if vmod is not None:
                     err.append('There is no document available for this selection')
@@ -668,7 +675,7 @@ def isoB(indat):
             modata = People.query.filter(People.Ptype == 'NewVendor').first()
             peep = modata.id
             err.append('Enter Data for New Entity')
-            expdata = Accounts.query.filter(Accounts.Type == 'Expense').all()
+            expdata = Accounts.query.filter(Accounts.Type == 'Expense').order_by(Accounts.Name).all()
 
         if addE2 is not None:
             leftsize = 8
@@ -685,7 +692,8 @@ def isoB(indat):
             modata = People.query.filter(People.Ptype == 'NewVendor').first()
             peep = modata.id
             err.append('Enter Data for New Entity')
-            expdata = Accounts.query.filter(Accounts.Type == 'Expense').all()
+            expdata = Accounts.query.filter(Accounts.Type == 'Expense').order_by(Accounts.Name).all()
+
 
 # ____________________________________________________________________________________________________________________E.Add Entries
 
@@ -738,7 +746,7 @@ def isoB(indat):
             xferto = request.values.get('toacct')
             if xamt is None:
                 xamt = '0.00'
-            vdata = [bdate, ddate, xamt, new_desc, xferfrom, xferto]
+            vdata = [bdate, ddate, xamt, new_desc, xferto, xferfrom]
             print(vdata)
             expdata = Accounts.query.filter((Accounts.Type == 'Bank') | (Accounts.Type == 'Equity')).order_by(
                 Accounts.Name).all()
@@ -758,17 +766,18 @@ def isoB(indat):
             btype = 'XFER'
             bclass = 'Non-Expense'
             nextjo = newjo(billxfrcode, today)
+            co = nextjo[0]
 
             input = Bills(Jo=nextjo, Pid=0, Company=toacct, Memo=None, Description=xdesc, bAmount=xamt, Status='Paid', Cache=0, Original=None,
                              Ref=None, bDate=sdate, pDate=sdate, pAmount=xamt, pMulti=None, pAccount=fromacct, bAccount=toacct, bType=btype,
-                             bCat=bclass, bSubcat='', Link=None, User=username, Co=None, Temp1=None, Temp2=None, Recurring=0, dDate=today,
+                             bCat=bclass, bSubcat='', Link=None, User=username, Co=co, Temp1=None, Temp2=None, Recurring=0, dDate=today,
                              pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0)
 
             db.session.add(input)
             db.session.commit()
 
             modata = Bills.query.filter(Bills.Jo == nextjo).first()
-            gledger_write('xfer',nextjo,fromacct,toacct)
+            gledger_write('xfer',nextjo,toacct,fromacct)
             bill = modata.id
             leftscreen = 1
             err.append('All is well')
@@ -862,34 +871,31 @@ def isoB(indat):
 
             if modlink == 4:
                 thiscompany = request.values.get('thiscomp')
-                if '(Credit Card)' not in thiscompany:
-                    cdat = People.query.filter((People.Company == thiscompany) & (
-                        (People.Ptype == 'Vendor') | (People.Ptype == 'TowCo')) ).first()
-                    if cdat is not None:
-                        hv[7] = cdat.Company
-                        if comp == 'Pick' or comp is None:
-                            hv[8] = cdat.Idtype
-                        else:
-                            hv[8] = comp
-                        if comp != cdat.Idtype:
-                            err.append(f'**Warning** this is not the default company for this vendor')
-                        ddat = Divisions.query.filter(Divisions.Co==cdat.Idtype).first()
-                        if ddat is not None:
-                            err.append(f'Loading data for {thiscompany} Defaults')
-                            err.append(f'Bill for {cdat.Idtype}: {ddat.Name}')
+                cdat = People.query.filter((People.Company == thiscompany) & (
+                    (People.Ptype == 'Vendor') | (People.Ptype == 'TowCo')) ).first()
+                thisaccount = request.values.get('billacct')
+                ccdat = Accounts.query.filter(Accounts.Name == thisaccount).first()
+
+                if cdat is not None:
+                    hv[7] = cdat.Company
+                    if comp == 'Pick' or comp is None:
+                        hv[8] = cdat.Idtype
                     else:
-                        err.append(f'This company {thiscompany} not found in database')
+                        hv[8] = comp
+                    if comp != cdat.Idtype:
+                        err.append(f'**Warning** this is not the default company for this vendor')
+                    ddat = Divisions.query.filter(Divisions.Co==cdat.Idtype).first()
+                    if ddat is not None:
+                        err.append(f'Loading data for {thiscompany} Defaults')
+                        err.append(f'Bill for {cdat.Idtype}: {ddat.Name}')
                 else:
                     # This section for case of bill to credit card account
-                    cdat = None
-                    if thiscompany is not None:
-                        ccacct = thiscompany.replace(' (Credit Card)','')
-                        ccacct = stripper(ccacct)
-                        ccdat = Accounts.query.filter( (Accounts.Name == ccacct) & (Accounts.Type == 'CC') ).first()
-                        if ccdat is not None:
-                            hv[7] = thiscompany
-                            hv[8] = ccdat.Co
-                            hv[9] = 'No'
+                    thisaccount = request.values.get('billacct')
+                    ccdat = Accounts.query.filter( Accounts.Name == thisaccount ).first()
+                    if ccdat is not None:
+                        hv[7] = thiscompany
+                        hv[8] = ccdat.Co
+                        hv[9] = 'No'
 
             else:
                 modlink = 4 #reset the vendor feed back to bill feed
@@ -903,7 +909,7 @@ def isoB(indat):
                 if ddat is not None:
                     cdat.Idtype = ddat.Co
                     ccode = ddat.Co
-                expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co == ccode)).all()
+                expdata = Accounts.query.filter( ((Accounts.Type == 'Expense') & (Accounts.Co == ccode)) | ((Accounts.Type == 'Credit Card') & (Accounts.Co == ccode)) ).order_by(Accounts.Name).all()
 
             # Get information from previous bill paid by the vendor
 
@@ -939,7 +945,7 @@ def isoB(indat):
                     vdata = [bdate, ddate, bamt, bdesc]
             else:
                 ccode = hv[8]
-                expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co == ccode)).all()
+                expdata = Accounts.query.filter( ((Accounts.Type == 'Expense') & (Accounts.Co == ccode)) | ((Accounts.Type == 'Credit Card') & (Accounts.Co == ccode)) ).order_by(Accounts.Name).all()
                 vdata = [bdate, ddate, bamt, bdesc]
 
         if thisbill is not None:
@@ -957,6 +963,7 @@ def isoB(indat):
                 acomp = cdat.Company
                 cid = cdat.Accountid
                 aid = cdat.id
+                cc_check = cdat.Associate2
                 acdat = Accounts.query.filter(Accounts.id == cid).first()
                 if acdat is not None:
                     baccount = acdat.Name
@@ -971,13 +978,25 @@ def isoB(indat):
                     btype = ''
                     baccount = ''
             else:
-                acomp = None
-                aid = None
-                category = 'NAY'
-                subcat = 'NAY'
-                descript = ''
-                btype = ''
-                baccount = ''
+                # This section for case of bill to credit card account
+                thisaccount = request.values.get('billacct')
+                ccdat = Accounts.query.filter(Accounts.Name == thisaccount).first()
+                if ccdat is not None:
+                    acomp = ccdat.Name
+                    aid = ccdat.id
+                    category = ccdat.Category
+                    subcat = ccdat.Subcategory
+                    descript = ccdat.Description
+                    btype = ccdat.Type
+
+                else:
+                    acomp = None
+                    aid = None
+                    category = 'NAY'
+                    subcat = 'NAY'
+                    descript = ''
+                    btype = ''
+                    baccount = ''
 
             bdesc = request.values.get('bdesc')
             bamt = request.values.get('bamt')
@@ -985,7 +1004,10 @@ def isoB(indat):
             bcomp = request.values.get('bcomp')
             cco = request.values.get('ctype')
             print(f'Getting nextjo with {cco} and {today}')
-            nextjo = newjo(cco+'B', today)
+            if cc_check == 'Credit Card':
+                nextjo = newjo(cco+'X', today)
+            else:
+                nextjo = newjo(cco+'B', today)
             account = request.values.get('crataccount')
             baccount = request.values.get('billacct')
 
@@ -996,7 +1018,7 @@ def isoB(indat):
 
             db.session.add(input)
             db.session.commit()
-            gledger_write('newbill',nextjo,baccount,account)
+            if cc_check != 'Credit Card': gledger_write('newbill',nextjo,baccount,account)
 
             # Check if shared account:
             adat = Accounts.query.filter(Accounts.Name == baccount).first()
@@ -1029,6 +1051,8 @@ def isoB(indat):
                 db.session.commit()
                 Gledger.query.filter((Gledger.Tcode == myb.Jo) & (Gledger.Type == 'PD')).delete()
                 Gledger.query.filter((Gledger.Tcode == myb.Jo) & (Gledger.Type == 'PC')).delete()
+                Gledger.query.filter((Gledger.Tcode == myb.Jo) & (Gledger.Type == 'XD')).delete()
+                Gledger.query.filter((Gledger.Tcode == myb.Jo) & (Gledger.Type == 'XC')).delete()
                 db.session.commit()
                 err.append(f'Unpay Bill {myb.Jo} and remove from register')
             else:
@@ -1056,7 +1080,7 @@ def isoB(indat):
                     myb.Status = 'Paying'
                     db.session.commit()
                     co = myb.Co
-                    expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co.contains(co))).all()
+                    expdata = Accounts.query.filter( ((Accounts.Type == 'Expense') & (Accounts.Co == co)) | ((Accounts.Type == 'Credit Card') & (Accounts.Co == co)) ).order_by(Accounts.Name).all()
                 else:
                     err.append('Bill for single bill pay has been paid already')
                     exit = 1
@@ -1092,7 +1116,7 @@ def isoB(indat):
                     masterpid = myb.Pid
                     masterpayee = myb.Company
                     co = myb.Co
-                    expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co.contains(co))).all()
+                    expdata = Accounts.query.filter( ((Accounts.Type == 'Expense') & (Accounts.Co == co)) | ((Accounts.Type == 'Credit Card') & (Accounts.Co == co)) ).order_by(Accounts.Name).all()
                     if masteracct is None or len(masteracct) < 4:
                         masteracct = 'Industrial Bank'
                     for bill in bill_ids:
@@ -1211,12 +1235,20 @@ def isoB(indat):
                     leftsize = 8
                     leftscreen = 0
                     co = bdat.Co
-                    expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co.contains(co))).all()
+                    ck_check = bdat.bType
+                    expdata = Accounts.query.filter( ((Accounts.Type == 'Expense') & (Accounts.Co == co)) | ((Accounts.Type == 'Credit Card') & (Accounts.Co == co)) ).order_by(Accounts.Name).all()
                     db.session.commit()
                     pacct = bdat.pAccount
                     if pacct is not None and pacct != '0':
-                        print('paying bill from',bdat.pAccount)
-                        gledger_write('paybill',bdat.Jo,bdat.bAccount,bdat.pAccount)
+                        print('check is',ck_check)
+                        if ck_check == 'Credit Card':
+                            print('Doing the Transfer')
+                            gledger_write('xfer',bdat.Jo,bdat.bAccount,bdat.pAccount)
+                            err.append(f'Ledger xfer for {bdat.Jo} to {bdat.bAccount} from {bdat.pAccount}')
+                        else:
+                            print('Paying the Bill')
+                            gledger_write('paybill',bdat.Jo,bdat.bAccount,bdat.pAccount)
+                            err.append(f'Ledger paid {bdat.Jo} to {bdat.bAccount} from {bdat.pAccount}')
                     else:
                         err.append('No Account for Fund Withdrawal')
 
@@ -1313,7 +1345,7 @@ def isoB(indat):
     today = datetime.date.today()
     critday = datetime.date.today()+datetime.timedelta(days=7)
     bdata, cdata = dataget_B(hv[1],hv[0])
-    acdata = Accounts.query.filter((Accounts.Type == 'Bank') | (Accounts.Type == 'CC')).order_by(Accounts.Name).all()
+    acdata = Accounts.query.filter((Accounts.Type == 'Bank') | (Accounts.Type == 'Credit Card')).order_by(Accounts.Name).all()
     err = erud(err)
 
     return username, divdat, hv, bdata, cdata, bill, peep, err, modata, adata, acdata, expdata, modlink, caldays, daylist, weeksum, nweeks, addjobselect, jobdata, modal, dlist, fdata, today, cdat, pb, critday, vdata, leftscreen, docref, doctxt, leftsize, cache, filesel

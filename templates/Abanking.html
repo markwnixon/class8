@@ -19,7 +19,7 @@
 {% else %}
 
   <div class="row">
-    <div class="col-sm-12" align="center" style="font-weight:bold"> Revenues and Deposits </div>
+    <div class="col-sm-12" align="center" style="font-weight:bold"> Deposits and Withdrawals </div>
   </div>
   <div class="row">
 
@@ -51,7 +51,7 @@
               {% endif %}
                 <td class="{{atc}}">{{ data.id }}{{data.Reconciled}}</td>
                 <td class="{{atc}}">{{ data.Account }}</td>
-                <td class="{{atc}}">{{ data.Source }}</td>
+                <td class="{{atl}}">&nbsp; &nbsp;{{ data.Source }}</td>
                 <td class="{{atr}}">${{'%0.2f'| format((data.Debit/100)|float)}}  </td>
                 <td class="{{atr}}">${{'%0.2f'| format((data.Credit/100)|float)}}  </td>
                 <td class="{{atc}}">{{ data.Tcode }}</td>

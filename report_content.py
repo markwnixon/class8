@@ -157,12 +157,11 @@ def depositcontents(file4,itemlist,cache,nextjo,acctin,stamp):
     if stamp==1:
         c.setFont('Helvetica-Bold',14,leading=None)
         top=top-3*dh
-        depstamp = "tmp/pics/deposited.png"
+        depstamp = f"tmp/{scac}/pics/deposited.png"
         c.drawImage(depstamp, 135, 50, mask='auto')
         c.drawCentredString(307,65,today)
         jdat=JO.query.filter(JO.jo==nextjo).first()
         jdat.dinc=d2s(totals)
-        jdat.dexp=complist[0]
         db.session.commit()
 
     c.showPage()

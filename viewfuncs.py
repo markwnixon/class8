@@ -1709,6 +1709,11 @@ def dataget_Q(thismuch):
 
 def dataget_B(thismuch,co):
     today = datetime.date.today()
+    acct = None
+    if ':' in co:
+        co, acct = co.split(':')
+        print(co, acct)
+
     if co == 'X':
         if thismuch == '1':
             stopdate = today-datetime.timedelta(days=60)
@@ -1723,14 +1728,16 @@ def dataget_B(thismuch,co):
     else:
         if thismuch == '1':
             stopdate = today-datetime.timedelta(days=60)
-            bdata = Bills.query.filter( (Bills.Co.contains(co)) & (Bills.bDate > stopdate) ).all()
         elif thismuch == '2':
             stopdate = today-datetime.timedelta(days=120)
-            bdata = Bills.query.filter( (Bills.Co.contains(co)) & (Bills.bDate > stopdate) ).all()
         else:
-            stopdate = today - datetime.timedelta(days=10)
-            bdata = Bills.query.all()
-            vdata = People.query.filter( (People.Ptype=='Vendor') & (People.Idtype.contains(co)) ).order_by(People.Company).all()
+            stopdate = today - datetime.timedelta(days=700)
+
+        if acct is None:
+            bdata = Bills.query.filter((Bills.Co.contains(co)) & (Bills.bDate > stopdate)).all()
+        else:
+            bdata = Bills.query.filter( (Bills.Co.contains(co)) & (Bills.bDate > stopdate) & (Bills.pAccount == acct) ).all()
+        vdata = People.query.filter( (People.Ptype=='Vendor') & (People.Idtype.contains(co)) ).order_by(People.Company).all()
 
     return bdata,vdata
 

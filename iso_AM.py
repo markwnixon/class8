@@ -114,6 +114,10 @@ def isoAM():
             odata = Accounts.query.all()
         elif companyon == 'Show Shared Accounts':
             odata = Accounts.query.filter(Accounts.Shared != None).all()
+        elif ':' in companyon:
+            comp,focus = companyon.split(':')
+            print(comp,focus)
+            odata = Accounts.query.filter( (Accounts.Co==comp) & (Accounts.Subcategory==focus) ).all()
         else:
             odata = Accounts.query.filter((Accounts.Co.contains(companyon))).all()
 # ____________________________________________________________________________________________________________________B.Search.General
@@ -308,6 +312,7 @@ def isoAM():
     print(colordict)
     err = erud(err)
     atypes = Accttypes.query.all()
+    if fmap is None: fmap = Focusareas.query.all()
 
 
     return odata,oder,err,modata,modlink,leftscreen,leftsize,today,now,scdata,companyon,divdata,atypes,tmap,fmap,qmap, gmap, colordict

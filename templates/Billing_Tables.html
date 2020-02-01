@@ -8,83 +8,85 @@
             <thead>
             <tr class="yellow lighten-5 text-black text-center">
                 <th style="font-weight:bold" >ID</th>
-                <th style="font-weight:bold" >ForCo</th>
-                <th style="font-weight:bold" >BillNo</th>
+                <th style="font-weight:bold" >Co</th>
+                <th style="font-weight:bold" >Trans</th>
+                <th style="font-weight:bold" >CkNo</th>
 
-                <th style="font-weight:bold" >ExpAcct</th>
-                <th style="font-weight:bold" >Vendor</th>
+                <th style="font-weight:bold" >From Account</th>
+                <th style="font-weight:bold" >To/Vendor</th>
 
                 <th style="font-weight:bold" >Bill Date</th>
                 <th style="font-weight:bold" >Due Date</th>
-
                 <th style="font-weight:bold" >Amount</th>
+
+                <th style="font-weight:bold" >Chk</th>
+
+                <th style="font-weight:bold" >Paid Date</th>
                 <th style="font-weight:bold" >Paid</th>
                 <th style="font-weight:bold" >BalDue</th>
 
-                <th style="font-weight:bold" >Chk</th>
-                <th style="font-weight:bold" >From Account</th>
-                <th style="font-weight:bold" >Reference</th>
-                <th style="font-weight:bold" >Memo</th>
-
-                <th style="font-weight:bold" >Paid Date</th>
-                <th style="font-weight:bold" >Status</th>
-                <th style="font-weight:bold" >Description</th>
-
+                <th style="font-weight:bold" >ExpAcct</th>
                 <th style="font-weight:bold" >Type</th>
                 <th style="font-weight:bold" >Cat</th>
                 <th style="font-weight:bold" >Subcat</th>
+
+                <th style="font-weight:bold" >Memo</th>
+                <th style="font-weight:bold" >Status</th>
+                <th style="font-weight:bold" >Description</th>
+
+
             </tr>
             </thead>
             <tbody>
 
             {% for data in data1 %}
                 {% if data.Temp2=='Copy' %}
-                    {% set act="amber font-weight-bold text-center" %}
-                    {% set alt="amber font-weight-bold text-left" %}
+                    {% set act="amber font-weight-bold" %}
                 {% elif data.Status[0] == 'P' and data.Bal() != '0.00' %}
-                    {% set act="blue-text font-weight-bold text-center" %}
+                    {% set act="blue-text font-weight-bold" %}
                 {% elif data.Status[0] == 'P' %}
-                    {% set act="green-text font-weight-bold text-center" %}
+                    {% set act="green-text font-weight-bold" %}
                 {% elif data.dDate %}
                     {% if data.dDate < today %}
-                        {% set act="red white-text font-weight-bold text-center" %}
+                        {% set act="red white-text font-weight-bold" %}
                     {% elif data.dDate < critday  %}
-                        {% set act="amber font-weight-bold text-center" %}
+                        {% set act="amber font-weight-bold" %}
                     {% else %}
-                        {% set act="font-weight-bold text-center" %}
+                        {% set act="font-weight-bold" %}
                     {% endif %}
                 {% else %}
-                    {% set act="font-weight-bold text-center" %}
+                    {% set act="font-weight-bold" %}
                 {% endif %}
+                {% set alt = act + " text-left" %}
+                {% set art = act + " text-right" %}
+                {% set act = act + " text-center" %}
             <tr>
                 <td class="{{act}}" >{{ data.id }}</td>
                 <td class="{{act}}" >{{ data.Co}}</td>
                 <td class="{{act}}" >{{ data.Jo}}</td>
+                <td class="{{act}}" >{{ data.Ref}}</td>
 
-                <td class="{{act}}" >{{ data.bAccount }}</td>
-                <td class="{{act}}" >{{ data.Company}}</td>
-
-
+                <td class="{{act}}" >{{ data.pAccount}}</td>
+                <td class="{{alt}}" >{{ data.Company}}</td>
 
                 <td class="{{act}}" >{{ data.bDate }}</td>
                 <td class="{{act}}" >{{ data.dDate }}</td>
-
-                <td class="{{act}}" >{{ data.bAmount}}</td>
-                <td class="{{act}}" >{{ data.pAmount}}</td>
-                <td class="{{act}}" >{{ data.Bal()}}</td>
+                <td class="{{art}}" >{{ data.bAmount}}</td>
 
                 <td class="{{act}}" ><input class="align-middle" type="checkbox" name="bill{{data.id}}" value="{{data.id}}"></td>
-                <td class="{{act}}" >{{ data.pAccount}}</td>
-                <td class="{{act}}" >{{ data.Ref}}</td>
-                <td class="{{act}}" >{{ data.Memo}}</td>
 
                 <td class="{{act}}" >{{ data.pDate}}</td>
-                <td class="{{act}}" >{{ data.Status}}</td>
-                <td class="{{act}}" >{{ data.Description}}</td>
+                <td class="{{art}}" >{{ data.pAmount}}</td>
+                <td class="{{act}}" >{{ data.Bal()}}</td>
 
+                <td class="{{alt}}" >{{ data.bAccount }}</td>
                 <td class="{{act}}" >{{ data.bType }}</td>
                 <td class="{{act}}" >{{ data.bCat }}</td>
                 <td class="{{act}}" >{{ data.bSubcat }}</td>
+
+                <td class="{{alt}}" >{{ data.Memo}}</td>
+                <td class="{{act}}" >{{ data.Status}}</td>
+                <td class="{{alt}}" >{{ data.Description}}</td>
 
             </tr>
             {% endfor %}

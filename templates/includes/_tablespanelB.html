@@ -1,6 +1,6 @@
 
 <br>
-<b>Billing Data:</b> &nbsp
+<b>Transaction Data:</b> &nbsp
 <div class="custom-control custom-checkbox custom-control-inline">
   <input type="checkbox" class="custom-control-input" id="defaultInline1" {% if dlist[0]=='on' %} checked {% endif %} name="datatable1" onchange="this.form.submit()">
   <label class="custom-control-label" for="defaultInline1">Bills</label>
@@ -48,7 +48,14 @@
                 {% for div in divdat %}
                     <option value="{{ div.Co }}" {% if hv[0] == div.Co %} selected {% endif %}>{{ div.Name }}</option>
                 {% endfor %}
-            <option value="X" {% if hv[0] == 'X' %} selected {% endif %} >All Divisions</option>
+                {% for div in divdat %}
+                    {% for ac in acdata %}
+                        {% if div.Co == ac.Co %}
+                            {% set acname = div.Co + ':' + ac.Name %}
+                            <option value="{{ acname }}" {% if hv[0] == acname %} selected {% endif %}>{{ acname }}</option>
+                        {% endif %}
+                {% endfor %}{% endfor %}
+            <option value="X" {% if hv[0] == 'X' %} selected {% endif %} >All Companies/Divisions</option>
         </select>
     </div>
     &nbsp; &nbsp;

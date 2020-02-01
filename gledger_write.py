@@ -128,10 +128,25 @@ def gledger_write(bus,jo,acctdb,acctcr):
             acr=Accounts.query.filter((Accounts.Name=='Cash') & (Accounts.Co ==cc)).first()
             adb=Accounts.query.filter((Accounts.Name==acctdb) & (Accounts.Co ==cc)).first()
             # In this case jo is the deposit ticket code
-            input1 = Gledger(Debit=0,Credit=amt,Account='Cash',Aid=acr.id,Source=comp,Sid=pid,Type='DC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
-            input2 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=comp,Sid=pid,Type='DD',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
-            db.session.add(input1)
-            db.session.add(input2)
+            gdat = Gledger.query.filter((Gledger.Tcode==jo) & (Gledger.Type=='DC')).first()
+            if gdat is not None:
+                gdat.Account=acctcr
+                gdat.Credit=amt
+                gdat.Recorded=dt
+                gdat.Aid=acr.id
+            else:
+                input1 = Gledger(Debit=0,Credit=amt,Account='Cash',Aid=acr.id,Source=comp,Sid=pid,Type='DC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                db.session.add(input1)
+
+            gdat = Gledger.query.filter((Gledger.Tcode==jo) & (Gledger.Type=='DD')).first()
+            if gdat is not None:
+                gdat.Account=acctdb
+                gdat.Debit=amt
+                gdat.Recorded=dt
+                gdat.Aid=adb.id
+            else:
+                input2 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=comp,Sid=pid,Type='DD',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                db.session.add(input2)
             db.session.commit()
 
         print('bus=',bus)
@@ -263,22 +278,22 @@ def gledger_write(bus,jo,acctdb,acctcr):
             adb=Accounts.query.filter((Accounts.Name==acctdb)).first() #the expense account
             acr=Accounts.query.filter((Accounts.Name==acctcr)).first() #the asset account
 
-            if (adb.Type=='Asset' or adb.Type=='Bank') and (acr.Type=='Asset' or acr.Type=='Bank'):
+            #if (adb.Type=='Asset' or adb.Type=='Bank') and (acr.Type=='Asset' or acr.Type=='Bank'):
 
-                gdat1 = Gledger.query.filter((Gledger.Tcode==jo) & (Gledger.Aid==adb.id) & (Gledger.Type=='XD')).first()
-                gdat2 = Gledger.query.filter((Gledger.Tcode==jo) & (Gledger.Aid==acr.id) & (Gledger.Type=='XC')).first()
-                if gdat1 is not None:
-                    gdat1.Debit=amt
-                    gdat1.Recorded=dt
-                else:
-                    input1 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=acctcr,Sid=acr.id,Type='XD',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
-                    db.session.add(input1)
-                db.session.commit()
+            gdat1 = Gledger.query.filter((Gledger.Tcode==jo) & (Gledger.Aid==adb.id) & (Gledger.Type=='XD')).first()
+            gdat2 = Gledger.query.filter((Gledger.Tcode==jo) & (Gledger.Aid==acr.id) & (Gledger.Type=='XC')).first()
+            if gdat1 is not None:
+                gdat1.Debit=amt
+                gdat1.Recorded=dt
+            else:
+                input1 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=acctcr,Sid=acr.id,Type='XD',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                db.session.add(input1)
+            db.session.commit()
 
-                if gdat2 is not None:
-                    gdat2.Credit=amt
-                    gdat2.Recorded=dt
-                else:
-                    input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=acctdb,Sid=adb.id,Type='XC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
-                    db.session.add(input2)
-                db.session.commit()
+            if gdat2 is not None:
+                gdat2.Credit=amt
+                gdat2.Recorded=dt
+            else:
+                input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=acctdb,Sid=adb.id,Type='XC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                db.session.add(input2)
+            db.session.commit()

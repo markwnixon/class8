@@ -101,7 +101,7 @@ def reportmaker(type,thiscomp):
             stamp=1
         else:
             stamp=0
-        file2=addpath(f'tmp/{scac}/data/vreport/oslmdepositslip.pdf')
+        file2=addpath(f'tmp/{scac}/data/vreport/depositslip.pdf')
         print('thiscomp=',thiscomp)
         itemlist=depositcalcs(thiscomp)
         # We are creating a deposit for review so get the account to deposit into
