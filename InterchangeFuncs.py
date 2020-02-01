@@ -1,13 +1,24 @@
 from runmain import db
 from models import OverSeas, Orders, People, Interchange, Bookings
 from flask import session, request
-from viewfuncs import d2s, stat_update
+from viewfuncs import d2s, stat_update, hasinput
 import datetime
 import pytz
+from datetime import timedelta
 
 my_datetime = datetime.datetime.now(pytz.timezone('US/Eastern'))
 today = my_datetime.date()
 now = my_datetime.time()
+
+def real_use(bk,bol):
+    if hasinput(bk) and not hasinput(bol):
+        return bk
+    elif hasinput(bol) and not hasinput(bk):
+        return bol
+    elif hasinput(bk) and hasinput(bol):
+        return bk
+    else:
+        return None
 
 def InterStrip(id):
     data = Interchange.query.get(id)
@@ -108,68 +119,52 @@ def Remove_Dup_Jobs():
 
 
 
-def Matched_Now():
+def Match_Trucking_Now():
     odata=Orders.query.filter(Orders.Hstat < 2).all()
     for data in odata:
         container=data.Container
         if container is None:
             container='TBD'
-        idat = Interchange.query.filter((Interchange.Status=='IO') & ( (Interchange.RELEASE==data.Booking) | (Interchange.CONTAINER==data.Container) ) ).first()
-        idatO = Interchange.query.filter((Interchange.Status == 'BBBBBB') & ((Interchange.RELEASE == data.Booking) | (Interchange.CONTAINER == data.Container))).first()
+        bk = data.Booking
+        bol = data.BOL
+        bk = real_use(bk,bol)
+        if bk is None: bk = 'Book TBD'
 
-        if idat is not None:
-            hstat=data.Hstat
-            if hstat < 2:
-                data.Hstat = 2
-            if container=='TBD':
-                data.Container=idat.CONTAINER
+        start_date = data.Date - timedelta(30)
+        end_date = data.Date + timedelta(30)
+
+        idata = Interchange.query.filter( (Interchange.Status == 'IO') & (Interchange.Date > start_date) & (Interchange.Date < end_date) & ((Interchange.CONTAINER == container) | (Interchange.RELEASE == bk)) ).all()
+        if idata is not None:
+            for idat in idata:
+                if data.Hstat < 2: data.Hstat = 2
+                if container=='TBD': data.Container = idat.CONTAINER
+
+                idat.Company = data.Shipper
+                idat.Jo = data.Jo
+                rel = idat.RELEASE
+                if not hasinput(rel):
+                    idat.RELEASE = bk
+                if 'Out' in idat.TYPE:
+                    data.Date = idat.Date
+                if 'In' in idat.TYPE:
+                    data.Date2 = idat.Date
                 db.session.commit()
-        elif idatO is not None:
-            hstat=data.Hstat
-            if hstat < 2:
-                data.Hstat = 1
-            if container=='TBD':
-                data.Container=idatO.CONTAINER
-                db.session.commit()
+
         else:
-            idat2=Interchange.query.filter((Interchange.Status=='BBBBBB') & ( (Interchange.RELEASE==data.Booking) | (Interchange.CONTAINER==data.Container) ) ).first()
-            if idat2 is not None:
-                type=idat2.TYPE
-                if 'Out' in type:
-                    hstat = data.Hstat
-                    if hstat == 0:
-                        data.Hstat = 1
-                        con=data.Container
-                        if con is None or len(con<10):
-                            data.Container=idat.CONTAINER
-                        db.session.commit()
-
-    #idata=Interchange.query.filter(~Interchange.Jo.contains('F')).all()
-    idata=Interchange.query.filter(Interchange.Jo=='NAY').all()
-    for idat in idata:
-        container=idat.CONTAINER
-        booking=idat.RELEASE
-        tdat=Orders.query.filter( (Orders.Container==container) | (Orders.Booking==booking) ).first()
-        if tdat is not None:
-            idat.Jo=tdat.Jo
-            idat.Company=tdat.Shipper
-            if booking is None or len(booking)<5:
-                idat.RELEASE=tdat.Booking
-            db.session.commit()
-        odat=OverSeas.query.filter( (OverSeas.Container==container) | (OverSeas.Booking==booking) ).first()
-        if tdat is None and odat is not None:
-            idat.Jo=odat.Jo
-            idat.Company=odat.BillTo
-            if booking is None or len(booking)<5:
-                idat.RELEASE=odat.Booking
-            db.session.commit()
-        if odat is None and tdat is None:
-            chassis=idat.CHASSIS
-            if chassis is not None:
-                if 'jay' in chassis.lower():
-                    idat.Jo='Jay'
-                    idat.Company='Jays Auto'
-
+            idat = Interchange.query.filter( (Interchange.Date > start_date) & (Interchange.Date < end_date) & ((Interchange.CONTAINER == container) | (Interchange.RELEASE == bk)) ).first()
+            if idat is not None:
+                if data.Hstat == 0: data.Hstat = 1
+                if container=='TBD': data.Container = idat.CONTAINER
+                idat.Company = data.Shipper
+                idat.Jo = data.Jo
+                rel = idat.RELEASE
+                if not hasinput(rel):
+                    idat.RELEASE = bk
+                if 'Out' in idat.TYPE:
+                    data.Date = idat.Date
+                if 'In' in idat.TYPE:
+                    data.Date2 = idat.Date
+                db.session.commit()
 
 def InterRematch():
     for data in kdata:
@@ -294,23 +289,32 @@ def Push_Orders():
 
 def Order_Container_Update(oder):
     odat = Orders.query.get(oder)
-    booking=odat.Booking
-    container=odat.Container
-    idata=Interchange.query.filter( (Interchange.RELEASE==booking) | (Interchange.CONTAINER==container)).all()
+
+    bk = odat.Booking
+    bol = odat.BOL
+    bk = real_use(bk,bol)
+    if bk is None: bk = 'Book TBD'
+    container = odat.Container
+
+    start_date = odat.Date - timedelta(30)
+    end_date = odat.Date + timedelta(30)
+    idata = Interchange.query.filter( (Interchange.Date > start_date) & (Interchange.Date < end_date) & ( (Interchange.CONTAINER == container) | (Interchange.RELEASE==bk) ) ).all()
+
     for idat in idata:
         type=idat.TYPE
-        print(odat.Shipper)
         idat.Company=odat.Shipper
         idat.Jo=odat.Jo
+        if not hasinput(container) or container == 'TBD': odat.Container = idat.CONTAINER
         hstat=odat.Hstat
         if hstat is None:
             hstat = 0
-        if 'Out' in type and hstat<1:
-            odat.Hstat = 1
-            db.session.commit()
+        if 'Out' in type:
+            if hstat == 0: odat.Hstat = 1
+            odat.Date = idat.Date
         if 'In' in type:
             odat.Hstat = 2
-            db.session.commit()
+            odat.Date2 = idat.Date
+        db.session.commit()
 
 
 
@@ -436,3 +440,40 @@ def Check_Sailing():
 
                 data.Status=status
                 db.session.commit()
+
+def Match_Ticket(oder,tick):
+    myo = Orders.query.get(oder)
+    myi = Interchange.query.get(tick)
+
+    bk = myo.Booking
+    bol = myo.BOL
+    con = myi.CONTAINER
+    bk = real_use(bk,bol)
+
+    start_date = myi.Date - timedelta(30)
+    end_date = myi.Date + timedelta(30)
+    idata = Interchange.query.filter( (Interchange.Status == 'IO') & (Interchange.Date > start_date) & (Interchange.Date < end_date) & (Interchange.CONTAINER == con) ).all()
+
+    myo.Container = myi.CONTAINER
+    myo.Type = myi.CONTYPE
+    db.session.commit()
+
+    if idata is not None:
+        for idat in idata:
+            idat.Company = myo.Shipper
+            idat.Jo = myo.Jo
+            rel = idat.RELEASE
+            if not hasinput(rel):
+                idat.RELEASE = bk
+            if 'Out' in idat.TYPE:
+                myo.Date = idat.Date
+            if 'In' in idat.TYPE:
+                myo.Date2 = idat.Date
+            db.session.commit()
+    else:
+        myi.Company = myo.Shipper
+        myi.Jo = myo.Jo
+        rel = myi.RELEASE
+        if not hasinput(rel):
+            myi.RELEASE = bk
+        db.session.commit()

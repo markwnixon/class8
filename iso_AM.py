@@ -175,6 +175,7 @@ def isoAM():
 
             if oder>0:
                 modata=Accounts.query.get(oder)
+                err.append(f'Modify {modata.Name}:{modata.Co}:{modata.Type}')
 
                 if hasinput(modata.Type):
                     fmap = Focusareas.query.filter(Focusareas.Co == modata.Co).all()

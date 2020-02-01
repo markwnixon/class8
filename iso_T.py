@@ -2,20 +2,13 @@ from runmain import db
 from models import DriverAssign, Gledger, Vehicles, Invoices, JO, Income, Orders, Accounts, LastMessage, People, Interchange, Drivers, ChalkBoard, Services, Drops
 from flask import render_template, flash, redirect, url_for, session, logging, request
 from CCC_system_setup import myoslist, addpath, tpath, companydata, scac
-from InterchangeFuncs import Order_Container_Update, Matched_Now
-from iso_InvM import updateinvo
+from InterchangeFuncs import Order_Container_Update, Match_Trucking_Now, Match_Ticket
 from email_appl import etemplate_truck
 
-import math
-from decimal import Decimal
 import datetime
-import calendar
 import os
 import subprocess
-import shutil
-import re
 from func_cal import calmodalupdate
-from PyPDF2 import PdfFileReader
 import json
 
 def isoT():
@@ -54,8 +47,6 @@ def isoT():
 
         match, modify, vmod, minvo, mpack, viewo, viewi, viewp, printn, addE, addS, slim, stayslim, unslim, limitptype, returnhit, deletehit, update, invoupdate, emailnow, emailinvo, newjob, thisjob, recpay, hispay, recupdate, calendar, calupdate = viewbuttons()
         stampnow = request.values.get('stampnow')
-        #emailnow2 = request.values.get('emailnow2')
-        #emailinvo2 = request.values.get('emailInvo2')
         loginvo = request.values.get('logInvo')
         logrec = request.values.get('logRec')
         reorder = request.values.get('reorder')
@@ -1417,7 +1408,8 @@ def isoT():
             modlink = 20
             # We will create a blank line and simply modify that by updating:
             input = Interchange(CONTAINER='New', TRUCK_NUMBER='', DRIVER='', CHASSIS='', Date=None, RELEASE='', GROSS_WT='',
-                                SEALS='', SCALE_WT='', CARGO_WT='', Time=None, Status='Unmatched', Original='', Path='', TYPE='Empty Out', Jo='', Company='')
+                                SEALS='', CONTYPE='', CARGO_WT='', Time=None, Status='Unmatched', Original='', Path='', TYPE='Empty Out', Jo='', Company='')
+
             db.session.add(input)
             db.session.commit()
             modata = Interchange.query.filter(Interchange.CONTAINER == 'New').first()
@@ -1952,6 +1944,7 @@ def isoT():
             modata = Orders.query.filter(Orders.Jo == nextjo).first()
             cdata = People.query.filter(People.Ptype == 'Trucking').order_by(People.Company).all()
             oder = modata.id
+            Order_Container_Update(oder)
             leftscreen = 1
 # ____________________________________________________________________________________________________________________E.Newjob.Trucking
         if copy is not None:
@@ -2073,55 +2066,15 @@ def isoT():
         if match is not None:
 
             if numchecked == 0:
-                Matched_Now()
+                Match_Trucking_Now()
+                err.append('Ran Global Truck to Interchange Matcher')
 
-            if oder > 0 and tick > 0 and numchecked == 2:
-                myo = Orders.query.get(oder)
-                myi = Interchange.query.get(tick)
-                myo.Container = myi.CONTAINER
-                myo.Type = myi.CONTYPE
-                myi.Company = myo.Shipper
-                myi.Jo = myo.Jo
-                bk = myo.Booking
-                if bk is None:
-                    bk = ''
-                bol = myo.BOL
-                if bol is None:
-                    bol = ''
-                if len(bk)<4:
-                    crel = bol
-                elif len(bol)<4:
-                    crel = bk
-                else:
-                    crel = bk
-                rel = myi.RELEASE
-                if len(rel)<4:
-                    myi.RELEASE = crel
-                if len(bk)<4 and len(rel)>4:
-                        myo.Booking = rel
-                if len(bol)<4 and len(rel)>4:
-                        myo.BOL = rel
+            elif oder > 0 and tick > 0 and numchecked == 2:
+                Match_Ticket(oder,tick)
+                err.append(f'Ran Matcher for Truck ID {oder} and Interchange ID {tick}')
 
-
-                db.session.commit()
-
-            if tick > 0 and numchecked == 1:
-                myi = Interchange.query.get(tick)
-                type = myi.TYPE
-                if type == 'Load In':
-                    newtype = 'Empty Out'
-                if type == 'Empty Out':
-                    newtype = 'Load In'
-
-                input = Interchange(CONTAINER=myi.CONTAINER, TRUCK_NUMBER=myi.TRUCK_NUMBER, DRIVER=myi.DRIVER, CHASSIS=myi.CHASSIS,
-                                    Date=myi.Date, RELEASE=myi.RELEASE, GROSS_WT=myi.GROSS_WT,
-                                    SEALS=myi.SEALS, SCALE_WT=myi.SCALE_WT, CARGO_WT=myi.CARGO_WT,
-                                    Time=myi.Time, Status='AAAAAA', Original=' ', Path=' ', TYPE=newtype, Jo=None, Company=None)
-                db.session.add(input)
-                db.session.commit()
-
-            if numchecked != 2:
-                err.append('Must select exactly 2 boxes to use this option.')
+            else:
+                err.append('Must check one Truck Job and one Interchange Ticket to Match')
 # ____________________________________________________________________________________________________________________E.Matching.Trucking
 # ____________________________________________________________________________________________________________________B.Calendar.Trucking
         if calendar is not None or calupdate is not None:

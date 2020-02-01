@@ -41,13 +41,25 @@
 </select>
 </td>
 </tr>
-{% if modata.Type=='Expense' %}
+{% if modata.Type=='Expense'%}
 <tr>
 <td> <div class="input-group-text">Expense Category:</div></td>
 <td>
 <select class="form-control" type="text" name="acctcat" onchange="this.form.submit()">
 <option  {% if modata.Category == 'Choose' %} selected {% endif %} value='Choose'> Choose </option>
 <option  {% if modata.Category == 'G-A' %} selected {% endif %} value='G-A'> General and Administrative </option>
+<option  {% if modata.Category == 'Direct' %} selected {% endif %} value='Direct'> Direct to Focus Area </option>
+</select>
+</td>
+</tr>
+{% endif %}
+{% if modata.Type=='Income'%}
+<tr>
+<td> <div class="input-group-text">Income Category:</div></td>
+<td>
+<select class="form-control" type="text" name="acctcat" onchange="this.form.submit()">
+<option  {% if modata.Category == 'Choose' %} selected {% endif %} value='Choose'> Choose </option>
+<option  {% if modata.Category == 'General' %} selected {% endif %} value='General'> General </option>
 <option  {% if modata.Category == 'Direct' %} selected {% endif %} value='Direct'> Direct to Focus Area </option>
 </select>
 </td>
@@ -68,7 +80,7 @@
 </tr>
 {% endif %}
 
-{% if modata.Type=='Expense' and modata.Category=='Direct' %}
+{% if modata.Category=='Direct' %}
 <tr>
 <td> <div class="input-group-text">Direct Expense Type:</div></td>
 <td>

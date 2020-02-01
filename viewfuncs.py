@@ -2386,7 +2386,7 @@ def get_tmap(atype, btype):
         ttype = stripper(adat.Taxtype)
     else:
         ttype = 'Not Tax Related'
-    if btype == 'Direct':
+    if atype== 'Expense' and btype == 'Direct':
         ttype = 'COGS'
     if ttype == 'Equity':
         ttype = 'Liabilities'
@@ -2395,11 +2395,12 @@ def get_tmap(atype, btype):
     return tdat
 
 def get_qmap(atype, btype):
+    newatype=''
     print('qmap atype btype=', atype,btype)
-    if btype == 'Direct':
+    if atype == 'Expense' and btype == 'Direct':
         atype = 'Cost of Goods Sold'
-    if atype == 'Cash' or atype == 'Assets':
-        atype = 'Asset'
+    if 'asset' in atype.lower():
+        atype = 'asset'
     qdat = QBaccounts.query.filter(QBaccounts.Type.contains(atype)).all()
     return qdat
 
