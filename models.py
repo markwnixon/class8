@@ -948,23 +948,31 @@ class Income(db.Model):
     __tablename__ = 'income'
     id = db.Column('id', db.Integer, primary_key=True)
     Jo = db.Column('Jo', db.String(25))
-    SubJo = db.Column('SubJo', db.String(25))
+    Account = db.Column('Account', db.String(99))
     Pid = db.Column('Pid', db.Integer)
     Description = db.Column('Description', db.String(200))
-    Amount = db.Column('Amount', db.Numeric(10, 2))
+    Amount = db.Column('Amount', db.String(45))
     Ref = db.Column('Ref', db.String(25))
     Date = db.Column('Date', db.DateTime)
-    Original = db.Column('Original', db.String(50))
+    Original = db.Column('Original', db.String(99))
+    From = db.Column('From', db.String(45))
+    Bank = db.Column('Bank', db.String(45))
+    Date2 = db.Column('Date2', db.DateTime)
+    Depositnum = db.Column('Depositnum', db.String(45))
 
-    def __init__(self, Jo, SubJo, Pid, Description, Amount, Ref, Date, Original):
+    def __init__(self, Jo, Account, Pid, Description, Amount, Ref, Date, Original, From, Bank, Date2, Depositnum):
         self.Jo = Jo
-        self.SubJo = SubJo
+        self.Account = Account
         self.Pid = Pid
         self.Description = Description
         self.Amount = Amount
         self.Ref = Ref
         self.Date = Date
         self.Original = Original
+        self.From = From
+        self.Bank = Bank
+        self.Date2 = Date2
+        self.Depositnum = Depositnum
 
 
 class Bills(db.Model):

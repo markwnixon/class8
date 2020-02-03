@@ -22,7 +22,7 @@
     <div class="col-sm-12" align="center" style="font-weight:bold"> Revenues and Deposits </div>
   </div>
   <div class="row">
-    <div class="col-sm-12">
+    <div class="col-sm-12" align="center">
       {% set atc = "font-weight-bold text-center" %}
       {% set atlb = "font-weight-bold text-left blue-text" %}
       {% set atl = "font-weight-bold text-left" %}
@@ -33,13 +33,16 @@
 
                 <th class="{{atc}}">Id</th>
                 <th class="{{atc}}">Jo</th>
-                <th class="{{atc}}">Subjo</th>
+                <th class="{{atc}}">Received Into</th>
                 <th class="{{atc}}">Date</th>
-                <th class="{{atc}}">Pid</th>
+                <th class="{{atc}}">From</th>
                 <th class="{{atc}}">Description</th>
                 <th class="{{atc}}">Ck</th>
                 <th class="{{atc}}">Amount</th>
                 <th class="{{atc}}">Ref</th>
+                <th class="{{atc}}">Moved To</th>
+                <th class="{{atc}}">Date Deposited</th>
+                <th class="{{atc}}">Deposit Ticket</th>
             </tr>
             </thead>
             <tbody>
@@ -48,13 +51,16 @@
 
                 <td class="{{atc}}">{{ data.id }}</td>
                 <td class="{{atc}}">{{ data.Jo }}</td>
-                <td class="{{atc}}">{{ data.SubJo }}</td>
+                <td class="{{atc}}">{{ data.Account}}</td>
                 <td class="{{atc}}">{{ data.Date }}</td>
-                <td class="{{atc}}">{{ data.Pid}}</td>
-                <td class="{{atl}}">{{ data.Description}}</td>
+                <td class="{{atc}}">{{ data.From }}</td>
+                <td class="{{atl}}">{{ data.Description }}</td>
                 <td align="center"><input class="align-middle" type="checkbox" name="oder{{data.id}}" value="{{data.id}}"></td>
                 <td class="{{atr}}">$ {{ data.Amount }}</td>
                 <td class="{{atlb}}">&nbsp;&nbsp;{{ data.Ref }}</td>
+                <td class="{{atc}}">{{ data.Bank }}</td>
+                <td class="{{atc}}">{{ data.Date2 }}</td>
+                <td class="{{atc}}">{{ data.Depositnum }}</td>
             </tr>
             {% endfor %}
             </tbody>
@@ -71,25 +77,10 @@
 
 
 <div class="col-sm-{{rightsize}}">
-       <div class="row" align="center">
-           <div class="col-sm-12"  style="font-weight:bold">Control Panel</div>
-       </div>
-       <div class="row" align="center">
-           <div class="col-sm-12">
-
-            <table>
-               <tr class="small text-danger"><td>Messages</td></tr>
-                {% for e in err %}
-                <tr><td>{{e}}</td></tr>
-                {% endfor %}
-            </table>
-            <br>
-
-           </div>
-       </div>
        <div class="row">
            <div class="col-sm-12">
-
+           <br>
+            {% include 'includes/_controlpanelheader.html' %}
             {% if modlink != 1 and modlink != 10 %}
                {% include 'includes/_controlpanel_Inc.html' %}
             {% endif %}
@@ -104,13 +95,13 @@
                         <td colspan="2"><input class="form-control" type="text" value="{{modata.Jo}}" name="jo"></td>
                     </tr>
                     <tr>
-                        <td> <div class="input-group-text">Subjo:</div></td>
-                        <td colspan="2"><input class="form-control" type="text" value="{{modata.SubJo}}" name="subjo"></td>
+                        <td> <div class="input-group-text">Received Into:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Account}}" name="account"></td>
                     </tr>
 
                     <tr>
-                        <td> <div class="input-group-text">Pid:</div></td>
-                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Pid}}" name="pid"></td>
+                        <td> <div class="input-group-text">From:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.From}}" name="from"></td>
                     </tr>
 
                     <tr>
@@ -133,7 +124,18 @@
                         <td> <div class="input-group-text">Original:</div></td>
                         <td colspan="2"><input class="form-control" type="text" value="{{modata.Original}}" name="original"></td>
                     </tr>
-
+                    <tr>
+                        <td> <div class="input-group-text">Bank To:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Bank}}" name="bank"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Deposit Date:</div></td>
+                        <td colspan="2"><input class="form-control" type="date" value="{{modata.Date2}}" name="depdate"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Deposit Ref:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{modata.Depositnum}}" name="depositnum"></td>
+                    </tr>
                     </tbody></table>
                     <input type = "hidden" name ="oder" value= {{oder}}>
                 {% endif %}
@@ -159,10 +161,12 @@ acdeposit = {{depdata[0]}}
 thismuch = {{thismuch}}
 depojo = {{depdata[2]}}
 cofor = {{depdata[1]}}
+depdate = {{depdata[3]}}
 <input type = "hidden" name ="thismuch" value= "{{thismuch}}">
 <input type = "hidden" name ="depojo" value= "{{depdata[2]}}">
 <input type = "hidden" name ="cofor" value= "{{depdata[1]}}">
 <input type = "hidden" name ="acdeposit" value= "{{depdata[0]}}">
+<input type = "hidden" name ="depdate" value= "{{depdata[3]}}">
 <input type = "hidden" name ="oder" value= "{{oder}}">
 <input type = "hidden" name ="modlink" value= "{{modlink}}">
 <input type = "hidden" name ="cache" value= "{{cache}}">

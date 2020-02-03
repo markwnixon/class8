@@ -66,13 +66,13 @@ def depositcontents(file4,itemlist,cache,nextjo,acctin,stamp):
 
     #Main Items Listing
     c.setFont('Helvetica-Bold',14,leading=None)
-    c.drawCentredString(320,720,'Deposit Ticket '+nextjo)
-    c.drawCentredString(320,700,'Bank Account: '+acctin)
+    c.drawString(45,550,'Deposit Ticket '+nextjo)
+    c.drawString(45,530,'Bank Account: '+acctin)
 
 
     c.setFont('Helvetica-Bold',12,leading=None)
 
-    top = n2+dh
+    top = n2+dh-50
     c.drawString(place[0],top,'Checks Deposited: Details by Job Order')
 
     top = top - dl

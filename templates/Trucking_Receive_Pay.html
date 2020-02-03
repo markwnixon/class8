@@ -29,14 +29,12 @@
 <td colspan="2"><input class="form-control" type="date" name="recdate" value={{modata.Date}}></td>
 </tr>
 <tr>
-<td><div class="input-group-text">Funds Received as:</div></td>
+<td><div class="input-group-text">Funds Received As/To:</div></td>
 <td colspan="2">
 <select class="form-control" type="text" name="acctto">
 {% for b in bklist %}
-<option  {% if modata.SubJo == b %} selected {% endif %} value='{{b}}'>
-{% if b =='Cash' %} Cash or Single-Job Check
-{% elif b == 'Mcheck' %} Multi-Job Check
-{% elif b == 'Mremit' %} Multi-Job Remittance
+<option  {% if modata.Account == b %} selected {% endif %} value='{{b}}'>
+{% if b =='Undeposited Funds' %} Cash or Check
 {% else %} Direct to {{b}} {% endif %}
 
 </option>

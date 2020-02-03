@@ -690,6 +690,8 @@ def isoT():
                 db.session.commit()
             Income.query.filter(Income.Jo == odat.Jo).delete()
             Gledger.query.filter((Gledger.Tcode == odat.Jo) & (Gledger.Type == 'IC')).delete()
+            Gledger.query.filter((Gledger.Tcode == odat.Jo) & (Gledger.Type == 'ID')).delete()
+            Gledger.query.filter((Gledger.Tcode == odat.Jo) & (Gledger.Type == 'DD')).delete()
             db.session.commit()
 
         # Need this comment
@@ -1063,9 +1065,9 @@ def isoT():
             odat = Orders.query.get(invooder)
             jo = odat.Jo
             inc = Income.query.filter(Income.Jo==jo).first()
-            acctdb = inc.SubJo
-            if acctdb is None:
-                acctdb = 'Undeposited Funds'
+            acctdb = inc.Account
+            if acctdb is None: acctdb = 'Undeposited Funds'
+            if acctdb == 'Cash': acctdb = 'Undeposited Funds'
             gledger_write('income',jo,acctdb,0)
             odat.Istat = 4
             db.session.commit()
@@ -1456,13 +1458,10 @@ def isoT():
             if recpay is not None:
                 invooder = oder
             odat = Orders.query.get(invooder)
-
-
-
             invojo = odat.Jo
             co = invojo[0]
             acdata = Accounts.query.filter((Accounts.Type=='Bank') & (Accounts.Co == co)).order_by(Accounts.Name).all()
-            bklist = ['Cash', 'Mcheck', 'Mremit']
+            bklist = ['Undeposited Funds']
             for adat in acdata:
                 bklist.append(adat.Name)
 
@@ -1476,10 +1475,8 @@ def isoT():
                     custref = 'ChkNo'
                     acctdb = request.values.get('acctto')
 
-
-
             ldat = Invoices.query.filter(Invoices.Jo == invojo).first()
-            err.append('Have no Invoice to Receive Against')
+
             if ldat is not None:
                 invodate = ldat.Date
                 invoamt = ldat.Total
@@ -1499,8 +1496,9 @@ def isoT():
                     acctdb = 'Undeposited Funds'
 
                     print('acctdb=',acctdb)
-                    input = Income(Jo=odat.Jo, SubJo=acctdb, Pid=odat.Bid, Description=paydesc,
-                                   Amount=recamount, Ref=custref, Date=recdate, Original=docref)
+                    input = Income(Jo=odat.Jo, Account=acctdb, Pid=odat.Bid, Description=paydesc,
+                                   Amount=d2s(recamount), Ref=custref, Date=recdate, Original=os.path.basename(docref),
+                                   From=odat.Shipper,Bank=None,Date2=None,Depositnum=None)
                     db.session.add(input)
                     db.session.commit()
 
@@ -1523,7 +1521,19 @@ def isoT():
                     incdat.Description = desc
                     incdat.Date = recdate
                     incdat.Original = docref
-                    incdat.SubJo = acctdb
+                    incdat.Account = acctdb
+                    adat = Accounts.query.filter((Accounts.Name==acctdb) & (Accounts.Co==co)).first()
+                    if adat is not None:
+                        if adat.Type == 'Bank':
+                            incdat.Bank = acctdb
+                            incdat.Date2 = recdate
+                            incdat.Depositnum = custref
+                        else:
+                            incdat.Bank=None
+                            incdat.Date2=None
+                            incdat.Depositnum=None
+                    else:
+                        incdat.Bank, incdat.Date2, incdat.Depositnum = None, None, None
                     db.session.commit()
 
                 try:
@@ -1562,7 +1572,7 @@ def isoT():
                         for data in ldata:
                             data.Status = 'P'
 
-                    gledger_write('income',invojo,acctdb,0)
+                    #gledger_write('income',invojo,acctdb,0)
 
                 from make_T_invoice import T_invoice
                 T_invoice(odat, ldata, pdata1, pdata2, pdata3, cache, invodate, payment)
@@ -1584,6 +1594,8 @@ def isoT():
                 err.append('Viewing '+docref)
                 emaildata = etemplate_truck('paidinvoice', 0, odat)
                 viewtype = 'paidinvoice'
+            else:
+                err.append('Have no Invoice to Receive Against')
 
         if recpay is not None and (oder == 0 or numchecked != 1):
             err.append('Invalid selections')

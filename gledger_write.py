@@ -118,22 +118,26 @@ def gledger_write(bus,jo,acctdb,acctcr):
         if bus=='deposit':
             idat=JO.query.filter(JO.jo==jo).first()
             amt=int(float(idat.dinc)*100)
-            comp=idat.dexp
-            cdat=People.query.filter(People.Company==comp).first()
+            #For deposits the company reference is carried in as the accr input
+            cdat=People.query.filter(People.Company==acctcr).first()
             if cdat is not None:
-                pid=cdat.id
+                comp = cdat.Company
+                pid = cdat.id
             else:
                 pid=0
-
+                comp = acctcr
+            print('cc=',cc)
             acr=Accounts.query.filter((Accounts.Name=='Cash') & (Accounts.Co ==cc)).first()
             adb=Accounts.query.filter((Accounts.Name==acctdb) & (Accounts.Co ==cc)).first()
             # In this case jo is the deposit ticket code
             gdat = Gledger.query.filter((Gledger.Tcode==jo) & (Gledger.Type=='DC')).first()
             if gdat is not None:
-                gdat.Account=acctcr
+                gdat.Account='Cash'
                 gdat.Credit=amt
                 gdat.Recorded=dt
                 gdat.Aid=acr.id
+                gdat.Source=comp
+                gdat.Sid = pid
             else:
                 input1 = Gledger(Debit=0,Credit=amt,Account='Cash',Aid=acr.id,Source=comp,Sid=pid,Type='DC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
                 db.session.add(input1)
@@ -144,6 +148,8 @@ def gledger_write(bus,jo,acctdb,acctcr):
                 gdat.Debit=amt
                 gdat.Recorded=dt
                 gdat.Aid=adb.id
+                gdat.Source=comp
+                gdat.Sid = pid
             else:
                 input2 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=comp,Sid=pid,Type='DD',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
                 db.session.add(input2)

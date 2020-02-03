@@ -1,5 +1,5 @@
 from runmain import db
-from models import Income, Accounts, users, JO, Gledger
+from models import Income, Accounts, users, JO, Gledger, People
 from flask import session, logging, request
 import datetime
 import calendar
@@ -32,7 +32,7 @@ def isoIncM():
     if request.method == 'POST':
 # ____________________________________________________________________________________________________________________B.FormVariables.General
 
-        from viewfuncs import parseline, popjo, jovec, newjo, timedata, nonone, nononef
+        from viewfuncs import parseline, popjo, jovec, newjo, timedata, nonone, nononef, erud, hasinput
         from viewfuncs import numcheck, numcheckv, viewbuttons, get_ints, numcheckvec, numcheckv
 
         #Zero and blank items for default
@@ -49,8 +49,11 @@ def isoIncM():
             acdeposit = request.values.get('actype')
         depojo = request.values.get('depojo')
         cofor = request.values.get('cofor')
-        depdata = [acdeposit,cofor,depojo]
-
+        depdate = request.values.get('depdate')
+        print(depdate,hasinput(depdate))
+        if not hasinput(depdate): depdate = datetime.datetime.today().strftime('%Y-%m-%d')
+        depdata = [acdeposit,cofor,depojo,depdate]
+        print(depdata)
 
         today = datetime.date.today()
         now = datetime.datetime.now().strftime('%I:%M %p')
@@ -79,12 +82,12 @@ def isoIncM():
         modlink=nonone(modlink)
 
         leftscreen=1
-        err=['All is well', ' ', ' ', ' ', ' ']
+        err=[]
 
         if returnhit is not None:
             modlink=0
             depojo=0
-            depdata=[0,0,0]
+            depdata=[0,0,0,depdate]
 
 
 # ____________________________________________________________________________________________________________________E.FormVariables.General
@@ -93,21 +96,25 @@ def isoIncM():
         if modlink==1:
             if oder > 0:
                 modata=Income.query.get(oder)
-                vals=['jo','subjo','pid','description','amount','ref','pdate','original']
+                vals=['jo','account','from','description','amount','ref','pdate','original','bank','depdate','depositnum']
                 a=list(range(len(vals)))
                 for i,v in enumerate(vals):
                     a[i]=request.values.get(v)
 
                 modata.Jo=a[0]
-                modata.SubJo=a[1]
-                modata.Pid=a[2]
+                modata.Account=a[1]
+                modata.From=a[2]
                 modata.Description=a[3]
                 modata.Amount=a[4]
                 modata.Ref=a[5]
                 modata.Date=a[6]
                 modata.Original=a[7]
+                modata.Bank = a[8]
+                if a[9]=='': modata.Date2=None
+                else: modata.Date2=a[9]
+                modata.Depositnum = a[10]
                 db.session.commit()
-                err[3]= 'Modification to Income id ' + str(modata.id) + ' completed.'
+                err.append('Modification to Income id ' + str(modata.id) + ' completed.')
                 if update is not None:
                     modlink=0
                     leftsize=10
@@ -139,8 +146,7 @@ def isoIncM():
 
         if (modify is not None or vmod is not None) and numchecked!=1:
             modlink=0
-            err[0]=' '
-            err[2]='Must check exactly one box to use this option'
+            err.append('Must check exactly one box to use this option')
 # ____________________________________________________________________________________________________________________E.Modify.General
 
 # ____________________________________________________________________________________________________________________B.Delete.General
@@ -156,24 +162,29 @@ def isoIncM():
 
 
         if deletehit is not None and numchecked != 1:
-            err=[' ', ' ', 'Must have exactly one item checked to use this option', ' ',  ' ']
+            err.append('Must have exactly one item checked to use this option')
 
 
         acctsel = request.values.get('actype')
-        if depojo is None or acdeposit != acctsel:
-            acdat = Accounts.query.filter(Accounts.Name==acctsel).first()
-            if acdat is not None:
-                cofor=acdat.Co + 'D'
+        if acctsel is not None and not hasinput(depojo):
+            print(f'Getting depojo acctsel {acctsel}')
+            cofor = 0
+            if oder > 0:
+                inc = Income.query.get(oder)
+                jo = inc.Jo
+                cofor = jo[0]+'D'
+            else:
+                acdat = Accounts.query.filter(Accounts.Name==acctsel).first()
+                if acdat is not None:
+                    cofor=acdat.Co + 'D'
+            if cofor != 0:
                 todayyf = datetime.datetime.today().strftime('%Y-%m-%d')
-                nextjo = newjo(cofor, todayyf)
-                jdat=JO.query.filter(JO.jo==nextjo).first()
-                jdat.jo=depojo
-                depdata = [acctsel,cofor,depojo]
-                db.session.commit()
+                depojo = newjo(cofor, todayyf)
+                depdata = [acctsel,cofor,depojo,depdate]
 
 # ____________________________________________________________________________________________________________________E.Delete.General
         if (depositmake is not None or recdeposit is not None) and depojo is not None:
-            err=['Must have exactly one item checked to use this option', ' ',  ' ']
+            err.append('Must have exactly one item checked to use this option')
 
             odervec = numcheckv(odata)
             if len(odervec)>0:
@@ -190,18 +201,48 @@ def isoIncM():
 
                 if recdeposit is not None:
                     cache,docref=reportmaker('recdeposit',odervec)
+                    depojo = request.values.get('depojo')
+                    sourcelist=[]
                     for oder in odervec:
                         idat=Income.query.get(oder)
-                        subjo = idat.SubJo
+                        fromco = idat.From
+                        if fromco is None:
+                            cdat = People.query.get(idat.Pid)
+                            if cdat is not None:
+                                fromco = cdat.Company
+                            else: fromco = 'Unknown Source'
+                        if fromco not in sourcelist: sourcelist.append(fromco)
+                        acct = idat.Account
                         ref = idat.Ref
-                        idata = Income.query.filter((Income.SubJo==subjo) & (Income.Ref==ref) ).all()
-                        for data in idata:
-                            data.SubJo = depojo
+                        bank = request.values.get('acdeposit')
+                        date2 = request.values.get('depdate')
+                        if len(ref) > 2 and ref != 'ChkNo':
+                            idata = Income.query.filter((Income.Account==acct) & (Income.Ref==ref) ).all()
+                            for data in idata:
+                                data.Depositnum = depojo
+                                data.Bank = bank
+                                data.Date2 = date2
+                                data.From = fromco
+                                data.Original = os.path.basename(docref)
+                                db.session.commit()
+                        else:
+                            idat.Bank = bank
+                            idat.Date2 = date2
+                            idat.Depositnum = depojo
+                            idat.From = fromco
+                            idat.Original = os.path.basename(docref)
                             db.session.commit()
 
+                    print('Here',depojo,acctsel)
+                    if len(sourcelist)==1:
+                        sendsource = sourcelist[0]
+                    else:
+                        sendsource = json.dumps(sourcelist)
+                        if len(sendsource)>49:
+                            sendsource = 'Multiple Sources'
 
                     from gledger_write import gledger_write
-                    gledger_write('deposit',depojo,acctsel,0)
+                    gledger_write('deposit',depojo,acctsel,sendsource)
 
                 else:
                     print(odervec)
@@ -227,16 +268,15 @@ def isoIncM():
         if viewo is not None and numchecked == 1:
             if oder>0:
                 modata=Income.query.get(oder)
-                depojo = modata.SubJo
-                docref = f'tmp/{scac}/data/vdeposits/' + depojo + '.pdf'
+                filename = modata.Depositnum
+                docref = f'tmp/{scac}/data/vdeposits/' + filename + '.pdf'
                 leftscreen = 0
 
 
 
         if unrecord is not None and numchecked!=1:
             modlink=0
-            err[0]=' '
-            err[2]='Must check exactly one box to use this option'
+            err.append('Must check exactly one box to use this option')
 
 
 
@@ -249,9 +289,9 @@ def isoIncM():
 
     #This is the else for 1st time through (not posting data from overseas.html)
     else:
-        from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero
+        from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero,erud
         today = datetime.date.today()
-        #today = datetime.datetime.today().strftime('%Y-%m-%d')
+        today_str = datetime.datetime.today().strftime('%Y-%m-%d')
         now = datetime.datetime.now().strftime('%I:%M %p')
         oder=0
         modata=0
@@ -260,16 +300,17 @@ def isoIncM():
         leftscreen=1
         leftsize=10
         docref=''
-        err=['All is well', ' ', ' ', ' ',  ' ']
+        err=['Ready to make and review account deposits']
         thismuch = '2'
         udat=users.query.filter(users.name=='Cache').first()
         cache=udat.username
         cache=nonone(cache)
-        depdata = [0,0,0]
+        depdata = [0,0,0,today_str]
         odata = dataget_Inc(thismuch)
 
     leftsize = 8
     acdata = Accounts.query.filter(Accounts.Type=='Bank').all()
+    err = erud(err)
 
 
     return odata,oder,err,modata,modlink,leftscreen,leftsize,today,now,docref,cache,acdata,thismuch,depdata

@@ -4,7 +4,7 @@
 
 <div class="card">
   <div class="card-header">
-  Modify and Delete Payments Received on Jobs
+  Modify and Delete Payments Received
   </div>
   <div class="card-body" align="center">
     <button type="submit" class="btn btn-group-small btn-mdb-color my-small-btn" name="Qmod"
@@ -19,15 +19,25 @@
 </div>
 <div class="card">
   <div class="card-header">
-  Make a Remittanc or Bank Deposit for the Selected Account
+  Make a Deposit Ticket for Cash/Checks to Bank Account
   </div>
   <div class="card-body" align="center">
-    <select class="form-control" type="text" name="actype" onchange="this.form.submit()">
+      <div class="form-group row justify-content-center">
+            <div class="col-sm-4 input-group-text">Date of Deposit:</div>
+            <div class="col-sm-4">
+                 <input class="form-control" type="date" id="depate" value="{{depdata[3]}}" name="depdate">
+            </div>
+      </div>
+  <div class="form-group row justify-content-center">
+  <div class="col-sm-8">
+        <select class="form-control" type="text" name="actype" onchange="this.form.submit()">
        <option value='None' {% if acdeposit == 'None' %} selected {% endif %}>Choose Account to Receive Undeposited Funds</option>
        {% for data in acdata %}
        <option {% if acdeposit == data.Name %} selected {% endif %}  value="{{data.Name}}"> {{data.Co}}:&nbsp&nbsp  {{data.Name}} </option>
        {% endfor %}
     </select>
+  </div>
+  </div>
     <button type="submit" class="btn btn-group-small btn-blue my-small-btn" name="depositmake"
       data-toggle="tooltip" title="Create a deposit slip and a bank deposit that will match the bank statement"> Create The<br>Deposit</button>
     <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="recdeposit"
