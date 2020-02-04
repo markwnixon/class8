@@ -60,7 +60,6 @@ def isoT():
         datatable4 = request.values.get('datatable4')
         dlist = [datatable1, datatable2, datatable3, datatable4]
         addP = request.values.get('addproof')
-        loadc = request.values.get('loadc')
         thismuch = request.values.get('thismuch')
         acceptthese = request.values.get('accept')
         payview = request.values.get('payview')
@@ -81,7 +80,7 @@ def isoT():
         umc = request.values.get('UpdateColumn')
 
         print('lbox=', lbox)
-        viewtype = 0
+        viewtype, loadc = 0, 0
         doclist = [0]*8
         holdvec = [0] * 20
         if dlist[1] == 'on':
@@ -163,6 +162,12 @@ def isoT():
         if thisbox2 == '4':
             loadc = 1
         if thisbox2 == '5':
+            loadc = 2
+        if thisbox2 == '6':
+            loadc = 3
+        if thisbox2 == '7':
+            loadc = 4
+        if thisbox2 == '8':
             viewtype = 'columnadd'
 
         thisbox3 = request.values.get('invobox')
@@ -1968,7 +1973,7 @@ def isoT():
                 load = myo.Company[0:1]+nextjo[-5:]
                 order = myo.Company[0:1]+nextjo[-5:]
                 original = myo.Original
-                input = Orders(Status='A0', Jo=nextjo, Load=load, Order=order, Company=myo.Company, Location=None, Booking=myo.Booking, BOL=myo.BOL,
+                input = Orders(Status='A0', Jo=nextjo, Load=load, Order=order, Company=myo.Company, Location=None, Booking=None, BOL=None,
                                Container='TBD', Date=today, Driver=None, Company2=myo.Company2, Time=now, Date2=today, Time2=now,
                                Seal=myo.Seal, Pickup=myo.Pickup, Delivery=None, Amount=myo.Amount, Path=None, Original=original,
                                Description=myo.Description, Chassis=myo.Chassis, Detention='0', Storage='0', Release=0, Shipper=myo.Shipper,
@@ -2014,23 +2019,42 @@ def isoT():
 
 # ____________________________________________________________________________________________________________________B.ManualUpdate.Trucking
 
-        if loadc == 1:
+        if loadc > 0:
             if oder > 0:
                 odervec = numcheckv(odata)
                 for oder in odervec:
                     myo = Orders.query.get(oder)
                     hstat = myo.Hstat
                     istat = myo.Istat
-                    if hstat != 4:
-                        if istat == 4:
-                            myo.Hstat = 4
-                            err.append(f'Invoice Status for {myo.Jo} Updated to Paid Complete')
+                    if loadc == 1:
+                        if hstat == 3 and istat < 4:
+                            err.append('Cannot set hauling status to paid without invoice status paid')
                         else:
-                            myo.Hstat = 3
-                            err.append(f'Haul Status for {myo.Jo} Updated to Complete')
-                        db.session.commit()
-                    else:
-                        err.append(f'Load {myo.Jo} already has paid & complete status')
+                            hstat = hstat + 1
+                            err.append(f'Hauling on {myo.Jo} increased by 1')
+                    if loadc == 2:
+                        hstat = hstat - 1
+                        err.append(f'Hauling on {myo.Jo} decreased by 1')
+                    if loadc == 3:
+                        if istat < 3:
+                            istat = istat + 1
+                            err.append(f'Invoicing on {myo.Jo} increased by 1')
+                        else:
+                            err.append(f'Cannot manually set to paid, must receive payment')
+
+                    if loadc == 4:
+                        istat = istat - 1
+                        err.append(f'Invoicing on {myo.Jo} decreased by 1')
+                    if hstat < 0 : hstat = 0
+                    if istat < 0 : istat = 0
+
+                    if istat == 4 and hstat == 3:
+                        myo.Hstat = 4
+                        err.append(f'Invoice Paid so hauling updated for {myo.Jo} to complete with pay')
+
+                    myo.Hstat = hstat
+                    myo.Istat = istat
+                    db.session.commit()
             else:
                 err.append('Must check at least one box')
 
