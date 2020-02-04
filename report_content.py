@@ -10,7 +10,7 @@ import csv
 import math
 import datetime
 from runmain import db
-from models import JO, OverSeas, Orders, People, Invoices, Income, Interchange, Bills
+from models import JO, OverSeas, Orders, People, Invoices, Income, Interchange, Bills, Accounts
 import subprocess
 from CCC_system_setup import myoslist,addpath,addtxt, scac
 
@@ -49,6 +49,13 @@ def depositcontents(file4,itemlist,cache,nextjo,acctin,stamp):
 
     today = datetime.datetime.today().strftime('%m/%d/%Y')
     invodate = datetime.date.today().strftime('%m/%d/%Y')
+    adat = Accounts.query.filter(Accounts.Name==acctin).first()
+    if adat is not None:
+        rt = adat.Routing
+        an = adat.AcctNumber
+    else:
+        rt = 'Unknown'
+        an = 'Unknow'
 
 
     ltm,rtm,bump,tb,ctrall,left_ctr,right_ctr,dl,dh,tdl,hls,m1,m2,m3,m4,m5,m6,m7,n1,n2,n3=reportsettings(1)
@@ -68,6 +75,8 @@ def depositcontents(file4,itemlist,cache,nextjo,acctin,stamp):
     c.setFont('Helvetica-Bold',14,leading=None)
     c.drawString(45,550,'Deposit Ticket '+nextjo)
     c.drawString(45,530,'Bank Account: '+acctin)
+    c.drawString(305, 550, 'Account Number: ' + an)
+    c.drawString(305, 530, 'Bank Routing: ' + rt)
 
 
     c.setFont('Helvetica-Bold',12,leading=None)

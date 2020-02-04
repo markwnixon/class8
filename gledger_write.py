@@ -1,6 +1,30 @@
 from runmain import db
-from models import Gledger, Invoices, JO, Income, Orders, Bills, Accounts, Bookings, OverSeas, People, Interchange, Drivers, ChalkBoard, Services, Drops
+from models import Gledger, Invoices, JO, Income, Bills, Accounts, People, Focusareas
 import datetime
+from viewfuncs import stripper
+
+def check_revenue_acct(fd):
+    fdat = Focusareas.query.filter(Focusareas.Focusid==fd).first()
+    if fdat is not None:
+        focus = stripper(fdat.Name)
+        co = fdat.Co
+        revacct = f'{focus} Revenues'
+        adat = Accounts.query.filter((Accounts.Name == revacct) & (Accounts.Co == co)).first()
+        if adat is not None:
+            return revacct
+        else:
+            #Need to add this revenue account
+            input = Accounts(Name=revacct, Balance=0.00, AcctNumber=None, Routing=None, Payee=None,
+                             Type='Income',Description='Focus Area Revenue', Category='Direct', Subcategory=focus,
+                             Taxrollup='Income:Gross receipts or sales', Co=co,
+                             QBmap=None, Shared=None)
+            db.session.add(input)
+            db.session.commit()
+            return revacct
+    else:
+        return 'Error'
+
+
 
 def gledger_app_write(sapp,jo,cofor,id1,id2,amt):
     dt = datetime.datetime.now()
@@ -45,9 +69,11 @@ def gledger_write(bus,jo,acctdb,acctcr):
     if 1 == 1:
         dt = datetime.datetime.now()
         cc=jo[0] # this is the company we will be working on
+        fd=jo[1]
         if bus=='invoice':
             acctdb='Accounts Receivable'
-            acctcr='Revenues'
+            acctcr = check_revenue_acct(fd)
+            #acctcr='Revenues'
             idat=Invoices.query.filter(Invoices.Jo==jo).first()
             amt=int(float(idat.Total)*100)
             pid=idat.Pid

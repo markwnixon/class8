@@ -210,12 +210,14 @@ class Focusareas(db.Model):
     Income = db.Column('Income', db.String(45))
     Expenses = db.Column('Expenses', db.String(45))
     Co = db.Column('Co', db.String(10))
+    Focusid = db.Column('Focusid', db.String(10))
 
-    def __init__(self, Name, Income, Expenses, Co):
+    def __init__(self, Name, Income, Expenses, Co, Focusid):
         self.Name = Name
         self.Income = Income
         self.Expenses = Expenses
         self.Co = Co
+        self.Focusid = Focusid
 
 
 class Orders(db.Model):
