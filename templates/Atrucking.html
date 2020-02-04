@@ -44,6 +44,12 @@
                 {% endif %}
 
                 {% include 'Trucking_Tables.html' %}
+                {% if holdvec[0] == 'write_vec' %}
+                    {% set textlines = holdvec[1] %}
+                    {% for line in textlines %}
+                        {{ line }}<br>
+                    {% endfor %}
+                {% endif %}
 
                 {% if dlist[0]!= 'on' and dlist[1]!= 'on' and dlist[2]!= 'on' and dlist[3]!= 'on' %}
                         <div class="row">

@@ -80,7 +80,7 @@ def isoT():
         umc = request.values.get('UpdateColumn')
 
         print('lbox=', lbox)
-        viewtype, loadc = 0, 0
+        viewtype, loadc, write_text = 0, 0, 0
         doclist = [0]*8
         holdvec = [0] * 20
         if dlist[1] == 'on':
@@ -247,6 +247,8 @@ def isoT():
                 lbox, holdvec, err = driver_payroll(lbox, holdvec)
             #if lbox == 6:
                 #lbox, holdvec, err = container_list(lbox, holdvec)
+            if lbox == 8:
+                write_text = 1
 
 
 
@@ -550,6 +552,18 @@ def isoT():
             oder, tick, serv, peep, numchecked = numcheck(4, odata, idata, sdata, cdata, 0, ['oder',  'tick', 'serv', 'peep'])
         else:
             numchecked = 0
+
+        if write_text == 1:
+
+            odervec = numcheckv(odata)
+            keydata = [0]*len(odervec)
+            grandtotal = 0
+            for j, oder in enumerate(odervec):
+                odat = Orders.query.get(oder)
+                keydata[j] =f'{odat.Jo} {odat.Date} {odat.Booking} {odat.Container} {odat.Amount}'
+            holdvec[0] = 'write_vec'
+            holdvec[1] = keydata
+
 
         if uploadS is not None:
             if oder > 0  and numchecked == 1:
