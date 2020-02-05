@@ -4,12 +4,14 @@
 <div class="card-header">
         <div class="d-flex justify-content-around align-items-center">
         <div class="p-0">Enter New Bill Information</div>
+        </div>
+    <div class="d-flex justify-content-around align-items-center">
         <div class="p-0">
-            <button type="submit" class="btn btn-md btn-green" name="ThisBill"
+            <button type="submit" class="btn btn-sm btn-green" name="ThisBill"
                     data-toggle="tooltip" title="Create the Bill with Information in Form"><b>Create<br>New Bill</b></button>
-            <button type="submit" class="btn btn-md btn-blue" name="addentity2"
+            <button type="submit" class="btn btn-sm btn-blue" name="addentity2"
                     data-toggle="tooltip" title="Add a Vendor if it does not Exist Already"><b>Add A<br>Vendor</b></button>
-            <button type="submit" class="btn btn-md btn-elegant" name="Return"
+            <button type="submit" class="btn btn-sm btn-elegant" name="Return"
                     data-toggle="tooltip" title="Reset everything to the start screen"><b>Cancel<br>& Return</b></button>
         </div>
     </div>
@@ -24,7 +26,7 @@
             <td><div class="input-group-text">From Vendor:</div></td>
             <td>
                 <select class="form-control" type="text" name="thiscomp" onchange="this.form.submit()">
-                <option selected value='1'>Choose Later</option>
+                <option selected value='0'>Choose Later</option>
                 {% for vendor in vendors %}
                 <option {% if hv[7] == vendor %} selected {% endif %} value="{{vendor}}" > {{vendor}} </option>
                 {% endfor %}</select>
@@ -34,7 +36,7 @@
             <td><div class="input-group-text">{{ cdat.Idtype }} Bill for Company:</div></td>
             <td>
                 <select class="form-control" type="text" name="ctype" onchange="this.form.submit()">
-                    <option value = 'Pick'>  Select Default Company/Division </option>
+                    <option value = '0'>  Select Default Company/Division </option>
                     {% for divt in divdat %}
                             <option {% if hv[8] == divt.Co %} selected {% endif %} value="{{ divt.Co }}">  {{ divt.Name }} (Code {{ divt.Co }}) </option>
                     {% endfor %}
@@ -46,7 +48,7 @@
             <td><div class="input-group-text">{{cdat.Idtype}} Exp Account:</div></td>
             <td>
                 <select class="form-control" type="text" name="billacct" >
-                <option selected value='1'>Choose Later</option>
+                <option selected value='0'>Choose Later</option>
                 {% for data in expdata %}
                 <option {% if cdat.Associate1 == data.Name %} selected {% endif %} value="{{data.Name}}" > {{data.Name}} </option>
                 {% endfor %}</select>

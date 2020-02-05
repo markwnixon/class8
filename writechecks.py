@@ -1,5 +1,6 @@
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
+from reportlab.graphics.barcode import eanbc, qr, usps
 from reportlab.lib.pagesizes import landscape
 from reportlab.platypus import Image
 import csv
@@ -7,10 +8,18 @@ import math
 import datetime
 import shutil
 from viewfuncs import dollar
-from CCC_system_setup import addpath, scac
+from CCC_system_setup import addpath, scac, companydata
+
+def getzip(addr):
+    items = addr.split()
+    zip = items[-1]
+    if len(zip)==5 or len(zip)==10:
+        return zip
+    else:
+        return 0
 
 
-def writechecks(bdat, pdat, file1, sbdata, links):
+def writechecks(bdat, pdat, file1, sbdata, links, style):
 
     today = datetime.datetime.today().strftime('%m/%d/%Y')
     nbills = 1
@@ -158,7 +167,6 @@ def writechecks(bdat, pdat, file1, sbdata, links):
         word = word.strip()
         return word
 
-# 104382426112 One Hundred Four Billion Three Hundred Eighty Two Million Four Hundred Twenty Six Thousand One HUndred Twelve
 
     val1 = float(amount_num)
     val2 = math.floor(val1)
@@ -254,6 +262,8 @@ def writechecks(bdat, pdat, file1, sbdata, links):
     bcat = bdat.bCat
     bsubcat = bdat.bSubcat
 
+
+
     item11 = ['Date', 'PayRef', 'Type', 'Category', 'Subcategory', 'Amount Paid']
     item12 = [datestr, payref, btype, bcat, bsubcat, amount_num]
     item21 = ['BillNo', 'Check Made Out To', 'From Acct']
@@ -261,39 +271,66 @@ def writechecks(bdat, pdat, file1, sbdata, links):
     item3 = 'Memo on Check:'
     item41 = ['Address of Company:']
 
-    fulllinesat = [m1, m2, m3, m4, m4, m5, m6, m7, m8, m9, m10, m11, m12]
-    for i in fulllinesat:
-        c.line(ltm, i, rtm, i)
-
-    vlines1at = [ltm, n1, n2-40, n3-40, n4-40, n5, rtm]
-
-    for i in vlines1at:
-        c.line(i, m1, i, m3)
-        c.line(i, m7, i, m9)
-
-    p1 = n1
-    p2 = n5-60
-    vlines2at = [ltm, n1, p2, rtm]
-    for i in vlines2at:
-        c.line(i, m4, i, m6)
-        c.line(i, m10, i, m12)
+    if style == 1:
+        fulllinesat = [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12]
+        for i in fulllinesat:
+            c.line(ltm, i, rtm, i)
+        vlines1at = [ltm, n1, n2-40, n3-40, n4-40, n5, rtm]
+        for i in vlines1at:
+            c.line(i, m1, i, m3)
+            c.line(i, m7, i, m9)
+        p1 = n1
+        p2 = n5 - 60
+        vlines2at = [ltm, n1, p2, rtm]
+        for i in vlines2at:
+            c.line(i, m4, i, m6)
+            c.line(i, m10, i, m12)
+    else:
+        fulllinesat = [m7, m8, m9, m10, m11, m12]
+        for i in fulllinesat:
+            c.line(ltm, i, rtm, i)
+        vlines1at = [ltm, n1, n2-40, n3-40, n4-40, n5, rtm]
+        for i in vlines1at:
+            c.line(i, m7, i, m9)
+        p1 = n1
+        p2 = n5 - 60
+        vlines2at = [ltm, n1, p2, rtm]
+        for i in vlines2at:
+            c.line(i, m10, i, m12)
 
     dx = 80
     xoff = 18
     stretch = [0, -5, 15, 10, 10, 0]
-    for i in range(6):
-        x = avg(vlines1at[i], vlines1at[i+1])
-        c.drawCentredString(x, m2+bump, item11[i])
-        c.drawCentredString(x, m3+bump, str(item12[i]))
-        c.drawCentredString(x, m8+bump, item11[i])
-        c.drawCentredString(x, m9+bump, str(item12[i]))
 
-    for i in range(3):
-        x = avg(vlines2at[i], vlines2at[i+1])
-        c.drawCentredString(x, m5+bump, item21[i])
-        c.drawCentredString(x, m6+bump, str(item22[i]))
-        c.drawCentredString(x, m11+bump, item21[i])
-        c.drawCentredString(x, m12+bump, str(item22[i]))
+    if style == 1:
+        for i in range(6):
+            x = avg(vlines1at[i], vlines1at[i+1])
+            c.drawCentredString(x, m2+bump, item11[i])
+            c.drawCentredString(x, m3+bump, str(item12[i]))
+            c.drawCentredString(x, m8+bump, item11[i])
+            c.drawCentredString(x, m9+bump, str(item12[i]))
+
+        for i in range(3):
+            x = avg(vlines2at[i], vlines2at[i + 1])
+            c.drawCentredString(x, m5 + bump, item21[i])
+            c.drawCentredString(x, m6 + bump, str(item22[i]))
+            c.drawCentredString(x, m11 + bump, item21[i])
+            c.drawCentredString(x, m12 + bump, str(item22[i]))
+    else:
+
+        for i in range(6):
+            x = avg(vlines1at[i], vlines1at[i + 1])
+            c.drawCentredString(x, m8 + bump, item11[i])
+            c.drawCentredString(x, m9 + bump, str(item12[i]))
+
+        for i in range(3):
+            x = avg(vlines2at[i], vlines2at[i + 1])
+            c.drawCentredString(x, m11 + bump, item21[i])
+            c.drawCentredString(x, m12 + bump, str(item22[i]))
+
+
+
+
 
     mlev11 = m6-dl
     mlev12 = mlev11-dl
@@ -331,13 +368,13 @@ def writechecks(bdat, pdat, file1, sbdata, links):
         c.drawString(52, 592, memo)
 
     c.setFont('Helvetica', 12, leading=None)
-    c.drawString(ltm+20, mlev11, item3)
+    if style == 1: c.drawString(ltm+20, mlev11, item3)
     c.drawString(ltm+20, mlev21, item3)
 
     c.setFont('Helvetica', 10, leading=None)
     if links == 0:
         c.drawString(ltm+20, mlev12, memo)
-        c.drawString(ltm+20, mlev22, memo)
+        if style == 1: c.drawString(ltm+20, mlev22, memo)
         memoline2 = mlev12
         memoline3 = mlev22
 
@@ -346,7 +383,7 @@ def writechecks(bdat, pdat, file1, sbdata, links):
     except:
         pufrom = 'Pickup: Unknown'
     c.setFont('Helvetica', 12, leading=None)
-    c.drawString(ltm+20, memoline2-dl, 'Payee Address:')
+    if style == 1: c.drawString(ltm+20, memoline2-dl, 'Payee Address:')
     c.drawString(ltm+20, memoline3-dl, 'Payee Address:')
     c.setFont('Helvetica', 10, leading=None)
     if addr1 is None:
@@ -355,10 +392,30 @@ def writechecks(bdat, pdat, file1, sbdata, links):
         addr2 = ''
     if pufrom is None:
         pufrom = ''
-    c.drawString(ltm+20, memoline2-dl*2, company)
-    c.drawString(ltm+20, memoline2-dl*2-11, addr1)
-    c.drawString(ltm+20, memoline2-dl*2-22, addr2)
-    c.drawString(ltm+20, memoline2-dl*2-44, pufrom)
+    if style == 1:
+        c.drawString(ltm+20, memoline2-dl*2, company)
+        c.drawString(ltm+20, memoline2-dl*2-11, addr1)
+        c.drawString(ltm+20, memoline2-dl*2-22, addr2)
+        c.drawString(ltm+20, memoline2-dl*2-44, pufrom)
+    else:
+        cdata = companydata()
+        c.setFont('Helvetica', 12, leading=None)
+        offup = 5
+        c.drawString(50, m2+offup, cdata[2])
+        c.drawString(50, m2+offup-14, cdata[5])
+        c.drawString(50, m2+offup-28, cdata[6])
+        memoline2 = memoline2 - 15
+        c.drawString(ltm+70, memoline2, company)
+        c.drawString(ltm+70, memoline2-14, addr1)
+        c.drawString(ltm+70, memoline2-28, addr2)
+        zip = getzip(addr2)
+        print('myzipcode is',zip)
+        if zip != 0:
+            barcode_usps = usps.POSTNET(zip)
+            barcode_usps.drawOn(c,ltm+70,memoline2-42)
+        c.setFont('Helvetica', 10, leading=None)
+
+
     c.drawString(ltm+20, memoline3-dl*2, company)
     c.drawString(ltm+20, memoline3-dl*2-11, addr1)
     c.drawString(ltm+20, memoline3-dl*2-22, addr2)
@@ -374,17 +431,17 @@ def writechecks(bdat, pdat, file1, sbdata, links):
 
     if nbills == 1:
         if btype == 'Expense':
-            c.drawString(ltm+230, mlev11, 'Expensed Account Name: '+ acct + ' (' + comp + ')')
+            if style == 1: c.drawString(ltm+230, mlev11, 'Expensed Account Name: '+ acct + ' (' + comp + ')')
             c.drawString(ltm+230, mlev21, 'Expensed Account Name: '+ acct + ' (' + comp + ')')
             mlev21 = mlev21-2*dl
             mlev11 = mlev11-2*dl
 
-        c.drawString(ltm+230, mlev11, 'Full Description:')
+        if style == 1: c.drawString(ltm+230, mlev11, 'Full Description:')
         c.drawString(ltm+230, mlev21, 'Full Description:')
         for i, line in enumerate(desc.splitlines()):
             mlev21 = mlev21-dl
             mlev11 = mlev11-dl
-            c.drawString(ltm+230, mlev11, line)
+            if style == 1: c.drawString(ltm+230, mlev11, line)
             c.drawString(ltm+230, mlev21, line)
 
     if nbills > 1:
@@ -399,12 +456,12 @@ def writechecks(bdat, pdat, file1, sbdata, links):
         s3 = ltm+380
         s4 = ltm+480
         if btype == 'Expense':
-            c.drawString(ltm+230, mlev11, 'Expensed Account Name: '+ acct + ' (' + comp + ')')
+            if style == 1: c.drawString(ltm+230, mlev11, 'Expensed Account Name: '+ acct + ' (' + comp + ')')
             c.drawString(ltm+230, mlev21, 'Expensed Account Name: '+ acct + ' (' + comp + ')')
             mlevtop = mlev21-2*dl
             mlevbot = mlev11-2*dl
         c.setFont('Helvetica-Bold', 12, leading=None)
-        c.drawString(s1, mlevtop+dl, 'Multi-bill payment:')
+        if style == 1: c.drawString(s1, mlevtop+dl, 'Multi-bill payment:')
         c.drawString(s1, mlevbot+dl, 'Multi-bill payment:')
         c.drawString(s1, mlevtop, 'ID')
         c.drawString(s2, mlevtop, 'Bill No / JO')

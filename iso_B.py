@@ -14,7 +14,6 @@ compdata = companydata()
 billexpcode = compdata[10]+'B'
 billxfrcode = compdata[10]+'X'
 
-
 def isoB(indat):
 
     if request.method == 'POST':
@@ -27,7 +26,7 @@ def isoB(indat):
         bill_path = 'processing/bills'
         bill, peep, cache, modata, modlink, fdata, adata, cdat, pb, passdata, vdata, caldays, daylist, weeksum, nweeks = init_billing_zero()
         filesel, docref, search11, search12, search13, search14, search21, search22, bType, bClass = init_billing_blank()
-        expdata, addjobselect, jobdata, modal, viewck = 0, 0, 0, 0, 0
+        expdata, addjobselect, jobdata, modal, viewck, towco = 0, 0, 0, 0, 0, 0
 
         hv = [0]*20
         divdat = Divisions.query.all()
@@ -257,9 +256,7 @@ def isoB(indat):
             csize = People.query.filter(People.Ptype == 'TowCo').order_by(People.Company).all()
             bill = modata.id
             leftscreen = 1
-            bdata = Bills.query.order_by(Bills.bDate).all()
-            cdata = People.query.filter((People.Ptype == 'Vendor') | (
-                People.Ptype == 'TowCo')).order_by(People.Company).all()
+            towco = 1
             modlink = 12
 # ____________________________________________________________________________________________________________________E.QuickBillPayTowing
 
@@ -290,6 +287,10 @@ def isoB(indat):
             print('Yes Here')
             if bill > 0:
                 modata = Bills.query.get(bill)
+                cdat = People.query.filter(People.Company==modata.Company).first()
+                if cdat is not None:
+                    if cdat.Ptype == 'TowCo': towco = 1
+                    print('towco in setter',towco)
                 ifxfer = modata.bType
                 if ifxfer == 'XFER':
                     vals = ['fromacct', 'toacct', 'pamt', 'bref',
@@ -365,10 +366,12 @@ def isoB(indat):
                             People.Ptype == 'TowCo') | (People.Ptype == 'Overseas'))).first()
                         if cdat is not None:
                             modata.Pid = cdat.id
+                            if cdat.Ptype == 'TowCo': towco = 1
                         else:
                             cdat = People.query.filter(People.Company == modata.Company).first()
                             if cdat is not None:
                                 modata.Pid = cdat.id
+                                if cdat.Ptype == 'TowCo': towco = 1
                             else:
                                 modata.Pid = 0
                         modata.Memo = a[7]
@@ -518,8 +521,8 @@ def isoB(indat):
             print('leftscreen on exit',leftscreen)
 
 # ____________________________________________________________________________________________________________________B.UpdateDatabasesSection
-
-        bdata, cdata = dataget_B(hv[1],hv[0])
+        print('towco=',towco)
+        bdata, cdata = dataget_B(hv[1],hv[0],towco)
 # ____________________________________________________________________________________________________________________B.SearchFilters
 
         if modlink < 5:
@@ -865,30 +868,49 @@ def isoB(indat):
             ddate = request.values.get('bdate')
             bamt = request.values.get('bamt')
             bdesc = request.values.get('bdesc')
-            comp = request.values.get('ctype')
             narrow = 1
             hv[5], hv[6] = vendorlist(narrow)
 
             if modlink == 4:
                 thiscompany = request.values.get('thiscomp')
-                cdat = People.query.filter((People.Company == thiscompany) & (
-                    (People.Ptype == 'Vendor') | (People.Ptype == 'TowCo')) ).first()
-                thisaccount = request.values.get('billacct')
+                form_co = request.values.get('ctype')
+                form_exp = request.values.get('billacct')
+                if thiscompany != '0':
+                    cdat = People.query.filter((People.Company == thiscompany) & (
+                        (People.Ptype == 'Vendor') | (People.Ptype == 'TowCo')) ).first()
+                    if cdat is not None:
+                        default_co = cdat.Idtype
+                        default_exp = cdat.Associate1
+                    else:
+                        default_co = None
+                        default_exp = None
+                else:
+                    default_co = None
+                    default_exp = None
+
+                if form_co == '0':
+                    comp = default_co
+                else:
+                    comp = form_co
+                if form_exp == '0':
+                    thisaccount = default_exp
+                else:
+                    thisaccount = form_exp
+                hv[8] = comp
+
                 ccdat = Accounts.query.filter(Accounts.Name == thisaccount).first()
 
                 if cdat is not None:
                     hv[7] = cdat.Company
-                    if comp == 'Pick' or comp is None:
-                        hv[8] = cdat.Idtype
-                    else:
-                        hv[8] = comp
-                    if comp != cdat.Idtype:
-                        err.append(f'**Warning** this is not the default company for this vendor')
+                    cdat.Idtype = comp
+                    cdat.Associate1 = thisaccount
+                    db.session.commit()
+
                     ddat = Divisions.query.filter(Divisions.Co==cdat.Idtype).first()
                     if ddat is not None:
                         err.append(f'Loading data for {thiscompany} Defaults')
                         err.append(f'Bill for {cdat.Idtype}: {ddat.Name}')
-                else:
+                elif thiscompany != 0:
                     # This section for case of bill to credit card account
                     thisaccount = request.values.get('billacct')
                     ccdat = Accounts.query.filter( Accounts.Name == thisaccount ).first()
@@ -1230,7 +1252,7 @@ def isoB(indat):
 
                     from writechecks import writechecks
 
-                    writechecks(bdat, pdat, docref, sbdata, links)
+                    writechecks(bdat, pdat, docref, sbdata, links, 2)
                     modlink = 6
                     leftsize = 8
                     leftscreen = 0
@@ -1337,6 +1359,7 @@ def isoB(indat):
         jobdata = 0
         modal = 0
         expdata = 0
+        towco = 0
         divdat = Divisions.query.all()
 
         err.append('All is well')
@@ -1344,7 +1367,8 @@ def isoB(indat):
     rightsize = 12 - leftsize
     today = datetime.date.today()
     critday = datetime.date.today()+datetime.timedelta(days=7)
-    bdata, cdata = dataget_B(hv[1],hv[0])
+    print('final twoco',towco)
+    bdata, cdata = dataget_B(hv[1],hv[0],towco)
     acdata = Accounts.query.filter((Accounts.Type == 'Bank') | (Accounts.Type == 'Credit Card')).order_by(Accounts.Name).all()
     err = erud(err)
 
