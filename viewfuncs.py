@@ -540,7 +540,7 @@ def timedata(subdata1):
         jol=jovec(jo)
         m=0
         for j in jol:
-            idat=Invoices.query.filter(Invoices.SubJo==j).first()
+            idat=Invoices.query.filter(Invoices.Subjo==j).first()
             if idat is not None:
                 if idat.Total is not None:
                     mdata[m]=str(idat.Total)
@@ -729,7 +729,7 @@ def money12(basejo):
 
     for m,j in enumerate(jol):
         idat=Invoices.query.filter(Invoices.SubJo==j).first()
-        pdat=Income.query.filter(Income.SubJo==j).first()
+        pdat=Income.query.filter(Income.Account==j).first()
         invoamt=0.00
         incoamt=0.00
         if idat is not None:
@@ -2185,7 +2185,7 @@ def get_invo_data(invo, holdvec):
                         err.append(f'Creating New Payment on Jo {invojo}')
                         paydesc = f'Received payment on Invoice {invojo}'
 
-                        input = Income(Jo=odat.Jo, SubJo=acctdb, Pid=odat.Bid, Description=paydesc,
+                        input = Income(Jo=odat.Jo, Account=acctdb, Pid=odat.Bid, Description=paydesc,
                                        Amount=recamount, Ref=custref, Date=recdate, Original=None)
                         db.session.add(input)
                         db.session.commit()
