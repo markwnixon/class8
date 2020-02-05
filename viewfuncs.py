@@ -2123,20 +2123,26 @@ def get_invo_data(invo, holdvec):
     print('amts=',amts)
     print(holdvec[7],holdvec[8])
     depmethod = request.values.get('paymethod')
+    depref=None
     if depmethod is None:
         deps = ['Choose Pay Method First']
         acctdb = 'None'
+        bank = None
     elif depmethod == 'Cash' or depmethod == 'Check':
         deps = ['Undeposited Funds']
         acctdb = 'Undeposited Funds'
+        bank = None
     elif depmethod == 'Credit Card':
         acctdb = request.values.get('acctfordeposit')
+        bank = acctdb
         deps = []
         acdata = Accounts.query.filter((Accounts.Type == 'Bank') & (Accounts.Description.contains('Merchant'))).all()
         for acd in acdata:
             deps.append(acd.Name)
     elif depmethod == 'Direct Deposit':
         acctdb = request.values.get('acctfordeposit')
+        bank = acctdb
+        depref = holdvec[8]
         #Get the account for deposit listing and the account for deposit selection:
         deps = []
         acdata = Accounts.query.filter( (Accounts.Type == 'Bank') | (Accounts.Type == 'Exch') ).all()
@@ -2186,7 +2192,7 @@ def get_invo_data(invo, holdvec):
                         paydesc = f'Received payment on Invoice {invojo}'
 
                         input = Income(Jo=odat.Jo, Account=acctdb, Pid=odat.Bid, Description=paydesc,
-                                       Amount=recamount, Ref=custref, Date=recdate, Original=None)
+                                       Amount=recamount, Ref=custref, Date=recdate, Original=None,From=odat.Shipper,Bank=bank,Date2=recdate,Depositnum=depref)
                         db.session.add(input)
                         db.session.commit()
 
