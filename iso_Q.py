@@ -154,10 +154,13 @@ def add_quote_emails():
     password = passwords['quot']
     dayback = 7
     datefrom = (datetime.date.today() - datetime.timedelta(dayback)).strftime("%d-%b-%Y")
+    print(username, password, datefrom, imap_url)
     con = imaplib.IMAP4_SSL(imap_url)
     con.login(username, password)
     con.select('INBOX')
+    print('log in ok')
     result, data = con.search(None,(f'since {datefrom}'))
+    print('got here')
     msgs = get_emails(data, con)
     #msgs = get_emails(search_from_date('TO', 'ALL', con, datefrom), con)
 
@@ -743,7 +746,7 @@ def isoQuote():
 
 
     else:
-
+        print('Entering Quotes1',flush=True)
         username = session['username'].capitalize()
         qdat=None
         locto = 'Capitol Heights, MD  20743'
@@ -762,6 +765,8 @@ def isoQuote():
         bidthis = None
         bidname = None
 
+        print('Entering Quotes2', flush=True)
+
         ex_drv = 27.41
         ex_fuel = .48
         ex_toll = 24.00
@@ -776,7 +781,9 @@ def isoQuote():
         thismuch = '1'
         taskbox = 0
         quot=0
+        print('Entering Quotes3', flush=True)
 
+    print('Getting qdata',flush=True)
     qdata = dataget_Q(thismuch)
     print(quot)
     return bidname, costdata, biddata, expdata, timedata, distdata, emaildata, locto, locfrom, newdirdata, qdata, bidthis, taskbox, thismuch, quot, qdat

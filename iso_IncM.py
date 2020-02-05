@@ -212,8 +212,8 @@ def isoIncM():
                                 fromco = cdat.Company
                             else: fromco = 'Unknown Source'
                         if fromco not in sourcelist: sourcelist.append(fromco)
-                        acct = idat.Account
                         ref = idat.Ref
+                        acct = idat.Account
                         bank = request.values.get('acdeposit')
                         date2 = request.values.get('depdate')
                         if len(ref) > 2 and ref != 'ChkNo':

@@ -29,6 +29,7 @@ def check_revenue_acct(fd):
 def gledger_app_write(sapp,jo,cofor,id1,id2,amt):
     dt = datetime.datetime.now()
     bdat = Bills.query.filter(Bills.Jo == jo).first()
+    bdate = bdat.bDate
     co = bdat.Company
     pid = bdat.Pid
     if sapp == 'app1':
@@ -48,9 +49,10 @@ def gledger_app_write(sapp,jo,cofor,id1,id2,amt):
     if gdat is not None:
         gdat.Debit = amt
         gdat.Recorded = dt
+        gdat.Date = bdate
     else:
         input1 = Gledger(Debit=amt, Credit=0, Account=acctdb, Aid=adb.id, Source=co, Sid=pid, Type=ad, Tcode=jo,
-                         Com=cofor, Recorded=dt, Reconciled=0)
+                         Com=cofor, Recorded=dt, Reconciled=0, Date=bdate)
         db.session.add(input1)
     db.session.commit()
 
@@ -58,9 +60,10 @@ def gledger_app_write(sapp,jo,cofor,id1,id2,amt):
     if gdat is not None:
         gdat.Credit = amt
         gdat.Recorded = dt
+        gdat.Date = bdate
     else:
         input2 = Gledger(Debit=0, Credit=amt, Account=acctcr, Aid=acr.id, Source=co, Sid=pid, Type=ac, Tcode=jo,
-                         Com=cofor, Recorded=dt, Reconciled=0)
+                         Com=cofor, Recorded=dt, Reconciled=0, Date=bdate)
         db.session.add(input2)
     db.session.commit()
 
@@ -77,6 +80,7 @@ def gledger_write(bus,jo,acctdb,acctcr):
             idat=Invoices.query.filter(Invoices.Jo==jo).first()
             amt=int(float(idat.Total)*100)
             pid=idat.Pid
+            date = idat.Date
             cdat=People.query.get(pid)
             co=cdat.Company
 
@@ -87,16 +91,18 @@ def gledger_write(bus,jo,acctdb,acctcr):
             if gdat is not None:
                 gdat.Debit=amt
                 gdat.Recorded=dt
+                gdat.Date = date
             else:
-                input1 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=co,Sid=pid,Type='VD',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                input1 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=co,Sid=pid,Type='VD',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=date)
                 db.session.add(input1)
             db.session.commit()
             gdat = Gledger.query.filter((Gledger.Tcode==jo) & (Gledger.Type=='VC')).first()
             if gdat is not None:
                 gdat.Credit=amt
                 gdat.Recorded=dt
+                gdat.Date = date
             else:
-                input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=co,Sid=pid,Type='VC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=co,Sid=pid,Type='VC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=date)
                 db.session.add(input2)
             db.session.commit()
 
@@ -112,10 +118,9 @@ def gledger_write(bus,jo,acctdb,acctcr):
             idat=Income.query.filter(Income.Jo==jo).first()
             amt=int(float(idat.Amount)*100)
             pid=idat.Pid
+            date = idat.Date
             cdat=People.query.get(pid)
             co=cdat.Company
-
-            print('62 acctdb=', acctdb)
 
             acr=Accounts.query.filter((Accounts.Name==acctcr) & (Accounts.Co ==cc)).first()
             adb=Accounts.query.filter((Accounts.Name==acctdb) & (Accounts.Co ==cc)).first()
@@ -126,8 +131,9 @@ def gledger_write(bus,jo,acctdb,acctcr):
                 gdat.Credit=amt
                 gdat.Recorded=dt
                 gdat.Aid=acr.id
+                gdat.Date = date
             else:
-                input1 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=co,Sid=pid,Type='IC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                input1 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=co,Sid=pid,Type='IC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=date)
                 db.session.add(input1)
             db.session.commit()
             gdat = Gledger.query.filter((Gledger.Tcode==jo) & (Gledger.Type==dtype)).first()
@@ -136,14 +142,17 @@ def gledger_write(bus,jo,acctdb,acctcr):
                 gdat.Debit=amt
                 gdat.Recorded=dt
                 gdat.Aid=adb.id
+                gdat.Date = date
             else:
-                input2 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=co,Sid=pid,Type=dtype,Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                input2 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=co,Sid=pid,Type=dtype,Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=date)
                 db.session.add(input2)
             db.session.commit()
 
         if bus=='deposit':
             idat=JO.query.filter(JO.jo==jo).first()
             amt=int(float(idat.dinc)*100)
+            incdat = Income.query.filter(Income.Jo == jo).first()
+            depdate = incdat.Date2
             #For deposits the company reference is carried in as the accr input
             cdat=People.query.filter(People.Company==acctcr).first()
             if cdat is not None:
@@ -164,8 +173,9 @@ def gledger_write(bus,jo,acctdb,acctcr):
                 gdat.Aid=acr.id
                 gdat.Source=comp
                 gdat.Sid = pid
+                gdat.Date = depdate
             else:
-                input1 = Gledger(Debit=0,Credit=amt,Account='Cash',Aid=acr.id,Source=comp,Sid=pid,Type='DC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                input1 = Gledger(Debit=0,Credit=amt,Account='Cash',Aid=acr.id,Source=comp,Sid=pid,Type='DC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=depdate)
                 db.session.add(input1)
 
             gdat = Gledger.query.filter((Gledger.Tcode==jo) & (Gledger.Type=='DD')).first()
@@ -176,8 +186,9 @@ def gledger_write(bus,jo,acctdb,acctcr):
                 gdat.Aid=adb.id
                 gdat.Source=comp
                 gdat.Sid = pid
+                gdat.Date = depdate
             else:
-                input2 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=comp,Sid=pid,Type='DD',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                input2 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=comp,Sid=pid,Type='DD',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=depdate)
                 db.session.add(input2)
             db.session.commit()
 
@@ -186,6 +197,7 @@ def gledger_write(bus,jo,acctdb,acctcr):
             bdat=Bills.query.filter(Bills.Jo==jo).first()
             amt=int(float(bdat.bAmount)*100)
             pid=bdat.Pid
+            bdate = bdat.bDate
             cdat=People.query.get(pid)
             if cdat is not None:
                 co=cdat.Company
@@ -203,8 +215,9 @@ def gledger_write(bus,jo,acctdb,acctcr):
             if gdat is not None:
                 gdat.Debit=amt
                 gdat.Recorded=dt
+                gdat.Date=bdate
             else:
-                input1 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=co,Sid=pid,Type='ED',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                input1 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=co,Sid=pid,Type='ED',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=bdate)
                 db.session.add(input1)
             db.session.commit()
 
@@ -212,8 +225,9 @@ def gledger_write(bus,jo,acctdb,acctcr):
             if gdat is not None:
                 gdat.Credit=amt
                 gdat.Recorded=dt
+                gdat.Date=bdate
             else:
-                input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=co,Sid=pid,Type='EC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=co,Sid=pid,Type='EC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=bdate)
                 db.session.add(input2)
             db.session.commit()
 
@@ -222,6 +236,7 @@ def gledger_write(bus,jo,acctdb,acctcr):
             bdat=Bills.query.filter(Bills.Jo==jo).first()
             amt=int(float(bdat.bAmount)*100)
             pid=bdat.Pid
+            pdate = bdat.pDate
             cdat=People.query.get(pid)
             co=cdat.Company
             acctdb = 'Accounts Payable'
@@ -250,16 +265,18 @@ def gledger_write(bus,jo,acctdb,acctcr):
                 if gdat is not None:
                     gdat.Debit=amt
                     gdat.Recorded=dt
+                    gdat.Date = pdate
                 else:
-                    input1 = Gledger(Debit=amt,Credit=0,Account=duetodb,Aid=duetodbid,Source=co,Sid=pid,Type='PD',Tcode=jo,Com=newcc,Recorded=dt,Reconciled=0)
+                    input1 = Gledger(Debit=amt,Credit=0,Account=duetodb,Aid=duetodbid,Source=co,Sid=pid,Type='PD',Tcode=jo,Com=newcc,Recorded=dt,Reconciled=0,Date=pdate)
                     db.session.add(input1)
                 db.session.commit()
                 gdat = Gledger.query.filter((Gledger.Tcode==jo) &  (Gledger.Type=='PC')).first()
                 if gdat is not None:
                     gdat.Credit=amt
                     gdat.Recorded=dt
+                    gdat.Date = pdate
                 else:
-                    input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=co,Sid=pid,Type='PC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                    input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=co,Sid=pid,Type='PC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=pdate)
                     db.session.add(input2)
                 db.session.commit()
 
@@ -267,16 +284,18 @@ def gledger_write(bus,jo,acctdb,acctcr):
                 if gdat is not None:
                     gdat.Debit=amt
                     gdat.Recorded=dt
+                    gdat.Date=pdate
                 else:
-                    input1 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=co,Sid=pid,Type='QD',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                    input1 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=co,Sid=pid,Type='QD',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=pdate)
                     db.session.add(input1)
                 db.session.commit()
                 gdat = Gledger.query.filter((Gledger.Tcode==jo) & (Gledger.Type=='QC')).first()
                 if gdat is not None:
                     gdat.Credit=amt
                     gdat.Recorded=dt
+                    gdat.Date = pdate
                 else:
-                    input2 = Gledger(Debit=0,Credit=amt,Account=duetocr,Aid=duetocrid,Source=co,Sid=pid,Type='QC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                    input2 = Gledger(Debit=0,Credit=amt,Account=duetocr,Aid=duetocrid,Source=co,Sid=pid,Type='QC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=pdate)
                     db.session.add(input2)
                 db.session.commit()
 
@@ -290,22 +309,25 @@ def gledger_write(bus,jo,acctdb,acctcr):
                 if gdat is not None:
                     gdat.Debit=amt
                     gdat.Recorded=dt
+                    gdat.Date=pdate
                 else:
-                    input1 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=co,Sid=pid,Type='PD',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                    input1 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=co,Sid=pid,Type='PD',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=pdate)
                     db.session.add(input1)
                 db.session.commit()
                 gdat = Gledger.query.filter((Gledger.Tcode==jo) &  (Gledger.Type=='PC')).first()
                 if gdat is not None:
                     gdat.Credit=amt
                     gdat.Recorded=dt
+                    gdat.Date=pdate
                 else:
-                    input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=co,Sid=pid,Type='PC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                    input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=co,Sid=pid,Type='PC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=pdate)
                     db.session.add(input2)
                 db.session.commit()
 
         if bus=='xfer':
             bdat=Bills.query.filter(Bills.Jo==jo).first()
             amt=int(float(bdat.bAmount)*100)
+            xdate = bdat.bDate
 
             adb=Accounts.query.filter((Accounts.Name==acctdb)).first() #the expense account
             acr=Accounts.query.filter((Accounts.Name==acctcr)).first() #the asset account
@@ -317,15 +339,17 @@ def gledger_write(bus,jo,acctdb,acctcr):
             if gdat1 is not None:
                 gdat1.Debit=amt
                 gdat1.Recorded=dt
+                gdat1.Date = xdate
             else:
-                input1 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=acctcr,Sid=acr.id,Type='XD',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                input1 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=acctcr,Sid=acr.id,Type='XD',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=xdate)
                 db.session.add(input1)
             db.session.commit()
 
             if gdat2 is not None:
                 gdat2.Credit=amt
                 gdat2.Recorded=dt
+                gdat2.Date = xdate
             else:
-                input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=acctdb,Sid=adb.id,Type='XC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0)
+                input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=acctdb,Sid=adb.id,Type='XC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=xdate)
                 db.session.add(input2)
             db.session.commit()
