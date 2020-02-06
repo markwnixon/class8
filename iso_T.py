@@ -560,7 +560,14 @@ def isoT():
             grandtotal = 0
             for j, oder in enumerate(odervec):
                 odat = Orders.query.get(oder)
-                keydata[j] =f'{odat.Jo} {odat.Date} {odat.Booking} {odat.Container} {odat.Amount}'
+                jo = odat.Jo
+                idata = Invoices.query.filter(Invoices.Jo == jo).all()
+                istring = ''
+                if idata is not None:
+                    for idat in idata:
+                        if idat.Amount is not None:
+                            istring = istring + ' ' + d2s(idat.Amount)
+                keydata[j] = f'{odat.Jo} {odat.Date} {odat.Booking} {odat.Order} {odat.Container} {istring} {odat.Amount}'
             holdvec[0] = 'write_vec'
             holdvec[1] = keydata
 
