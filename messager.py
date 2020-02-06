@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import os
 import shutil
 import subprocess
-from CCC_system_setup import addpath, scac
+from CCC_system_setup import addpath, scac, companydata
 from viewfuncs import d2s
 from iso_Bank import banktotals
 
@@ -977,7 +977,9 @@ def make_global_job(msg,sequence,sessionph):
             book = book.strip()
             odat = Orders.query.filter(Orders.Booking == book).first()
             if odat is None:
-                nextjo = newjo('T', sdate)
+                cdata = companydata()
+                jbcode = cdata[10] + 'T'
+                nextjo = newjo(jbcode, sdate)
 
                 input = Orders(Status='A0', Jo=nextjo, Load=None, Order=nextjo, Company=company, Location=None, Booking=book,
                                BOL=None, Container='TBD',Date=today, Driver=sessionph, Company2=company2, Time=None, Date2=today, Time2=None, Seal=None,
@@ -1136,8 +1138,9 @@ def msg_analysis(msg, sessionph, medialist):
     if newjob == 1 or sequence[0] == 'J':
         if newjob == 1:
             sequence = 'J0000000000'
-            jtype = 'T'
-            nextjo = newjo(jtype, sdate)
+            cdata = companydata()
+            jbcode = cdata[10] + 'T'
+            nextjo = newjo(jbcode, sdate)
             putjo(sequence, nextjo, sessionph)
             newmsg = 'Congrats on a new job.\nThe JO is *' + nextjo + '*\n\n*Who is the customer?*\nEnter number or _NEW_ to add:\n'
             for adat in db.session.query(People.Company).filter(People.Ptype == 'Trucking').distinct():

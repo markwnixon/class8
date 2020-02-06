@@ -1721,7 +1721,7 @@ def dataget_B(thismuch,co,towco):
         print(co, acct)
 
     if co == 'X':
-        if thismuch == '1':
+        if thismuch == '1' or thismuch == '9':
             stopdate = today-datetime.timedelta(days=60)
             bdata = Bills.query.filter(Bills.bDate > stopdate).all()
         elif thismuch == '2':
@@ -1732,7 +1732,7 @@ def dataget_B(thismuch,co,towco):
             bdata = Bills.query.all()
         if towco == 0: vdata = People.query.filter(People.Ptype == 'Vendor').order_by(People.Company).all()
     else:
-        if thismuch == '1':
+        if thismuch == '1' or thismuch == '9':
             stopdate = today-datetime.timedelta(days=60)
         elif thismuch == '2':
             stopdate = today-datetime.timedelta(days=120)
@@ -1745,7 +1745,7 @@ def dataget_B(thismuch,co,towco):
             bdata = Bills.query.filter( (Bills.Co.contains(co)) & (Bills.bDate > stopdate) & (Bills.pAccount == acct) ).all()
         if towco == 0 : vdata = People.query.filter( (People.Ptype=='Vendor') & (People.Idtype.contains(co)) ).order_by(People.Company).all()
 
-    if towco == 1: vdata = People.query.filter((People.Ptype == 'Vendor') | (People.Ptype == 'TowCo') ).order_by(People.Company).all()
+    if towco == 1 or thismuch == '9': vdata = People.query.filter((People.Ptype == 'Vendor') | (People.Ptype == 'TowCo') ).order_by(People.Company).all()
 
     return bdata,vdata
 
