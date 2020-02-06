@@ -11,11 +11,14 @@ from viewfuncs import dollar
 from CCC_system_setup import addpath, scac, companydata
 
 def getzip(addr):
-    items = addr.split()
-    zip = items[-1]
-    if len(zip)==5 or len(zip)==10:
-        return zip
-    else:
+    try:
+        items = addr.split()
+        zip = items[-1]
+        if len(zip)==5 or len(zip)==10:
+            return zip
+        else:
+            return 0
+    except:
         return 0
 
 
