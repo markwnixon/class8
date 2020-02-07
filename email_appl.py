@@ -135,9 +135,9 @@ def etemplate_truck(viewtype,eprof,odat):
         return emaildata
 
     elif viewtype == 'packages':
-        etitle = f'{scac} Invoice Package for Completed Order: {od} | {keyval} | {con}'
+        etitle = f'{scac} Invoice Package for Completed Orders: {od} | {keyval} | {con}'
         ebody = f'Dear {odat.Shipper},\n\nAn invoice package is enclosed for your review.\nWe greatly appreciate your business.\n\nSincerely,\n\n{signature}'
-        aname = odat.Package
+        aname = f'Package_{odat.Jo}.pdf'
         emailin1 = estatus
         emailin2 = eaccts
         emailcc1 = em['info']

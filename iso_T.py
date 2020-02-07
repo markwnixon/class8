@@ -1036,15 +1036,15 @@ def isoT():
                 grandtotal = grandtotal+float(idat.Total)
                 # put together the file paperwork
             print('scac', scac)
-            #file1 = f'tmp/{scac}/data/vinvoice/P_' + 'test.pdf'
+            file1 = addpath(f'tmp/{scac}/data/vpackages/P_' + 'test.pdf')
             print('file1here=',file1)
             cache2 = int(odat.Detention)
             cache2 = cache2+1
-            docref = f'tmp/{scac}/data/vinvoice/P_c{cache2}_{order}.pdf'
+            docref = f'tmp/{scac}/data/vpackages/P_c{cache2}_{order}.pdf'
 
             for j, i in enumerate(odervec):
                 odat = Orders.query.get(i)
-                odat.Package = docref
+                odat.Package = os.path.basename(docref)
                 db.session.commit()
 
             import make_TP_invoice
@@ -1055,21 +1055,21 @@ def isoT():
             leftsize = 8
             modlink = 0
 
-            filegather = ['pdfunite', addpath(file1)]
+            filegather = ['pdfunite', file1]
             codata = companydata()
             etitle = codata[2]+' Invoices:'
             #Prepare for email, but at this point only created invoice
             for i in odervec:
                 odat = Orders.query.get(i)
                 etitle = etitle+' '+odat.Jo
-                filegather.append(addpath(odat.Invoice))
+                filegather.append(addpath(f'tmp/{scac}/data/vinvoice/{odat.Invoice}' ))
                 odat.Istat = 1
                 db.session.commit()
 
             filegather.append(addpath(docref))
             tes = subprocess.check_output(filegather)
 
-            emaildata = etemplate_truck('invoice', 0 , odat)
+            emaildata = etemplate_truck('packages', 0 , odat)
             invo = 3
             viewtype = 'packages'
 # ____________________________________________________________________________________________________________________E.Package2.Trucking

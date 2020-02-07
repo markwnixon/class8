@@ -17,7 +17,6 @@ def main(file1, keydata, grandtotal, pdata1, date1, date2):
 
     date1 = date1.strftime('%m/%d/%Y')
     date2 = date2.strftime('%m/%d/%Y')
-    file1 = addpath(file1)
 # ___________________________________________________________
 
     def dollar(infloat):

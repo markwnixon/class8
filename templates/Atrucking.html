@@ -142,6 +142,8 @@
                                 {% include 'Trucking_Multi_Invoice.html' %}
                             {% elif viewtype == 'columnadd'%}
                                 {% include 'Trucking_Column_Add.html' %}
+                            {% elif emaildata %}
+                                {% include 'includes/_button_upd_email_ret.html' %}
                             {% else %}
                                 {% include 'includes/_button_upd_ret.html' %}
                             {% endif %}
