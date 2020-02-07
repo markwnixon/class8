@@ -28,7 +28,8 @@ def isoB(indat):
         filesel, docref, search11, search12, search13, search14, search21, search22, bType, bClass = init_billing_blank()
         expdata, addjobselect, jobdata, modal, viewck, towco = 0, 0, 0, 0, 0, 0
 
-        hv = [0]*20
+        hv = [0]*24
+        hv[21] = 1 #default check style
         divdat = Divisions.query.all()
 
         monlvec = ['January', 'February', 'March', 'April', 'May', 'June',
@@ -1250,9 +1251,16 @@ def isoB(indat):
                         bdat.pAmount = bdat.bAmount
                     db.session.commit()
 
+                    ckstyle = request.values.get('ckstyle')
+                    if ckstyle is not None:
+                        hv[21] = ckstyle
+                        ckstyle = nonone(ckstyle)
+                    else:
+                        ckstyle = 1
+
                     from writechecks import writechecks
 
-                    writechecks(bdat, pdat, docref, sbdata, links, 2)
+                    writechecks(bdat, pdat, docref, sbdata, links, ckstyle)
                     modlink = 6
                     leftsize = 8
                     leftscreen = 0

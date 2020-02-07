@@ -457,23 +457,6 @@ class Quotes(db.Model):
         self.Mid = Mid
         self.Person = Person
 
-class Drivers(db.Model):
-    __tablename__ = 'drivers'
-    id = db.Column('id', db.Integer, primary_key=True)
-    Name = db.Column('Name', db.String(50))
-    Truck = db.Column('Truck', db.String(9))
-    Tag = db.Column('Tag', db.String(9))
-    Email = db.Column('Email', db.String(50))
-    Path = db.Column('Path', db.String(50))
-    Phone = db.Column('Phone', db.String(25))
-
-    def __init__(self, Name, Truck, Tag, Email, Path, Phone):
-        self.Name = Name
-        self.Truck = Truck
-        self.Tag = Tag
-        self.Email = Email
-        self.Path = Path
-        self.Phone = Phone
 
 class DriverAssign(db.Model):
     __tablename__ = 'driverassign'
@@ -876,46 +859,6 @@ class Trucklog(db.Model):
         self.Rdist = Rdist
         self.Rloc = Rloc
 
-class Driverlog(db.Model):
-    __tablename__ = 'driverlog'
-    id = db.Column('id', db.Integer, primary_key=True)
-    Date = db.Column('Date', db.Date)
-    Clockin = db.Column('Clockin', db.DateTime)
-    Clockout = db.Column('Clockout', db.DateTime)
-    GPSin= db.Column('GPSin', db.DateTime)
-    GPSout = db.Column('GPSout', db.DateTime)
-    Odomstart = db.Column('Odomstart', db.String(45))
-    Odomstop = db.Column('Odomstop', db.String(45))
-    Odverify = db.Column('Odverify', db.String(45))
-    Truckstart = db.Column('Truckstart', db.String(45))
-    Truckstop = db.Column('Truckstop', db.String(45))
-    Driver = db.Column('Driver', db.String(45))
-    Phone = db.Column('Phone', db.String(45))
-    Maintrecord = db.Column('Maintrecord', db.String(45))
-    Locationstart = db.Column('Locationstart', db.String(45))
-    Locationstop = db.Column('Locationstop', db.String(45))
-    Maintid = db.Column('Maintid', db.String(45))
-    Status = db.Column('Status', db.String(45))
-
-    def __init__(self, Date, Clockin, Clockout, GPSin, GPSout, Odomstart, Odomstop, Odverify, Truckstart, Truckstop, Driver, Phone, Maintrecord, Locationstart, Locationstop, Maintid, Status):
-        self.Date = Date
-        self.Clockin = Clockin
-        self.Clockout = Clockout
-        self.GPSin = GPSin
-        self.GPSout = GPSout
-        self.Odomstart = Odomstart
-        self.Odomstop = Odomstop
-        self.Odverify = Odverify
-        self.Truckstart = Truckstart
-        self.Truckstop = Truckstop
-        self.Driver = Driver
-        self.Phone = Phone
-        self.Maintrecord = Maintrecord
-        self.Locationstart = Locationstart
-        self.Locationstop = Locationstop
-        self.Mainid = Maintid
-        self.Status = Status
-
 
 class Invoices(db.Model):
     __tablename__ = 'invoices'
@@ -1097,3 +1040,111 @@ class Accounts(db.Model):
         self.Co = Co
         self.QBmap = QBmap
         self.Shared = Shared
+        
+ 
+class Portlog(db.Model):
+    __tablename__ = 'portlog'
+    id = db.Column('id', db.Integer, primary_key=True)
+    Date = db.Column('Date', db.Date)
+    Unit = db.Column('Unit', db.String(45))
+    Driver = db.Column('Driver', db.String(45))
+    GPSin= db.Column('GPSin', db.DateTime)
+    GPSout = db.Column('GPSout', db.DateTime)
+    PortTime = db.Column('PortTime', db.String(45))
+    CustTime = db.Column('CustTime', db.String(45))
+    ConIn = db.Column('ConIn', db.String(45))
+    ConOut = db.Column('ConOut', db.String(45))
+    Status = db.Column('Status', db.String(45))
+    Portmiles = db.Column('Portmiles', db.String(45))
+
+    def __init__(self, Date, Unit, Driver, GPSin, GPSout, PortTime, CustTime, ConIn, ConOut, Status, Portmiles):
+        self.Date = Date
+        self.GPSin = GPSin
+        self.GPSout = GPSout
+        self.Unit = Unit
+        self.Driver = Driver
+        self.PortTime = PortTime
+        self.CustTime = CustTime
+        self.ConIn = ConIn
+        self.ConOut = ConOut
+        self.Status = Status
+        self.Portmiles = Portmiles
+        
+class Driverlog(db.Model):
+    __tablename__ = 'driverlog'
+    id = db.Column('id', db.Integer, primary_key=True)
+    Date = db.Column('Date', db.Date)
+    Driver = db.Column('Driver', db.String(45))
+    GPSin= db.Column('GPSin', db.DateTime)
+    GPSout = db.Column('GPSout', db.DateTime)
+    Odomstart = db.Column('Odomstart', db.String(45))
+    Odomstop = db.Column('Odomstop', db.String(45))
+    Truck = db.Column('Truck', db.String(45))
+    Locationstart = db.Column('Locationstart', db.String(45))
+    Locationstop = db.Column('Locationstop', db.String(45))
+    Shift = db.Column('Shift', db.String(45))
+    Status = db.Column('Status', db.String(45))
+
+    def __init__(self, Date, Driver, GPSin, GPSout, Odomstart, Odomstop, Truck, Locationstart, Locationstop, Shift, Status):
+        self.Date = Date
+        self.GPSin = GPSin
+        self.GPSout = GPSout
+        self.Odomstart = Odomstart
+        self.Odomstop = Odomstop
+        self.Truck = Truck
+        self.Driver = Driver
+        self.Locationstart = Locationstart
+        self.Locationstop = Locationstop
+        self.Shift = Shift
+        self.Status = Status
+        
+class Drivers(db.Model):
+    __tablename__ = 'drivers'
+    id = db.Column('id', db.Integer, primary_key=True)
+    Name = db.Column('Name', db.String(50))
+    Truck = db.Column('Truck', db.String(9))
+    Tag = db.Column('Tag', db.String(9))
+    Email = db.Column('Email', db.String(50))
+    Path = db.Column('Path', db.String(50))
+    Phone = db.Column('Phone', db.String(25))
+    Start = db.Column('Start',db.DateTime)
+    End = db.Column('End', db.DateTime)
+    Tagid = db.Column('Tagid', db.String(25))
+    Cdl = db.Column('Cdl', db.String(45))
+    Twic= db.Column('Twic', db.String(45))
+    Record = db.Column('Record', db.String(45))
+    Med= db.Column('Med', db.String(45))
+    Pin= db.Column('Pin', db.String(45))
+    DLnum= db.Column('DLnum', db.String(45))
+    DLexp= db.Column('DLexp', db.String(45))
+    DOB= db.Column('DOB', db.String(45))
+    Addr1= db.Column('Addr1', db.String(45))
+    Addr2= db.Column('Addr2', db.String(45))
+    TwicExp= db.Column('TwicExp', db.String(45))
+    TwicNum= db.Column('TwicNum', db.String(45))
+
+
+    def __init__(self, Name, Truck, Tag, Email, Path, Phone, Start, End, Tagid, Cdl, Twic, Record, Med, Pin, DLnum, DLexp,
+                 DOB, Addr1, Addr2, TwicExp, TwicNum):
+        self.Name = Name
+        self.Truck = Truck
+        self.Tag = Tag
+        self.Email = Email
+        self.Path = Path
+        self.Phone = Phone
+        self.Start = Start
+        self.End = End
+        self.Tagid = Tagid
+        self.Cdl = Cdl
+        self.Twic = Twic
+        self.Record = Record
+        self.Med = Med
+        self.Pin = Pin
+        self.DLnum = DLnum
+        self.DLexp = DLexp
+        self.DOB = DOB
+        self.Addr1 = Addr1
+        self.Addr2 = Addr2
+        self.TwicExp = TwicExp
+        self.TwicNum = TwicNum
+        

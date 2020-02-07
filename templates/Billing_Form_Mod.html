@@ -62,6 +62,16 @@
 {% else %}
 
                 {% if pb == 1 %}
+                            {% set ckstyle = hv[21] %}
+                            <tr>
+                            <td><div class="input-group-text">Check Style:</div></td>
+                            <td>
+                            <select class="form-control" type="text" name="ckstyle" onchange="this.form.submit()">
+                            <option value="1" {% if ckstyle == '1' %} selected {% endif %} > Repeated Notation </option>
+                            <option value="2" {% if ckstyle == '2' %} selected {% endif %} > Address for Mailing </option>
+                            </select>
+                            </td>
+                            </tr>
                             <tr>
                             <td><div class="input-group-text">Paid Amount:</div></td>
                             <td><input class="form-control" type="text" name="pamt" value="{{modata.pAmount}}"></td>
