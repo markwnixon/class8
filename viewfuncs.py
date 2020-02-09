@@ -2469,3 +2469,29 @@ def check_mirror_exp(co,oid,oName,err):
         else:
             return 0, err.append('Problem with shared account creation')
 
+def enter_bk_charges(acct,bkch,date,username):
+    from gledger_write import gledger_write
+    recdate = datetime.datetime.strptime(date,"%Y-%m-%d")
+    recdate = recdate.date()
+    print(recdate, acct, bkch)
+    bdat = Bills.query.filter( (Bills.Company == acct) & (Bills.bDate == recdate) ).first()
+    bacct = 'Bank Service Charges'
+    if bdat is None:
+        adat = Accounts.query.filter(Accounts.Name == acct).first()
+        co = adat.Co
+        desc = f'Bank service fees on {date}'
+        nextjo = newjo(co + 'B', date)
+        input = Bills(Jo=nextjo, Pid=adat.id, Company=acct, Memo='', Description=desc, bAmount=bkch, Status='Paid', Cache=0,
+                      Original=None,
+                      Ref='', bDate=recdate, pDate=recdate, pAmount=bkch, pMulti=None, pAccount=acct, bAccount=bacct,
+                      bType='Expense',
+                      bCat='G-A', bSubcat="Bank Charges", Link=None, User=username, Co=co, Temp1=None, Temp2=None, Recurring=0,
+                      dDate=today,
+                      pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0)
+        db.session.add(input)
+        db.session.commit()
+        gledger_write('dircharge',nextjo,bacct,acct)
+        return nextjo
+    else:
+        print(f'Have this bill {bdat.id} {bdat.Company}')
+        return bdat.Jo

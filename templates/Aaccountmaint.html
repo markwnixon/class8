@@ -61,7 +61,11 @@
                     {% set atl = "font-weight-bold text-left red-text" %}
                     {% set atr = "font-weight-bold text-right red-text" %}
                 {% else %}
-                    {% set color = colordata[data.Co] %}
+                    {% if data.Co %}
+                        {% set color = colordata[data.Co] %}
+                    {% else %}
+                        {% set color = 'red' %}
+                    {% endif %}
                     {% set atc = "font-weight-bold text-center " + color + "-text" %}
                     {% set atl = "font-weight-bold text-left " + color + "-text" %}
                     {% set atr = "font-weight-bold text-right " + color + "-text" %}

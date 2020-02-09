@@ -12,6 +12,12 @@ from report_maker import reportmaker
 from viewfuncs import d2s
 from CCC_system_setup import scac
 
+def reset_trial():
+    gdata = Gledger.query.filter(Gledger.Reconciled == 25).all()
+    for gdat in gdata:
+        gdat.Reconciled = 0
+    db.session.commit()
+
 def dataget_Bank(thismuch,bankacct):
     # 0=order,#1=proofs,#2=interchange,#3=people/services
     today = datetime.date.today()
@@ -41,15 +47,17 @@ def banktotals(bankacct):
         actbal=0.00
     gdata = Gledger.query.filter(Gledger.Account==bankacct).all()
     for gdat in gdata:
-         if gdat.Type=='DD':
-             totald = totald + gdat.Debit
-             if gdat.Reconciled==0:
+        type = gdat.Type
+        if type == 'DD' or type == 'XD':
+            totald = totald + gdat.Debit
+            if gdat.Reconciled==0:
                 totald_U = totald_U + gdat.Debit
 
-         if gdat.Type=='PC':
-             totalc = totalc + gdat.Credit
-             if gdat.Reconciled==0:
-                 totalc_U = totalc_U + gdat.Credit
+        if type == 'PC' or type == 'XC':
+            totalc = totalc + gdat.Credit
+            if gdat.Reconciled==0:
+                totalc_U = totalc_U + gdat.Credit
+
     totalds = d2s(float(totald)/100)
     totalcs = d2s(float(totalc)/100)
     balance = d2s( (float(totald) - float(totalc))/100 )
@@ -61,13 +69,33 @@ def banktotals(bankacct):
 
     return acctinfo
 
+def recon_totals(bankacct):
+    # Find service charges for month:
+    gdat = Gledger.query.filter((Gledger.Account == bankacct) & (Gledger.Reconciled == 25) & (Gledger.Source == bankacct)).first()
+    bkc = gdat.Credit
+    totald, totalc = 0.0, 0.0
+    gdata = Gledger.query.filter((Gledger.Account == bankacct) & (Gledger.Reconciled == 25)).all()
+    for gdat in gdata:
+        type = gdat.Type
+        if type == 'DD' or type == 'XD': totald = totald + gdat.Debit
+        if type == 'PC' or type == 'XC': totalc = totalc + gdat.Credit
+
+    totalc = totalc - bkc
+    return d2s(float(totald)/100), d2s(float(totalc)/100), d2s(float(bkc)/100)
+
+
+
 def isoBank():
 
     if request.method == 'POST':
 # ____________________________________________________________________________________________________________________B.FormVariables.General
 
-        from viewfuncs import parseline, popjo, jovec, newjo, timedata, nonone, nononef
-        from viewfuncs import numcheck, numcheckv, viewbuttons, get_ints, numcheckvec, numcheckv, d2s
+        from viewfuncs import parseline, popjo, jovec, newjo, timedata, nonone, nononef, enter_bk_charges
+        from viewfuncs import numcheck, numcheckv, viewbuttons, get_ints, numcheckvec, numcheckv, d2s, erud
+
+        today = datetime.date.today()
+        today_str = today.strftime('%Y-%m-%d')
+        hv = [0]*9
 
         #Zero and blank items for default
         username = session['username'].capitalize()
@@ -84,6 +112,7 @@ def isoBank():
 
         today = datetime.date.today()
         now = datetime.datetime.now().strftime('%I:%M %p')
+        err = []
 
         leftsize=10
 
@@ -105,12 +134,22 @@ def isoBank():
         unrecord = request.values.get('unrecord')
         thismuch = request.values.get('thismuch')
         recothese = request.values.get('recothese')
+        finalize = request.values.get('finalize')
         undothese = request.values.get('undothese')
+        rdate = request.values.get('rdate')
+        if rdate is None:
+            rdate = today_str
+        hv[0] = rdate
+        hv[1] = [0]
         actbal = request.values.get('actbal')
         try:
             actbal=float(actbal)
+            recready=1
         except:
             actbal=0.00
+            err.append('No Statement Balance Entered for Reconciliation')
+            recready=0
+
 
         oder=nonone(oder)
         modlink=nonone(modlink)
@@ -135,7 +174,7 @@ def isoBank():
                     a[i]=request.values.get(v)
 
                 modata.Jo=a[0]
-                modata.SubJo=a[1]
+                modata.Account=a[1]
                 modata.Pid=a[2]
                 modata.Description=a[3]
                 modata.Amount=a[4]
@@ -163,14 +202,45 @@ def isoBank():
             oder,numchecked=numcheck(1,odata,0,0,0,0,['oder'])
 
 # ____________________________________________________________________________________________________________________E.Search.General
-        if recothese is not None:
+        if (recothese is not None or finalize is not None) and recready == 1:
 
-            odervec = numcheckv(odata)
-            for oder in odervec:
-                gdat = Gledger.query.get(oder)
-                gdat.Reconciled=1
-                db.session.commit()
+            if numchecked > 0:
+
+                reset_trial()
+                #Get date of reconciliation and bank charges for month
+                rdate = request.values.get('rdate')
+                recdate = datetime.datetime.strptime(rdate, "%Y-%m-%d")
+                recmo = recdate.month
+                if recothese is not None: recmo = 25 #Do not record month until reconciliation final
+                bkcharges = request.values.get('bkcharges')
+                bkcharges = d2s(bkcharges)
+                bkchargeid = 0
+                try:
+                    bkf = float(bkcharges)
+                    print('bkf=',bkf)
+                    if bkf > 0.0:
+                        bank_jo = enter_bk_charges(acname, bkcharges, rdate, username)
+                        gdat = Gledger.query.filter((Gledger.Tcode == bank_jo) & (Gledger.Type=='PC')).first()
+                        if gdat is not None:
+                            bkchargeid = gdat.id
+                except:
+                    bkf = 0.00
+
+                odervec = numcheckv(odata)
+                print('bkid=',bkchargeid)
+                if bkchargeid > 0 and bkchargeid not in odervec: odervec.append(bkchargeid)
+                hv[1] = odervec
+                print('hv[1]', hv[1])
+                for oder in odervec:
+                    gdat = Gledger.query.get(oder)
+                    gdat.Reconciled=recmo
+                    db.session.commit()
                 acctinfo = banktotals(acname)
+                hv[2], hv[3], hv[4] = recon_totals(acname)
+                print(hv[2],hv[3])
+
+            else:
+                err.append('No items checked for reconciliation')
 
         if undothese is not None:
 
@@ -274,10 +344,14 @@ def isoBank():
 
     #This is the else for 1st time through (not posting data from overseas.html)
     else:
-        from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero,d2s
+        from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero,d2s, erud
         today = datetime.date.today()
-        #today = datetime.datetime.today().strftime('%Y-%m-%d')
+        today_str = today.strftime('%Y-%m-%d')
+        hv = [0]*9
+        hv[0] = today_str
+        hv[1] = [0]
         now = datetime.datetime.now().strftime('%I:%M %p')
+        reset_trial()
         oder=0
         modata=0
         modlink=0
@@ -295,9 +369,11 @@ def isoBank():
         acctinfo = banktotals(bankacct)
         odata = dataget_Bank(thismuch,bankacct)
 
+
     leftsize = 8
     acdata = Accounts.query.filter(Accounts.Type=='Bank').all()
+    err=erud(err)
 
 
 
-    return odata,oder,err,modata,modlink,leftscreen,leftsize,today,now,docref,cache,acdata,thismuch,acctinfo
+    return odata,oder,err,modata,modlink,leftscreen,leftsize,today,now,docref,cache,acdata,thismuch,acctinfo,hv

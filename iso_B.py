@@ -750,7 +750,7 @@ def isoB(indat):
             xferto = request.values.get('toacct')
             if xamt is None:
                 xamt = '0.00'
-            vdata = [bdate, ddate, xamt, new_desc, xferto, xferfrom]
+            vdata = [bdate, ddate, xamt, new_desc, xferfrom, xferto]
             print(vdata)
             expdata = Accounts.query.filter((Accounts.Type == 'Bank') | (Accounts.Type == 'Equity')).order_by(
                 Accounts.Name).all()
@@ -943,16 +943,20 @@ def isoB(indat):
                     last_memo = ldat.Memo
                     new_desc = ''
                     new_memo = ''
-                    for i, x in enumerate(monlvec):
-                        if i == 11:
-                            k = 0
-                        else:
-                            k = i+1
-                        if x in last_desc:
-                            new_desc = last_desc.replace(x, monlvec[k])
-                        if x in last_memo:
-                            new_memo = last_memo.replace(x, monlvec[k])
-                    last_amt = d2s(ldat.bAmount)
+                    try:
+                        for i, x in enumerate(monlvec):
+                            if i == 11:
+                                k = 0
+                            else:
+                                k = i+1
+                            if x in last_desc:
+                                new_desc = last_desc.replace(x, monlvec[k])
+                            if x in last_memo:
+                                new_memo = last_memo.replace(x, monlvec[k])
+                        last_amt = d2s(ldat.bAmount)
+                    except:
+                        last_amt = 0.00
+                        #No previous bills
                     # last_date=datetime.datetime.strptime(ldat.bDate,"%Y-%m-%d")+datetime.timedelta(days=30)
 
                     last_date = ldat.bDate

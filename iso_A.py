@@ -198,10 +198,10 @@ def InvoiceMaint():
 def Banking():
 
     from iso_Bank import isoBank
-    odata, oder, err, modata, modlink, leftscreen, leftsize, today, now, docref, cache, acdata, thismuch, acctinfo = isoBank()
+    odata, oder, err, modata, modlink, leftscreen, leftsize, today, now, docref, cache, acdata, thismuch, acctinfo, hv = isoBank()
     rightsize = 12-leftsize
     return render_template('Abanking.html', cmpdata=cmpdata, scac=scac, data1=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
-                           leftsize=leftsize, rightsize=rightsize, docref=docref, cache = cache, acdata=acdata, thismuch=thismuch, acctinfo = acctinfo)
+                           leftsize=leftsize, rightsize=rightsize, docref=docref, cache = cache, acdata=acdata, thismuch=thismuch, acctinfo = acctinfo, hv=hv)
 
 @app.route('/DriverMaint', methods=['GET', 'POST'])
 def DriverMaint():

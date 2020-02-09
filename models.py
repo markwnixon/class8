@@ -394,8 +394,9 @@ class Gledger(db.Model):
     Recorded = db.Column('Recorded', db.DateTime)
     Reconciled = db.Column('Reconciled', db.Integer)
     Date = db.Column('Date', db.DateTime)
+    Ref = db.Column('Ref', db.String(45))
 
-    def __init__(self, Debit,Credit,Account,Aid,Source,Sid,Type,Tcode,Com,Recorded,Reconciled,Date):  # , dinc, dexp,):
+    def __init__(self, Debit,Credit,Account,Aid,Source,Sid,Type,Tcode,Com,Recorded,Reconciled,Date,Ref):  # , dinc, dexp,):
         self.Debit=Debit
         self.Credit=Credit
         self.Account=Account
@@ -408,6 +409,7 @@ class Gledger(db.Model):
         self.Recorded=Recorded
         self.Reconciled=Reconciled
         self.Date = Date
+        self.Ref = Ref
 
 class Divisions(db.Model):
     __tablename__ = 'divisions'

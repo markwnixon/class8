@@ -29,5 +29,29 @@
               <option {% if thismuch == '3' %} selected {% endif %} value='3'>Last 60 Days</option>
               <option {% if thismuch == '4' %} selected {% endif %} value='4'>All Records</option>
           </select>
+         <table class="table table-condensed table-hover">
+                    <tbody>
+                    {% set rdate = hv[0] %}
+                    {% set deposits = hv[2] %}
+                    {% set withdrawals = hv[3] %}
+                    {% set bkcharges = hv[4] %}
+                    <tr>
+                        <td> <div class="input-group-text">Reconciliation Date</div></td>
+                        <td colspan="2"><input class="form-control" type="date" value="{{rdate}}" name="rdate"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Bank Charges for Month:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{bkcharges}}" name="bkcharges"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Total Deposits for Month:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{deposits}}" name="deposits"></td>
+                    </tr>
+                    <tr>
+                        <td> <div class="input-group-text">Total Withdrawals for Month:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{withdrawals}}" name="withdrawals"></td>
+                    </tr>
+                    </tbody>
+         </table>
 </div>
 </div>
