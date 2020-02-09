@@ -251,9 +251,9 @@ def isoAM():
             qbmap = request.values.get('qbmap')
 
             acctname = stripper(acctname)
-            adat = Accounts.query.filter(Accounts.Name==acctname).first()
+            adat = Accounts.query.filter((Accounts.Name==acctname) & (Accounts.Co==acctco)).first()
             if adat is not None:
-                err.append(f'Account with name {acctname} already exists')
+                err.append(f'Account with name {acctname} for {acctco} already exists')
             else:
                 input = Accounts(Name=acctname,Balance=0.00,AcctNumber=acctnumb,Routing=acctrout,Payee=acctpaye,Type=accttype,
                                  Description=acctdesc,Category=acctcat,Subcategory=acctsub,Taxrollup=accttax,Co=acctco,QBmap=qbmap, Shared=None)
