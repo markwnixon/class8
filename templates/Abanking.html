@@ -36,8 +36,8 @@
                 <th class="{{atc}}">Account</th>
                 <th class="{{atc}}">Source</th>
                 <th class="{{atc}}">Ck#</th>
-                <th class="{{atc}}">Deposits</th>
-                <th class="{{atc}}">Withdrawals</th>
+                <th class="{{atc}}">Deposit</th>
+                <th class="{{atc}}">Withdraw</th>
                 <th class="{{atc}}">Box</th>
                 <th class="{{atc}}">Trans Date</th>
                 <th class="{{atc}}">Trans Code</th>
@@ -54,15 +54,20 @@
               {% else %}
                     {% set atr = "font-weight-bold text-right" %}
               {% endif %}
+              {% if data.Date %}
+                 {% set transdate = data.Date.date() %}
+              {% else %}
+                 {% set transdate = ''  %}
+              {% endif %}
                 <td class="{{atc}}">{{ data.id }}</td>
                 <td class="{{atc}}">{{ data.Type }}</td>
                 <td class="{{atc}}">{{ data.Account }}</td>
                 <td class="{{atl}}">&nbsp; &nbsp;{{ data.Source }}</td>
-                <td class="{{atl}}">&nbsp; &nbsp;{{ data.Ref }}</td>
+                <td class="{{atc}}">&nbsp; &nbsp;{{ data.Ref }}</td>
                 <td class="{{atr}}">${{'%0.2f'| format((data.Debit/100)|float)}}  </td>
                 <td class="{{atr}}">${{'%0.2f'| format((data.Credit/100)|float)}}  </td>
                 <td align="center"><input class="align-middle" type="checkbox" {% if data.id in odervec %} checked {% endif %}name="oder{{data.id}}" value="{{data.id}}"></td>
-                <td class="{{atc}}">{{ data.Date.date() }}</td>
+                <td class="{{atc}}">{{ transdate }}</td>
                 <td class="{{atc}}">{{ data.Tcode }}</td>
                 <td class="{{atc}}">{{ data.Recorded.strftime('%Y-%m-%d %H:%M:%S') }}</td>
 
