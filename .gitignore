@@ -1,7 +1,6 @@
 /templates/companysite
 /tmp
 *.pyc
-runmain.py
 /processing
 /.idea
 /__pycache__
