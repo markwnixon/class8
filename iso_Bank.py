@@ -23,8 +23,9 @@ def dataget_Bank(thismuch,bankacct):
     today = datetime.date.today()
     stopdate = today-datetime.timedelta(days=60)
     if thismuch == '1':
-        print('bankacct',bankacct)
-        odata = Gledger.query.filter((Gledger.Account==bankacct) & (Gledger.Reconciled==0)).all()
+        odata = Gledger.query.filter((Gledger.Account==bankacct) & ( (Gledger.Reconciled==0) | (Gledger.Reconciled==25) )).all()
+    elif thismuch == '5':
+        odata = Gledger.query.filter((Gledger.Account==bankacct) & (Gledger.Reconciled==25)).all()
     elif thismuch == '2':
         stopdate = today-datetime.timedelta(days=45)
         odata = Gledger.query.filter((Gledger.Account==bankacct) & (Gledger.Recorded > stopdate)).all()
@@ -35,44 +36,13 @@ def dataget_Bank(thismuch,bankacct):
         odata = Gledger.query.filter(Gledger.Account==bankacct ).all()
     return odata
 
-def banktotals(bankacct):
-    totald=0
-    totalc=0
-    totald_U = 0
-    totalc_U = 0
-    actbal = request.values.get('actbal')
-    try:
-        actbal=float(actbal)
-    except:
-        actbal=0.00
-    gdata = Gledger.query.filter(Gledger.Account==bankacct).all()
-    for gdat in gdata:
-        type = gdat.Type
-        if type == 'DD' or type == 'XD':
-            totald = totald + gdat.Debit
-            if gdat.Reconciled==0:
-                totald_U = totald_U + gdat.Debit
-
-        if type == 'PC' or type == 'XC':
-            totalc = totalc + gdat.Credit
-            if gdat.Reconciled==0:
-                totalc_U = totalc_U + gdat.Credit
-
-    totalds = d2s(float(totald)/100)
-    totalcs = d2s(float(totalc)/100)
-    balance = d2s( (float(totald) - float(totalc))/100 )
-    totald_Us = d2s(float(totald_U)/100)
-    totalc_Us = d2s(float(totalc_U)/100)
-    projbal = d2s( float(totald-totalc-totald_U+totalc_U)/100 )
-    diff = float(projbal) - actbal
-    acctinfo=[balance,totald_Us,totalc_Us,projbal,d2s(actbal),d2s(diff),bankacct,totalds,totalcs]
-
-    return acctinfo
-
 def recon_totals(bankacct):
     # Find service charges for month:
     gdat = Gledger.query.filter((Gledger.Account == bankacct) & (Gledger.Reconciled == 25) & (Gledger.Source == bankacct)).first()
-    bkc = gdat.Credit
+    if gdat is not None:
+        bkc = gdat.Credit
+    else:
+        bkc = 0
     totald, totalc = 0.0, 0.0
     gdata = Gledger.query.filter((Gledger.Account == bankacct) & (Gledger.Reconciled == 25)).all()
     for gdat in gdata:
@@ -82,6 +52,53 @@ def recon_totals(bankacct):
 
     totalc = totalc - bkc
     return d2s(float(totald)/100), d2s(float(totalc)/100), d2s(float(bkc)/100)
+
+def banktotals(bankacct):
+    totald=0
+    totalc=0
+    totald_U = 0
+    totalc_U = 0
+    endbal = request.values.get('endbal')
+    begbal = request.values.get('begbal')
+    print(begbal,endbal)
+    try:
+        endbal = float(endbal)
+    except:
+        endbal=0.00
+    try:
+        begbal = float(begbal)
+    except:
+        begbal=0.00
+    gdata = Gledger.query.filter(Gledger.Account==bankacct).all()
+    for gdat in gdata:
+        type = gdat.Type
+        if type == 'DD' or type == 'XD':
+            totald = totald + gdat.Debit
+            if gdat.Reconciled==0 or gdat.Reconciled==25:
+                totald_U = totald_U + gdat.Debit
+
+        if type == 'PC' or type == 'XC':
+            totalc = totalc + gdat.Credit
+            if gdat.Reconciled==0 or gdat.Reconciled==25:
+                totalc_U = totalc_U + gdat.Credit
+
+    trial_dr, trial_cr, bk_charge = recon_totals(bankacct)
+
+    totald = float(totald)/100
+    totalc = float(totalc)/100
+    diff = begbal + float(trial_dr) - float(trial_cr) - float(bk_charge) - endbal
+    totalds = d2s(totald)
+    totalcs = d2s(totalc)
+    balance = d2s( (float(totald) - float(totalc))/100 )
+    totald_Us = d2s(float(totald_U)/100)
+    totalc_Us = d2s(float(totalc_U)/100)
+    projbal = d2s( float(totald-totalc-totald_U+totalc_U)/100 )
+
+    acctinfo=[balance,totald_Us,totalc_Us,projbal,d2s(endbal),d2s(diff),bankacct,totalds,totalcs,d2s(begbal)]
+
+    return acctinfo
+
+
 
 
 
@@ -141,13 +158,20 @@ def isoBank():
             rdate = today_str
         hv[0] = rdate
         hv[1] = [0]
-        actbal = request.values.get('actbal')
+        endbal = request.values.get('endbal')
+        begbal = request.values.get('begbal')
+        recready = 1
         try:
-            actbal=float(actbal)
-            recready=1
+            endbal=float(endbal)
         except:
-            actbal=0.00
+            endbal=0.00
             err.append('No Statement Balance Entered for Reconciliation')
+            recready=0
+        try:
+            begbal=float(begbal)
+        except:
+            endbal=0.00
+            err.append('No Statement Ending Entered for Reconciliation')
             recready=0
 
 
@@ -238,6 +262,7 @@ def isoBank():
                 acctinfo = banktotals(acname)
                 hv[2], hv[3], hv[4] = recon_totals(acname)
                 print(hv[2],hv[3])
+                odata = dataget_Bank(thismuch, acname)
 
             else:
                 err.append('No items checked for reconciliation')

@@ -9,47 +9,51 @@
        {% endfor %}
     </select>
     <button type="submit" class="btn btn-group-small btn-mdb-color my-small-btn" name="Return"
-        data-toggle="tooltip" title="Update Actual Balance"> Update<br>Tables</button>
+        data-toggle="tooltip" title="Update Actual Balance"> Return<br>Cancel</button>
     <button type="submit" class="btn btn-group-small btn-blue my-small-btn" name="recothese"
-      data-toggle="tooltip" title="Add items selected to pre-RECONCILED"> Reconcile<br>Selected</button>
+      data-toggle="tooltip" title="Add items selected to pre-RECONCILED"> Trial<br>Balance</button>
     <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="finalize"
-        data-toggle="tooltip" title="Complete and Permanently Reconcile Statement"> Record All<br>Reconciled</button>
+        data-toggle="tooltip" title="Complete and Permanently Reconcile Statement"> Record <br>Reconcile</button>
       <button type="submit" class="btn btn-group-small btn-red my-small-btn" name="undothese"
         data-toggle="tooltip" title="Unrecord Reconcile Selected Items">Undo<br>Selected</button>
   </div>
 </div>
 <div class="card">
   <div class="card-header">
-    Choose what Records to View
+    Records to View & Reconciliation Information
   </div>
   <div class="card-body">
           <select class="form-control align-text-botton" type="text" name="thismuch" onchange="this.form.submit()">
               <option {% if thismuch == '1' %} selected {% endif %} value='1'>Only Unreconciled Transactions</option>
+              <option {% if thismuch == '5' %} selected {% endif %} value='5'>Only Trial Balance Records</option>
               <option {% if thismuch == '2' %} selected {% endif %} value='2'>Last 45 Days</option>
               <option {% if thismuch == '3' %} selected {% endif %} value='3'>Last 60 Days</option>
               <option {% if thismuch == '4' %} selected {% endif %} value='4'>All Records</option>
           </select>
          <table class="table table-condensed table-hover">
+             {% if bkcharges %}
+                {% set newcharges = 'Already Included' %}
+             {% else %}
+                {% set newcharges = '' %}
+             {% endif %}
                     <tbody>
                     {% set rdate = hv[0] %}
-                    {% set deposits = hv[2] %}
-                    {% set withdrawals = hv[3] %}
                     {% set bkcharges = hv[4] %}
                     <tr>
                         <td> <div class="input-group-text">Reconciliation Date</div></td>
                         <td colspan="2"><input class="form-control" type="date" value="{{rdate}}" name="rdate"></td>
                     </tr>
                     <tr>
-                        <td> <div class="input-group-text">Bank Charges for Month:</div></td>
-                        <td colspan="2"><input class="form-control" type="text" value="{{bkcharges}}" name="bkcharges"></td>
+                        <td> <div class="input-group-text">BeginningBalance</div></td>
+                       <td colspan="2"><input class="form-control" type="text" value="{{acctinfo[9]}}" name="begbal"></td>
                     </tr>
                     <tr>
-                        <td> <div class="input-group-text">Total Deposits for Month:</div></td>
-                        <td colspan="2"><input class="form-control" type="text" value="{{deposits}}" name="deposits"></td>
+                        <td> <div class="input-group-text">Ending Balance</div></td>
+                       <td colspan="2"><input class="form-control" type="text" value="{{acctinfo[4]}}" name="endbal"></td>
                     </tr>
                     <tr>
-                        <td> <div class="input-group-text">Total Withdrawals for Month:</div></td>
-                        <td colspan="2"><input class="form-control" type="text" value="{{withdrawals}}" name="withdrawals"></td>
+                        <td> <div class="input-group-text"> Add Bank Charges:</div></td>
+                        <td colspan="2"><input class="form-control" type="text" value="{{newcharges}}" name="bkcharges"></td>
                     </tr>
                     </tbody>
          </table>

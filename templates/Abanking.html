@@ -19,7 +19,7 @@
 {% else %}
 
   <div class="row">
-    <div class="col-sm-12" align="center" style="font-weight:bold"> Deposits and Withdrawals </div>
+    <div class="col-sm-12" align="center" style="font-weight:bold"> Account Status and Reconciliation</div>
   </div>
   <div class="row">
 
@@ -51,6 +51,10 @@
             <tr>
               {% if data.Reconciled == 0 %}
                     {% set atr = "white blue-text font-weight-bold text-right" %}
+              {% elif data.Reconciled == 25 and data.Debit == 0 %}
+                    {% set atr = "white red-text font-weight-bold text-right" %}
+              {% elif data.Reconciled == 25 and data.Credit == 0 %}
+                    {% set atr = "white green-text font-weight-bold text-right" %}
               {% else %}
                     {% set atr = "font-weight-bold text-right" %}
               {% endif %}
@@ -64,9 +68,10 @@
                 <td class="{{atc}}">{{ data.Account }}</td>
                 <td class="{{atl}}">&nbsp; &nbsp;{{ data.Source }}</td>
                 <td class="{{atc}}">&nbsp; &nbsp;{{ data.Ref }}</td>
-                <td class="{{atr}}">${{'%0.2f'| format((data.Debit/100)|float)}}  </td>
-                <td class="{{atr}}">${{'%0.2f'| format((data.Credit/100)|float)}}  </td>
-                <td align="center"><input class="align-middle" type="checkbox" {% if data.id in odervec %} checked {% endif %}name="oder{{data.id}}" value="{{data.id}}"></td>
+                <td class="{{atr}}">{% if data.Debit >0 %} ${{'%0.2f'| format((data.Debit/100)|float)}} {% endif %}  </td>
+                <td class="{{atr}}">{% if data.Credit >0 %}${{'%0.2f'| format((data.Credit/100)|float)}} {% endif %}  </td>
+                <td align="center"><input class="align-middle" type="checkbox" {% if data.id in odervec or data.Reconciled == 25 %} checked
+                {% endif %} name="oder{{data.id}}" value="{{data.id}}"></td>
                 <td class="{{atc}}">{{ transdate }}</td>
                 <td class="{{atc}}">{{ data.Tcode }}</td>
                 <td class="{{atc}}">{{ data.Recorded.strftime('%Y-%m-%d %H:%M:%S') }}</td>
@@ -76,58 +81,79 @@
             </tbody>
         </table>
     </div>
-
     <div class="col-sm-3">
-             <div class="row"><div class="col-sm-12">&nbsp;</div></div>
               <div class="row"><div class="col-sm-12">
-                          <div class="card">
-                            <div class="card-header">
-                              Reconcilation Data
-                            </div>
-                            <div class="card-body" align="left">
-
-
-                              <table class="table table-condensed table-hover">
-                                  <tbody>
+                  <div class="card">
+                      <div class="card-header">
+                          Current Account Data
+                      </div>
+                      <div class="card-body" align="left">
+                          <table class="table table-condensed table-hover">
+                              <tbody>
                                   <tr>
-                                      <td> <div class="input-group-text">Current Balance:</div></td>
-                                  </tr><tr>
+                                      <td> <div class="input-group-text">Account Balance:</div></td>
+                                  </tr>
+                                  <tr>
                                       <td><input class="form-control" type="text" value="{{acctinfo[0]}}" name="acctbal"></td>
                                   </tr>
                                   <tr>
                                       <td> <div class="input-group-text">Unreconciled Deposits</div></td>
-                                  </tr><tr>
+                                  </tr>
+                                  <tr>
                                       <td><input class="form-control" type="text" value="{{acctinfo[1]}}" name="depbal"></td>
                                   </tr>
 
                                   <tr>
                                       <td> <div class="input-group-text">Unreconciled Checks:</div></td>
-                                  </tr><tr>
+                                  </tr>
+                                  <tr>
                                       <td><input class="form-control" type="text" value="{{acctinfo[2]}}" name="chkbal"></td>
                                   </tr>
-
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+                  <div class="card">
+                      <div class="card-header">
+                          Reconciliation Output
+                          {% set deposits = hv[2] %}
+                          {% set withdrawals = hv[3] %}
+                          {% set bkcharges = hv[4] %}
+                      </div>
+                      <div class="card-body" align="left">
+                          <table class="table table-condensed table-hover">
+                              <tbody>
+                                    <tr>
+                                        <td> <div class="input-group-text">Deposits/Credits:</div></td>
+                                        </tr>
+                                    <tr>
+                                        <td colspan="1"><input class="form-control" type="text" value="{{deposits}}" name="deposits"></td>
+                                    </tr>
+                                    <tr>
+                                        <td> <div class="input-group-text">Withdrawals + Checks:</div></td>
+                                        </tr>
+                                    <tr>
+                                        <td colspan="1"><input class="form-control" type="text" value="{{withdrawals}}" name="withdrawals"></td>
+                                    </tr>
+                                    <tr>
+                                        <td> <div class="input-group-text">Service Fees:</div></td>
+                                        </tr>
+                                    <tr>
+                                        <td colspan="1"><input class="form-control" type="text" value="{{bkcharges}}" name="inalready"></td>
+                                    </tr>
                                   <tr>
-                                      <td> <div class="input-group-text">Projected Balance:</div></td>
-                                      </tr><tr>
-                                      <td><input class="form-control" type="text" value="{{acctinfo[3]}}" name="projbal"></td>
+                                      <td> <div class="input-group-text">Trial Discrepency:</div></td>
                                   </tr>
                                   <tr>
-                                      <td> <div class="input-group-text">Enter Statement Balance</div></td>
-                                      </tr><tr>
-                                      <td><input class="form-control" type="text" value="{{acctinfo[4]}}" name="actbal"></td>
-                                  </tr>
-                                  <tr>
-                                      <td> <div class="input-group-text">Difference:</div></td>
-                                      </tr><tr>
                                       <td><input class="form-control" type="text" value="{{acctinfo[5]}}" name="diffbal"></td>
                                   </tr>
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
 
-                                  </tbody></table>
-
-
-                            </div>
-                          </div>
-              </div></div>
+          </div>
+      </div>
 
       </div>
 
