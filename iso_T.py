@@ -747,6 +747,13 @@ def isoT():
             stampdata = [0] * 9
             for i in range(9):
                 stampdata[i] = request.values.get('stampdata' + str(i))
+            stampstring = json.dumps(stampdata)
+            print('the updated stamp string is:',stampstring)
+            pdat = People.query.get(odat.Bid)
+            if pdat is not None:
+                pdat.Temp2 = stampstring
+                db.session.commit()
+
             for i in range(4):
                 if eprof is None or eprof == '6':
                     packname = 'section' + str(i + 1)
@@ -829,7 +836,6 @@ def isoT():
                 tes = subprocess.check_output(pdflist)
                 leftscreen = 0
                 stampstring = json.dumps(stampdata)
-                print('stampstring=', stampstring)
                 odat.Status = stampstring
                 db.session.commit()
             except:
@@ -871,16 +877,19 @@ def isoT():
                 doclist[7] = f'tmp/{scac}/data/vpackages/P_c{cache2}_{odat.Jo}.pdf'
                 odat.Pkcache = cache2
                 db.session.commit()
-
-                stampstring = odat.Status
-                try:
-                    stampdata = json.loads(stampstring)
-                    if isinstance(stampdata, list):
-                        print('stampdata is',stampdata)
-                    else:
+                pdat = People.query.get(odat.Bid)
+                if pdat is not None:
+                    stampstring = pdat.Temp2
+                    try:
+                        stampdata = json.loads(stampstring)
+                        if isinstance(stampdata, list):
+                            print('stampdata is',stampdata)
+                        else:
+                            stampdata = None
+                    except:
                         stampdata = None
-                except:
-                    stampdata = None
+
+                print(stampdata)
 
                 if stampdata is None:
                     packitems = []
@@ -920,42 +929,58 @@ def isoT():
                     packitems = []
                     subdata = stampdata[9:13]
                     stampdata = stampdata[0:9]
-                    print('subdata is ',subdata)
-                    for test in subdata:
-                        if test != 'none':
-                            if test == 'Source':
-                                fa = addpath(f'tmp/{scac}/data/vorders/{odat.Original}')
-                                if os.path.isfile(fa):
-                                    packitems.append(fa)
-                                    stampdata.append(test)
-                            if test == 'Invoice':
-                                fa = addpath(f'tmp/{scac}/data/vinvoice/{odat.Invoice}')
-                                if os.path.isfile(fa):
-                                    packitems.append(fa)
-                                    stampdata.append(test)
-                            if test == 'Proofs':
-                                fa = addpath(f'tmp/{scac}/data/vproofs/{odat.Proof}')
-                                if os.path.isfile(fa):
-                                    packitems.append(fa)
-                                    stampdata.append(test)
-                            if test == 'Ticks':
-                                idata = Interchange.query.filter(Interchange.CONTAINER == odat.Container).all()
-                                if idata is not None:
-                                    if len(idata) > 1:
-                                        # Get a blended ticket
-                                        con = idata[0].CONTAINER
-                                        newdoc = f'tmp/{scac}/data/vinterchange/{con}_Blended.pdf'
-                                        if os.path.isfile(addpath(newdoc)):
-                                            print(f'{newdoc} exists already')
+                    if len(subdata) == 0:
+
+                        doclist[0] = f'tmp/{scac}/data/vorders/{odat.Original}'
+                        doclist[1] = f'tmp/{scac}/data/vproofs/{odat.Proof}'
+                        doclist[2] = f'tmp/{scac}/data/vinvoice/{odat.Invoice}'
+                        doclist[3] = f'tmp/{scac}/data/vinterchange/{odat.Gate}'
+
+                        for ix in range(4):
+                            if dockind[ix] != 'none':
+                                fexist[ix] = os.path.isfile(addpath(doclist[ix]))
+                                if fexist[ix] == 0:
+                                    print(f'{addpath(doclist[ix])} does not exist')
+                                    err.append(f'No {dockind[ix]} Document Exists')
+                                else:
+                                    packitems.append(addpath(doclist[ix]))
+                                    stampdata.append(dockind[ix])
+                    else:
+                        for test in subdata:
+                            if test != 'none':
+                                if test == 'Source':
+                                    fa = addpath(f'tmp/{scac}/data/vorders/{odat.Original}')
+                                    if os.path.isfile(fa):
+                                        packitems.append(fa)
+                                        stampdata.append(test)
+                                if test == 'Invoice':
+                                    fa = addpath(f'tmp/{scac}/data/vinvoice/{odat.Invoice}')
+                                    if os.path.isfile(fa):
+                                        packitems.append(fa)
+                                        stampdata.append(test)
+                                if test == 'Proofs':
+                                    fa = addpath(f'tmp/{scac}/data/vproofs/{odat.Proof}')
+                                    if os.path.isfile(fa):
+                                        packitems.append(fa)
+                                        stampdata.append(test)
+                                if test == 'Ticks':
+                                    idata = Interchange.query.filter(Interchange.CONTAINER == odat.Container).all()
+                                    if idata is not None:
+                                        if len(idata) > 1:
+                                            # Get a blended ticket
+                                            con = idata[0].CONTAINER
+                                            newdoc = f'tmp/{scac}/data/vinterchange/{con}_Blended.pdf'
+                                            if os.path.isfile(addpath(newdoc)):
+                                                print(f'{newdoc} exists already')
+                                            else:
+                                                g1 = f'tmp/{scac}/data/vinterchange/{idata[0].Original}'
+                                                g2 = f'tmp/{scac}/data/vinterchange/{idata[1].Original}'
+                                                blendticks(addpath(g1), addpath(g2), addpath(newdoc))
+                                            packitems.append(addpath(newdoc))
+                                            stampdata.append(test)
                                         else:
-                                            g1 = f'tmp/{scac}/data/vinterchange/{idata[0].Original}'
-                                            g2 = f'tmp/{scac}/data/vinterchange/{idata[1].Original}'
-                                            blendticks(addpath(g1), addpath(g2), addpath(newdoc))
-                                        packitems.append(addpath(newdoc))
-                                        stampdata.append(test)
-                                    else:
-                                        packitems.append(addpath(f'tmp/{scac}/data/vinterchange/{idata[0].Original}'))
-                                        stampdata.append(test)
+                                            packitems.append(addpath(f'tmp/{scac}/data/vinterchange/{idata[0].Original}'))
+                                            stampdata.append(test)
 
                     if len(stampdata)<13:
                         for ix in range(len(stampdata),13):
