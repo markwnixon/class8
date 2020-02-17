@@ -40,6 +40,7 @@
             <tbody>
 
             {% for data in data1 %}
+                {% set act="font-weight-bold" %}
                 {% if data.Temp2=='Copy' %}
                     {% set act="amber font-weight-bold" %}
                 {% elif data.Status[0] == 'P' and data.Bal() != '0.00' %}
@@ -51,8 +52,6 @@
                         {% set act="red white-text font-weight-bold" %}
                     {% elif data.dDate < critday  %}
                         {% set act="amber font-weight-bold" %}
-                    {% else %}
-                        {% set act="font-weight-bold" %}
                     {% endif %}
                 {% else %}
                     {% set act="font-weight-bold" %}
