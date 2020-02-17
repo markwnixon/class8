@@ -40,17 +40,17 @@
             <tbody>
 
             {% for data in data1 %}
-                {% set act="font-weight-bold" %}
+                {% set act="font-weight-bold"%}
                 {% if data.Temp2=='Copy' %}
-                    {% set act="amber font-weight-bold" %}
+                    {% set act="yellow font-weight-bold" %}
                 {% elif data.Status[0] == 'P' and data.Bal() != '0.00' %}
                     {% set act="blue-text font-weight-bold" %}
                 {% elif data.Status[0] == 'P' %}
                     {% set act="green-text font-weight-bold" %}
                 {% elif data.dDate %}
-                    {% if data.dDate < today %}
+                    {% if today > data.dDate %}
                         {% set act="red white-text font-weight-bold" %}
-                    {% elif data.dDate < critday  %}
+                    {% elif critday > data.dDate %}
                         {% set act="amber font-weight-bold" %}
                     {% endif %}
                 {% else %}
@@ -59,6 +59,7 @@
                 {% set alt = act + " text-left" %}
                 {% set art = act + " text-right" %}
                 {% set act = act + " text-center" %}
+
             <tr>
                 <td class="{{act}}" >{{ data.id }}</td>
                 <td class="{{act}}" >{{ data.Co}}</td>

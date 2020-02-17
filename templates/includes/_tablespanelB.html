@@ -29,6 +29,7 @@
 
 
 {% set thismuch = hv[1] %}
+{% set vendmuch = hv[3] %}
 
 <div class="d-sm-flex justify-content-center small">
     <div class="p-0">
@@ -36,10 +37,20 @@
             <option value="" disabled selected>Filter Table</option>
             <option {% if thismuch == '1' %} selected {% endif %} value='1'>Filter: Last 60 Days</option>
             <option {% if thismuch == '2' %} selected {% endif %} value='2'>Filter: Last 120 Days</option>
-            <option {% if thismuch == '3' %} selected {% endif %} value='3'>Filter: Unreconciled</option>
-            <option {% if thismuch == '4' %} selected {% endif %} value='4'>Filter: Reconciled</option>
+            <option {% if thismuch == '3' %} selected {% endif %} value='3'>Filter: Last 360 Days</option>
+            <option {% if thismuch == '4' %} selected {% endif %} value='4'>Filter: Unreconciled</option>
+            <option {% if thismuch == '5' %} selected {% endif %} value='5'>Filter: Reconciled</option>
             <option {% if thismuch == '8' %} selected {% endif %} value='8'>Filter: All Transactions</option>
-            <option {% if thismuch == '9' %} selected {% endif %} value='9'>Filter: Incl Minor Vendors</option>
+        </select>
+    </div>
+    &nbsp; &nbsp;
+    <div class="p-0">
+        <select class="mdb-select md-form" name="vendmuch" onchange="this.form.submit()">
+            <option value="" disabled selected>Filter Vendors</option>
+            <option {% if vendmuch == '1' %} selected {% endif %} value='1'>Regular Vendors</option>
+            <option {% if vendmuch == '2' %} selected {% endif %} value='2'>Tow Companies</option>
+            <option {% if vendmuch == '3' %} selected {% endif %} value='3'>One Timers</option>
+            <option {% if vendmuch == '4' %} selected {% endif %} value='4'>Everyone</option>
         </select>
     </div>
     &nbsp; &nbsp;

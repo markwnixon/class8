@@ -26,7 +26,7 @@ def isoB(indat):
         bill_path = 'processing/bills'
         bill, peep, cache, modata, modlink, fdata, adata, cdat, pb, passdata, vdata, caldays, daylist, weeksum, nweeks = init_billing_zero()
         filesel, docref, search11, search12, search13, search14, search21, search22, bType, bClass = init_billing_blank()
-        expdata, addjobselect, jobdata, modal, viewck, towco = 0, 0, 0, 0, 0, 0
+        expdata, addjobselect, jobdata, modal, viewck, acceptthese = 0, 0, 0, 0, 0, 0
 
         hv = [0]*24
         hv[21] = 1 #default check style
@@ -92,6 +92,12 @@ def isoB(indat):
             hv[1] = thismuch
         else:
             hv[1] = request.values.get('passthismuch')
+
+        vendmuch = request.values.get('vendmuch')
+        if vendmuch is not None:
+            hv[3] = vendmuch
+        else:
+            hv[3] = request.values.get('passvendmuch')
 
         thisbox0 = request.values.get('codiv')
         if thisbox0 is not None:
@@ -257,7 +263,6 @@ def isoB(indat):
             csize = People.query.filter(People.Ptype == 'TowCo').order_by(People.Company).all()
             bill = modata.id
             leftscreen = 1
-            towco = 1
             modlink = 12
 # ____________________________________________________________________________________________________________________E.QuickBillPayTowing
 
@@ -290,8 +295,7 @@ def isoB(indat):
                 modata = Bills.query.get(bill)
                 cdat = People.query.filter(People.Company==modata.Company).first()
                 if cdat is not None:
-                    if cdat.Ptype == 'TowCo': towco = 1
-                    print('towco in setter',towco)
+                    if cdat.Ptype == 'TowCo': hv[3] = '2'
                 ifxfer = modata.bType
                 if ifxfer == 'XFER':
                     vals = ['fromacct', 'toacct', 'pamt', 'bref',
@@ -331,7 +335,7 @@ def isoB(indat):
                         if bval is not None:
                             modata.Co = bval
                             db.session.commit()
-                            expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co.contains(bval))).all()
+                            expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co.contains(bval))).order_by(Accounts.Name).all()
                         pacct = request.values.get('account')
                         print(pacct)
                         pcheck = next_check(pacct,modata.id)
@@ -367,12 +371,12 @@ def isoB(indat):
                             People.Ptype == 'TowCo') | (People.Ptype == 'Overseas'))).first()
                         if cdat is not None:
                             modata.Pid = cdat.id
-                            if cdat.Ptype == 'TowCo': towco = 1
+                            if cdat.Ptype == 'TowCo': hv[3] = '2'
                         else:
                             cdat = People.query.filter(People.Company == modata.Company).first()
                             if cdat is not None:
                                 modata.Pid = cdat.id
-                                if cdat.Ptype == 'TowCo': towco = 1
+                                if cdat.Ptype == 'TowCo': hv[3] = '2'
                             else:
                                 modata.Pid = 0
                         modata.Memo = a[7]
@@ -521,10 +525,25 @@ def isoB(indat):
 
             print('leftscreen on exit',leftscreen)
 
+
+
 # ____________________________________________________________________________________________________________________B.UpdateDatabasesSection
-        print('towco=',towco)
-        bdata, cdata = dataget_B(hv[1],hv[0],towco)
+
+        bdata, cdata = dataget_B(hv[1],hv[0],hv[3])
 # ____________________________________________________________________________________________________________________B.SearchFilters
+        if acceptthese == 1:
+            print('acceptthese',acceptthese)
+            modlink = 0
+            # Check to see if these are all new jobs ready to be updated to ready status
+            odervec = numcheckvec(bdata,'bill')
+            print(odervec)
+            if len(odervec)>0:
+                for ix in odervec:
+                    bdat = Bills.query.get(ix)
+                    bdat.Temp2 = None
+                db.session.commit()
+            else:
+                err.append('Must check at least one box to use this option')
 
         if modlink < 5:
             bill, peep, numchecked = numcheck(2, bdata, cdata, 0, 0, 0, ['bill', 'peep'])
@@ -1371,7 +1390,6 @@ def isoB(indat):
         jobdata = 0
         modal = 0
         expdata = 0
-        towco = 0
         divdat = Divisions.query.all()
 
         err.append('All is well')
@@ -1379,9 +1397,8 @@ def isoB(indat):
     rightsize = 12 - leftsize
     today = datetime.date.today()
     critday = datetime.date.today()+datetime.timedelta(days=7)
-    print('final twoco',towco)
-    bdata, cdata = dataget_B(hv[1],hv[0],towco)
-    acdata = Accounts.query.filter((Accounts.Type == 'Bank') | (Accounts.Type == 'Credit Card')).order_by(Accounts.Name).all()
+    bdata, cdata = dataget_B(hv[1],hv[0],hv[3])
+    acdata = Accounts.query.filter((Accounts.Type == 'Bank') | (Accounts.Type == 'Credit Card') | (Accounts.Type == 'Current Liability') ).order_by(Accounts.Name).all()
     err = erud(err)
 
     return username, divdat, hv, bdata, cdata, bill, peep, err, modata, adata, acdata, expdata, modlink, caldays, daylist, weeksum, nweeks, addjobselect, jobdata, modal, dlist, fdata, today, cdat, pb, critday, vdata, leftscreen, docref, doctxt, leftsize, cache, filesel

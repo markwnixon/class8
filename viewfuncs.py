@@ -1707,45 +1707,46 @@ def dataget_Q(thismuch):
 
     return qdata
 
-def dataget_B(thismuch,co,towco):
+def dataget_B(thismuch,co,vendmuch):
     today = datetime.date.today()
     acct = None
     if co is None:
         co = 'X'
     if thismuch is None:
         thismuch = '1'
-    if towco is None:
-        towco = 0
+    if vendmuch is None:
+        vendmuch = 0
     if ':' in co:
         co, acct = co.split(':')
         print(co, acct)
 
     if co == 'X':
-        if thismuch == '1' or thismuch == '9':
+        if thismuch == '1':
             stopdate = today-datetime.timedelta(days=60)
             bdata = Bills.query.filter(Bills.bDate > stopdate).all()
         elif thismuch == '2':
             stopdate = today - datetime.timedelta(days=120)
             bdata = Bills.query.filter(Bills.bDate > stopdate).all()
+        elif thismuch == '3':
+            stopdate = today - datetime.timedelta(days=360)
+            bdata = Bills.query.filter(Bills.bDate > stopdate).all()
         else:
-            stopdate = today - datetime.timedelta(days=10)
             bdata = Bills.query.all()
-        if towco == 0: vdata = People.query.filter(People.Ptype == 'Vendor').order_by(People.Company).all()
     else:
-        if thismuch == '1' or thismuch == '9':
-            stopdate = today-datetime.timedelta(days=60)
-        elif thismuch == '2':
-            stopdate = today-datetime.timedelta(days=120)
-        else:
-            stopdate = today - datetime.timedelta(days=700)
+        if thismuch == '1': stopdate = today-datetime.timedelta(days=60)
+        elif thismuch == '2': stopdate = today-datetime.timedelta(days=120)
+        elif thismuch == '3': stopdate = today - datetime.timedelta(days=360)
+        else: stopdate = today - datetime.timedelta(days=700)
 
         if acct is None:
             bdata = Bills.query.filter((Bills.Co.contains(co)) & (Bills.bDate > stopdate)).all()
         else:
             bdata = Bills.query.filter( (Bills.Co.contains(co)) & (Bills.bDate > stopdate) & (Bills.pAccount == acct) ).all()
-        if towco == 0 : vdata = People.query.filter( (People.Ptype=='Vendor') & (People.Idtype.contains(co)) ).order_by(People.Company).all()
 
-    if towco == 1 or thismuch == '9': vdata = People.query.filter((People.Ptype == 'Vendor') | (People.Ptype == 'TowCo') ).order_by(People.Company).all()
+    if vendmuch == 0 or vendmuch == '4': vdata = People.query.filter((People.Ptype == 'Vendor') | (People.Ptype == 'TowCo') ).order_by(People.Company).all()
+    if vendmuch == '1':vdata = People.query.filter(People.Ptype == 'Vendor').order_by(People.Company).all()
+    if vendmuch == '2':vdata = People.query.filter(People.Ptype == 'TowCo').order_by(People.Company).all()
+    if vendmuch == '3':vdata = People.query.filter(People.Ptype == 'TowCo').order_by(People.Company).all()
 
     return bdata,vdata
 
