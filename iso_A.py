@@ -1,11 +1,12 @@
 from runmain import app, db
 from models import users, ChalkBoard, Interchange, Orders, General
 from models import Services, Drivers, JO, People, OverSeas, Chassis, LastMessage
-from models import Autos, Bookings, Vehicles, Invoices, Income, Accounts, Bills, Drops
+from models import Autos, Bookings, Vehicles, Invoices, Income, Accounts, Bills, Drops, IEroll
 
-from flask import render_template, flash, redirect, url_for, session, logging, request
+from flask import render_template, flash, redirect, url_for, session, logging, request, jsonify
 import math
 from decimal import Decimal
+from random import sample
 
 import datetime
 import os
@@ -18,7 +19,7 @@ import requests
 import mimetypes
 from urllib.parse import urlparse
 import img2pdf
-from viewfuncs import make_new_order, nonone
+from viewfuncs import make_new_order, nonone, monvals, getmonths
 
 today = datetime.datetime.today()
 year = str(today.year)
@@ -77,6 +78,37 @@ def FileUpload():
     print(f'File {fileob.filename} uploaded as {filename2}')
 
     return "successful_upload"
+
+@app.route('/Charttest', methods=['GET', 'POST'])
+def Charttest():
+    from viewfuncs import erud
+    err=[]
+    hv=[0]*9
+    idata = IEroll.query.order_by(IEroll.Name).all()
+    err = erud(err)
+    if request.method == 'POST':
+        hv[1] = request.values.get('thisacct')
+    return render_template('chart.html',cmpdata=cmpdata, scac=scac, err=err, hv=hv, idata=idata)
+
+@app.route('/chartdata', methods=['GET', 'POST'])
+def chartdata():
+    acct = request.values['thisacct']
+    print(acct)
+    labeld = []
+    datad = []
+    lablist=monvals(12)
+    print(lablist)
+    plotitems=[acct]
+    for plotitem in plotitems:
+        datad.append(getmonths(plotitem,12))
+        labeld.append(plotitem)
+    print(lablist)
+    print(labeld)
+    print(datad)
+    return jsonify({'lablist' : lablist,
+                    'labeld'  : labeld,
+                    'datad'   : datad
+                    })
 
 
 

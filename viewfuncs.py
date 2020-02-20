@@ -1,6 +1,6 @@
 from runmain import db
 from models import Trucklog, DriverAssign, Invoices, JO, Income, Bills, Accounts, Bookings, OverSeas, Autos, People, Interchange, Drivers, ChalkBoard, Orders, Drops, Services, Quotes, Divisions
-from models import Taxmap, QBaccounts, Accttypes
+from models import Taxmap, QBaccounts, Accttypes, IEroll
 from flask import session, logging, request
 import datetime
 import calendar
@@ -2496,3 +2496,45 @@ def enter_bk_charges(acct,bkch,date,username):
     else:
         print(f'Have this bill {bdat.id} {bdat.Company}')
         return bdat.Jo
+
+def monvals(iback):
+    today = datetime.datetime.today()
+    from datetime import date
+    monnam = []
+
+    monlist = [0, 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    mon = today.month
+    yer = today.year
+    prev12 = []
+    year12 = []
+    dfr = []
+    dto = []
+    nmonths = iback
+    for ix in range(nmonths + 1):
+        if mon < 1:
+            mon = 12
+            yer = yer - 1
+        prev12.append(mon)
+        year12.append(yer)
+        mid_month = mon - 1
+        mid_yer = yer
+        if mid_month == 0:
+            mid_month = 12
+            mid_yer = mid_yer - 1
+        monnam.append(f'{monlist[mid_month]} {str(mid_yer)}')
+        print(date(yer, mon, 1))
+        dfr.append(date(yer, mon, 1))
+        mon = mon - 1
+
+    dto = dfr[0:nmonths]
+    dfr = dfr[1:nmonths + 1]
+    monnam = monnam[:iback]
+    return monnam
+
+def getmonths(acct,mback):
+    dat = IEroll.query.filter(IEroll.Name.contains(acct)).first()
+    dlist = []
+    if dat is not None:
+        for ix in range(1,mback+1):
+            dlist.append(float(getattr(dat, f'C{ix}')))
+    return dlist

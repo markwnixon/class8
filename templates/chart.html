@@ -1,0 +1,114 @@
+{% extends 'A_layout_portal.html' %}
+
+{% block body %}
+<form action="{{ url_for ('Charttest') }}" method="post">
+<div class="table-responsive">
+<!-- JQuery -->
+<script type="text/javascript" src="tmp/js/jquery-3.3.1.min.js"></script>
+
+    <div class="row">
+            <div class="col-sm-8">
+
+        {% if hv[1] != 0 %}
+
+            Testing the barchart<br>
+            <canvas id="bar2"></canvas>
+        {% endif %}
+
+<input type = "hidden" name="uploadtype" id="uploadtype" value={{ hv[1] }}>
+<script>
+     var acct = 'Dumerrage and Detention';
+     var acct2 = document.getElementById("uploadtype").value;
+
+     var getData = $.ajax({
+                   url: "/chartdata",
+                   type: "post",
+                   data: {'thisacct' : acct2}
+                });
+
+     getData.done(function(results) {
+        var mydata = {
+                   type: "bar",
+                   data: {
+                        labels: results.lablist,
+                        datasets: [
+                            {label: results.labeld[0], data: results.datad[0], backgroundColor:"rgba(54, 162, 235, 0.2)", borderColor: "rgb(54, 162, 235)"},
+                            ]
+                          }
+                    }
+        new Chart(document.getElementById("bar2"), mydata);
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            </div>
+
+
+            <div class="col-sm-4">
+
+              <div class="row">
+           <div class="col-sm-12">
+           <br>
+            {% include 'includes/_controlpanelheader.html' %}
+
+               <div class="card">
+                    <div class="card-body">
+                    Creat Bar Chart:<br>
+                        <table class="table table-condensed table-hover">
+                        <tbody>
+                            <tr>
+                                <td><div class="input-group-text">Account:</div></td>
+                                <td>
+                                    <select class="form-control" type="text" id="thisacct" name="thisacct" onchange="this.form.submit()">
+                                    {% for idat in idata %}
+                                        <option {% if hv[1] == idat.Name %} selected {% endif %} value="{{idat.Name}}" > {{idat.Name}} </option>
+                                    {% endfor %}</select>
+                                </td>
+                            </tr>
+                        </tbody>
+                        </table>
+                    </div>
+               </div>
+
+
+    </div>
+</div>
+
+
+
+
+
+
+           </div></div>
+
+
+
+
+
+
+
+
+
+            Here is the right side
+            </div>
+
+
+    </div>
+</div>
+
+</form>
+
+{% endblock %}
