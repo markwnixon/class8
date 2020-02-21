@@ -57,10 +57,16 @@ def isoR():
         hv[2] = request.values.get('act2')
         hv[3] = request.values.get('act3')
         #hv[4] = request.values.get('act4')
-        if all(h=='0' for h in hv): plotswitch=1
-        else: plotswitch=0
-        hv[5] = plotswitch
-        print(hv,plotswitch)
+        if all(h=='0' for h in hv):
+            plotswitch = 0
+            plotthese = []
+        else:
+            plotswitch=1
+            plotthese = [h for h in hv if h != '0' ]
+        hv[5] = len(plotthese)
+        hv[6] = plotthese
+
+        print('plotstuff',plotswitch,plotthese)
 
         monvec=['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
         for j, mon in enumerate(monvec):
@@ -104,7 +110,8 @@ def isoR():
         from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero, erud
         today = datetime.date.today()
         err=[]
-        hv=[0]*9
+        hv = ['0'] * 9
+        hv[5] = 0
         #today = datetime.datetime.today().strftime('%Y-%m-%d')
         now = datetime.datetime.now().strftime('%I:%M %p')
         docref=''
