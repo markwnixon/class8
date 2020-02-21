@@ -7,31 +7,21 @@
     
 <div class="col-sm-{{leftsize}}">
     
-{% if leftscreen == 0 %}
+{% if hv[5] == 1 %}
     
-    <div class="row">
-        <div class="col-sm-4" align="left">
-        Text version of file {{doctxt}}:<br>
-            
-        <embed src="{{doctxt}}" width="300px" height="550px"/>
-  
-        </div>
-        <div class="col-sm-8" align="left">
-        Looking for: {{docref}}<br>
-            
-        <embed src="{{docref}}" width="500px" height="550px"/>
-        </div>
-    </div>
+<div class="row">
+<div class="col-sm-12" align="center">
+Looking for: {{docref}}<br>
+<embed src="{{docref}}" width="600px" height="800px"/>
+</div>
+</div>
+
 {% else %}
 
-  <div class="row">
-    <div class="col-sm-12" align="center" style="font-weight:bold"> Reports Data </div>
-  </div>   
-  <div class="row">
-    <div class="col-sm-12">
-        No Tables in This Section
-    </div>
-</div>    
+<div class="row"><div class="col-sm-12" align="center" style="font-weight:bold"> Chart Data </div></div>
+<div class="row"><div class="col-sm-12" align="center">
+{% include 'Reports_Charts.html' %}
+</div></div>
      
 {% endif %}    
         
@@ -42,32 +32,83 @@
     
     
 <div class="col-sm-{{rightsize}}">
-       <div class="row" align="center">
-           <div class="col-sm-12"  style="font-weight:bold">Control Panel</div>
-       </div>
-       <div class="row" align="center">
-           <div class="col-sm-12">
-            
-            <table>
-               <tr class="small text-danger"><td>Messages</td></tr>
-                {% for e in err %}
-                <tr><td>{{e}}</td></tr> 
-                {% endfor %}
-            </table>
-            <br>
-                        
-           </div>
-       </div>
-       <div class="row">
-           <div class="col-sm-12">
-             
-            {% if modlink != 1 and modlink != 10 %}    
-               {% include 'includes/_controlpanelR.html' %}
-            {% endif %}
-               
- 
-                   
-           </div></div>
+
+<br>
+<div class="row" align="center">
+<div class="col-sm-12">
+{% include 'includes/_controlpanelheader.html' %}
+</div>
+</div>
+
+
+
+<div class="row">
+<div class="col-sm-12">
+<div class="card">
+<div class="card-header">
+Charts and Graphs
+</div>
+<div class="card-body">
+Single-Bar Views:<br>
+<table class="table table-condensed table-hover">
+<tbody>
+<tr>
+<td><div class="input-group-text">Totaling Accounts:</div></td>
+<td>
+<select class="form-control" type="text" id="act1" name="act1" onchange="this.form.submit()">
+<option value=0 > Select Totaling Account </option>
+{% for idat in idata1 %}
+<option {% if hv[1] == idat.Name %} selected {% endif %} value="{{idat.Name}}" > {{idat.Name}} </option>
+{% endfor %}</select>
+</td>
+</tr>
+<tr>
+<td><div class="input-group-text">Expense Accounts:</div></td>
+<td>
+<select class="form-control" type="text" id="act2" name="act2" onchange="this.form.submit()">
+<option value=0 > Select Expense Account </option>
+{% for idat in idata2 %}
+<option {% if hv[2] == idat.Name %} selected {% endif %} value="{{idat.Name}}" > {{idat.Name}} </option>
+{% endfor %}</select>
+</td>
+</tr>
+<tr>
+<td><div class="input-group-text">Income Accounts:</div></td>
+<td>
+<select class="form-control" type="text" id="act3" name="act3" onchange="this.form.submit()">
+<option value=0 > Select Income Account </option>
+{% for idat in idata3 %}
+<option {% if hv[3] == idat.Name %} selected {% endif %} value="{{idat.Name}}" > {{idat.Name}} </option>
+{% endfor %}</select>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<div class="row">
+<div class="col-sm-12">
+{% if modlink != 1 and modlink != 10 %}
+<div class="card">
+<div class="card-body">
+{% include 'includes/_controlpanelR.html' %}
+</div></div>
+{% endif %}
+</div></div>
+
+
+
+
+
+
+</div></div>
+
+
+
+
      
       
     

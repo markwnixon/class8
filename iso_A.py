@@ -93,13 +93,17 @@ def Charttest():
 @app.route('/chartdata', methods=['GET', 'POST'])
 def chartdata():
     acct = request.values['thisacct']
+    print('acct=',acct)
+    print(type(acct))
+    import ast
+    acct = ast.literal_eval(acct)
     print(acct)
+    print(type(acct))
     labeld = []
     datad = []
     lablist=monvals(12)
     print(lablist)
-    plotitems=[acct]
-    for plotitem in plotitems:
+    for plotitem in acct:
         datad.append(getmonths(plotitem,12))
         labeld.append(plotitem)
     print(lablist)
@@ -306,9 +310,9 @@ def EasyStart():
 def Reports():
 
     from iso_R import isoR
-    cache, err, leftscreen, docref, leftsize, today, now, doctxt, sdate, fdate, fyear, customerlist, thiscomp, clist = isoR()
+    idata1, idata2, idata3, idata4, hv, cache, err, leftscreen, docref, leftsize, today, now, doctxt, sdate, fdate, fyear, customerlist, thiscomp, clist = isoR()
     rightsize = 12-leftsize
-    return render_template('Areports.html', cmpdata=cmpdata, scac=scac, clist=clist, thiscomp=thiscomp, customerlist=customerlist, fyear=fyear, cache=cache, sdate=sdate, fdate=fdate, err=err, doctxt=doctxt, leftscreen=leftscreen, docref=docref, leftsize=leftsize, rightsize=rightsize)
+    return render_template('Areports.html', cmpdata=cmpdata, scac=scac, clist=clist, thiscomp=thiscomp, customerlist=customerlist, fyear=fyear, cache=cache, sdate=sdate, fdate=fdate, err=err, doctxt=doctxt, leftscreen=leftscreen, docref=docref, leftsize=leftsize, rightsize=rightsize, idata1 = idata1, idata2=idata2, idata3=idata3, idata4=idata4, hv=hv)
 
 
 @app.route('/CalendarBig', methods=['GET', 'POST'])

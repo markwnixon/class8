@@ -1,0 +1,68 @@
+<!-- JQuery -->
+<script type="text/javascript" src="tmp/js/jquery-3.3.1.min.js"></script>
+{% if hv[1] == '0' and  (hv[2] != '0' and hv[3] != '0') %}
+
+<canvas id="bar2"></canvas>
+
+        <input type = "hidden" id="acct1id" value="{{ [hv[2],hv[3]] }}">
+        <script>
+             var acct1 = document.getElementById("acct1id").value;
+
+             var getData = $.ajax({
+                           url: "/chartdata",
+                           type: "post",
+                           data: {'thisacct' : acct1}
+                        });
+
+             getData.done(function(results) {
+                var mydata = {
+                           type: "bar",
+                           data: {
+                                labels: results.lablist,
+                                datasets: [
+                                    {label: results.labeld[0], data: results.datad[0], backgroundColor:"rgba(54, 162, 235, 0.2)", borderColor: "rgb(54, 162, 235)"},
+                                    {label: results.labeld[1], data: results.datad[1], backgroundColor:"rgba(54, 162, 235, 0.2)", borderColor: "rgb(54, 162, 235)"},
+                                    ]
+                                  }
+                            }
+                new Chart(document.getElementById("bar2"), mydata);
+            });
+        </script>
+
+
+
+
+
+
+
+
+{% elif hv[1] != '0' or hv[2] != '0' or hv[3] != '0' %}
+<canvas id="bar1"></canvas>
+
+{% if hv[1] != '0' %}{% set plotme = hv[1] %}{% elif hv[2] != '0' %}{% set plotme = hv[2] %}{% else %}{% set plotme = hv[3] %}{% endif %}
+{{ plotme }}{{ hsum }}
+<input type = "hidden" id="acct1id" value="{{ [plotme] }}">
+<script>
+     var acct1 = document.getElementById("acct1id").value;
+
+     var getData = $.ajax({
+                   url: "/chartdata",
+                   type: "post",
+                   data: {'thisacct' : acct1}
+                });
+
+     getData.done(function(results) {
+        var mydata = {
+                   type: "bar",
+                   data: {
+                        labels: results.lablist,
+                        datasets: [
+                            {label: results.labeld[0], data: results.datad[0], backgroundColor:"rgba(54, 162, 235, 0.2)", borderColor: "rgb(54, 162, 235)"},
+                            ]
+                          }
+                    }
+        new Chart(document.getElementById("bar1"), mydata);
+    });
+</script>
+
+{% endif %}

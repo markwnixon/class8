@@ -1,5 +1,5 @@
 from runmain import db
-from models import General, users, OverSeas, Orders
+from models import General, users, OverSeas, Orders, IEroll
 from flask import session, logging, request
 import datetime
 import calendar
@@ -15,12 +15,12 @@ def isoR():
 # ____________________________________________________________________________________________________________________B.FormVariables.General
 
         from viewfuncs import parseline, popjo, jovec, newjo, timedata, nonone, nononef
-        from viewfuncs import numcheck, numcheckv, viewbuttons, get_ints, numcheckvec
+        from viewfuncs import numcheck, numcheckv, viewbuttons, get_ints, numcheckvec, erud
 
         #Zero and blank items for default
         username = session['username'].capitalize()
         cache= request.values.get('cache')
-        err=['','']
+        err=[]
         docref=''
         doctxt=''
         fyear=2019
@@ -50,6 +50,17 @@ def isoR():
 
         sdate=request.values.get('start')
         fdate=request.values.get('finish')
+
+
+        hv = ['0'] * 9
+        hv[1] = request.values.get('act1')
+        hv[2] = request.values.get('act2')
+        hv[3] = request.values.get('act3')
+        #hv[4] = request.values.get('act4')
+        if all(h=='0' for h in hv): plotswitch=1
+        else: plotswitch=0
+        hv[5] = plotswitch
+        print(hv,plotswitch)
 
         monvec=['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
         for j, mon in enumerate(monvec):
@@ -88,12 +99,12 @@ def isoR():
             udat.username=str(cache)
             db.session.commit()
 
-            err=['All is well', ' ']
-
 
     else:
-        from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero
+        from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero, erud
         today = datetime.date.today()
+        err=[]
+        hv=[0]*9
         #today = datetime.datetime.today().strftime('%Y-%m-%d')
         now = datetime.datetime.now().strftime('%I:%M %p')
         docref=''
@@ -104,7 +115,6 @@ def isoR():
         udat=users.query.filter(users.name=='Cache').first()
         cache=udat.username
         cache=nonone(cache)
-        err=['All is well', ' ', ' ', ' ',  ' ']
         sdate=today
         fdate=today
         fyear=2019
@@ -125,6 +135,11 @@ def isoR():
                 customerlist.append(cust)
 
     customerlist.sort()
+    idata1 = IEroll.query.filter(IEroll.Name.contains('Totals')).order_by(IEroll.Name).all()
+    idata2 = IEroll.query.filter(~(IEroll.Name.contains('Totals')) & (IEroll.Type == 'Expense')).order_by(IEroll.Name).all()
+    idata3 = IEroll.query.filter(~(IEroll.Name.contains('Totals')) & (IEroll.Type == 'Income')).order_by(IEroll.Name).all()
+    idata4 = IEroll.query.filter(IEroll.Type == 'Special').order_by(IEroll.Name).all()
+    err = erud(err)
 
 
-    return cache,err,leftscreen,docref,leftsize,today,now,doctxt,sdate,fdate,fyear,customerlist,thiscomp,clist
+    return idata1, idata2, idata3, idata4, hv, cache, err, leftscreen, docref, leftsize, today, now, doctxt, sdate, fdate, fyear, customerlist, thiscomp, clist
