@@ -51,20 +51,28 @@ def isoR():
         sdate=request.values.get('start')
         fdate=request.values.get('finish')
 
+        #This sequence will reset hv while collecting the new plot accounts
+        # hv[0] and hv[11] store the number of bars and their labels of the plot
+        # This provide hv[1-10] as the bar chart data available
+        hv = [request.values.get(f'act{ix}') for ix in range(0,13)]
+        for ix, est in enumerate(hv):
+            if est is None: hv[ix] = '0'
 
-        hv = ['0'] * 9
-        hv[1] = request.values.get('act1')
-        hv[2] = request.values.get('act2')
-        hv[3] = request.values.get('act3')
-        #hv[4] = request.values.get('act4')
+        #If the first 3 selections are all '0' make sure remaining are turned off:
+        if hv[1] == '0' and hv[2] == '0' and hv[3] == '0': hv = ['0']*13
+
+        # If no accts selected to plot then switch off the plot section of page
         if all(h=='0' for h in hv):
             plotswitch = 0
             plotthese = []
         else:
             plotswitch=1
             plotthese = [h for h in hv if h != '0' ]
-        hv[5] = len(plotthese)
-        hv[6] = plotthese
+        hv[0] = len(plotthese)
+        hv[11] = plotthese
+        hv[12] = request.values.get('timestyle')
+        if hv[12] is None:
+            hv[12] = '12'
 
         print('plotstuff',plotswitch,plotthese)
 
@@ -110,8 +118,8 @@ def isoR():
         from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero, erud
         today = datetime.date.today()
         err=[]
-        hv = ['0'] * 9
-        hv[5] = 0
+        hv = ['0'] * 12
+        hv[0] = 0
         #today = datetime.datetime.today().strftime('%Y-%m-%d')
         now = datetime.datetime.now().strftime('%I:%M %p')
         docref=''

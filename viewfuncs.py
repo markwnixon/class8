@@ -2531,10 +2531,18 @@ def monvals(iback):
     monnam = monnam[:iback]
     return monnam
 
-def getmonths(acct,mback):
+def getmonths(acct,mback,mstart):
     dat = IEroll.query.filter(IEroll.Name.contains(acct)).first()
     dlist = []
-    if dat is not None:
-        for ix in range(1,mback+1):
-            dlist.append(float(getattr(dat, f'C{ix}')))
-    return dlist
+    if mback > mstart:
+        if dat is not None:
+            for ix in range(mstart,mback+1):
+                dlist.append(float(getattr(dat, f'C{ix}')))
+        return dlist
+    else:
+        if dat is not None:
+            print('mstuffhere',mback,mstart)
+            for ix in range(mstart-1,mback-1,-1):
+                print(ix)
+                dlist.append(float(getattr(dat, f'C{ix}')))
+        return dlist

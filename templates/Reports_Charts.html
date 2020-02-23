@@ -1,30 +1,23 @@
 <!-- JQuery -->
 <script type="text/javascript" src="tmp/js/jquery-3.3.1.min.js"></script>
-{% if hv[5] > 0 %}
+{% if hv[0] > 0 %}
 
 <canvas id="bar2"></canvas>
 
-        <input type = "hidden" id="acct1id" value="{{ hv[6] }}">
+        <input type = "hidden" id="acct1id" value="{{ hv[11] }}">
+        <input type = "hidden" id="accttime" value="{{ hv[12] }}">
         <script>
              var acct1 = document.getElementById("acct1id").value;
+             var nmonths = document.getElementById("accttime").value;
 
              var getData = $.ajax({
                            url: "/chartdata",
                            type: "post",
-                           data: {'thisacct' : acct1}
+                           data: {'thisacct' : acct1,
+                                  'thesemonths' : nmonths}
                         });
 
              getData.done(function(results) {
-                var mydata = {
-                           type: "bar",
-                           data: {
-                                labels: results.lablist,
-                                datasets: [
-                                    {label: results.labeld[0], data: results.datad[0], backgroundColor:"rgba(54, 162, 235, 0.2)", borderColor: "rgb(54, 162, 235)"},
-                                    {label: results.labeld[1], data: results.datad[1], backgroundColor:"rgba(54, 162, 235, 0.2)", borderColor: "rgb(54, 162, 235)"},
-                                    ]
-                                  }
-                            }
                  var testdata = {
                            type: "bar",
                            data: {
@@ -37,8 +30,8 @@
                     testdata.data.datasets.push({
                         label: results.labeld[i],
                         data: results.datad[i],
-                        backgroundColor: "rgba(54, 162, 235, 0.2)",
-                        borderColor: "rgb(54, 162, 235)"
+                        backgroundColor: results.rgba[i],
+                        borderColor: results.rgb[i]
                     });
                 };
 

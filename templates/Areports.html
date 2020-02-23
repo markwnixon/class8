@@ -7,7 +7,7 @@
     
 <div class="col-sm-{{leftsize}}">
     
-{% if hv[5] == 0 %}
+{% if hv[0] == 0 %}
     
 <div class="row">
 <div class="col-sm-12" align="center">
@@ -49,39 +49,96 @@ Looking for: {{docref}}<br>
 Charts and Graphs
 </div>
 <div class="card-body">
-Single-Bar Views:<br>
+
 <table class="table table-condensed table-hover">
 <tbody>
+
+<tr>
+<td><div class="input-group-text">Bar Chart Time Period</div></td>
+<td>
+<select class="form-control" type="text" id="timestyle" name="timestyle" onchange="this.form.submit()">
+  <option {% if hv[12] == "6" %} selected {% endif %} value="6">Last 6 months</option>
+  <option {% if hv[12] == "12" %} selected {% endif %} value="12">Last 12 months</option>
+  <option {% if hv[12] == "18" %} selected {% endif %} value="18">Last 18 months</option>
+  <option {% if hv[12] == "24" %} selected {% endif %} value="24"> Last 24 months</option>
+  <option {% if hv[12] == "lymon" %} selected {% endif %} value="lymon"> Last year by months</option>
+  <option {% if hv[12] == "tymon" %} selected {% endif %} value="tymon"> This year by months</option>
+  <option {% if hv[12] == "lyq" %} selected {% endif %} value="lyq"> Last year by quarter</option>
+  <option {% if hv[12] == "tyq" %} selected {% endif %} value="tyq"> This year by quarter</option>
+  <option {% if hv[12] == "lyty" %} selected {% endif %} value="lyty"> This year vs. last year</option>
+</select>
+</td>
+</tr>
+
+
 <tr>
 <td><div class="input-group-text">Totaling Accounts:</div></td>
 <td>
 <select class="form-control" type="text" id="act1" name="act1" onchange="this.form.submit()">
-<option value=0 > Select Totaling Account </option>
+<option value=0 > No Selection </option>
 {% for idat in idata1 %}
 <option {% if hv[1] == idat.Name %} selected {% endif %} value="{{idat.Name}}" > {{idat.Name}} </option>
 {% endfor %}</select>
 </td>
 </tr>
+
 <tr>
 <td><div class="input-group-text">Expense Accounts:</div></td>
 <td>
 <select class="form-control" type="text" id="act2" name="act2" onchange="this.form.submit()">
-<option value=0 > Select Expense Account </option>
+<option value=0 > No Selection </option>
 {% for idat in idata2 %}
 <option {% if hv[2] == idat.Name %} selected {% endif %} value="{{idat.Name}}" > {{idat.Name}} </option>
 {% endfor %}</select>
 </td>
 </tr>
+
 <tr>
 <td><div class="input-group-text">Income Accounts:</div></td>
 <td>
 <select class="form-control" type="text" id="act3" name="act3" onchange="this.form.submit()">
-<option value=0 > Select Income Account </option>
+<option value=0 > No Selection </option>
 {% for idat in idata3 %}
 <option {% if hv[3] == idat.Name %} selected {% endif %} value="{{idat.Name}}" > {{idat.Name}} </option>
 {% endfor %}</select>
 </td>
 </tr>
+
+{% set idx = [3] %}
+{% if hv[1] != '0' %}
+        {% if idx.append(idx.pop() + 1) %}{% endif %}
+        <tr>
+        <td><div class="input-group-text">Totaling Accounts:</div></td>
+        <td>
+        <select class="form-control" type="text" id="act{{ idx[0] }}" name="act{{ idx[0] }}" onchange="this.form.submit()">
+        <option value=0 > No Selection </option>
+        {% for idat in idata1 %}
+        <option {% if hv[idx[0]] == idat.Name %} selected {% endif %} value="{{idat.Name}}" > {{idat.Name}} </option>
+        {% endfor %}</select>
+        </td>
+        </tr>
+            {% for ntry in range(idx[0],11) %}
+                {% if hv[ntry] != '0' %}
+                    {% if idx.append(idx.pop() + 1) %}{% endif %}
+                    <tr>
+                    <td><div class="input-group-text">Totaling Accounts:</div></td>
+                    <td>
+                    <select class="form-control" type="text" id="act{{ idx[0] }}" name="act{{ idx[0] }}" onchange="this.form.submit()">
+                    <option value=0 > No Selection </option>
+                    {% for idat in idata1 %}
+                    <option {% if hv[idx[0]] == idat.Name %} selected {% endif %} value="{{idat.Name}}" > {{idat.Name}} </option>
+                    {% endfor %}</select>
+                    </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+{% endif %}
+
+
+
+
+
+
 </tbody>
 </table>
 </div>

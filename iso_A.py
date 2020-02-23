@@ -79,40 +79,68 @@ def FileUpload():
 
     return "successful_upload"
 
-@app.route('/Charttest', methods=['GET', 'POST'])
-def Charttest():
-    from viewfuncs import erud
-    err=[]
-    hv=[0]*9
-    idata = IEroll.query.order_by(IEroll.Name).all()
-    err = erud(err)
-    if request.method == 'POST':
-        hv[1] = request.values.get('thisacct')
-    return render_template('chart.html',cmpdata=cmpdata, scac=scac, err=err, hv=hv, idata=idata)
-
 @app.route('/chartdata', methods=['GET', 'POST'])
 def chartdata():
     acct = request.values['thisacct']
-    print('acct=',acct)
-    print(type(acct))
+    timestyle = request.values['thesemonths']
     import ast
     acct = ast.literal_eval(acct)
-    print(acct)
-    print(type(acct))
-    labeld = []
-    datad = []
-    lablist=monvals(12)
-    print(lablist)
-    for plotitem in acct:
-        datad.append(getmonths(plotitem,12))
-        labeld.append(plotitem)
-    print(lablist)
-    print(labeld)
-    print(datad)
-    return jsonify({'lablist' : lablist,
-                    'labeld'  : labeld,
-                    'datad'   : datad
-                    })
+    print(acct,timestyle)
+    print(type(timestyle))
+    if timestyle in ['6', '12', '18', '24']:
+        nmonths = int(timestyle)
+        labeld = []
+        datad = []
+        lablist=monvals(nmonths)
+        rgba = []
+        rgb = []
+        colors = [[31,105,161], [31,161,65], [161,141,31], [161,57,31], [161,31,141], [161,31,63], [31,53,161], [31,161,126]]
+        for ix, plotitem in enumerate(acct):
+            datad.append(getmonths(plotitem,nmonths,1))
+            labeld.append(plotitem)
+            rgba.append(f'rgba({colors[ix][0]}, {colors[ix][1]}, {colors[ix][2]}, 0.3)')
+            rgb.append(f'rgb({colors[ix][0]}, {colors[ix][1]}, {colors[ix][2]})')
+        return jsonify({'lablist' : lablist,
+                        'labeld'  : labeld,
+                        'datad'   : datad,
+                        'rgba'    : rgba,
+                        'rgb'     : rgb
+                        })
+    elif timestyle == 'lymon' or 'tymon':
+        thisyear = datetime.datetime.today().year
+        thismonth = datetime.datetime.today().month
+        lastyear = thisyear - 1
+        print(lastyear,thismonth)
+        labeld = []
+        datad = []
+        lablist=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        if timestyle == 'lymon':
+            start = thismonth
+            stop = thismonth+12
+            for ix, lab in enumerate(lablist):
+                lablist[ix] = f'{lab} {lastyear}'
+        else:
+            start = 1
+            stop = thismonth-1
+            lablist = lablist[:stop]
+            for ix, lab in enumerate(lablist):
+                lablist[ix] = f'{lab} {thisyear}'
+
+
+        rgba = []
+        rgb = []
+        colors = [[31,105,161], [31,161,65], [161,141,31], [161,57,31], [161,31,141], [161,31,63], [31,53,161], [31,161,126]]
+        for ix, plotitem in enumerate(acct):
+            datad.append(getmonths(plotitem,thismonth,thismonth+12))
+            labeld.append(plotitem)
+            rgba.append(f'rgba({colors[ix][0]}, {colors[ix][1]}, {colors[ix][2]}, 0.3)')
+            rgb.append(f'rgb({colors[ix][0]}, {colors[ix][1]}, {colors[ix][2]})')
+        return jsonify({'lablist' : lablist,
+                        'labeld'  : labeld,
+                        'datad'   : datad,
+                        'rgba'    : rgba,
+                        'rgb'     : rgb
+                        })
 
 
 

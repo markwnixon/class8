@@ -297,6 +297,7 @@ def isoB(indat):
                 if cdat is not None:
                     if cdat.Ptype == 'TowCo': hv[3] = '2'
                 ifxfer = modata.bType
+
                 if ifxfer == 'XFER':
                     vals = ['fromacct', 'toacct', 'pamt', 'bref',
                             'pdate', 'ckmemo', 'bdesc', 'ddate']
@@ -320,12 +321,23 @@ def isoB(indat):
                     modata.Ref = a[3]
                     modata.User = username
                     modata.Company = a[1]
+                    modata.bAccount = a[1]
+                    adat = Accounts.query.filter(Accounts.Name == a[1]).first()
+                    if adat is not None:
+                        cat = adat.Category
+                        sub = adat.Subcategory
+                        modata.bCat = cat
+                        modata.bSubcat = sub
+
                     err.append('Modification to Xfer ' + modata.Jo + ' completed.')
+                    if update is not None:
+                        gledger_write('xfer', modata.Jo, modata.Company, modata.pAccount)
 
                 else:
-
+                    # This section means the transaction is not a transfer
                     leftsize = 8
                     leftscreen = 0
+
                     if update is None:
 
                         pbill = request.values.get('pbill')
@@ -414,29 +426,10 @@ def isoB(indat):
                         # Check that JO still consistent with modification
                         co=modata.Co
                         jo=modata.Jo
-                        #Check to see if uploaded file and created JO before inputting data...need to update the JO
-                        if jo[0] == 'X':
-                            jo = co+jo[1:]
-                            modata.Jo = jo
-                            db.session.commit()
-                        ccode=jo[0]
-                        if co is None:
-                            co = ccode
-                        if jo is None:
-                            ccode = co[0]
-                        if co != ccode:
-                            # Have to change all the Gledger items with old jo to new jo
-                            Gledger.query.filter(Gledger.Tcode==jo).delete()
-                            jo=jo.replace(ccode,co)
-                            modata.Jo=jo
-                            db.session.commit()
+
                         print('line302:',modata.Jo,modata.bAccount,modata.pAccount)
-                        ck_check = modata.bType
-                        if ck_check != 'Credit Card':
-                            gledger_write('newbill',modata.Jo,modata.bAccount,modata.pAccount)
-                        else:
-                            gledger_write('xfer', modata.Jo, modata.bAccount, modata.pAccount)
-                            err.append(f'Ledger xfer for {modata.Jo} to {modata.bAccount} from {modata.pAccount}')
+                        gledger_write('newbill',modata.Jo,modata.bAccount,modata.pAccount)
+
 
 
                 if modal == 1:
@@ -614,12 +607,10 @@ def isoB(indat):
 # ____________________________________________________________________________________________________________________B.Modify Entries
         if (modify is not None or vmod is not None) and numchecked == 1:
             leftsize = 8
+            print('Entering Modification Section')
 
             if bill > 0:
                 modata = Bills.query.get(bill)
-                filesel = request.values.get('FileSel')
-                fdata = myoslist(bill_path)
-                fdata.sort()
                 vendor = modata.Company
                 co = modata.Co
                 vdat = People.query.filter((People.Ptype == 'Vendor') & (People.Company == vendor)).first()
@@ -755,7 +746,7 @@ def isoB(indat):
             modlink = 3
             err.append('Select Source Document from List')
             leftscreen = 0
-            expdata = Accounts.query.filter((Accounts.Type == 'Bank') | (Accounts.Type == 'Equity')).order_by(Accounts.Name).all()
+            expdata = Accounts.query.filter((Accounts.Type != 'Expense') & (Accounts.Type != 'Income') & (~Accounts.Type.contains('Accounts'))).order_by(Accounts.Name).all()
             vdata = [today, today, '', '']
 
         if newxfer is None and modlink == 3:
@@ -771,8 +762,7 @@ def isoB(indat):
                 xamt = '0.00'
             vdata = [bdate, ddate, xamt, new_desc, xferfrom, xferto]
             print(vdata)
-            expdata = Accounts.query.filter((Accounts.Type == 'Bank') | (Accounts.Type == 'Equity')).order_by(
-                Accounts.Name).all()
+            expdata = Accounts.query.filter((Accounts.Type != 'Expense') & (Accounts.Type != 'Income') & (~Accounts.Type.contains('Accounts'))).order_by(Accounts.Name).all()
 
         if thisxfer is not None:
             modlink = 0
@@ -783,17 +773,23 @@ def isoB(indat):
 
             fromacct = request.values.get('fromacct')
             toacct = request.values.get('toacct')
+            adat = Accounts.query.filter(Accounts.Name == toacct).first()
+            if adat is not None:
+                cat = adat.Category
+                sub = adat.Subcategory
+            else:
+                cat = None
+                sub = None
             xamt = request.values.get('xamt')
             xamt = d2s(xamt)
             xdesc = request.values.get('xdesc')
             btype = 'XFER'
-            bclass = 'Non-Expense'
             nextjo = newjo(billxfrcode, today)
             co = nextjo[0]
 
             input = Bills(Jo=nextjo, Pid=0, Company=toacct, Memo=None, Description=xdesc, bAmount=xamt, Status='Paid', Cache=0, Original=None,
                              Ref=None, bDate=sdate, pDate=sdate, pAmount=xamt, pMulti=None, pAccount=fromacct, bAccount=toacct, bType=btype,
-                             bCat=bclass, bSubcat='', Link=None, User=username, Co=co, Temp1=None, Temp2=None, Recurring=0, dDate=today,
+                             bCat=cat, bSubcat=sub, Link=None, User=username, Co=co, Temp1=None, Temp2=None, Recurring=0, dDate=today,
                              pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0)
 
             db.session.add(input)
@@ -1240,10 +1236,17 @@ def isoB(indat):
                 if ifxfer == 'XFER':
                     acct_to = bdat.Company
                     acdat = Accounts.query.filter(Accounts.Name == acct_to).first()
-                    pdat = People.query.filter((People.Ptype == 'Vendor') &
-                                               (People.Company == acdat.Payee)).first()
+                    if acdat is None:
+                        err.append(f'Account {acct_to} has no Payee Listed for Check')
+                    else:
+                        pdat = People.query.filter(People.Company == acdat.Payee).first()
+                        if pdat is None:
+                            err.append(f'From account {acct_to} with Payee {acdat.Payee}')
+                            err.append(f'Could not find company or person in database with name {acdat.Payee}')
                 else:
                     pdat = People.query.get(bdat.Pid)
+                    if pdat is None:
+                        err.append(f'Could not find company with ID {bdat.Pid}')
 
                 if bdat.Status == 'Unpaid':
                     bdat.Status = 'Paid'
@@ -1282,40 +1285,40 @@ def isoB(indat):
                         ckstyle = 1
 
                     from writechecks import writechecks
-
-                    writechecks(bdat, pdat, docref, sbdata, links, ckstyle)
-                    modlink = 6
-                    leftsize = 8
-                    leftscreen = 0
-                    co = bdat.Co
-                    ck_check = bdat.bType
-                    expdata = Accounts.query.filter( ((Accounts.Type == 'Expense') & (Accounts.Co == co)) | ((Accounts.Type == 'Credit Card') & (Accounts.Co == co)) ).order_by(Accounts.Name).all()
-                    db.session.commit()
-                    pacct = bdat.pAccount
-                    if pacct is not None and pacct != '0':
-                        print('check is',ck_check)
-                        if ck_check == 'Credit Card':
-                            print('Doing the Transfer')
-                            gledger_write('xfer',bdat.Jo,bdat.bAccount,bdat.pAccount)
-                            err.append(f'Ledger xfer for {bdat.Jo} to {bdat.bAccount} from {bdat.pAccount}')
+                    if pdat is not None:
+                        writechecks(bdat, pdat, docref, sbdata, links, ckstyle)
+                        modlink = 6
+                        leftsize = 8
+                        leftscreen = 0
+                        co = bdat.Co
+                        ck_check = bdat.bType
+                        expdata = Accounts.query.filter( ((Accounts.Type == 'Expense') & (Accounts.Co == co)) | ((Accounts.Type == 'Credit Card') & (Accounts.Co == co)) ).order_by(Accounts.Name).all()
+                        db.session.commit()
+                        pacct = bdat.pAccount
+                        if pacct is not None and pacct != '0':
+                            print('check is',ck_check)
+                            if ck_check == 'Credit Card' or ck_check == 'XFER':
+                                print('Doing the Transfer')
+                                gledger_write('xfer',bdat.Jo,bdat.bAccount,bdat.pAccount)
+                                err.append(f'Ledger xfer for {bdat.Jo} to {bdat.bAccount} from {bdat.pAccount}')
+                            else:
+                                print('Paying the Bill')
+                                gledger_write('paybill',bdat.Jo,bdat.bAccount,bdat.pAccount)
+                                err.append(f'Ledger paid {bdat.Jo} to {bdat.bAccount} from {bdat.pAccount}')
                         else:
-                            print('Paying the Bill')
-                            gledger_write('paybill',bdat.Jo,bdat.bAccount,bdat.pAccount)
-                            err.append(f'Ledger paid {bdat.Jo} to {bdat.bAccount} from {bdat.pAccount}')
-                    else:
-                        err.append('No Account for Fund Withdrawal')
+                            err.append('No Account for Fund Withdrawal')
 
-                    bdata = Bills.query.order_by(Bills.bDate).all()
-                    cdata = People.query.filter((People.Ptype == 'Vendor') | (People.Ptype == 'TowCo') | (
-                        People.Ptype == 'Overseas')).order_by(People.Company).all()
-                    modata = Bills.query.get(bill)
-                    pb = 1
-                    #Attempt to remove the previous cache copy:
-                    try:
-                        last_file = addpath(f'tmp/{scac}/data/vchecks/{last_ckfile}')
-                        os.remove(last_file)
-                    except:
-                        print(f'Could nor remove {last_file}')
+                        bdata = Bills.query.order_by(Bills.bDate).all()
+                        cdata = People.query.filter((People.Ptype == 'Vendor') | (People.Ptype == 'TowCo') | (
+                            People.Ptype == 'Overseas')).order_by(People.Company).all()
+                        modata = Bills.query.get(bill)
+                        pb = 1
+                        #Attempt to remove the previous cache copy:
+                        try:
+                            last_file = addpath(f'tmp/{scac}/data/vchecks/{last_ckfile}')
+                            os.remove(last_file)
+                        except:
+                            print(f'Could nor remove {last_file}')
 
             else:
                 err.append('Must select exactly 1 Bill box to use this option.')
@@ -1398,7 +1401,7 @@ def isoB(indat):
     today = datetime.date.today()
     critday = datetime.date.today()+datetime.timedelta(days=7)
     bdata, cdata = dataget_B(hv[1],hv[0],hv[3])
-    acdata = Accounts.query.filter((Accounts.Type == 'Bank') | (Accounts.Type == 'Credit Card') | (Accounts.Type == 'Current Liability') ).order_by(Accounts.Name).all()
+    acdata = Accounts.query.filter((Accounts.Type != 'Expense') & (Accounts.Type != 'Income') & (~Accounts.Type.contains('Accounts'))).order_by(Accounts.Name).all()
     err = erud(err)
 
     return username, divdat, hv, bdata, cdata, bill, peep, err, modata, adata, acdata, expdata, modlink, caldays, daylist, weeksum, nweeks, addjobselect, jobdata, modal, dlist, fdata, today, cdat, pb, critday, vdata, leftscreen, docref, doctxt, leftsize, cache, filesel

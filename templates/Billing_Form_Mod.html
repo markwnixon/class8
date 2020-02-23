@@ -24,7 +24,7 @@
                 <select class="form-control" type="text" name="fromacct">
                 <option value='0'>Choose Later</option>
                 {% for data in acdata %}
-                <option value="{{data.Name}}" {% if modata.Account == data.Name %} selected {% endif %} > {{data.Name}} </option>
+                    <option value="{{data.Name}}" {% if modata.pAccount == data.Name %} selected {% endif %} > {{data.Name}} </option>
                 {% endfor %}</select>
                 </td>
                 </tr>
@@ -34,7 +34,7 @@
                 <select class="form-control" type="text" name="toacct">
                 <option value='0'>Choose Later</option>
                 {% for data in acdata %}
-                <option value="{{data.Name}}" {% if modata.Company == data.Name %} selected {% endif %} > {{data.Name}} </option>
+                    <option value="{{data.Name}}" {% if modata.Company == data.Name %} selected {% endif %} > {{data.Name}} </option>
                 {% endfor %}</select>
                 </td>
                 </tr>

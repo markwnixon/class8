@@ -24,7 +24,7 @@
                 <select class="form-control" type="text" name="fromacct" onchange="this.form.submit()">
                 <option selected value='1'>Choose Later</option>
                 {% for data in expdata %}
-                <option {% if vdata[4] == data.Name %} selected {% endif %} value="{{data.Name}}" > {{data.Name}} </option>
+                <option {% if vdata[4] == data.Name %} selected {% endif %} value="{{data.Name}}" > {{ data.Co }}: {{data.Name}} </option>
                 {% endfor %}</select>
             </td>
         </tr>
@@ -34,7 +34,7 @@
                 <select class="form-control" type="text" name="toacct" onchange="this.form.submit()">
                 <option selected value='1'>Choose Later</option>
                 {% for data in expdata %}
-                <option {% if vdata[5] == data.Name %} selected {% endif %} value="{{data.Name}}" > {{data.Name}} </option>
+                <option {% if vdata[5] == data.Name %} selected {% endif %} value="{{data.Name}}" > {{ data.Co }}: {{data.Name}} </option>
                 {% endfor %}</select>
             </td>
         </tr>
