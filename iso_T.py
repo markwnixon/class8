@@ -82,7 +82,7 @@ def isoT():
         print('lbox=', lbox)
         viewtype, loadc, write_text = 0, 0, 0
         doclist = [0]*8
-        holdvec = [0] * 20
+        holdvec = [0] * 25
         if dlist[1] == 'on':
             Services.query.filter((Services.Service == 'New') & (Services.Price == 0.00)).delete()
 
@@ -1951,7 +1951,7 @@ def isoT():
             holdvec[18] = '500.00'
 
         if newjob is None and modlink == 4:
-            holdvec = [''] * 20
+            holdvec = [''] * 25
             cdata = People.query.filter(People.Ptype == 'Trucking').order_by(People.Company).all()
             leftscreen = 0
             shipper = request.values.get('shipper')
@@ -1986,8 +1986,8 @@ def isoT():
                 oship = Orders.query.filter( (Orders.Shipper == shipper) & (Orders.Company2 == holdvec[7]) ).first()
                 if oship is not None:
                     holdvec[9] = oship.Dropblock2
-            vals = ['order', 'bol', 'booking', 'container', 'ctype', 'pickup',
-                    'date', 'date2', 'amount']
+            vals = ['order', 'bol', 'booking', 'container', 'ctype', 'future',
+                    'date', 'date2', 'amount', 'commodity', 'packing', 'pickup', 'seal', 'desc']
             a = list(range(len(vals)))
             for i, v in enumerate(vals):
                 a[i] = request.values.get(v)
@@ -2223,7 +2223,7 @@ def isoT():
         newc = 'Not found'
         oder, poof, tick, serv, peep, invo, cache, modata, modlink, stayslim, invooder, stamp, fdata, csize, invodate, inco, cdat, pb, passdata, vdata, caldays, daylist, weeksum, nweeks = init_truck_zero()
         leftscreen = 1
-        holdvec = [0]*3
+        holdvec = [0]*25
         quot = 0
         lbox = 0
 

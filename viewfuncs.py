@@ -1342,7 +1342,7 @@ def make_new_order():
     nextjo = newjo(jbcode, sdate)
 
     vals = ['shipper', 'order', 'bol', 'booking', 'container', 'pickup',
-            'date', 'date2', 'amount', 'ctype', 'dropblock1', 'dropblock2']
+            'date', 'date2', 'amount', 'ctype', 'dropblock1', 'dropblock2', 'commodity', 'packing', 'seal', 'desc']
     a = list(range(len(vals)))
     for ix, vx in enumerate(vals):
         a[ix] = request.values.get(vx)
@@ -1381,12 +1381,12 @@ def make_new_order():
 
     input = Orders(Status='00', Jo=nextjo, Load=None, Order=a[1], Company=company, Location=None, Booking=a[3],
                    BOL=a[2], Container=a[4],
-                   Date=a[6], Driver=None, Company2=company2, Time=None, Date2=a[7], Time2=None, Seal=None,
+                   Date=a[6], Driver=None, Company2=company2, Time=None, Date2=a[7], Time2=None, Seal=a[14],
                    Pickup=a[5], Delivery=None,
-                   Amount=amt, Path=None, Original=None, Description=None, Chassis=None, Detention='0',
+                   Amount=amt, Path=None, Original=None, Description=a[15], Chassis=None, Detention='0',
                    Storage='0',
                    Release=0, Shipper=a[0], Type=a[9], Time3=None, Bid=idb, Lid=idl, Did=idd, Label='FileUpload',
-                   Dropblock1=newdrop1, Dropblock2=newdrop2, Commodity=None, Packing=None, Links=None, Hstat=0, Istat=0,
+                   Dropblock1=newdrop1, Dropblock2=newdrop2, Commodity=a[12], Packing=a[13], Links=None, Hstat=0, Istat=0,
                    Proof=None,Invoice=None,Gate=None,Package=None,Manifest=None,Scache=0,Pcache=0,Icache=0,Mcache=0,
                    Pkcache=0, QBi=0)
     db.session.add(input)

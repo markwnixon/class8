@@ -60,10 +60,6 @@
 </select>
 </td>
 </tr>
-<tr>
-<td><div class="input-group-text">Pickup No.:</div></td>
-<td><input class="form-control" type="text" name="pickup" value="{{ holdvec[15] }}"></td>
-</tr>
 
 {% set pus = holdvec[4] %}
 {% set thispu = holdvec[6] %}
@@ -119,6 +115,31 @@
 <td><input class="form-control" type="text" name="amount" value="{{ holdvec[18] }}"></td>
 </tr>
 <tr>
+<td colspan="2">OPTIONAL DISPATCH INFORMATION (CAN INPUT LATER UPON MANIFEST CREATION)</td>
+</tr>
+<tr>
+<td align="right"> <div class="input-group-text">Commodity:</div></td> <td><input class="form-control input-sm" type="text" name="commodity" value="{{ holdvec[19] }}"></td>
+</tr>
+
+<tr>
+<td align="right"> <div class="input-group-text">Packing:</div></td> <td><input class="form-control input-sm" type="text" name="packing" value="{{ holdvec[20] }}"></td>
+</tr>
+
+<tr>
+<td  align="right">  <div class="input-group-text">Pickup No.:</div></td> <td><input class="form-control input-sm" type="text" name="pickup" value="{{ holdvec[21] }}"></td>
+</tr>
+
+<tr>
+<td align="right">  <div class="input-group-text">Seal:</div></td> <td><input class="form-control input-sm" type="text" name="seal" value="{{ holdvec[22] }}"></td>
+</tr>
+
+<tr>
+    <td><div class="input-group-text">Special Instructions:</div></td>
+    <td><textarea class="form-control" type="text" name="desc" rows="4">{{holdvec[23]}}</textarea></td>
+</tr>
+
+
+
 </tbody></table>
 
 </div>
