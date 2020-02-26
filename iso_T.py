@@ -236,6 +236,7 @@ def isoT():
             lbox=0
             eprof = None
             leftscreen = 1
+            mm3 = 0
 
         if lbox > 0:
             if lbox == 1:
@@ -622,58 +623,66 @@ def isoT():
 
         if mm2 is not None or mm3 == 1:
             if returnhit is None:
-                passoder=request.values.get('passoder')
-                passoder=nonone(passoder)
                 mm2 = 1
             else:
                 mm2, mm3 = 0, 0
                 oder = 0
                 passoder = 0
-            print('manifest',mm2,oder,passoder,mm3)
-            if (oder > 0 and numchecked == 1) or passoder > 0:
-                truck='111'
-                if oder == 0:
-                    oder = passoder
-                if update is not None or passoder > 0:
-                    modata = Orders.query.get(oder)
-                    vals = ['driver', 'truck', 'commodity', 'packing', 'pickup', 'seal', 'date1',
-                            'time1', 'date2','time2', 'desc', 'sigdate']
-                    a = list(range(len(vals)))
-                    i = 0
-                    for v in vals:
-                        a[i] = request.values.get(v)
-                        print(a[i])
-                        i = i+1
-                    truck=a[1]
-                    # Check dates:
-                    if a[6] is None:
-                        a[6] = today_str
-                    if a[8] is None:
-                        a[8] = today_str
-                    if a[11] is None:
-                        a[11] = today_str
-                    modata.Driver=a[0]
-                    modata.Commodity = a[2]
-                    modata.Packing = a[3]
-                    modata.Pickup = a[4]
-                    modata.Seal = a[5]
-                    modata.Date = a[6]
-                    modata.Time = a[7]
-                    modata.Date2 = a[8]
-                    modata.Time2 = a[9]
-                    modata.Description = a[10]
-                    cache = int(modata.Detention)+1
-                    cache=cache+1
-                    modata.Detention=cache
-                    db.session.commit()
-                    holdvec[16] = a[11]
+            from makemanifest2 import makemanifestT
 
-                leftscreen=0
-
-
-
-                from makemanifest2 import makemanifestT
+            if (oder > 0 and numchecked == 1):
                 modata = Orders.query.get(oder)
+                truck = 'x'
+                print('manifest1',modata.Seal)
+                passoder = 0
+            else:
+                passoder=request.values.get('passoder')
+                print('passoder',passoder)
+                passoder=nonone(passoder)
+                if passoder is None:
+                    err.append('Must Check One Box in Job Table')
+                    mm2 = 0
+                    modata = 0
+
+            if update is not None or passoder > 0:
+                oder = passoder
+                modata = Orders.query.get(oder)
+                vals = ['driver', 'truck', 'commodity', 'packing', 'pickup', 'seal', 'date1',
+                        'time1', 'date2','time2', 'desc', 'sigdate']
+                a = list(range(len(vals)))
+                i = 0
+                for v in vals:
+                    a[i] = request.values.get(v)
+                    print(a[i])
+                    i = i+1
+                truck=a[1]
+                # Check dates:
+                if a[6] is None:
+                    a[6] = today_str
+                if a[8] is None:
+                    a[8] = today_str
+                if a[11] is None:
+                    a[11] = today_str
+                modata.Driver=a[0]
+                modata.Commodity = a[2]
+                modata.Packing = a[3]
+                modata.Pickup = a[4]
+                modata.Seal = a[5]
+                modata.Date = a[6]
+                modata.Time = a[7]
+                modata.Date2 = a[8]
+                modata.Time2 = a[9]
+                modata.Description = a[10]
+                cache = int(modata.Detention)+1
+                cache=cache+1
+                modata.Detention=cache
+                db.session.commit()
+                holdvec[16] = a[11]
+                db.session.commit()
+                modata = Orders.query.get(oder)
+
+            if modata != 0:
+                leftscreen = 0
                 pid = modata.Bid
                 pdata1 = People.query.get(pid)
                 jtype='Trucking'
@@ -682,15 +691,13 @@ def isoT():
                 if drvdata is None:
                     drvdata = Drivers.query.filter(Drivers.id > 1).first()
                 cache = int(modata.Detention)
-                time1=modata.Time
-                time2=modata.Time2
                 commodity=request.values.get('commodity')
                 packing=request.values.get('packing')
-                bol=request.values.get('bol')
+                bol=modata.BOL
                 tdata=Vehicles.query.filter(Vehicles.Unit==truck).first()
                 if tdata is None:
                     tdata = Vehicles.query.filter(Vehicles.id > 1).first()
-                docref=makemanifestT(modata, pdata1, None, None, tdata, drvdata, cache, jtype, time1, time2, commodity, packing, bol)
+                docref=makemanifestT(modata, pdata1, None, None, tdata, drvdata, cache, jtype, commodity, packing, bol)
                 fname = os.path.basename(docref)
                 modata.Delivery = fname
                 viewtype = 'manifest'
@@ -699,9 +706,7 @@ def isoT():
                 modata.Manifest = os.path.basename(docref)
                 db.session.commit()
 
-            else:
-                err.append('Must Check One Box in Job Table')
-                mm2 = 0
+
 
         # Need this comment
         if unpay == 1:

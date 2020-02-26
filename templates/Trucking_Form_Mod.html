@@ -13,8 +13,6 @@
 <div class="card-body">
 
 
-
-
 <table class="table table-condensed table-hover">
 <tbody>
 <tr>
@@ -63,9 +61,6 @@
 </td>
 </tr>
 <tr>
-<td> <div class="input-group-text">Pickup Number:</div></td>
-<td colspan="2"><input class="form-control" type="text" value="{{modata.Pickup}}" name="pickup"></td>
-</tr>
 
 {% set pus = holdvec[4] %}
 {% set thispu = holdvec[6] %}
@@ -123,6 +118,37 @@ Load At:</div></td>
 <td> <div class="input-group-text">Base Charge:</div></td>
 <td colspan="2"><input class="form-control" type="text" value="{{modata.Amount}}" name="amount"></td>
 </tr>
+
+<tr>
+<td colspan="2">OPTIONAL DISPATCH INFORMATION (CAN INPUT LATER UPON MANIFEST CREATION)</td>
+</tr>
+<tr>
+<td > <div class="input-group-text">Commodity:</div></td> <td colspan="2"><input class="form-control input-sm" type="text" name="commodity" value="{{ modata.Commodity }}"></td>
+</tr>
+
+<tr>
+<td> <div class="input-group-text">Packing:</div></td> <td colspan="2"><input class="form-control input-sm" type="text" name="packing" value="{{ modata.Packing }}"></td>
+</tr>
+
+<tr>
+<td>  <div class="input-group-text">Pickup No.:</div></td> <td  colspan="2"><input class="form-control input-sm" type="text" name="pickup" value="{{ modata.Pickup }}"></td>
+</tr>
+
+<tr>
+<td>  <div class="input-group-text">Seal:</div></td> <td colspan="2"><input class="form-control input-sm" type="text" name="seal" value="{{ modata.Seal }}"></td>
+</tr>
+
+<tr>
+    <td><div class="input-group-text">Special Instructions:</div></td>
+    <td colspan="2"><textarea class="form-control" type="text" name="desc" rows="4">{{modata.Description}}</textarea></td>
+</tr>
+
+
+
+
+
+
+
 
 </tbody></table>
 <input type = "hidden" name ="oder" value= {{oder}}>

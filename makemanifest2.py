@@ -1,6 +1,6 @@
 from flask import request
 
-def makemanifestT(odata, pdata1, pdata2, pdata3, tdata, drvdata, cache, jtype, time1, time2, commodity, packing, bol):
+def makemanifestT(odata, pdata1, pdata2, pdata3, tdata, drvdata, cache, jtype, commodity, packing, bol):
     #pdata1:Bid (Bill To)
     #pdata2:Lid (Load At)
     #pdata3:Did (Delv To)
@@ -181,8 +181,6 @@ def makemanifestT(odata, pdata1, pdata2, pdata3, tdata, drvdata, cache, jtype, t
 
     seal=str(odata.Seal)
 
-    time1=nononestr(time1)
-    time2=nononestr(time2)
     try:
         date1s=date1.strftime('%m/%d/%Y')
     except:
@@ -195,8 +193,8 @@ def makemanifestT(odata, pdata1, pdata2, pdata3, tdata, drvdata, cache, jtype, t
     #chassis='S019762'
     type=str(type)
     #deliver='82890104'
-    loaddatetime=date1s+' at '+time1
-    deliverdatetime=date2s+' at '+time2
+    loaddatetime=date1s
+    deliverdatetime=date2s
 
     if '53' in type:
         labc='Trailer No.'
@@ -439,11 +437,9 @@ def makemanifestT(odata, pdata1, pdata2, pdata3, tdata, drvdata, cache, jtype, t
 
     y=y-dl*1.5
     c.drawRightString(x,y,'   Arrival Time:')
-    c.drawString(x + 20, y + bump, time1)
     c.line(x+4,y,x+150,y)
     y=y-dl*1.5
     c.drawRightString(x,y,'Depart Time:')
-    c.drawString(x + 20, y + bump, time2)
     c.line(x+4,y,x+150,y)
 
     x=ltm+5

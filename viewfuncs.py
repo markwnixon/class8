@@ -235,9 +235,9 @@ def parselinenoupper(line,j):
     return outline
 
 def nonone(input):
-    if input is not None and input != 'None':
+    try:
         output=int(input)
-    else:
+    except:
         output=0
     return output
 
@@ -247,7 +247,9 @@ def nons(input):
     return input
 
 def nononef(input):
-    if input=='' or input==' ' or input=='None' or input is None:
+    if input is None:
+        output = 0.00
+    elif input=='' or input==' ' or input=='None':
         output=0.00
     else:
         input=input.replace('$','').replace(',','')
@@ -2257,7 +2259,7 @@ def get_invo_data(invo, holdvec):
 def Orders_Form_Update(oder):
     modata = Orders.query.get(oder)
     vals = ['order', 'bol', 'booking', 'container', 'pickup',
-            'date', 'date2', 'amount', 'ctype']
+            'date', 'date2', 'amount', 'ctype', 'commodity', 'packing', 'seal', 'desc']
     a = list(range(len(vals)))
     for i, v in enumerate(vals):
         a[i] = stripper(request.values.get(v))
@@ -2269,6 +2271,10 @@ def Orders_Form_Update(oder):
     modata.Container = a[3]
     modata.Pickup = a[4]
     modata.Type = a[8]
+    modata.Commodity = a[9]
+    modata.Packing = a[10]
+    modata.Seal = a[11]
+    modata.Description = a[12]
     try:
         modata.Date = a[5]
     except:
