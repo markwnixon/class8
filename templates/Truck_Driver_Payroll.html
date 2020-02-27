@@ -2,6 +2,7 @@
 <div class="card">
     <div class="card-header">
         Run Truck Driver Payroll
+        <button type="submit" class="btn btn-sm btn-green" name="UpdatePayroll">Update</button>
         <button type="submit" class="btn btn-sm btn-elegant" name="Return">Cancel</button>
     </div>
 <div class="card-body">
@@ -33,12 +34,14 @@
         </div>
     </div>
 
+{% if holdvec[7] == 0 %}{% set pstart = d1 %}{% else %}{% set pstart = holdvec[7] %}{% endif %}
+{% if holdvec[8] == 0 %}{% set pstop = d2 %}{% else %}{% set pstop = holdvec[8] %}{% endif %}
     <div class="d-sm-flex justify-content-center">
         <div class="p-0">
-            <div class="input-group-text">From Date</div><input class="form-control" type="date" name="pstart" value="{{d1}}">
+            <div class="input-group-text">From Date</div><input class="form-control" type="date" name="pstart" value="{{pstart}}">
         </div>
         <div class="p-0">
-           <div class="input-group-text">To Date</div><input class="form-control" type="date" name="pstop" value="{{d2}}">
+           <div class="input-group-text">To Date</div><input class="form-control" type="date" name="pstop" value="{{pstop}}">
         </div>
     </div>
 

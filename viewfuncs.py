@@ -1943,6 +1943,13 @@ def driver_payroll(lbox,holdvec):
         pstart = thispstart
         pstop = thispstop
 
+    update = request.values.get('UpdatePayroll')
+    if update is not None:
+        pstart = request.values.get('pstart')
+        pstop = request.values.get('pstop')
+        holdvec[7] = pstart
+        holdvec[8] = pstop
+
     holdvec[2]=pstarts
     holdvec[3]=pstops
 
@@ -2185,6 +2192,7 @@ def get_invo_data(invo, holdvec):
 
     if update is not None:
         err = []
+        jolist = []
         #Apply the payments
         for jx, odat in enumerate(odata):
             if thechecks[jx]==1:
@@ -2247,12 +2255,19 @@ def get_invo_data(invo, holdvec):
                     odat.Istat = 4
                     db.session.commit()
 
-                    from gledger_write import gledger_write
-                    gledger_write('income',invojo,acctdb,0)
+                    jolist.append(invojo)
+                    print(jx,invojo,jolist)
                     invo = 0
 
                 else:
                     err.append(f'Have no Invoice to Receive Against for JO={invojo}')
+
+
+        from gledger_write import gledger_multi_job
+        gledger_multi_job('income',jolist,acctdb,0)
+
+
+
 
     return invo, holdvec, err
 

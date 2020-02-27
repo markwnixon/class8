@@ -294,6 +294,15 @@ def IncomeMaint():
     return render_template('Aincomemaint.html', cmpdata=cmpdata, scac=scac, data1=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
                            leftsize=leftsize, rightsize=rightsize, docref=docref, cache = cache, acdata=acdata, thismuch=thismuch, depdata=depdata)
 
+@app.route('/Deposits', methods=['GET', 'POST'])
+def Deposits():
+
+    from iso_Deposits import isoDeposit
+    odata, gdata, oder, err, modata, modlink, leftscreen, leftsize, today, now, docref, cache, acdata, thismuch, depdata = isoDeposit()
+    rightsize = 12-leftsize
+    return render_template('Adeposits.html', cmpdata=cmpdata, scac=scac, data1=gdata, data2=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
+                           leftsize=leftsize, rightsize=rightsize, docref=docref, cache = cache, acdata=acdata, thismuch=thismuch, depdata=depdata)
+
 
 @app.route('/AccountMaint', methods=['GET', 'POST'])
 def AccountMaint():

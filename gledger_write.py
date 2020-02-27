@@ -1,7 +1,8 @@
 from runmain import db
-from models import Gledger, Invoices, JO, Income, Bills, Accounts, People, Focusareas
+from models import Gledger, Invoices, JO, Income, Bills, Accounts, People, Focusareas, Deposits
 import datetime
 from viewfuncs import stripper
+import json
 
 def get_company(pid):
     cdat = People.query.get(pid)
@@ -37,7 +38,60 @@ def check_revenue_acct(fd):
     else:
         return 'Error'
 
+def gledger_multi_job(bus,jolist,acctdb,acctcr):
+    dt = datetime.datetime.now()
+    jo = jolist[0]
+    cc = jo[0]  # this is the company we will be working on
+    fd = jo[1]
+    if bus == 'income':
 
+        if 'Cash' in acctdb or 'Check' in acctdb or 'Mcheck' in acctdb or 'Undeposited' in acctdb:
+            acctdb = 'Cash'
+            dtype = 'ID'
+        else:
+            dtype = 'DD'
+            # Else we will write directly to the bank account
+        acctcr = 'Accounts Receivable'
+        idat = Income.query.filter(Income.Jo == jo).first()
+        pid = idat.Pid
+        date = idat.Date
+        co = get_company(pid)
+        ref = idat.Ref
+
+        amt = 0
+        for joget in jolist:
+            idat = Income.query.filter(Income.Jo == joget).first()
+            amt = amt + int(float(idat.Amount) * 100)
+
+
+        acr = Accounts.query.filter((Accounts.Name == acctcr) & (Accounts.Co == cc)).first()
+        adb = Accounts.query.filter((Accounts.Name == acctdb) & (Accounts.Co == cc)).first()
+
+        gdat = Gledger.query.filter((Gledger.Tcode == jo) & (Gledger.Type == 'IC')).first()
+        if gdat is not None:
+            gdat.Account = acctcr
+            gdat.Credit = amt
+            gdat.Recorded = dt
+            gdat.Aid = acr.id
+            gdat.Date = date
+        else:
+            source = json.dumps(jolist)
+            input1 = Gledger(Debit=0, Credit=amt, Account=acctcr, Aid=acr.id, Source=source, Sid=pid, Type='IC', Tcode=jo,
+                             Com=cc, Recorded=dt, Reconciled=0, Date=date, Ref=ref)
+            db.session.add(input1)
+        db.session.commit()
+        gdat = Gledger.query.filter((Gledger.Tcode == jo) & (Gledger.Type == dtype)).first()
+        if gdat is not None:
+            gdat.Account = acctdb
+            gdat.Debit = amt
+            gdat.Recorded = dt
+            gdat.Aid = adb.id
+            gdat.Date = date
+        else:
+            input2 = Gledger(Debit=amt, Credit=0, Account=acctdb, Aid=adb.id, Source=co, Sid=pid, Type=dtype, Tcode=jo,
+                             Com=cc, Recorded=dt, Reconciled=0, Date=date, Ref=ref)
+            db.session.add(input2)
+        db.session.commit()
 
 def gledger_app_write(sapp,jo,cofor,id1,id2,amt):
     dt = datetime.datetime.now()
@@ -162,7 +216,8 @@ def gledger_write(bus,jo,acctdb,acctcr):
         if bus=='deposit':
             idat=JO.query.filter(JO.jo==jo).first()
             amt=int(float(idat.dinc)*100)
-            incdat = Income.query.filter(Income.Jo == jo).first()
+            print('the jo is',jo)
+            incdat = Deposits.query.filter(Deposits.Depositnum == jo).first()
             depdate = incdat.Date2
             #For deposits the company reference is carried in as the accr input
             cdat=People.query.filter(People.Company==acctcr).first()

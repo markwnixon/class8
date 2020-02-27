@@ -1,6 +1,6 @@
 from flask import session, logging, request
 from runmain import db
-from models import OverSeas, Orders, People, Invoices, Income, Interchange, Bills
+from models import OverSeas, Orders, People, Invoices, Income, Interchange, Bills, Gledger
 from flask import session, request
 import datetime
 import calendar
@@ -16,19 +16,16 @@ def depositcalcs(odervec):
     jolist=[]
 
     for oder in odervec:
-        myo = Income.query.get(oder)
-        jo = myo.Jo
-        odata = Income.query.filter(Income.Jo == jo).all()
-        for odat in odata:
-            jo = odat.Jo
-            pid = int(odat.Pid)
-            myc = People.query.get(pid)
-            company = myc.Company
-
-            print('For',jo,odat.Ref,company,str(odat.Amount))
-            if jo not in jolist:
-                depositdata.append([jo,company,odat.Ref,str(odat.Amount)])
-                jolist.append(jo)
+        myo = Gledger.query.get(oder)
+        jo = myo.Tcode
+        pid = int(myo.Sid)
+        myc = People.query.get(pid)
+        company = myc.Company
+        amount = d2s(float(myo.Debit)/100.)
+        print('For',jo,myo.Ref,company,amount)
+        if jo not in jolist:
+            depositdata.append([jo,company,myo.Ref,amount])
+            jolist.append(jo)
 
 
 
