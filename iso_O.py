@@ -598,15 +598,15 @@ def isoO():
                 for v in vals:
                     a[i] = request.values.get(v)
                     i = i+1
-                modata.CONTAINER = a[0]
+                modata.Container = a[0]
                 modata.Date = a[1]
                 modata.Time = a[2]
-                modata.CHASSIS = a[3]
-                modata.RELEASE = a[4]
-                modata.TRUCK_NUMBER = a[5]
-                modata.GROSS_WT = a[6]
-                modata.DRIVER = a[7]
-                modata.TYPE = a[8]
+                modata.Chassis = a[3]
+                modata.Release = a[4]
+                modata.TruckNumber = a[5]
+                modata.GrossWt = a[6]
+                modata.Driver = a[7]
+                modata.Type = a[8]
                 status = modata.Status
                 if status == 'AAAAAA':
                     modata.Status = 'BBBBBB'
@@ -1342,7 +1342,7 @@ def isoO():
 
             if tick > 0 and numchecked == 1:
                 myi = Interchange.query.get(tick)
-                type = myi.TYPE
+                type = myi.Type
                 if type == 'Load In':
                     newtype = 'Empty Out'
                 if type == 'Empty Out':
@@ -1352,10 +1352,10 @@ def isoO():
                 if type == 'Load Out':
                     newtype = 'Empty In'
 
-                input = Interchange(CONTAINER=myi.CONTAINER, TRUCK_NUMBER=myi.TRUCK_NUMBER, DRIVER=myi.DRIVER, CHASSIS=myi.CHASSIS,
-                                    Date=myi.Date, RELEASE=myi.RELEASE, GROSS_WT=myi.GROSS_WT,
-                                    SEALS=myi.SEALS, SCALE_WT=myi.SCALE_WT, CARGO_WT=myi.CARGO_WT,
-                                    Time=myi.Time, Status='AAAAAA', Original=' ', Path=' ', TYPE=newtype, Jo=myi.Jo, Company=myi.Company)
+                input = Interchange(Container=myi.Container, TruckNumber=myi.TruckNumber, Driver=myi.Driver, Chassis=myi.Chassis,
+                                    Date=myi.Date, Release=myi.Release, GrossWt=myi.GrossWt,
+                                    Seals=myi.Seals, ConType=myi.ConType, CargoWt=myi.CargoWt,
+                                    Time=myi.Time, Status='AAAAAA', Original=' ', Path=' ', Type=newtype, Jo=myi.Jo, Company=myi.Company, Other=None)
                 db.session.add(input)
                 db.session.commit()
 
@@ -1380,7 +1380,7 @@ def isoO():
             if ship > 0 and tick > 0 and numchecked == 2:
                 myo = OverSeas.query.get(ship)
                 myi = Interchange.query.get(tick)
-                myo.Container = myi.CONTAINER
+                myo.Container = myi.Container
                 myi.Company = myo.BillTo
                 myi.Jo = myo.Jo
                 db.session.commit()
@@ -1506,7 +1506,7 @@ def isoO():
             bdata = Bookings.query.filter(Bookings.Booking == booking).all()
             pdata = People.query.filter((People.id == odat.Pid) | (People.id == odat.ExportID) | (People.id == odat.ConsigID) | (
                 People.id == odat.NotifyID) | (People.id == odat.FrForID) | (People.id == odat.PreCarryID)).all()
-            idata = Interchange.query.filter(Interchange.RELEASE == booking).all()
+            idata = Interchange.query.filter(Interchange.Release == booking).all()
         else:
             odata, adata, bdata, pdata, idata = dataget_O(thismuch, dlist)
 

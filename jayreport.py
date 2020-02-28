@@ -65,9 +65,9 @@ for data in odata:
 
         container=data.Container
         booking=data.Booking
-        ticket1=Interchange.query.filter(Interchange.CONTAINER==container).first()
+        ticket1=Interchange.query.filter(Interchange.Container==container).first()
         try:
-            ticket2=Interchange.query.filter((Interchange.CONTAINER==container) & (Interchange.id != ticket1.id)).first()
+            ticket2=Interchange.query.filter((Interchange.Container==container) & (Interchange.id != ticket1.id)).first()
         except:
             ticket2 is None
 
@@ -105,17 +105,17 @@ for data in odata:
     booking=data.Booking
     container=data.Container
 
-    ticket1=Interchange.query.filter(Interchange.CONTAINER==container).first()
+    ticket1=Interchange.query.filter(Interchange.Container==container).first()
     if ticket1 is not None:
-        driver1=ticket1.DRIVER
-        yard1=ticket1.CHASSIS
+        driver1=ticket1.Driver
+        yard1=ticket1.Chassis
     else:
         driver1='NotJay'
         yard1='NotJay'
     try:
-        ticket2=Interchange.query.filter((Interchange.CONTAINER==container) & (Interchange.id != ticket1.id)).first()
-        driver2=ticket2.DRIVER
-        yard2=ticket2.CHASSIS
+        ticket2=Interchange.query.filter((Interchange.Container==container) & (Interchange.id != ticket1.id)).first()
+        driver2=ticket2.Driver
+        yard2=ticket2.Chassis
     except:
         ticket2 is None
         driver2='NotJay'
@@ -174,18 +174,18 @@ print('The ocean job containers are:',oceanjobcontainers)
 jobcontainers=truckjobcontainers+oceanjobcontainers
 
 jaycontainers=[]
-idata = db.session.query(Interchange.CONTAINER).distinct().filter((Interchange.Date>=start) & (Interchange.Date<=end))
+idata = db.session.query(Interchange.Container).distinct().filter((Interchange.Date>=start) & (Interchange.Date<=end))
 for data in idata:
-    idat=Interchange.query.filter(Interchange.CONTAINER==data.CONTAINER).first()
-    container=idat.CONTAINER
-    driver=idat.DRIVER
+    idat=Interchange.query.filter(Interchange.Container==data.Container).first()
+    container=idat.Container
+    driver=idat.Driver
     if driver=="Hassan Khoder" and container not in jobcontainers:
-        booking=idat.RELEASE
+        booking=idat.Release
         date1=idat.Date
-        match=Interchange.query.filter((Interchange.CONTAINER==container) & (Interchange.id != idat.id)).first()
+        match=Interchange.query.filter((Interchange.Container==container) & (Interchange.id != idat.id)).first()
 
         if match is not None:
-            driver2=match.DRIVER
+            driver2=match.Driver
             if driver2=="Hassan Khoder":
                 # Matched Containers and Khoder is Driver for both
                 date2=match.Date
@@ -209,11 +209,11 @@ allcompletes=jaycontainers+jobcontainers
 
 idata = Interchange.query.filter((Interchange.Date>=start) & (Interchange.Date<=end)).all()
 for data in idata:
-    container=data.CONTAINER
-    if container not in allcompletes and data.DRIVER=='Hassan Khoder':
+    container=data.Container
+    if container not in allcompletes and data.Driver=='Hassan Khoder':
         status=data.Status
         date1=data.Date
-        booking=data.RELEASE
+        booking=data.Release
         odat=Orders.query.filter(Orders.Container==container).first()
         if 'IO' in status or odat is not None:
             explain='Local Port Pull/Drop'

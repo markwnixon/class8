@@ -45,18 +45,12 @@
 <tr>
 <td> <div class="input-group-text">Containerized:</div></td>
 <td>
+{% set contypes = holdvec[24] %}
 <select class="form-control" type="text" name="ctype">
 <option  {% if modata.Type == 'None' %} selected {% endif %} value='None'> None </option>
-<option  {% if modata.Type == '53FT Dry' %} selected {% endif %} value='53FT Dry'> 53FT Dry </option>
-<option  {% if modata.Type == '20FT STD' %} selected {% endif %} value='20FT STD'> 20FT STD </option>
-<option  {% if modata.Type == '40FT STD' %} selected {% endif %} value='40FT STD'> 40FT STD </option>
-<option  {% if modata.Type == '40FT HC' %} selected {% endif %} value='40FT HC'> 40FT HC </option>
-<option  {% if modata.Type == '40FT OT' %} selected {% endif %} value='40FT OT'> 40FT OT </option>
-<option  {% if modata.Type == '40FT REF' %} selected {% endif %} value='40FT REF'> 40FT REF </option>
-<option  {% if modata.Type == '45FT STD' %} selected {% endif %} value='45FT STD'> 45FT STD </option>
-<option  {% if modata.Type == '45FT HC' %} selected {% endif %} value='45FT HC'> 45FT HC </option>
-<option  {% if modata.Type == 'LCL' %} selected {% endif %} value='LCL'> LCL </option>
-<option  {% if modata.Type == 'RORO' %} selected {% endif %} value='RORO'> RORO </option>
+{% for contype in contypes %}
+<option  {% if modata.Type == contype %} selected {% endif %} value="{{ contype }}"> {{ contype }} </option>
+{% endfor %}
 </select>
 </td>
 </tr>

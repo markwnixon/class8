@@ -239,7 +239,7 @@ def dockm(odata, bdata, adata, pdata1, pdata2, pdata3, pdata4, pdata5, newfile, 
     hscode='HS Code: '+hscode
     release=nonone(odata.RelType)
     if release=='telex':
-        reldisplay='TELEX RELEASE REQUESTED'
+        reldisplay='TELEX Release REQUESTED'
     else:
         reldisplay='SEAWAY BILL REQUESTED'
 #___________________________________________________________

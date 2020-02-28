@@ -22,9 +22,9 @@ def real_use(bk,bol):
 
 def InterStrip(id):
     data = Interchange.query.get(id)
-    release=data.RELEASE
-    contain=data.CONTAINER
-    chassis=data.CHASSIS
+    release=data.Release
+    contain=data.Container
+    chassis=data.Chassis
     if chassis is None:
         chassis='Own'
     if release is None:
@@ -34,9 +34,9 @@ def InterStrip(id):
     release=release.strip()
     contain=contain.strip()
     chassis=chassis.strip()
-    data.RELEASE=release
-    data.CONTAINER=contain
-    data.CHASSIS=chassis
+    data.Release=release
+    data.Container=contain
+    data.Chassis=chassis
     db.session.commit()
 
 def InterRestart():
@@ -46,18 +46,18 @@ def InterRestart():
         db.session.commit()
 
 def InterMatchV2():
-    kdata = db.session.query(Interchange.CONTAINER).distinct()
+    kdata = db.session.query(Interchange.Container).distinct()
     for data in kdata:
-        container=data.CONTAINER
-        idat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('IO')) & (Interchange.CONTAINER==container) ).first()
+        container=data.Container
+        idat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('IO')) & (Interchange.Container==container) ).first()
         if idat is not None:
             testid=idat.id
-            type=idat.TYPE
+            type=idat.Type
             if 'In' in type:
                 matcher='Out'
             else:
                 matcher='In'
-            mdat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('IO')) & (Interchange.TYPE.contains(matcher)) & (Interchange.CONTAINER==container)).first()
+            mdat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('IO')) & (Interchange.Type.contains(matcher)) & (Interchange.Container==container)).first()
             if mdat is not None:
                 idat.Status='IO'
                 mdat.Status='IO'
@@ -65,14 +65,14 @@ def InterMatchV2():
 
 def InterMatchThis(id):
     idat=Interchange.query.get(id)
-    container=idat.CONTAINER
-    release=idat.RELEASE
-    type=idat.TYPE
+    container=idat.Container
+    release=idat.Release
+    type=idat.Type
     if 'In' in type:
         matcher='Out'
     else:
         matcher='In'
-    mdat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('IO')) & (Interchange.TYPE.contains(matcher)) & (Interchange.CONTAINER==container)).first()
+    mdat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('IO')) & (Interchange.Type.contains(matcher)) & (Interchange.Container==container)).first()
     if mdat is not None:
         idat.Status='IO'
         mdat.Status='IO'
@@ -82,7 +82,7 @@ def InterMatchThis(id):
         hstat = odat.Hstat
         if hstat==0 and 'Out' in type:
             if(odat.Container)=='TBD':
-                odat.Container=idat.CONTAINER
+                odat.Container=idat.Container
             odat.Hstat = 1
             db.session.commit()
         if hstat==1 and 'In' in type:
@@ -94,7 +94,7 @@ def InterMatchThis(id):
         bit1=status[0]
         if bit1=='0' and 'Out' in type:
             if(odat.Container)=='TBD':
-                odat.Container=idat.CONTAINER
+                odat.Container=idat.Container
             newstatus=stat_update(status,'1',0)
             odat.Status=newstatus
             db.session.commit()
@@ -112,7 +112,7 @@ def Remove_Dup_Jobs():
         if tdat is not None:
             Orders.query.filter(Orders.id == tdat.id).delete()
             #Now change any interchange tickets that may have wrong company data
-            idata=Interchange.query.filter( (Interchange.CONTAINER==container)|(Interchange.RELEASE==booking) ).all()
+            idata=Interchange.query.filter( (Interchange.Container==container)|(Interchange.Release==booking) ).all()
             for idat in idata:
                 idat.Company = odat.BillTo
     db.session.commit()
@@ -133,95 +133,95 @@ def Match_Trucking_Now():
         start_date = data.Date - timedelta(30)
         end_date = data.Date + timedelta(30)
 
-        idata = Interchange.query.filter( (Interchange.Status == 'IO') & (Interchange.Date > start_date) & (Interchange.Date < end_date) & ((Interchange.CONTAINER == container) | (Interchange.RELEASE == bk)) ).all()
+        idata = Interchange.query.filter( (Interchange.Status == 'IO') & (Interchange.Date > start_date) & (Interchange.Date < end_date) & ((Interchange.Container == container) | (Interchange.Release == bk)) ).all()
         if idata is not None:
             for idat in idata:
                 if data.Hstat < 2: data.Hstat = 2
-                if container=='TBD': data.Container = idat.CONTAINER
+                if container=='TBD': data.Container = idat.Container
 
                 idat.Company = data.Shipper
                 idat.Jo = data.Jo
-                rel = idat.RELEASE
+                rel = idat.Release
                 if not hasinput(rel):
-                    idat.RELEASE = bk
-                if 'Out' in idat.TYPE:
+                    idat.Release = bk
+                if 'Out' in idat.Type:
                     data.Date = idat.Date
-                if 'In' in idat.TYPE:
+                if 'In' in idat.Type:
                     data.Date2 = idat.Date
                 db.session.commit()
 
         else:
-            idat = Interchange.query.filter( (Interchange.Date > start_date) & (Interchange.Date < end_date) & ((Interchange.CONTAINER == container) | (Interchange.RELEASE == bk)) ).first()
+            idat = Interchange.query.filter( (Interchange.Date > start_date) & (Interchange.Date < end_date) & ((Interchange.Container == container) | (Interchange.Release == bk)) ).first()
             if idat is not None:
                 if data.Hstat == 0: data.Hstat = 1
-                if container=='TBD': data.Container = idat.CONTAINER
+                if container=='TBD': data.Container = idat.Container
                 idat.Company = data.Shipper
                 idat.Jo = data.Jo
-                rel = idat.RELEASE
+                rel = idat.Release
                 if not hasinput(rel):
-                    idat.RELEASE = bk
-                if 'Out' in idat.TYPE:
+                    idat.Release = bk
+                if 'Out' in idat.Type:
                     data.Date = idat.Date
-                if 'In' in idat.TYPE:
+                if 'In' in idat.Type:
                     data.Date2 = idat.Date
                 db.session.commit()
 
 def InterRematch():
     for data in kdata:
-        container=data.CONTAINER
-        idat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (Interchange.CONTAINER==container) ).first()
+        container=data.Container
+        idat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (Interchange.Container==container) ).first()
         if idat is not None:
             testid=idat.id
-            type=idat.TYPE
+            type=idat.Type
             if 'In' in type:
                 matcher='Out'
             else:
                 matcher='In'
-            mdat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (Interchange.TYPE.contains(matcher)) & (Interchange.CONTAINER==container)).first()
+            mdat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (Interchange.Type.contains(matcher)) & (Interchange.Container==container)).first()
             if mdat is not None:
                 idat.Status='IO'
                 mdat.Status='IO'
                 db.session.commit()
 
 def InterDups():
-    kdata = db.session.query(Interchange.CONTAINER).distinct()
+    kdata = db.session.query(Interchange.Container).distinct()
     for data in kdata:
-        container=data.CONTAINER
-        idat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('IO')) & (Interchange.CONTAINER==container) ).first()
+        container=data.Container
+        idat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('IO')) & (Interchange.Container==container) ).first()
         if idat is not None:
             testid=idat.id
-            type=idat.TYPE
+            type=idat.Type
             if 'In' in type:
                 matcher='Out'
             else:
                 matcher='In'
 
             #Test if other tickets are duplicate to this one:
-            dupdata=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('IO')) & (Interchange.id != testid) & (Interchange.TYPE==type) & (Interchange.CONTAINER==container)).all()
+            dupdata=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('IO')) & (Interchange.id != testid) & (Interchange.Type==type) & (Interchange.Container==container)).all()
             for dup in dupdata:
                 dup.Status='Dup'+str(testid)
                 db.session.commit()
 
             #Test if this ticket is a duplicate to a match already made:
-            dupdata2=Interchange.query.filter( (Interchange.Status.contains('IO')) & (Interchange.id!=testid) & (Interchange.TYPE==type) & (Interchange.CONTAINER==container)).first()
+            dupdata2=Interchange.query.filter( (Interchange.Status.contains('IO')) & (Interchange.id!=testid) & (Interchange.Type==type) & (Interchange.Container==container)).first()
             if dupdata2 is not None:
                 idat.Status='Dup to IO'+str(dupdata2.id)
                 db.session.commit()
 
 def InterDupThis(id):
     idat=Interchange.query.get(id)
-    container=idat.CONTAINER
+    container=idat.Container
     testid=idat.id
-    type=idat.TYPE
+    type=idat.Type
 
     #Test if ticket is a duplicate to other match eligible tickets:
-    dupdata=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('IO')) & (Interchange.id != testid) & (Interchange.TYPE==type) & (Interchange.CONTAINER==container)).first()
+    dupdata=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('IO')) & (Interchange.id != testid) & (Interchange.Type==type) & (Interchange.Container==container)).first()
     if dupdata is not None:
         idat.Status='Dup'+str(dupdata.id)
         db.session.commit()
 
     #Test if this ticket is a duplicate to a match already made:
-    dupdata2=Interchange.query.filter( (Interchange.Status.contains('IO')) & (Interchange.id != testid) & (Interchange.TYPE==type) & (Interchange.CONTAINER==container)).first()
+    dupdata2=Interchange.query.filter( (Interchange.Status.contains('IO')) & (Interchange.id != testid) & (Interchange.Type==type) & (Interchange.Container==container)).first()
     if dupdata2 is not None:
         idat.Status='Dup to IO'+str(dupdata2.id)
         db.session.commit()
@@ -229,14 +229,14 @@ def InterDupThis(id):
 
 
 def Push_Overseas():
-    kdata = db.session.query(Interchange.CONTAINER).distinct()
+    kdata = db.session.query(Interchange.Container).distinct()
     for data in kdata:
-        container=data.CONTAINER
-        idat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('Lock')) & (Interchange.CONTAINER==container) & (Interchange.TYPE.contains('Out')) ).first()
+        container=data.Container
+        idat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('Lock')) & (Interchange.Container==container) & (Interchange.Type.contains('Out')) ).first()
         if idat is not None:
             testid=idat.id
-            type=idat.TYPE
-            booking=idat.RELEASE
+            type=idat.Type
+            booking=idat.Release
 
             odat=OverSeas.query.filter(OverSeas.Booking==booking).first()
             if odat is not None:
@@ -249,7 +249,7 @@ def Push_Overseas():
                     newstatus=stat_update(status,'1',0)
                     odat.Status=newstatus
                 #See if there is a matching interchange ticket to update as well
-                mdat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('Lock')) & (Interchange.CONTAINER==container) & (Interchange.TYPE.contains('In')) ).first()
+                mdat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('Lock')) & (Interchange.Container==container) & (Interchange.Type.contains('In')) ).first()
                 if mdat is not None:
                     mdat.Company=odat.BillTo
                     mdat.Jo=odat.Jo
@@ -260,14 +260,14 @@ def Push_Overseas():
                 db.session.commit()
 
 def Push_Orders():
-    kdata = db.session.query(Interchange.CONTAINER).distinct()
+    kdata = db.session.query(Interchange.Container).distinct()
     for data in kdata:
-        container=data.CONTAINER
-        idat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('Lock')) & (Interchange.CONTAINER==container) & (Interchange.TYPE.contains('Out')) ).first()
+        container=data.Container
+        idat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('Lock')) & (Interchange.Container==container) & (Interchange.Type.contains('Out')) ).first()
         if idat is not None:
             testid=idat.id
-            type=idat.TYPE
-            booking=idat.RELEASE
+            type=idat.Type
+            booking=idat.Release
 
             odat=Orders.query.filter( (Orders.Booking==booking) | (Orders.Container==container) ).first()
             if odat is not None:
@@ -279,7 +279,7 @@ def Push_Orders():
                 db.session.commit()
 
                 #See if there is a matching interchange ticket to update as well
-                mdat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('Lock')) & (Interchange.CONTAINER==container) & (Interchange.TYPE.contains('In')) ).first()
+                mdat=Interchange.query.filter( (Interchange.Status != 'AAAAAA') & (~Interchange.Status.contains('Lock')) & (Interchange.Container==container) & (Interchange.Type.contains('In')) ).first()
                 if mdat is not None:
                     mdat.Company=odat.Shipper
                     mdat.Jo=odat.Jo
@@ -298,13 +298,13 @@ def Order_Container_Update(oder):
 
     start_date = odat.Date - timedelta(30)
     end_date = odat.Date + timedelta(30)
-    idata = Interchange.query.filter( (Interchange.Date > start_date) & (Interchange.Date < end_date) & ( (Interchange.CONTAINER == container) | (Interchange.RELEASE==bk) ) ).all()
+    idata = Interchange.query.filter( (Interchange.Date > start_date) & (Interchange.Date < end_date) & ( (Interchange.Container == container) | (Interchange.Release==bk) ) ).all()
 
     for idat in idata:
-        type=idat.TYPE
+        type=idat.Type
         idat.Company=odat.Shipper
         idat.Jo=odat.Jo
-        if not hasinput(container) or container == 'TBD': odat.Container = idat.CONTAINER
+        if not hasinput(container) or container == 'TBD': odat.Container = idat.Container
         hstat=odat.Hstat
         if hstat is None:
             hstat = 0
@@ -322,9 +322,9 @@ def PushJobsThis(id):
 
     idat=Interchange.query.get(id)
     testid=idat.id
-    type=idat.TYPE
-    booking=idat.RELEASE
-    container=idat.CONTAINER
+    type=idat.Type
+    booking=idat.Release
+    container=idat.Container
 
     odat=OverSeas.query.filter(OverSeas.Booking==booking).first()
     if odat is not None:
@@ -371,9 +371,9 @@ def PushJobsThis(id):
         container=data.Container
         company=data.BillTo
         booking=data.Booking
-        idat=Interchange.query.filter((Interchange.RELEASE==booking) & (Interchange.Status != 'AAAAAA') ).first()
+        idat=Interchange.query.filter((Interchange.Release==booking) & (Interchange.Status != 'AAAAAA') ).first()
         if idat is not None:
-            data.Container=idat.CONTAINER
+            data.Container=idat.Container
             idat.Company=company
             idat.Jo=data.Jo
             db.session.commit()
@@ -383,12 +383,12 @@ def PushJobsThis(id):
 
 
 def InterMatchOld():
-    idata = db.session.query(Interchange.CONTAINER).distinct()
+    idata = db.session.query(Interchange.Container).distinct()
     for data in idata:
-        idat=Interchange.query.filter((Interchange.CONTAINER==data.CONTAINER) & (Interchange.Status != 'AAAAAA') & ( ~Interchange.Status.contains('IO') )).first()
+        idat=Interchange.query.filter((Interchange.Container==data.Container) & (Interchange.Status != 'AAAAAA') & ( ~Interchange.Status.contains('IO') )).first()
         if idat is not None:
-            stat1=idat.CONTAINER
-            amatch=Interchange.query.filter( (Interchange.CONTAINER==stat1) & (Interchange.id != idat.id) & (Interchange.Status != 'AAAAAA') & ( ~Interchange.Status.contains('IO') )).all()
+            stat1=idat.Container
+            amatch=Interchange.query.filter( (Interchange.Container==stat1) & (Interchange.id != idat.id) & (Interchange.Status != 'AAAAAA') & ( ~Interchange.Status.contains('IO') )).all()
             t1=len(amatch)
             print('The length of the query is: ',t1)
             if t1==0:
@@ -397,7 +397,7 @@ def InterMatchOld():
                 db.session.commit()
             elif t1==1:
                 for match in amatch:
-                    if ('In' in idat.TYPE and 'Out' in match.TYPE) or ('Out' in idat.TYPE and 'In' in match.TYPE):
+                    if ('In' in idat.Type and 'Out' in match.Type) or ('Out' in idat.Type and 'In' in match.Type):
                         print('The match is correct for Container: ',stat1,idat.id,idat.Status,match.id,match.Status,'will now become IO')
                         idat.Status='IO'
                         match.Status='IO'
@@ -447,33 +447,33 @@ def Match_Ticket(oder,tick):
 
     bk = myo.Booking
     bol = myo.BOL
-    con = myi.CONTAINER
+    con = myi.Container
     bk = real_use(bk,bol)
 
     start_date = myi.Date - timedelta(30)
     end_date = myi.Date + timedelta(30)
-    idata = Interchange.query.filter( (Interchange.Status == 'IO') & (Interchange.Date > start_date) & (Interchange.Date < end_date) & (Interchange.CONTAINER == con) ).all()
+    idata = Interchange.query.filter( (Interchange.Status == 'IO') & (Interchange.Date > start_date) & (Interchange.Date < end_date) & (Interchange.Container == con) ).all()
 
-    myo.Container = myi.CONTAINER
-    myo.Type = myi.CONTYPE
+    myo.Container = myi.Container
+    myo.Type = myi.ConType
     db.session.commit()
 
     if idata is not None:
         for idat in idata:
             idat.Company = myo.Shipper
             idat.Jo = myo.Jo
-            rel = idat.RELEASE
+            rel = idat.Release
             if not hasinput(rel):
-                idat.RELEASE = bk
-            if 'Out' in idat.TYPE:
+                idat.Release = bk
+            if 'Out' in idat.Type:
                 myo.Date = idat.Date
-            if 'In' in idat.TYPE:
+            if 'In' in idat.Type:
                 myo.Date2 = idat.Date
             db.session.commit()
     else:
         myi.Company = myo.Shipper
         myi.Jo = myo.Jo
-        rel = myi.RELEASE
+        rel = myi.Release
         if not hasinput(rel):
-            myi.RELEASE = bk
+            myi.Release = bk
         db.session.commit()

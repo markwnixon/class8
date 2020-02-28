@@ -250,42 +250,59 @@ class Compliance(db.Model):
 class Interchange(db.Model):
     __tablename__ = 'interchange'
     id = db.Column('id', db.Integer, primary_key=True)
-    CONTAINER = db.Column('CONTAINER', db.String(25))
-    TRUCK_NUMBER = db.Column('TRUCK NUMBER', db.String(25))
-    DRIVER = db.Column('DRIVER', db.String(25))
-    CHASSIS = db.Column('CHASSIS', db.String(25))
+    Container = db.Column('Container', db.String(25))
+    TruckNumber = db.Column('TruckNumber', db.String(25))
+    Driver = db.Column('Driver', db.String(25))
+    Chassis = db.Column('Chassis', db.String(25))
     Date = db.Column('Date', db.DateTime)
-    RELEASE = db.Column('RELEASE', db.String(25))
-    GROSS_WT = db.Column('GROSS WT', db.String(25))
-    SEALS = db.Column('SEALS', db.String(25))
-    CONTYPE = db.Column('SCALE WT', db.String(25))
-    CARGO_WT = db.Column('CARGO WT', db.String(25))
+    Release = db.Column('Release', db.String(25))
+    GrossWt = db.Column('GrossWt', db.String(25))
+    Seals = db.Column('Seals', db.String(25))
+    ConType = db.Column('ConType', db.String(25))
+    CargoWt = db.Column('CargoWt', db.String(25))
     Time = db.Column('Time', db.String(25))
     Status = db.Column('Status', db.String(25))
     Original = db.Column('Original', db.String(50))
     Path = db.Column('Path', db.String(50))
-    TYPE = db.Column('TYPE', db.String(25))
+    Type = db.Column('Type', db.String(25))
     Jo = db.Column('Jo', db.String(25))
     Company = db.Column('Company', db.String(50))
+    Other = db.Column('Other', db.String(50))
 
-    def __init__(self, CONTAINER, TRUCK_NUMBER, DRIVER, CHASSIS, Date, RELEASE, GROSS_WT, SEALS, CONTYPE, CARGO_WT, Time, Status, Original, Path, TYPE, Jo, Company):
-        self.CONTAINER = CONTAINER
-        self.TRUCK_NUMBER = TRUCK_NUMBER
-        self.DRIVER = DRIVER
-        self.CHASSIS = CHASSIS
+    def __init__(self, Container, TruckNumber, Driver, Chassis, Date, Release, GrossWt, Seals, ConType, CargoWt, Time, Status, Original, Path, Type, Jo, Company, Other):
+        self.Container = Container
+        self.TruckNumber = TruckNumber
+        self.Driver = Driver
+        self.Chassis = Chassis
         self.Date = Date
-        self.RELEASE = RELEASE
-        self.GROSS_WT = GROSS_WT
-        self.SEALS = SEALS
-        self.CONTYPE = CONTYPE
-        self.CARGO_WT = CARGO_WT
+        self.Release = Release
+        self.GrossWt = GrossWt
+        self.Seals = Seals
+        self.ConType = ConType
+        self.CargoWt = CargoWt
         self.Time = Time
         self.Status = Status
         self.Original = Original
         self.Path = Path
-        self.TYPE = TYPE
+        self.Type = Type
         self.Jo = Jo
         self.Company = Company
+        self.Other = Other
+
+class StreetTurns(db.Model):
+    __tablename__ = 'streetturns'
+    id = db.Column('id', db.Integer, primary_key=True)
+    Container = db.Column('Container', db.String(25))
+    BookingTo = db.Column('BookingTo', db.String(25))
+    Date = db.Column('Date', db.DateTime)
+    Status = db.Column('Status', db.Integer)
+
+    def __init__(self, Container, BookingTo, Date, Status):
+        self.Container = Container
+        self.BookingTo = BookingTo
+        self.Date = Date
+        self.Status = Status
+
 
 class LastMessage(db.Model):
     __tablename__='lastmessage'

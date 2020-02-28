@@ -18,6 +18,7 @@
             {% elif lbox==1 or lbox==3 or lbox == 4 %}
                 {% include 'Trucking_TruckLog.html' %}
 
+
             {% elif leftscreen == 2 %}
                 {% include 'includes/_calendarT.html' %}
                 <input type = "hidden" name ="datatable1" value= "{{dlist[0]}}">
@@ -119,6 +120,9 @@
 
                     {% elif (tick > 0 and modlink == 1) or modlink==20 %}
                         {% include 'Trucking_Tickmod.html' %}
+
+                    {% elif holdvec[23] == 1 %}
+                        {% include 'Trucking_Street.html' %}
 
                     {% elif lbox == 1 %}
                         <br>

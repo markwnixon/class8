@@ -95,6 +95,10 @@ def hasinput(input):
     else:
         return 1
 
+def container_types():
+    return ['''40' GP 9'6"''', '''40' GP 8'6"''', '''45' GP 9'6"''', '''20' GP 8'6"''', '''45' VH 9'6"''',
+            '''20' VH 8'6"''', '53FT Dry', 'LCL', 'RORO']
+
 def testdrop(dblock):
     idret = 0
     xtest = 'xxx'
@@ -163,9 +167,9 @@ def dropupdate2(bid):
 
 
 def getexpimp(con):
-    idata = Interchange.query.filter(Interchange.CONTAINER == con).all()
+    idata = Interchange.query.filter(Interchange.Container == con).all()
     for idat in idata:
-        ctype = idat.TYPE
+        ctype = idat.Type
         if ctype == 'Load Out':
             return 'Import'
         if ctype == 'Load In':
@@ -1187,7 +1191,7 @@ def containersout(datecut):
     idata=Interchange.query.filter((Interchange.Status=='Unmatched') & (Interchange.Date > datecut)).all()
     cout=[]
     for data in idata:
-        cout.append(data.CONTAINER)
+        cout.append(data.Container)
 
     return cout
 
@@ -1195,9 +1199,9 @@ def chassismatch(odat):
     con=odat.Container
     book=odat.Booking
     if 1==1:
-        ticket1=Interchange.query.filter((Interchange.RELEASE==book) | (Interchange.CONTAINER==con)).first()
+        ticket1=Interchange.query.filter((Interchange.Release==book) | (Interchange.Container==con)).first()
         if ticket1 is not None:
-            ticket2=Interchange.query.filter(((Interchange.RELEASE==book) | (Interchange.CONTAINER==con)) & (Interchange.id != ticket1.id)).first()
+            ticket2=Interchange.query.filter(((Interchange.Release==book) | (Interchange.Container==con)) & (Interchange.id != ticket1.id)).first()
 
         if ticket1 is not None and ticket2 is not None:
             date1=ticket1.Date
@@ -1215,13 +1219,13 @@ def chassismatch(odat):
             ticket1.Jo=odat.Jo
             ticket2.Jo=odat.Jo
             #Now check to see if a no-charge chassis was used...
-            chas1 = ticket1.CHASSIS
-            chas2 = ticket2.CHASSIS
+            chas1 = ticket1.Chassis
+            chas2 = ticket2.Chassis
             if chas1 == 'GBL' or chas2 == 'GBL':
                 chassisdays = 0
                 odat.BOL = 'GBL Chassis'
                 odat.Chassis = 'GBL'
-            odat.Container=ticket1.CONTAINER
+            odat.Container=ticket1.Container
             odat.Date=d1
             odat.Date2=d2
             db.session.commit()

@@ -1,5 +1,5 @@
 from runmain import db
-from models import DriverAssign, Gledger, Vehicles, Invoices, JO, Income, Orders, Accounts, LastMessage, People, Interchange, Drivers, ChalkBoard, Services, Drops
+from models import DriverAssign, Gledger, Vehicles, Invoices, JO, Income, Orders, Accounts, LastMessage, People, Interchange, Drivers, ChalkBoard, Services, Drops, StreetTurns
 from flask import render_template, flash, redirect, url_for, session, logging, request
 from CCC_system_setup import myoslist, addpath, tpath, companydata, scac
 from InterchangeFuncs import Order_Container_Update, Match_Trucking_Now, Match_Ticket
@@ -21,7 +21,7 @@ def isoT():
 
         from viewfuncs import parseline, tabdata, tabdataR, popjo, jovec, newjo, timedata, nonone, nononef, init_truck_zero, dropupdate, dropupdate2, dropupdate3
         from viewfuncs import d2s, d2sa, stat_update, numcheck, numcheckv, sdiff, calendar7_weeks, viewbuttons, get_ints, containersout, numcheckvec
-        from viewfuncs import txtfile, doctransfer, getexpimp, docuploader, dataget_T
+        from viewfuncs import txtfile, doctransfer, getexpimp, docuploader, dataget_T, container_types
         from InterchangeFuncs import InterStrip, InterMatchThis, InterDupThis, PushJobsThis
         from invoice_mimemail import invoice_mimemail
         from invoice_makers import multi_inv
@@ -80,7 +80,7 @@ def isoT():
         umc = request.values.get('UpdateColumn')
 
         print('lbox=', lbox)
-        viewtype, loadc, write_text = 0, 0, 0
+        viewtype, loadc, write_text, street = 0, 0, 0, 0
         doclist = [0]*8
         holdvec = [0] * 25
         if dlist[1] == 'on':
@@ -216,6 +216,8 @@ def isoT():
             lbox, holdvec, err = container_list(lbox, holdvec)
         if thisbox6 == '3':
             lbox = 1
+        if thisbox6 == '5':
+            street = 1
 
 
 
@@ -251,6 +253,19 @@ def isoT():
             if lbox == 8:
                 write_text = 1
 
+        upstreet = request.values.get('upstreet')
+        if street == 1 or upstreet is not None:
+            holdvec[23] = 1
+
+            if upstreet is not None:
+                container = request.values.get('container')
+                booking = request.values.get('booking')
+                dateturn = request.values.get('dateturn')
+                input = StreetTurns(Container=container,BookingTo=booking,Date=dateturn,Status=0)
+                db.session.add(input)
+                db.session.commit()
+                holdvec[23] = 0
+                err.append(f'Street Turn Created for {container} to {booking}')
 
 
         if modlink == 4 and (newjob is None and thisjob is None and update is None):
@@ -415,21 +430,21 @@ def isoT():
             if tick > 0:
                 modata = Interchange.query.get(tick)
                 vals = ['intcontainer', 'intdate', 'inttime', 'chassis', 'release',
-                        'truck', 'grosswt', 'driver', 'type', 'cargowt', 'contype']
+                        'truck', 'grosswt', 'driver', 'type', 'cargowt', 'intctype']
                 a = list(range(len(vals)))
                 for i, v in enumerate(vals):
                     a[i] = request.values.get(v)
-                modata.CONTAINER = a[0]
+                modata.Container = a[0]
                 modata.Date = a[1]
                 modata.Time = a[2]
-                modata.CHASSIS = a[3]
-                modata.RELEASE = a[4]
-                modata.TRUCK_NUMBER = a[5]
-                modata.GROSS_WT = a[6]
-                modata.DRIVER = a[7]
-                modata.TYPE = a[8]
-                modata.CARGO_WT = a[9]
-                modata.CONTYPE = a[10]
+                modata.Chassis = a[3]
+                modata.Release = a[4]
+                modata.TruckNumber = a[5]
+                modata.GrossWt = a[6]
+                modata.Driver = a[7]
+                modata.Type = a[8]
+                modata.CargoWt = a[9]
+                modata.ConType = a[10]
 
                 modata.Status = 'BBBBBB'
 
@@ -737,7 +752,7 @@ def isoT():
             db.session.commit()
 # ____________________________________________________________________________________________________________________E.Search.Trucking
         def packmake(odat, eprof):
-            idata = Interchange.query.filter(Interchange.CONTAINER == odat.Container).all()
+            idata = Interchange.query.filter(Interchange.Container == odat.Container).all()
             packitems = []
             if eprof == '1':
                 dockind = ['Source', 'none', 'none', 'none']
@@ -797,7 +812,7 @@ def isoT():
                             stampdata.append('Ticks')
                             if len(idata) > 1:
                                 # Get a blended ticket
-                                con = idata[0].CONTAINER
+                                con = idata[0].Container
                                 newdoc = f'tmp/{scac}/data/vinterchange/{con}_Blended.pdf'
                                 if os.path.isfile(addpath(newdoc)):
                                     print(f'{newdoc} exists already')
@@ -969,11 +984,11 @@ def isoT():
                                         packitems.append(fa)
                                         stampdata.append(test)
                                 if test == 'Ticks':
-                                    idata = Interchange.query.filter(Interchange.CONTAINER == odat.Container).all()
+                                    idata = Interchange.query.filter(Interchange.Container == odat.Container).all()
                                     if idata is not None:
                                         if len(idata) > 1:
                                             # Get a blended ticket
-                                            con = idata[0].CONTAINER
+                                            con = idata[0].Container
                                             newdoc = f'tmp/{scac}/data/vinterchange/{con}_Blended.pdf'
                                             if os.path.isfile(addpath(newdoc)):
                                                 print(f'{newdoc} exists already')
@@ -1292,7 +1307,7 @@ def isoT():
                     doclist[4] = 0
                 else:
                     jo = odat.Jo
-                    idat = Interchange.query.filter( (Interchange.Jo == odat.Jo) & (Interchange.TYPE.contains('Out')) ).first()
+                    idat = Interchange.query.filter( (Interchange.Jo == odat.Jo) & (Interchange.Type.contains('Out')) ).first()
                     if idat is not None:
                         viewtype = 'gate1'
                         leftscreen = 0
@@ -1301,17 +1316,17 @@ def isoT():
                     else:
                         err.append('There is no gate OUT ticket available for this selection')
 
-                    idat = Interchange.query.filter( (Interchange.Jo == odat.Jo) & (Interchange.TYPE.contains('In')) ).first()
+                    idat = Interchange.query.filter( (Interchange.Jo == odat.Jo) & (Interchange.Type.contains('In')) ).first()
                     if idat is not None:
                         viewtype = 'gate2'
                         leftscreen = 0
-                        con = idat.CONTAINER
+                        con = idat.Container
                         doclist[5] = f'tmp/{scac}/data/vinterchange/{idat.Original}'
                         err.append(f'Viewing document {idat.Original}')
                         if doclist[4] !=0 and doclist[5] != 0:
                             viewtype = 'gate3'
                             #Get a blended ticket
-                            con = idat.CONTAINER
+                            con = idat.Container
                             base = f'{jo}_{con}_blend.pdf'
                             newdoc = f'tmp/{scac}/data/vinterchange/{base}'
                             if os.path.isfile(addpath(newdoc)):
@@ -1465,12 +1480,12 @@ def isoT():
             leftsize = 8
             modlink = 20
             # We will create a blank line and simply modify that by updating:
-            input = Interchange(CONTAINER='New', TRUCK_NUMBER='', DRIVER='', CHASSIS='', Date=None, RELEASE='', GROSS_WT='',
-                                SEALS='', CONTYPE='', CARGO_WT='', Time=None, Status='Unmatched', Original='', Path='', TYPE='Empty Out', Jo='', Company='')
+            input = Interchange(Container='New', TruckNumber='', Driver='', Chassis='', Date=None, Release='', GrossWt='',
+                                Seals='', ConType='', CargoWt='', Time=None, Status='Unmatched', Original='', Path='', Type='Empty Out', Jo='', Company='', Other=None)
 
             db.session.add(input)
             db.session.commit()
-            modata = Interchange.query.filter(Interchange.CONTAINER == 'New').first()
+            modata = Interchange.query.filter(Interchange.Container == 'New').first()
             tick = modata.id
             err.append('Enter Data for New Interchange Ticket')
 
@@ -1950,7 +1965,7 @@ def isoT():
             leftsize = 8
             leftscreen = 0
             docref = None
-            holdvec=['']*20
+            holdvec=['']*25
             holdvec[16] = today_str
             holdvec[17] = today_str
             holdvec[18] = '500.00'
@@ -2048,7 +2063,7 @@ def isoT():
 
             if tick > 0 and numchecked == 1:
                 myi = Interchange.query.get(tick)
-                type = myi.TYPE
+                type = myi.Type
                 if type == 'Load In':
                     newtype = 'Empty Out'
                 if type == 'Empty Out':
@@ -2058,10 +2073,10 @@ def isoT():
                 if type == 'Load Out':
                     newtype = 'Empty In'
 
-                input = Interchange(CONTAINER=myi.CONTAINER, TRUCK_NUMBER=myi.TRUCK_NUMBER, DRIVER=myi.DRIVER, CHASSIS=myi.CHASSIS,
-                                    Date=myi.Date, RELEASE=myi.RELEASE, GROSS_WT=myi.GROSS_WT,
-                                    SEALS=myi.SEALS, CONTYPE=myi.CONTYPE, CARGO_WT=myi.CARGO_WT,
-                                    Time=myi.Time, Status='AAAAAA', Original=' ', Path=' ', TYPE=newtype, Jo=myi.Jo, Company=myi.Company)
+                input = Interchange(Container=myi.Container, TruckNumber=myi.TruckNumber, Driver=myi.Driver, Chassis=myi.Chassis,
+                                    Date=myi.Date, Release=myi.Release, GrossWt=myi.GrossWt,
+                                    Seals=myi.Seals, ConType=myi.ConType, CargoWt=myi.CargoWt,
+                                    Time=myi.Time, Status='AAAAAA', Original=' ', Path=' ', Type=newtype, Jo=myi.Jo, Company=myi.Company, Other=None)
                 db.session.add(input)
                 db.session.commit()
 
@@ -2185,7 +2200,7 @@ def isoT():
 # ____________________________________________________________________________________________________________________E.Calendar.Trucking
     # This is the else for 1st time through (not posting data from overseas.html)
     else:
-        from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero, dataget_T
+        from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero, dataget_T, container_types
         username = session['username'].capitalize()
         try:
             edat = LastMessage.query.filter(LastMessage.User==username).first()
@@ -2249,6 +2264,7 @@ def isoT():
     pdata = 0
     if doclist[0] == 0:
         doclist = [docref] + doclist[1:]
+    holdvec[24] = container_types()
 
     print(viewtype,doclist,lbox)
     return lbox, doclist, username, bklist, lastpr, thismuch, etitle, ebody, emaildata, odata, pdata, idata, sdata, cdata, oder, poof, sdata2, tick, serv, peep, err, modata, caldays, daylist, nweeks, howapp, modlink, leftscreen, docref, 0, leftsize, newc, tdata, drvdata, dlist, rightsize, ldata, invodate, inco, invo, quot, invooder, cache, stamp, alltdata, allvdata, stampdata, fdata, filesel, today, now, doctxt, holdvec, mm2, viewtype

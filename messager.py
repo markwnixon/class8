@@ -136,15 +136,15 @@ def test_session_quit(c, sessionph):
             print('File already removed')
 
 def get_out_msg():
-    cdata = Interchange.query.filter( (Interchange.Status != 'IO') & (Interchange.TYPE.contains('Out') ) ).all()
-    newmsg = '*CONTAINERS OUT*'
+    cdata = Interchange.query.filter( (Interchange.Status != 'IO') & (Interchange.Type.contains('Out') ) ).all()
+    newmsg = '*ContainerS OUT*'
     for cdat in cdata:
         sdate = cdat.Date
         sdate = sdate.strftime('%m/%d')
-        newmsg = newmsg + f'\n{cdat.CONTAINER} on {sdate}'
+        newmsg = newmsg + f'\n{cdat.Container} on {sdate}'
 
     cdata = Chassis.query.filter(Chassis.Datein == 'Still Out').all()
-    newmsg =  newmsg + '\n\n*DCLI CHASSIS OUT*'
+    newmsg =  newmsg + '\n\n*DCLI Chassis OUT*'
     for cdat in cdata:
         sdate = cdat.Dateout
         sdate = sdate[0:5]

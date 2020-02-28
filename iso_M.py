@@ -187,15 +187,15 @@ def isoM():
                 for v in vals:
                     a[i]=request.values.get(v)
                     i=i+1
-                modata.CONTAINER=a[0]
+                modata.Container=a[0]
                 modata.Date=a[1]
                 modata.Time=a[2]
-                modata.CHASSIS=a[3]
-                modata.RELEASE=a[4]
-                modata.TRUCK_NUMBER=a[5]
-                modata.GROSS_WT=a[6]
-                modata.DRIVER=a[7]
-                modata.TYPE=a[8]
+                modata.Chassis=a[3]
+                modata.Release=a[4]
+                modata.TruckNumber=a[5]
+                modata.GrossWt=a[6]
+                modata.Driver=a[7]
+                modata.Type=a[8]
                 modata.Status='BBBBBB'
                 db.session.commit()
                 err=[' ', ' ', 'Modification to Interchange Ticket with ID ' + str(modata.id) + ' completed.', ' ',  ' ']
@@ -630,14 +630,14 @@ def isoM():
             leftsize=8
             modlink=20
             #We will create a blank line and simply modify that by updating:
-            input = Interchange(CONTAINER='New',TRUCK_NUMBER='',DRIVER='', CHASSIS='',Date=None,RELEASE='',GROSS_WT='',
-                                SEALS='',SCALE_WT='',CARGO_WT='',Time=None,Status='Unmatched',Original='',Path='',TYPE='Empty Out',Jo='',Company='')
+            input = Interchange(Container='New',TruckNumber='',Driver='', Chassis='',Date=None,Release='',GrossWt='',
+                                Seals='',ConType='',CargoWt='',Time=None,Status='Unmatched',Original='',Path='',Type='Empty Out',Jo='',Company='', Other=None)
             db.session.add(input)
             db.session.commit()
             fdata = myoslist(f'tmp/{scac}/data/vunknown')
             fdata.sort()
             docref=f'tmp/{scac}/data/vunknown/NewJob.pdf'
-            modata= Interchange.query.filter( Interchange.CONTAINER == 'New' ).first()
+            modata= Interchange.query.filter( Interchange.Container == 'New' ).first()
             tick=modata.id
             err=[' ', ' ', 'Enter Data for New Interchange Ticket', ' ',  ' ']
 
@@ -932,7 +932,7 @@ def isoM():
             if oder>0 and tick>0 and numchecked==2:
                 myo=Moving.query.get(oder)
                 myi=Interchange.query.get(tick)
-                myo.Container=myi.CONTAINER
+                myo.Container=myi.Container
                 db.session.commit()
 
             if numchecked != 2:

@@ -20,6 +20,7 @@
                 <th style="font-weight:bold">Booking No.</th>
                 <th style="font-weight:bold">Container No.</th>
                 <th style="font-weight:bold">Container Type</th>
+                <th style="font-weight:bold">Chassis</th>
                 <th style="font-weight:bold">Chk</th>
                 <th style="font-weight:bold">Pull Date</th>
                 <th style="font-weight:bold">Return Date</th>
@@ -74,6 +75,7 @@
                 <td align="center" class="{{atc1}}">{{ data.Booking }}</td>
                 <td align="center" class="{{atc1}}">{{ data.Container }}</td>
                 <td align="center" class="{{atc1}}">{{ data.Type }}</td>
+                <td align="center" class="{{atc1}}">{{ data.Chassis }}</td>
                 <td align="center" ><input class="align-middle" type="checkbox" name="oder{{data.id}}" value="{{data.id}}"></td>
                 <td align="center" class="{{atc2}}">{{ data.Date }}</td>
                 <td align="center" class="{{atc2}}">{{ data.Date2 }}</td>
@@ -160,15 +162,15 @@
                 <td class="{{atc1}}" align="center">{{ data.Company }}</td>
                 <td class="{{atc1}}" align="center">{{ data.Date }}</td>
                 <td class="{{atc1}}" align="center">{{ data.Time }}</td>
-                <td class="{{atc1}}" align="center">{{ data.CONTAINER }}</td>
-                <td class="{{atc1}}" align="center">{{ data.CONTYPE }}</td>
-                <td class="{{atc1}}" align="center">{{ data.RELEASE }}</td>
-                <td class="{{atc1}}" align="center">{{ data.TRUCK_NUMBER}}</td>
-                <td class="{{atc1}}" align="center">{{ data.GROSS_WT}}</td>
-                <td class="{{atc1}}" align="center">{{ data.CARGO_WT}}</td>
-                <td class="{{atc1}}" align="center">{{ data.DRIVER}}</td>
-                <td class="{{atc1}}" align="center">{{ data.TYPE}}</td>
-                <td class="{{atc1}}" align="center">{{ data.CHASSIS }}</td>
+                <td class="{{atc1}}" align="center">{{ data.Container }}</td>
+                <td class="{{atc1}}" align="center">{{ data.ConType }}</td>
+                <td class="{{atc1}}" align="center">{{ data.Release }}</td>
+                <td class="{{atc1}}" align="center">{{ data.TruckNumber}}</td>
+                <td class="{{atc1}}" align="center">{{ data.GrossWt}}</td>
+                <td class="{{atc1}}" align="center">{{ data.CargoWt}}</td>
+                <td class="{{atc1}}" align="center">{{ data.Driver}}</td>
+                <td class="{{atc1}}" align="center">{{ data.Type}}</td>
+                <td class="{{atc1}}" align="center">{{ data.Chassis }}</td>
                 <td class="{{atc1}}" align="center">{{ data.Status }}</td>
 
             </tr>

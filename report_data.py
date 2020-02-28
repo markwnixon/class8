@@ -83,7 +83,7 @@ def ticketcalcs():
     for idat in idata:
         date=idat.Date
         date=date.strftime('%Y-%m-%d')
-        unmatched.append([date,idat.RELEASE, idat.CONTAINER, idat.TYPE, idat.TRUCK_NUMBER, idat.DRIVER])
+        unmatched.append([date,idat.Release, idat.Container, idat.Type, idat.TruckNumber, idat.Driver])
     return unmatched
 
 
@@ -110,10 +110,10 @@ def jaycalcs():
         take=0
         type='J'
         move='deliver'
-        cdata=Interchange.query.filter(Interchange.CONTAINER==con).all()
+        cdata=Interchange.query.filter(Interchange.Container==con).all()
         for cdat in cdata:
-            driver=cdat.DRIVER
-            chassis=cdat.CHASSIS
+            driver=cdat.Driver
+            chassis=cdat.Chassis
             if "Khoder" in driver or "Jay" in driver:
                 take=take+1
                 odat=Orders.query.filter(Orders.Container==con).first()
@@ -145,9 +145,9 @@ def jaycalcs():
     def get_chassisdays(con):
         d1=None
         d2=None
-        ticket1=Interchange.query.filter(Interchange.CONTAINER==con).first()
+        ticket1=Interchange.query.filter(Interchange.Container==con).first()
         try:
-            ticket2=Interchange.query.filter((Interchange.CONTAINER==con) & (Interchange.id != ticket1.id)).first()
+            ticket2=Interchange.query.filter((Interchange.Container==con) & (Interchange.id != ticket1.id)).first()
         except:
             ticket2 is None
             chassisdays=0
@@ -167,9 +167,9 @@ def jaycalcs():
 
     def get_special(con):
         dispo='N'
-        ticket=Interchange.query.filter(Interchange.CONTAINER==con).first()
+        ticket=Interchange.query.filter(Interchange.Container==con).first()
         if ticket is not None:
-            chassis=ticket.CHASSIS
+            chassis=ticket.Chassis
             if 'yard' in chassis.lower():
                 dispo='Y'
             if 'toll' in chassis.lower():
@@ -179,10 +179,10 @@ def jaycalcs():
     def jay_special(con):
         dispo='N'
         booking='UNK'
-        ticket=Interchange.query.filter(Interchange.CONTAINER==con).first()
+        ticket=Interchange.query.filter(Interchange.Container==con).first()
         if ticket is not None:
-            chassis=ticket.CHASSIS
-            booking=ticket.RELEASE
+            chassis=ticket.Chassis
+            booking=ticket.Release
             if 'jay' in chassis.lower():
                 dispo='J'
         return dispo,booking
@@ -191,10 +191,10 @@ def jaycalcs():
         dispo='N'
         booking='UNK'
         d1='None'
-        ticket=Interchange.query.filter(Interchange.CONTAINER==con).first()
+        ticket=Interchange.query.filter(Interchange.Container==con).first()
         if ticket is not None:
-            chassis=ticket.CHASSIS
-            booking=ticket.RELEASE
+            chassis=ticket.Chassis
+            booking=ticket.Release
             d1=ticket.Date
             if 'jay' in chassis.lower():
                 dispo='J'
@@ -203,10 +203,10 @@ def jaycalcs():
 
 
 
-    idata=Interchange.query.filter((Interchange.Date>=start) & (Interchange.Date<=end)).filter((Interchange.DRIVER.contains("Khoder")) | (Interchange.DRIVER.contains("Jay"))).order_by(Interchange.Date).all()
+    idata=Interchange.query.filter((Interchange.Date>=start) & (Interchange.Date<=end)).filter((Interchange.Driver.contains("Khoder")) | (Interchange.Driver.contains("Jay"))).order_by(Interchange.Date).all()
     for idat in idata:
         if idat.Status=='IO':
-            con=idat.CONTAINER
+            con=idat.Container
             take,type,move=get_take(con)
 
             if move=='deliver':
@@ -359,8 +359,8 @@ def jaycalcs():
 
 
     for con in yardmoves:
-        idat=Interchange.query.filter(Interchange.CONTAINER==con).first()
-        booking=idat.RELEASE
+        idat=Interchange.query.filter(Interchange.Container==con).first()
+        booking=idat.Release
         take,type,move=get_take(con)
         d1,d2,chassisdays=get_chassisdays(con)
         if move =='ym2toll2':
