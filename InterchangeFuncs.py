@@ -287,6 +287,11 @@ def Push_Orders():
                         odat.Hstat=2
                     db.session.commit()
 
+def seektaken(container,dstart):
+    ocheck = Orders.query.filter((Orders.Container==container) & (Orders.Date>dstart) ).first()
+    if ocheck is not None: return 1
+    else: return 0
+
 def Order_Container_Update(oder):
     odat = Orders.query.get(oder)
 
@@ -304,7 +309,11 @@ def Order_Container_Update(oder):
         type=idat.Type
         idat.Company=odat.Shipper
         idat.Jo=odat.Jo
-        if not hasinput(container) or container == 'TBD': odat.Container = idat.Container
+        if not hasinput(container) or container == 'TBD':
+            if not seektaken(idat.Container,start_date):
+                odat.Container = idat.Container
+                if odat.Istat == -1:
+                    odat.Istat = 0
         hstat=odat.Hstat
         if hstat is None:
             hstat = 0
@@ -315,7 +324,6 @@ def Order_Container_Update(oder):
             odat.Hstat = 2
             odat.Date2 = idat.Date
         db.session.commit()
-
 
 
 def PushJobsThis(id):
