@@ -277,6 +277,8 @@ def gledger_write(bus,jo,acctdb,acctcr):
                 gdat.Debit=amt
                 gdat.Recorded=dt
                 gdat.Date=bdate
+                gdat.Account=acctdb
+                gdat.Sid = pid
             else:
                 input1 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=co,Sid=pid,Type='ED',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=bdate,Ref=bdat.Ref)
                 db.session.add(input1)
@@ -294,8 +296,11 @@ def gledger_write(bus,jo,acctdb,acctcr):
 
 
         if bus=='paybill':
+            from viewfuncs import check_multi_line
+            err, amt = check_multi_line(jo)
+            amt=int(amt*100)
+
             bdat=Bills.query.filter(Bills.Jo==jo).first()
-            amt=int(float(bdat.bAmount)*100)
             pid=bdat.Pid
             pdate = bdat.pDate
             co = get_company(pid)

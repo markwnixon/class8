@@ -293,6 +293,15 @@ def isoB(indat):
             print('Yes Here')
             if bill > 0:
                 modata = Bills.query.get(bill)
+                # if paying a bill there could be multiple linke items to capture
+                if modlink == 6:
+                    try:
+                        links = json.loads(modata.Link)
+                    except:
+                        links = 0
+                    if links != 0:
+                        bill = links[0]
+                        modata = Bills.query.get(bill)
                 cdat = People.query.filter(People.Company==modata.Company).first()
                 if cdat is not None:
                     if cdat.Ptype == 'TowCo': hv[3] = '2'
@@ -1213,6 +1222,24 @@ def isoB(indat):
             bdata = Bills.query.order_by(Bills.bDate).all()
 
         if printck is not None or modlink == 6 or modlink == 12 or paynmake is not None or indat != '0':
+            from viewfuncs import check_prep
+
+
+
+            def multi_prep(bill):
+                if bdat.Status == 'Paid-M':
+                    linkcode = bdat.Link
+                    sbdata = Bills.query.filter(Bills.Link == linkcode)
+                    link = linkcode.replace('Link+', '')
+                    items = link.split('+')
+                    links = []
+                    [links.append(int(item)) for item in items]
+                else:
+                    links = 0
+                    sbdata = 0
+
+
+
             if paynmake is not None:
                 bill = nonone(paynmake)
                 bdat = Bills.query.get(bill)
@@ -1228,41 +1255,27 @@ def isoB(indat):
                 bill = bdat.id
                 modlink = 6
 
-            if (numchecked == 1 and bill > 0) or modlink == 6 or modlink == 12:
-                exit = 0
-                bdat = Bills.query.get(bill)
+            if (numchecked >= 1 and bill > 0) or modlink == 6 or modlink == 12:
 
-                ifxfer = bdat.bType
-                if ifxfer == 'XFER':
-                    acct_to = bdat.Company
-                    acdat = Accounts.query.filter(Accounts.Name == acct_to).first()
-                    if acdat is None:
-                        err.append(f'Account {acct_to} has no Payee Listed for Check')
-                    else:
-                        pdat = People.query.filter(People.Company == acdat.Payee).first()
-                        if pdat is None:
-                            err.append(f'From account {acct_to} with Payee {acdat.Payee}')
-                            err.append(f'Could not find company or person in database with name {acdat.Payee}')
+                if modlink == 6 or modlink == 12:
+                    bdat = Bills.query.get(bill)
+                    try:
+                        bill_list = json.loads(bdat.Link)
+                    except:
+                        bill_list = [bill]
+                    billready, err, linkcode = check_prep(bill_list)
+
                 else:
+                    bill_list = numcheckvec(bdata, 'bill')
+                    billready, err, linkcode = check_prep(bill_list)
+
+                if billready == 1:
+                    from viewfuncs import check_inputs
+                    sbdata = Bills.query.filter(Bills.Link == linkcode).all()
+                    links = json.loads(linkcode)
+                    bdat = Bills.query.get(links[0])
                     pdat = People.query.get(bdat.Pid)
-                    if pdat is None:
-                        err.append(f'Could not find company with ID {bdat.Pid}')
 
-                if bdat.Status == 'Unpaid':
-                    bdat.Status = 'Paid'
-                    db.session.commit()
-                if bdat.Status == 'Paid-M':
-                    linkcode = bdat.Link
-                    sbdata = Bills.query.filter(Bills.Link == linkcode)
-                    link = linkcode.replace('Link+', '')
-                    items = link.split('+')
-                    links = []
-                    [links.append(int(item)) for item in items]
-                else:
-                    links = 0
-                    sbdata = 0
-
-                if exit == 0:
                     ckcache = bdat.CkCache
                     if ckcache is None or ckcache == 0:
                         ckcache = 1
@@ -1284,35 +1297,42 @@ def isoB(indat):
                     else:
                         ckstyle = 1
 
-                    from writechecks import writechecks
-                    if pdat is not None:
-                        writechecks(bdat, pdat, docref, sbdata, links, ckstyle)
-                        modlink = 6
-                        leftsize = 8
-                        leftscreen = 0
-                        co = bdat.Co
-                        ck_check = bdat.bType
-                        expdata = Accounts.query.filter( ((Accounts.Type == 'Expense') & (Accounts.Co == co)) | ((Accounts.Type == 'Credit Card') & (Accounts.Co == co)) ).order_by(Accounts.Name).all()
-                        db.session.commit()
-                        pacct = bdat.pAccount
-                        if pacct is not None and pacct != '0':
-                            print('check is',ck_check)
-                            if ck_check == 'Credit Card' or ck_check == 'XFER':
-                                print('Doing the Transfer')
-                                gledger_write('xfer',bdat.Jo,bdat.bAccount,bdat.pAccount)
-                                err.append(f'Ledger xfer for {bdat.Jo} to {bdat.bAccount} from {bdat.pAccount}')
-                            else:
-                                print('Paying the Bill')
-                                gledger_write('paybill',bdat.Jo,bdat.bAccount,bdat.pAccount)
-                                err.append(f'Ledger paid {bdat.Jo} to {bdat.bAccount} from {bdat.pAccount}')
-                        else:
-                            err.append('No Account for Fund Withdrawal')
 
-                        bdata = Bills.query.order_by(Bills.bDate).all()
-                        cdata = People.query.filter((People.Ptype == 'Vendor') | (People.Ptype == 'TowCo') | (
-                            People.Ptype == 'Overseas')).order_by(People.Company).all()
-                        modata = Bills.query.get(bill)
-                        pb = 1
+                    err = check_inputs(bill_list)
+                    co = bdat.Co
+                    expdata = Accounts.query.filter(((Accounts.Type == 'Expense') & (Accounts.Co == co)) | ((Accounts.Type == 'Credit Card') & (Accounts.Co == co))).order_by(Accounts.Name).all()
+                    modlink = 6
+                    leftscreen = 0
+                    modata = Bills.query.get(links[0])
+                    pb = 1
+                    if err[0] != 'All is Well':
+                        err.append('Check will not be displayed until above input items input or corrected')
+
+                    else:
+                        from writechecks import writechecks
+                        if pdat is not None:
+                            writechecks(bdat, pdat, docref, sbdata, links, ckstyle)
+
+                            ck_check = bdat.bType
+
+                            db.session.commit()
+                            pacct = bdat.pAccount
+                            #Only write to the ledger on update
+                            if update is not None:
+                                if pacct is not None and pacct != '0':
+                                    print('check is',ck_check)
+                                    if ck_check == 'Credit Card' or ck_check == 'XFER':
+                                        print('Doing the Transfer')
+                                        gledger_write('xfer',bdat.Jo,bdat.bAccount,bdat.pAccount)
+                                        err.append(f'Ledger xfer for {bdat.Jo} to {bdat.bAccount} from {bdat.pAccount}')
+                                    else:
+                                        print('Paying the Bill')
+                                        gledger_write('paybill',bdat.Jo,bdat.bAccount,bdat.pAccount)
+                                        err.append(f'Ledger paid {bdat.Jo} to {bdat.bAccount} from {bdat.pAccount}')
+                                else:
+                                    err.append('No Account for Fund Withdrawal')
+
+
                         #Attempt to remove the previous cache copy:
                         try:
                             last_file = addpath(f'tmp/{scac}/data/vchecks/{last_ckfile}')

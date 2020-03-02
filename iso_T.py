@@ -266,6 +266,8 @@ def isoT():
                 db.session.commit()
                 holdvec[23] = 0
                 err.append(f'Street Turn Created for {container} to {booking}')
+                from viewfuncs import street_this
+                street_this()
 
 
         if modlink == 4 and (newjob is None and thisjob is None and update is None):
@@ -2062,23 +2064,8 @@ def isoT():
                 db.session.commit()
 
             if tick > 0 and numchecked == 1:
-                myi = Interchange.query.get(tick)
-                type = myi.Type
-                if type == 'Load In':
-                    newtype = 'Empty Out'
-                if type == 'Empty Out':
-                    newtype = 'Load In'
-                if type == 'Empty In':
-                    newtype = 'Load Out'
-                if type == 'Load Out':
-                    newtype = 'Empty In'
-
-                input = Interchange(Container=myi.Container, TruckNumber=myi.TruckNumber, Driver=myi.Driver, Chassis=myi.Chassis,
-                                    Date=myi.Date, Release=myi.Release, GrossWt=myi.GrossWt,
-                                    Seals=myi.Seals, ConType=myi.ConType, CargoWt=myi.CargoWt,
-                                    Time=myi.Time, Status='AAAAAA', Original=' ', Path=' ', Type=newtype, Jo=myi.Jo, Company=myi.Company, Other=None)
-                db.session.add(input)
-                db.session.commit()
+                from viewfuncs import ticket_copy
+                ticket_copy(tick)
 
             if numchecked > 1:
                 err.append('Must select exactly one box to choose this option.')

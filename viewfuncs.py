@@ -1,6 +1,6 @@
 from runmain import db
 from models import Trucklog, DriverAssign, Invoices, JO, Income, Bills, Accounts, Bookings, OverSeas, Autos, People, Interchange, Drivers, ChalkBoard, Orders, Drops, Services, Quotes, Divisions
-from models import Taxmap, QBaccounts, Accttypes, IEroll
+from models import Taxmap, QBaccounts, Accttypes, IEroll, StreetTurns, Gledger
 from flask import session, logging, request
 import datetime
 import calendar
@@ -2571,3 +2571,163 @@ def getmonths(acct,mback,mstart):
                 print(ix)
                 dlist.append(float(getattr(dat, f'C{ix}')))
         return dlist
+
+def ticket_copy(tick):
+    myi = Interchange.query.get(tick)
+    type = myi.Type
+    if type == 'Load In':
+        newtype = 'Empty Out'
+    if type == 'Empty Out':
+        newtype = 'Load In'
+    if type == 'Empty In':
+        newtype = 'Load Out'
+    if type == 'Load Out':
+        newtype = 'Empty In'
+
+    input = Interchange(Container=myi.Container, TruckNumber=myi.TruckNumber, Driver=myi.Driver, Chassis=myi.Chassis,
+                        Date=myi.Date, Release=myi.Release, GrossWt=myi.GrossWt,
+                        Seals=myi.Seals, ConType=myi.ConType, CargoWt=myi.CargoWt,
+                        Time=myi.Time, Status='AAAAAA', Original=' ', Path=' ', Type=newtype, Jo=myi.Jo,
+                        Company=myi.Company, Other=str(tick))
+    db.session.add(input)
+    db.session.commit()
+    myo = Interchange.query.filter(Interchange.Other==str(tick)).first()
+    return myo.id
+
+
+
+def street_this():
+    sdata = StreetTurns.query.filter(StreetTurns.Status == 0).all()
+    for sdat in sdata:
+        sdat.Status = 1
+        con = sdat.Container
+        bk = sdat.BookingTo
+        dt = sdat.Date
+        lookback = dt - datetime.timedelta(30)
+        #Original Out Container
+        idat = Interchange.query.filter((Interchange.Container == con) & (Interchange.Date > lookback) & (Interchange.Type.contains('Out'))).first()
+        if idat is not None:
+            tick = idat.id
+            #Create New Match to Original.  Both Original Out and its Street Turn Match have **
+            ctick = ticket_copy(tick)
+            newcon = f'*{con}*'
+            idat.Container = newcon
+            idat.Status = 'IO'
+            myi = Interchange.query.get(ctick)
+            if myi is not None:
+                myi.Container = newcon
+                myi.Release = idat.Release
+                myi.Status = 'IO'
+                myi.Date = dt
+                #Create New Interchange for Future Match, This has the street turn booking and street turn reuse date
+                input = Interchange(Container=con, TruckNumber=myi.TruckNumber, Driver=myi.Driver,
+                                    Chassis=myi.Chassis,
+                                    Date=dt, Release=bk, GrossWt=myi.GrossWt,
+                                    Seals=myi.Seals, ConType=myi.ConType, CargoWt=myi.CargoWt,
+                                    Time=myi.Time, Status='AAAAAA', Original=' ', Path=' ', Type='Empty Out', Jo=None,
+                                    Company=None, Other=None)
+                db.session.add(input)
+
+            odat = Orders.query.filter( (Orders.Container == con) & (Orders.Date > lookback) ).first()
+            if odat is not None:
+                odat.Container = newcon
+        db.session.commit()
+
+        # Now see if this container has already been returned and get those matched....
+        idatret = Interchange.query.filter( (Interchange.Container == con) & (Interchange.Date > lookback) & (Interchange.Type.contains('In'))).first()
+        if idatret is not None:
+            idatret.Status = 'IO'
+            idatret.Type = 'Load In'
+            idatret.Release = bk
+            idatout = Interchange.query.filter((Interchange.Container == con) & (Interchange.Date > lookback) & (Interchange.Type.contains('Out'))).first()
+            if idatout is not None:
+                idatout.Status = 'IO'
+                idatout.Company = idatret.Company
+                idatout.Jo = idatret.Jo
+                idatout.Release = bk
+            db.session.commit()
+
+def check_prep(bill_list):
+    billready = 1
+    linkcode = json.dumps(bill_list)
+    total = 0.00
+    err = []
+    for bill in bill_list:
+        bdat = Bills.query.get(bill)
+        trans_type = bdat.bType
+        total = total + float(bdat.bAmount)
+        if trans_type == 'XFER':
+            acct_to = bdat.Company
+            acdat = Accounts.query.filter(Accounts.Name == acct_to).first()
+            if acdat is None:
+                err.append(f'Account {acct_to} has no Payee Listed for Check')
+                billready = 0
+            else:
+                pdat = People.query.filter(People.Company == acdat.Payee).first()
+                if pdat is None:
+                    err.append(f'From account {acct_to} with Payee {acdat.Payee}')
+                    err.append(f'Could not find company or person in database with name {acdat.Payee}')
+                    billready = 0
+        else:
+            pdat = People.query.get(bdat.Pid)
+            if pdat is None:
+                err.append(f'Could not find company with ID {bdat.Pid}')
+                billready = 0
+
+        if billready == 1:
+            if bdat.Status == 'Unpaid': bdat.Status = 'Paid'
+            bdat.Link = linkcode
+            db.session.commit()
+    for bill in bill_list:
+        bdat = Bills.query.get(bill)
+        bdat.pAmount = bdat.bAmount
+        bdat.pMulti = d2s(total)
+    db.session.commit()
+
+    return billready, err, linkcode
+
+def check_multi_line(jo):
+    bdat = Bills.query.filter(Bills.Jo == jo).first()
+    err = []
+    try:
+        links = json.loads(bdat.Link)
+    except:
+        links = [bdat.id]
+    acct = bdat.bAccount
+    total = 0.00
+    for bill in links:
+        bd = Bills.query.get(bill)
+        bacct = bd.bAccount
+        bjo = bd.Jo
+        co = bjo[0]
+        bd.Temp2 = None
+        bd.Status = 'Paid'
+        adat = Accounts.query.filter((Accounts.Name == bacct) & (Accounts.Co == co) ).first()
+        aid = adat.id
+        #Update the previous gledger entry for expense account if it has been modified
+        gdat = Gledger.query.filter( (Gledger.Type == 'ED') & (Gledger.Tcode == bjo) ).first()
+        if gdat is not None:
+            gdat.Account = bacct
+            gdat.Aid = aid
+        else:
+            err.append(f'Bill {bd.id} was never recorded')
+        total = total + float(bd.pAmount)
+        # Remove any previous payments to individual accounts as this check about to be paid for all
+        Gledger.query.filter( (Gledger.Tcode == bjo) & (Gledger.Type == 'PD') ).delete()
+        Gledger.query.filter( (Gledger.Tcode == bjo) & (Gledger.Type == 'PC') ).delete()
+    db.session.commit()
+    return err, total
+
+def check_inputs(bill_list):
+    err = []
+    bill = bill_list[0]
+    bdat = Bills.query.get(bill)
+    billfrom = bdat.Pid
+    if not hasinput(bdat.pAccount): err.append('Need to specify the account to pay from')
+    if not hasinput(bdat.Ref): err.append('Enter some value for the payment reference, either check number, epay, ach...etc')
+    for bi in bill_list:
+        bidat = Bills.query.get(bi)
+        pid = bidat.Pid
+        if pid != billfrom: err.append(f'Payee for transaction {bidat.Jo} does not match {bdat.Jo}')
+    if err == []: err.append('All is Well')
+    return err

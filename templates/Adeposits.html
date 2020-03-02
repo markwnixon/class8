@@ -28,6 +28,7 @@
 
       {% set atc = "font-weight-bold text-center" %}
       {% set atlb = "font-weight-bold text-left blue-text" %}
+      {% set atrb = "font-weight-bold text-right blue-text" %}
       {% set atl = "font-weight-bold text-left" %}
       {% set atr = "font-weight-bold text-right" %}
         <table id="dtHorizontalVerticalExample2" class="table table-striped table-bordered  w-auto" cellspacing="0" width="100%">
@@ -37,7 +38,7 @@
                 <th class="{{atc}}">Id</th>
                 <th class="{{atc}}">Source</th>
                 <th class="{{atc}}">Check No</th>
-                <th class="{{atc}}">Received Into</th>
+                <th class="{{atc}}">Received As</th>
                 <th class="{{atc}}">Date</th>
 
                 <th class="{{atc}}">Sel</th>
@@ -57,7 +58,7 @@
                 <td class="{{atc}}">{{ data.Date }}</td>
 
                 <td align="center"><input class="align-middle" type="checkbox" name="oder{{data.id}}" value="{{data.id}}"></td>
-                <td class="{{atlb}}">$ {{ data.Debit }}</td>
+                <td class="{{atrb}}">${{'%0.2f'| format((data.Debit|float)/100)}}</td>
 
 
             </tr>
@@ -100,7 +101,7 @@
                 <td class="{{atc}}">{{ data.From }}</td>
                 <td class="{{atl}}">{{ data.Total }}</td>
                 <td align="center"><input class="align-middle" type="checkbox" name="oder{{data.id}}" value="{{data.id}}"></td>
-                <td class="{{atr}}">$ {{ data.Amount }}</td>
+                <td class="{{atr}}"> ${{'%0.2f'| format((data.Amount|float)/100)}}</td>
                 <td class="{{atlb}}">&nbsp;&nbsp;{{ data.Ref }}</td>
                 <td class="{{atc}}">{{ data.Bank }}</td>
                 <td class="{{atc}}">{{ data.Date2 }}</td>

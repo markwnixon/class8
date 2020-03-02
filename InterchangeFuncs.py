@@ -9,6 +9,7 @@ from datetime import timedelta
 my_datetime = datetime.datetime.now(pytz.timezone('US/Eastern'))
 today = my_datetime.date()
 now = my_datetime.time()
+cutoff = today - datetime.timedelta(45)
 
 def real_use(bk,bol):
     if hasinput(bk) and not hasinput(bol):
@@ -67,6 +68,8 @@ def InterMatchThis(id):
     idat=Interchange.query.get(id)
     container=idat.Container
     release=idat.Release
+    if not hasinput(container): container = 'Con TBD'
+    if not hasinput(release): release = 'Bk TBD'
     type=idat.Type
     if 'In' in type:
         matcher='Out'
@@ -128,7 +131,7 @@ def Match_Trucking_Now():
         bk = data.Booking
         bol = data.BOL
         bk = real_use(bk,bol)
-        if bk is None: bk = 'Book TBD'
+        if not hasinput(bk): bk = 'Book TBD'
 
         start_date = data.Date - timedelta(30)
         end_date = data.Date + timedelta(30)
@@ -237,6 +240,7 @@ def Push_Overseas():
             testid=idat.id
             type=idat.Type
             booking=idat.Release
+            if not hasinput(booking): booking = 'Book TBD'
 
             odat=OverSeas.query.filter(OverSeas.Booking==booking).first()
             if odat is not None:
@@ -268,11 +272,14 @@ def Push_Orders():
             testid=idat.id
             type=idat.Type
             booking=idat.Release
+            if not hasinput(booking): booking = 'Book TBD'
 
             odat=Orders.query.filter( (Orders.Booking==booking) | (Orders.Container==container) ).first()
             if odat is not None:
                 idat.Company=odat.Shipper
                 idat.Jo=odat.Jo
+                release = idat.Release
+                if not hasinput(release): idat.Release = odat.Booking
                 hstat = odat.Hstat
                 if hstat == 0:
                     odat.Hstat = 1
@@ -298,7 +305,7 @@ def Order_Container_Update(oder):
     bk = odat.Booking
     bol = odat.BOL
     bk = real_use(bk,bol)
-    if bk is None: bk = 'Book TBD'
+    if not hasinput(bk): bk = 'Book TBD'
     container = odat.Container
 
     start_date = odat.Date - timedelta(30)
@@ -333,12 +340,16 @@ def PushJobsThis(id):
     type=idat.Type
     booking=idat.Release
     container=idat.Container
+    if not hasinput(booking): booking = 'Book TBD'
+    if not hasinput(container): container = 'Con TBD'
 
     odat=OverSeas.query.filter(OverSeas.Booking==booking).first()
     if odat is not None:
         odat.Container=container
         idat.Company=odat.BillTo
         idat.Jo=odat.Jo
+        release = idat.Release
+        if not hasinput(release): idat.Release = odat.Booking
 
         status=odat.Status
         bit1=status[0]
@@ -356,10 +367,12 @@ def PushJobsThis(id):
 
         db.session.commit()
 
-    odat=Orders.query.filter( (Orders.Booking==booking) & ( (Orders.Container=='TBD') | (Orders.Container==container) ) ).first()
+    odat=Orders.query.filter( ( (Orders.Booking==booking) | (Orders.Container==container) ) & (Orders.Date > cutoff) ).first()
     if odat is not None:
         idat.Company=odat.Shipper
         idat.Jo=odat.Jo
+        release = idat.Release
+        if not hasinput(release): idat.Release = odat.Booking
         odat.Container=container
         hstat = odat.Hstat
         if hstat == 0 and 'Out' in type:
