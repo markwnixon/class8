@@ -1,5 +1,5 @@
 from runmain import db
-from models import Income, Accounts, users, JO, Gledger
+from models import Income, Accounts, users, JO, Gledger, Reconciliations
 from flask import session, logging, request
 import datetime
 import calendar
@@ -38,6 +38,8 @@ def dataget_Bank(thismuch,bankacct):
 
 def recon_totals(bankacct):
     # Find service charges for month:
+    dlist = []
+    wlist = []
     gdat = Gledger.query.filter((Gledger.Account == bankacct) & (Gledger.Reconciled == 25) & (Gledger.Source == bankacct)).first()
     if gdat is not None:
         bkc = gdat.Credit
@@ -47,11 +49,15 @@ def recon_totals(bankacct):
     gdata = Gledger.query.filter((Gledger.Account == bankacct) & (Gledger.Reconciled == 25)).all()
     for gdat in gdata:
         type = gdat.Type
-        if type == 'DD' or type == 'XD': totald = totald + gdat.Debit
-        if type == 'PC' or type == 'XC': totalc = totalc + gdat.Credit
+        if type == 'DD' or type == 'XD':
+            totald = totald + gdat.Debit
+            dlist.append(gdat.id)
+        if type == 'PC' or type == 'XC':
+            totalc = totalc + gdat.Credit
+            wlist.append(gdat.id)
 
     totalc = totalc - bkc
-    return d2s(float(totald)/100), d2s(float(totalc)/100), d2s(float(bkc)/100)
+    return d2s(float(totald)/100), d2s(float(totalc)/100), d2s(float(bkc)/100), dlist, wlist
 
 def banktotals(bankacct):
     totald=0
@@ -82,7 +88,7 @@ def banktotals(bankacct):
             if gdat.Reconciled==0 or gdat.Reconciled==25:
                 totalc_U = totalc_U + gdat.Credit
 
-    trial_dr, trial_cr, bk_charge = recon_totals(bankacct)
+    trial_dr, trial_cr, bk_charge, dlist, wlist = recon_totals(bankacct)
 
     totald = float(totald)/100
     totalc = float(totalc)/100
@@ -260,9 +266,36 @@ def isoBank():
                     gdat.Reconciled=recmo
                     db.session.commit()
                 acctinfo = banktotals(acname)
-                hv[2], hv[3], hv[4] = recon_totals(acname)
+                hv[2], hv[3], hv[4], dlist, wlist = recon_totals(acname)
                 print(hv[2],hv[3])
                 odata = dataget_Bank(thismuch, acname)
+                rdat = Reconciliations.query.filter((Reconciliations.Rdate == hv[0]) & (Reconciliations.Account == acname)).first()
+                try:
+                    dlists = json.dumps(dlist)
+                except:
+                    dlists = None
+                try:
+                    wlists = json.dumps(wlist)
+                except:
+                    wlists = None
+                if rdat is None:
+                    input = Reconciliations(Account=acname,Rdate=hv[0],Bbal=acctinfo[9],Ebal=acctinfo[4],Deposits=hv[2],Withdraws=hv[3],Servicefees=hv[4],DepositList=dlists,WithdrawList=wlists,Status=1,Diff=acctinfo[5])
+                    db.session.add(input)
+                    db.session.commit()
+                else:
+                    print('diff', acctinfo[5])
+                    rdat.Account = acname
+                    rdat.Bbal = acctinfo[9]
+                    rdat.Ebal = acctinfo[4]
+                    rdat.Servicefees = hv[4]
+                    rdat.Deposits = hv[2]
+                    rdat.Withdraws = hv[3]
+                    rdat.DepositList = dlists
+                    rdat.WithdrawList = wlists
+                    rdat.Status = 1
+                    rdat.Rdate = hv[0]
+                    rdat.Diff = acctinfo[5]
+                    db.session.commit()
 
             else:
                 err.append('No items checked for reconciliation')
