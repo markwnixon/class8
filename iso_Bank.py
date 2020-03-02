@@ -12,10 +12,10 @@ from report_maker import reportmaker
 from viewfuncs import d2s
 from CCC_system_setup import scac
 
-def reset_trial():
+def reset_trial(ix):
     gdata = Gledger.query.filter(Gledger.Reconciled == 25).all()
     for gdat in gdata:
-        gdat.Reconciled = 0
+        gdat.Reconciled = ix
     db.session.commit()
 
 def dataget_Bank(thismuch,bankacct):
@@ -234,14 +234,14 @@ def isoBank():
 # ____________________________________________________________________________________________________________________E.Search.General
         if (recothese is not None or finalize is not None) and recready == 1:
 
-            if numchecked > 0:
+            if numchecked > -1:
 
-                reset_trial()
+                reset_trial(0)
                 #Get date of reconciliation and bank charges for month
                 rdate = request.values.get('rdate')
                 recdate = datetime.datetime.strptime(rdate, "%Y-%m-%d")
                 recmo = recdate.month
-                if recothese is not None: recmo = 25 #Do not record month until reconciliation final
+                #if recothese is not None: recmo = 25 #Do not record month until reconciliation final
                 bkcharges = request.values.get('bkcharges')
                 bkcharges = d2s(bkcharges)
                 bkchargeid = 0
@@ -263,39 +263,44 @@ def isoBank():
                 print('hv[1]', hv[1])
                 for oder in odervec:
                     gdat = Gledger.query.get(oder)
-                    gdat.Reconciled=recmo
-                    db.session.commit()
+                    gdat.Reconciled=25
+                db.session.commit()
                 acctinfo = banktotals(acname)
                 hv[2], hv[3], hv[4], dlist, wlist = recon_totals(acname)
                 print(hv[2],hv[3])
                 odata = dataget_Bank(thismuch, acname)
-                rdat = Reconciliations.query.filter((Reconciliations.Rdate == hv[0]) & (Reconciliations.Account == acname)).first()
-                try:
-                    dlists = json.dumps(dlist)
-                except:
-                    dlists = None
-                try:
-                    wlists = json.dumps(wlist)
-                except:
-                    wlists = None
-                if rdat is None:
-                    input = Reconciliations(Account=acname,Rdate=hv[0],Bbal=acctinfo[9],Ebal=acctinfo[4],Deposits=hv[2],Withdraws=hv[3],Servicefees=hv[4],DepositList=dlists,WithdrawList=wlists,Status=1,Diff=acctinfo[5])
-                    db.session.add(input)
-                    db.session.commit()
-                else:
-                    print('diff', acctinfo[5])
-                    rdat.Account = acname
-                    rdat.Bbal = acctinfo[9]
-                    rdat.Ebal = acctinfo[4]
-                    rdat.Servicefees = hv[4]
-                    rdat.Deposits = hv[2]
-                    rdat.Withdraws = hv[3]
-                    rdat.DepositList = dlists
-                    rdat.WithdrawList = wlists
-                    rdat.Status = 1
-                    rdat.Rdate = hv[0]
-                    rdat.Diff = acctinfo[5]
-                    db.session.commit()
+
+                if finalize is not None:
+                    reset_trial(recmo)
+                    hv[1] = [0]
+                    rdat = Reconciliations.query.filter((Reconciliations.Rdate == hv[0]) & (Reconciliations.Account == acname)).first()
+                    try:
+                        dlists = json.dumps(dlist)
+                    except:
+                        dlists = None
+                    try:
+                        wlists = json.dumps(wlist)
+                    except:
+                        wlists = None
+                    if rdat is None:
+                        input = Reconciliations(Account=acname,Rdate=hv[0],Bbal=acctinfo[9],Ebal=acctinfo[4],Deposits=hv[2],Withdraws=hv[3],Servicefees=hv[4],DepositList=dlists,WithdrawList=wlists,Status=1,Diff=acctinfo[5])
+                        db.session.add(input)
+                        db.session.commit()
+                    else:
+                        print('diff', acctinfo[5])
+                        rdat.Account = acname
+                        rdat.Bbal = acctinfo[9]
+                        rdat.Ebal = acctinfo[4]
+                        rdat.Servicefees = hv[4]
+                        rdat.Deposits = hv[2]
+                        rdat.Withdraws = hv[3]
+                        rdat.DepositList = dlists
+                        rdat.WithdrawList = wlists
+                        rdat.Status = 1
+                        rdat.Rdate = hv[0]
+                        rdat.Diff = acctinfo[5]
+                        db.session.commit()
+                    err.append(f'Reconciliation data saved for Account {acname} Date: {hv[0]}')
 
             else:
                 err.append('No items checked for reconciliation')
@@ -409,7 +414,7 @@ def isoBank():
         hv[0] = today_str
         hv[1] = [0]
         now = datetime.datetime.now().strftime('%I:%M %p')
-        reset_trial()
+        reset_trial(0)
         oder=0
         modata=0
         modlink=0
