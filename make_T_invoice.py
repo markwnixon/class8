@@ -78,13 +78,10 @@ def T_invoice(odata, ldata, pdata1, pdata2, pdata3, cache, invodate, payment):
 
     if type == 'T':
         chassis = ' '
-        time1 = date1+' '+nononestr(odata.Time)
-        time2 = date2+' '+nononestr(odata.Time2)
-
         try:
-            line3 = [odata.Order, odata.Booking, time1, time2, odata.BOL, odata.Container]
+            line3 = [odata.Order, odata.Booking, date1, date2, odata.BOL, odata.Container]
         except:
-            line3 = [odata.Order, odata.Booking, time1, time2, ' ', ' ']
+            line3 = [odata.Order, odata.Booking, date1, date2, ' ', ' ']
 
     qnote, note, bank, us, lab, logoi = bankdata('FC')
     lab1=lab[0]

@@ -550,14 +550,12 @@ def invoiceM(oder, payment):
 
         line1 = ['No. Stops', 'Terms', 'Job Start', 'Job Finish', 'Bill of Lading', 'Container No.']
         line2 = ['Quantity', 'Item Code', 'Description', 'Price Each', 'Amount']
-        time1 = date1+' '+nononestr(myo.Time)
-        time2 = date2+' '+nononestr(myo.Time2)
         due = 'Due Upon Receipt'
         bol = myo.BOL
         if len(bol) < 2:
             bol = myo.Jo
 
-        line3 = [myo.Booking, due, time1, time2, bol, myo.Container]
+        line3 = [myo.Booking, due, date1, date2, bol, myo.Container]
 
         note, bank = bankdata('FC')
 
