@@ -137,6 +137,7 @@ def gledger_app_write(sapp,jo,cofor,id1,id2,amt):
 
 def gledger_write(bus,jo,acctdb,acctcr):
     if 1 == 1:
+        err = []
         dt = datetime.datetime.now()
         cc=jo[0] # this is the company we will be working on
         fd=jo[1]
@@ -272,28 +273,34 @@ def gledger_write(bus,jo,acctdb,acctcr):
             adb=Accounts.query.filter((Accounts.Name==acctdb) & (Accounts.Co ==cc)).first() #the expense account
             acr=Accounts.query.filter((Accounts.Name==acctcr) & (Accounts.Co ==cc)).first() #the asset account
 
-            gdat = Gledger.query.filter((Gledger.Tcode==jo) & (Gledger.Type=='ED')).first()
-            if gdat is not None:
-                gdat.Debit=amt
-                gdat.Recorded=dt
-                gdat.Date=bdate
-                gdat.Account=acctdb
-                gdat.Sid = pid
-            else:
-                input1 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=co,Sid=pid,Type='ED',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=bdate,Ref=bdat.Ref)
-                db.session.add(input1)
-            db.session.commit()
+            if bdat is not None and adb is not None and acr is not None:
 
-            gdat = Gledger.query.filter((Gledger.Tcode==jo) &  (Gledger.Type=='EC')).first()
-            if gdat is not None:
-                gdat.Credit=amt
-                gdat.Recorded=dt
-                gdat.Date=bdate
-            else:
-                input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=co,Sid=pid,Type='EC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=bdate,Ref=bdat.Ref)
-                db.session.add(input2)
-            db.session.commit()
+                gdat = Gledger.query.filter((Gledger.Tcode==jo) & (Gledger.Type=='ED')).first()
+                if gdat is not None:
+                    gdat.Debit=amt
+                    gdat.Recorded=dt
+                    gdat.Date=bdate
+                    gdat.Account=acctdb
+                    gdat.Sid = pid
+                else:
+                    input1 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=co,Sid=pid,Type='ED',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=bdate,Ref=bdat.Ref)
+                    db.session.add(input1)
+                db.session.commit()
 
+                gdat = Gledger.query.filter((Gledger.Tcode==jo) &  (Gledger.Type=='EC')).first()
+                if gdat is not None:
+                    gdat.Credit=amt
+                    gdat.Recorded=dt
+                    gdat.Date=bdate
+                else:
+                    input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=co,Sid=pid,Type='EC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=bdate,Ref=bdat.Ref)
+                    db.session.add(input2)
+                db.session.commit()
+
+            else:
+                if bdat is None: err.append(f'Cannot locate Bill JO {jo}')
+                if adb is None: err.append(f'Cannot locate Debit Account {acctdb} for {cc}')
+                if acr is None: err.append(f'Cannot locate Credit Account {acctcr} for {cc}')
 
         if bus=='paybill':
             from viewfuncs import check_multi_line
@@ -449,3 +456,5 @@ def gledger_write(bus,jo,acctdb,acctcr):
                 input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=co,Sid=pid,Type='PC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=bdate,Ref=bdat.Ref)
                 db.session.add(input2)
             db.session.commit()
+
+        return err

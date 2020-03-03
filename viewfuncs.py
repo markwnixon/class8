@@ -1409,6 +1409,7 @@ def make_new_bill():
     if sdate == '':
         sdate = today_str
 
+
     thiscomp = request.values.get('thiscomp')
     cdat = People.query.filter((People.Company == thiscomp) & (
             (People.Ptype == 'Vendor') | (People.Ptype == 'TowCo'))).first()
@@ -1450,7 +1451,8 @@ def make_new_bill():
         ddate = today_str
     bdesc = request.values.get('bdesc')
 
-    nextjo = newjo(cco+'B', today_str)
+    jbcode = cdata[10] + 'B'
+    nextjo = newjo(jbcode, today_str)
 
     account = request.values.get('crataccount')
 

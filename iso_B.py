@@ -13,6 +13,7 @@ from CCC_system_setup import myoslist, addpath, addtxt, scac, companydata
 compdata = companydata()
 billexpcode = compdata[10]+'B'
 billxfrcode = compdata[10]+'X'
+print(billexpcode)
 
 def isoB(indat):
 
@@ -250,6 +251,7 @@ def isoB(indat):
             account = compdata[9]
             baccount = 'Towing Costs'
             nextjo = newjo(billexpcode, today)
+            print('JO generation output',billexpdata,nextjo)
 
             input = Bills(Jo=nextjo, Pid=aid, Company=cdat.Company, Memo=ckmemo, Description=bdesc, bAmount=bamt, Status='Paid', Cache=0, Original='',
                              Ref=bref, bDate=sdate, pDate=today, pAmount=bamt, pMulti=None, pAccount=account, bAccount=baccount, bType=btype,
@@ -302,6 +304,34 @@ def isoB(indat):
                     if links != 0:
                         bill = links[0]
                         modata = Bills.query.get(bill)
+
+                if modlink == 7:
+                    vendor = request.values.get('thiscomp')
+                    vdat = People.query.filter((People.Ptype == 'Vendor') & (People.Company == vendor)).first()
+
+                    co = request.values.get('ctype')
+                    print(co,vendor)
+                    if co == 'Pick':
+                        if vdat is not None:
+                            co = vdat.Idtype
+
+                    defexp = request.values.get('billacct')
+                    print(defexp)
+                    if defexp == '1':
+                        if vdat is not None:
+                            defexp = vdat.Associate1
+
+                    print(vendor,co,defexp)
+
+                    modata.Company = vendor
+                    modata.bAccount = defexp
+                    modata.Co = co
+                    db.session.commit()
+                    modata = Bills.query.get(bill)
+
+
+
+
                 cdat = People.query.filter(People.Company==modata.Company).first()
                 if cdat is not None:
                     if cdat.Ptype == 'TowCo': hv[3] = '2'
@@ -340,7 +370,7 @@ def isoB(indat):
 
                     err.append('Modification to Xfer ' + modata.Jo + ' completed.')
                     if update is not None:
-                        gledger_write('xfer', modata.Jo, modata.Company, modata.pAccount)
+                        err = gledger_write('xfer', modata.Jo, modata.Company, modata.pAccount)
 
                 else:
                     # This section means the transaction is not a transfer
@@ -351,12 +381,8 @@ def isoB(indat):
 
                         pbill = request.values.get('pbill')
                         pb = nonone(pbill)
-                        bval = request.values.get('ctype')
-                        print('Updat is None so running this sequence')
-                        if bval is not None:
-                            modata.Co = bval
-                            db.session.commit()
-                            expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co.contains(bval))).order_by(Accounts.Name).all()
+                        co = modata.Co
+                        expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co.contains(co))).order_by(Accounts.Name).all()
                         pacct = request.values.get('account')
                         print(pacct)
                         pcheck = next_check(pacct,modata.id)
@@ -437,7 +463,7 @@ def isoB(indat):
                         jo=modata.Jo
 
                         print('line302:',modata.Jo,modata.bAccount,modata.pAccount)
-                        gledger_write('newbill',modata.Jo,modata.bAccount,modata.pAccount)
+                        err = gledger_write('newbill',modata.Jo,modata.bAccount,modata.pAccount)
 
 
 
@@ -620,20 +646,31 @@ def isoB(indat):
 
             if bill > 0:
                 modata = Bills.query.get(bill)
-                vendor = modata.Company
-                co = modata.Co
+                vendor = request.values.get('thiscomp')
+                if vendor is None:
+                    vendor = modata.Company
+
                 vdat = People.query.filter((People.Ptype == 'Vendor') & (People.Company == vendor)).first()
-                # co = vdat.Idtype
-                if vdat is not None:
+
+                co = request.values.get('ctype')
+                if co is None:
+                    co = modata.Co
+                if co == 'Pick':
+                    if vdat is not None:
+                        co = vdat.Idtype
+
+                defexp = request.values.get('billacct')
+                if defexp is None:
                     defexp = modata.bAccount
-                    if defexp is not None:
-                        if len(defexp) < 5:
-                            defexp = vdat.Associate1
-                    else:
+                if defexp == '1':
+                    if vdat is not None:
                         defexp = vdat.Associate1
-                else:
-                    defexp = None
+
+                modata.Company = vendor
                 modata.bAccount = defexp
+                modata.Co = co
+                db.session.commit()
+
                 duedate = modata.dDate
                 if duedate is None:
                     modata.dDate = modata.bDate
@@ -805,7 +842,7 @@ def isoB(indat):
             db.session.commit()
 
             modata = Bills.query.filter(Bills.Jo == nextjo).first()
-            gledger_write('xfer',nextjo,toacct,fromacct)
+            err = gledger_write('xfer',nextjo,toacct,fromacct)
             bill = modata.id
             leftscreen = 1
             err.append('All is well')
@@ -824,7 +861,7 @@ def isoB(indat):
                 db.session.add(input)
                 db.session.commit()
 
-                gledger_write('newbill', nextjo, bdat.bAccount, bdat.pAccount)
+                err = gledger_write('newbill', nextjo, bdat.bAccount, bdat.pAccount)
 
             elif peep > 0 and numchecked == 1:
                 # sdate=today.strftime('%Y-%m-%d')
@@ -857,7 +894,7 @@ def isoB(indat):
                     db.session.add(input)
                     db.session.commit()
 
-                    gledger_write('newbill',nextjo,bdat.bAccount,bdat.pAccount)
+                    err = gledger_write('newbill',nextjo,bdat.bAccount,bdat.pAccount)
 
         if qpay is not None:
             if bill > 0 and numchecked == 1:
@@ -1069,7 +1106,7 @@ def isoB(indat):
 
             db.session.add(input)
             db.session.commit()
-            if cc_check != 'Credit Card': gledger_write('newbill',nextjo,baccount,account)
+            if cc_check != 'Credit Card': err = gledger_write('newbill',nextjo,baccount,account)
 
             # Check if shared account:
             adat = Accounts.query.filter(Accounts.Name == baccount).first()
@@ -1193,7 +1230,7 @@ def isoB(indat):
                         myb.Company = masterpayee
                         db.session.commit()
                         jo = myb.Jo
-                        gledger_write('paybill',jo,myb.bAccount,myb.pAccount)
+                        err = gledger_write('paybill',jo,myb.bAccount,myb.pAccount)
 
             if numchecked == 0 or bill == 0:
                 err.append('Must check at least one bill for this selection')
@@ -1323,11 +1360,11 @@ def isoB(indat):
                                     print('check is',ck_check)
                                     if ck_check == 'Credit Card' or ck_check == 'XFER':
                                         print('Doing the Transfer')
-                                        gledger_write('xfer',bdat.Jo,bdat.bAccount,bdat.pAccount)
+                                        err = err = gledger_write('xfer',bdat.Jo,bdat.bAccount,bdat.pAccount)
                                         err.append(f'Ledger xfer for {bdat.Jo} to {bdat.bAccount} from {bdat.pAccount}')
                                     else:
                                         print('Paying the Bill')
-                                        gledger_write('paybill',bdat.Jo,bdat.bAccount,bdat.pAccount)
+                                        err = gledger_write('paybill',bdat.Jo,bdat.bAccount,bdat.pAccount)
                                         err.append(f'Ledger paid {bdat.Jo} to {bdat.bAccount} from {bdat.pAccount}')
                                 else:
                                     err.append('No Account for Fund Withdrawal')

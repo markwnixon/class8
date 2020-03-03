@@ -104,7 +104,7 @@
                 <tr>
                     <td>    <div class="input-group-text">From Vendor:</div>    </td>
                     <td>
-                            <select class="form-control" type="text" name="thiscomp" >
+                            <select class="form-control" type="text" name="thiscomp" onchange="this.form.submit()">
                                     <option selected value='1'>Choose Later</option>
                                     {% for data in data2 %}
                                         <option value="{{data.Company}}" {% if modata.Company == data.Company %} selected {% endif %}> {{data.Company}} </option>
@@ -116,7 +116,7 @@
                     <td>    <div class="input-group-text">Bill for Company:</div>   </td>
                     <td>
                             <select class="form-control" type="text" name="ctype" onchange="this.form.submit()">
-                                <option value = 'Pick '>  Select Default Company/Division </option>
+                                <option value = 'Pick'>  Select Default Company/Division </option>
                                     {% for div in divdat %}
                                         <option {% if modata.Co== div.Co %} selected {% endif %} value='{{ div.Co }}'>  {{ div.Name }} (Code {{ div.Co }}) </option>
                                     {% endfor %}
