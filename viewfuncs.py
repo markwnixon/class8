@@ -1908,6 +1908,8 @@ def driver_assignments(lbox,holdvec):
 
 def driver_payroll(lbox,holdvec):
     err=[]
+    thispstart = 0
+    thispstop = 0
     thisdriver = request.values.get('thisdriver')
     print('thisdriver=', thisdriver)
     if thisdriver is None:
@@ -1919,7 +1921,7 @@ def driver_payroll(lbox,holdvec):
     pstarts = [pstart.strftime('%Y-%m-%d')]
     pstop = pstart + datetime.timedelta(13)
     pstops = [pstop.strftime('%Y-%m-%d')]
-    for ix in range(30):
+    for ix in range(50):
         pstart = pstart+datetime.timedelta(14)
         pstop = pstart+datetime.timedelta(13)
         pstarts.append(pstart.strftime('%Y-%m-%d'))
@@ -1944,8 +1946,14 @@ def driver_payroll(lbox,holdvec):
         pstop = pstops[thispaycycle]
         holdvec[1] = thispaycycle
     else:
-        pstart = thispstart
-        pstop = thispstop
+        if thispstart !=  0:
+            pstart = thispstart
+        else:
+            pstart = today_str
+        if thispstop != 0:
+            pstop = thispstop
+        else:
+            pstop = today_str
 
     update = request.values.get('UpdatePayroll')
     if update is not None:
