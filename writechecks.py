@@ -85,7 +85,6 @@ def writechecks(bdat, pdat, file1, sbdata, links, style):
 
         lm = len(memo)
         memo = memo[0:lm-2]
-        memo = 'Payment for multiple references:\n'+memo
 
     one = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine']
     tenp = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen']
@@ -284,7 +283,7 @@ def writechecks(bdat, pdat, file1, sbdata, links, style):
             c.line(i, m7, i, m9)
         p1 = n1
         p2 = n5 - 60
-        vlines2at = [ltm, n1, p2, rtm]
+        vlines2at = [ltm, n1, p2-20, rtm]
         for i in vlines2at:
             c.line(i, m4, i, m6)
             c.line(i, m10, i, m12)
@@ -297,7 +296,7 @@ def writechecks(bdat, pdat, file1, sbdata, links, style):
             c.line(i, m7, i, m9)
         p1 = n1
         p2 = n5 - 60
-        vlines2at = [ltm, n1, p2, rtm]
+        vlines2at = [ltm, n1, p2-20, rtm]
         for i in vlines2at:
             c.line(i, m10, i, m12)
 
@@ -362,7 +361,7 @@ def writechecks(bdat, pdat, file1, sbdata, links, style):
             memoline = memoline-13
 
             c.setFont('Helvetica', 10, leading=None)
-            c.drawString(ltm+20, memoline2, line)
+            if style == 1: c.drawString(ltm+20, memoline2, line)
             memoline2 = memoline2-10
             c.drawString(ltm+20, memoline3, line)
             memoline3 = memoline3-10
@@ -432,7 +431,7 @@ def writechecks(bdat, pdat, file1, sbdata, links, style):
         comp = ' '
 
 
-    if nbills == 1:
+    if nbills == 0:
         if btype == 'Expense':
             if style == 1: c.drawString(ltm+230, mlev11, 'Expensed Account Name: '+ acct + ' (' + comp + ')')
             c.drawString(ltm+230, mlev21, 'Expensed Account Name: '+ acct + ' (' + comp + ')')
@@ -461,16 +460,17 @@ def writechecks(bdat, pdat, file1, sbdata, links, style):
         if btype == 'Expense':
             if style == 1: c.drawString(ltm+230, mlev11, 'Expensed Account Name: '+ acct + ' (' + comp + ')')
             c.drawString(ltm+230, mlev21, 'Expensed Account Name: '+ acct + ' (' + comp + ')')
-            mlevtop = mlev21-2*dl
-            mlevbot = mlev11-2*dl
+            mlevtop = mlev11-2*dl
+            mlevbot = mlev21-2*dl
         c.setFont('Helvetica-Bold', 12, leading=None)
-        if style == 1: c.drawString(s1, mlevtop+dl, 'Multi-bill payment:')
-        c.drawString(s1, mlevbot+dl, 'Multi-bill payment:')
-        c.drawString(s1, mlevtop, 'ID')
-        c.drawString(s2, mlevtop, 'Bill No / JO')
-        c.drawString(s3, mlevtop, 'Reference/BkNo.')
-        c.drawString(s4, mlevtop, 'Amount')
-        c.drawString(s1, mlevbot, 'Bill ID')
+
+        if style == 1:
+            c.drawString(s1, mlevtop, 'ID')
+            c.drawString(s2, mlevtop, 'Bill No')
+            c.drawString(s3, mlevtop, 'Reference/BkNo.')
+            c.drawString(s4, mlevtop, 'Amount')
+
+        c.drawString(s1, mlevbot, 'ID')
         c.drawString(s2, mlevbot, 'Bill No')
         c.drawString(s3, mlevbot, 'Reference/BkNo.')
         c.drawString(s4, mlevbot, 'Amount')
@@ -485,15 +485,15 @@ def writechecks(bdat, pdat, file1, sbdata, links, style):
             # if memo long
             ref = ref.replace('For booking ', '')
             amt = dollar(float(data.pAmount))
-            c.drawString(s1, mlevtop, id)
+            if style == 1: c.drawString(s1, mlevtop, id)
+            c.drawString(s1, mlevbot, id)
             try:
-                c.drawString(s2, mlevtop, billno)
+                if style == 1: c.drawString(s2, mlevtop, billno)
                 c.drawString(s2, mlevbot, billno)
             except:
                 err = '1'
-            c.drawString(s3, mlevtop, ref)
-            c.drawString(s4, mlevtop, amt)
-            c.drawString(s1, mlevbot, id)
+            if style == 1: c.drawString(s3, mlevtop, ref)
+            if style == 1: c.drawString(s4, mlevtop, amt)
 
             c.drawString(s3, mlevbot, ref)
             c.drawString(s4, mlevbot, amt)
