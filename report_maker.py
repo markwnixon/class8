@@ -113,6 +113,6 @@ def reportmaker(type,thiscomp):
 
         if stamp == 1:
             savefile = addpath(f'tmp/{scac}/data/vdeposits/' + depojo + '.pdf')
-            shutil.copyfile(docref, savefile)
+            shutil.copyfile(addpath(docref), savefile)
 
     return cache,docref
