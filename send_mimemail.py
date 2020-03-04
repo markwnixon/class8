@@ -38,7 +38,7 @@ def send_mimemail(emaildata,emailsender):
 
     emailto=[emailin1]
     if emailin2 is not None:
-        msg["To"] = emailin2
+        msg["CC"] = emailin2
         emailto.append(emailin2)
     if emailcc1 is not None:
         msg["CC"] = emailcc1
