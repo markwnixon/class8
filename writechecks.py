@@ -406,7 +406,7 @@ def writechecks(bdat, pdat, file1, sbdata, links, style):
         c.drawString(50, m2+offup, cdata[2])
         c.drawString(50, m2+offup-14, cdata[5])
         c.drawString(50, m2+offup-28, cdata[6])
-        memoline2 = memoline2 - 10
+        memoline2 = memoline2 + 1
         c.drawString(ltm+70, memoline2, company)
         c.drawString(ltm+70, memoline2-14, addr1)
         c.drawString(ltm+70, memoline2-28, addr2)

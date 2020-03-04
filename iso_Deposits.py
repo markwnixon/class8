@@ -127,11 +127,13 @@ def isoDeposit():
 
 # ____________________________________________________________________________________________________________________E.Delete.General
         if (depositmake is not None or recdeposit is not None) and depojo is not None:
-            err.append('Must have exactly one item checked to use this option')
-
             odervec = numcheckv(gdata)
+            print('odervec', odervec)
             if len(odervec)>0:
-                oderstring = json.dumps(odervec)
+                try:
+                    oderstring = json.dumps(odervec)
+                except:
+                    oderstring = ''
             else:
                 udat=users.query.filter(users.name=='cache').first()
                 oderstring = udat.email

@@ -1,5 +1,5 @@
 from runmain import db
-from models import General, users, OverSeas, Orders, IEroll
+from models import General, users, OverSeas, Orders, IEroll, Broll
 from flask import session, logging, request
 import datetime
 import calendar
@@ -59,7 +59,7 @@ def isoR():
             if est is None: hv[ix] = '0'
 
         #If the first 3 selections are all '0' make sure remaining are turned off:
-        if hv[1] == '0' and hv[2] == '0' and hv[3] == '0': hv = ['0']*13
+        if hv[1] == '0' and hv[2] == '0' and hv[3] == '0' and hv[4] == '0': hv = ['0']*13
 
         # If no accts selected to plot then switch off the plot section of page
         if all(h=='0' for h in hv):
@@ -153,7 +153,7 @@ def isoR():
     idata1 = IEroll.query.filter(IEroll.Name.contains('Totals')).order_by(IEroll.Name).all()
     idata2 = IEroll.query.filter(~(IEroll.Name.contains('Totals')) & (IEroll.Type == 'Expense')).order_by(IEroll.Name).all()
     idata3 = IEroll.query.filter(~(IEroll.Name.contains('Totals')) & (IEroll.Type == 'Income')).order_by(IEroll.Name).all()
-    idata4 = IEroll.query.filter(IEroll.Type == 'Special').order_by(IEroll.Name).all()
+    idata4 = Broll.query.filter(Broll.Type == 'Expense-B').order_by(Broll.Tot.desc()).all()
     err = erud(err)
 
 

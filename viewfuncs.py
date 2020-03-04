@@ -1,6 +1,6 @@
 from runmain import db
 from models import Trucklog, DriverAssign, Invoices, JO, Income, Bills, Accounts, Bookings, OverSeas, Autos, People, Interchange, Drivers, ChalkBoard, Orders, Drops, Services, Quotes, Divisions
-from models import Taxmap, QBaccounts, Accttypes, IEroll, StreetTurns, Gledger
+from models import Taxmap, QBaccounts, Accttypes, IEroll, Broll, StreetTurns, Gledger
 from flask import session, logging, request
 import datetime
 import calendar
@@ -2568,11 +2568,17 @@ def monvals(iback):
 
 def getmonths(acct,mback,mstart):
     dat = IEroll.query.filter(IEroll.Name.contains(acct)).first()
+    if dat is None:
+        dat = Broll.query.filter(Broll.Name.contains(acct)).first()
     dlist = []
     if mback > mstart:
         if dat is not None:
             for ix in range(mstart,mback+1):
-                dlist.append(float(getattr(dat, f'C{ix}')))
+                try:
+                    amt = float(getattr(dat, f'C{ix}'))
+                except:
+                    amt = 0.00
+                dlist.append(amt)
         return dlist
     else:
         if dat is not None:

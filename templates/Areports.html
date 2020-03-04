@@ -104,7 +104,18 @@ Charts and Graphs
 </td>
 </tr>
 
-{% set idx = [3] %}
+<tr>
+<td><div class="input-group-text">Vendor Bills:</div></td>
+<td>
+<select class="form-control" type="text" id="act4" name="act4" onchange="this.form.submit()">
+<option value=0 > No Selection </option>
+{% for idat in idata4 %}
+<option {% if hv[4] == idat.Name %} selected {% endif %} value="{{idat.Name}}" > {{idat.Name}} </option>
+{% endfor %}</select>
+</td>
+</tr>
+
+{% set idx = [4] %}
 {% if hv[1] != '0' %}
         {% if idx.append(idx.pop() + 1) %}{% endif %}
         <tr>
