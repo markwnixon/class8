@@ -97,6 +97,7 @@ def reportmaker(type,thiscomp):
 
     if type=='deposit' or type=='recdeposit':
 
+
         if type=='recdeposit':
             stamp=1
         else:
