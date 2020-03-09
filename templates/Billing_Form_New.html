@@ -33,7 +33,16 @@
             </td>
         </tr>
         <tr>
-            <td><div class="input-group-text">{{ cdat.Idtype }} Bill for Company:</div></td>
+            <td><div class="input-group-text">Payment Type:</div></td>
+            <td>
+                <select class="form-control" type="text" name="thistype" onchange="this.form.submit()">
+                <option {% if hv[22] == 'bill' %} selected {% endif %} value="bill" > Bill/Expense </option>
+                <option {% if hv[22] == 'asset1' %} selected {% endif %} value="asset1" > Purchase Depreciating Asset </option>
+                <option {% if hv[22] == 'asset2' %} selected {% endif %} value="asset2" > Purchase Prepayment Asset </option>
+            </td>
+        </tr>
+        <tr>
+            <td><div class="input-group-text">{{ cdat.Idtype }} Payment from Company:</div></td>
             <td>
                 <select class="form-control" type="text" name="ctype" onchange="this.form.submit()">
                     <option value = '0'>  Select Default Company/Division </option>
@@ -44,31 +53,58 @@
             </td>
         </tr>
         {% if hv[9] != 'No' %}
+            {%  set explabel = 'Expense Account' %}{% set prefix = 'Bill' %}
+            {% if hv[22] == 'bill' %}{% set explabel = 'Expense Account' %}{% endif %}
+            {% if hv[22] == 'asset1' %}{% set asslabel = 'Depreciating Asset' %}{% set explabel = 'Accumlation Account' %}{% set assdata = hv[23] %}{% endif %}
+            {% if hv[22] == 'asset2' %}{% set asslabel = 'Adjusting Asset' %}{% set explabel = 'Adjusting Expense' %}{% set assdata = hv[23] %}{% endif %}
+        {% if hv[22] != 'bill' %}
+            {% set prefix = 'Purchase' %}
         <tr>
-            <td><div class="input-group-text">{{cdat.Idtype}} Exp Account:</div></td>
+            <td><div class="input-group-text">{{ asslabel }}:</div></td>
             <td>
-                <select class="form-control" type="text" name="billacct" >
+                <select class="form-control" type="text" name="assacct" >
                 <option selected value='0'>Choose Later</option>
-                {% for data in expdata %}
-                <option {% if cdat.Associate1 == data.Name %} selected {% endif %} value="{{data.Name}}" > {{data.Name}} </option>
-                {% endfor %}</select>
+                {% if assdata %}
+                    {% for data in assdata %}
+                    <option {% if cdat.Associate1 == data.Name %} selected {% endif %} value="{{data.Name}}" > {{data.Name}} </option>
+                    {% endfor %}</select>
+                {% else %}
+                    <option  value="0" > No accounts exist for payment option </option>
+                {% endif %}
             </td>
         </tr>
         {% endif %}
         <tr>
-            <td><div class="input-group-text">Bill Amount:</div></td>
+            <td><div class="input-group-text">{{cdat.Idtype}} {{ explabel }}:</div></td>
+            <td>
+                <select class="form-control" type="text" name="billacct" >
+                <option selected value='0'>Choose Later</option>
+                {% if expdata %}
+                    {% for data in expdata %}
+                    <option {% if cdat.Associate1 == data.Name %} selected {% endif %} value="{{data.Name}}" > {{data.Name}} </option>
+                    {% endfor %}</select>
+                {% else %}
+                    <option  value="0" > No accounts exist for payment option </option>
+                {% endif %}
+            </td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td><div class="input-group-text">{{prefix}} Amount:</div></td>
             <td><input class="form-control" type="text" name="bamt" value="{{vdata[2]}}"></td>
         </tr>
         <tr>
-            <td><div class="input-group-text">Bill Date:</div></td>
+            <td><div class="input-group-text">{{prefix}} Date:</div></td>
             <td><input class="form-control" type="date" name="bdate" value="{{vdata[0]}}"></td>
         </tr>
+        {% if hv[22] == 'bill' %}
         <tr>
             <td><div class="input-group-text">Due Date:</div></td>
             <td><input class="form-control" type="date" name="ddate" value="{{vdata[1]}}"></td>
         </tr>
+        {% endif %}
         <tr>
-            <td><div class="input-group-text">Bill Description:</div></td>
+            <td><div class="input-group-text">{{prefix}} Description:</div></td>
             <td><textarea class="form-control" type="text" name="bdesc" rows="3">{{vdata[3]}}</textarea></td>
         </tr>
     </tbody>

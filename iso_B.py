@@ -1,5 +1,5 @@
 from runmain import app, db
-from models import Vehicles, Invoices, JO, Income, Bills, Accounts, OverSeas, Orders, Gledger
+from models import Vehicles, Invoices, JO, Income, Bills, Accounts, OverSeas, Orders, Gledger, Adjusting
 from models import Autos, People, Interchange, Drivers, ChalkBoard, Services, Drops, Divisions, LastMessage
 from flask import session, logging, request
 import datetime
@@ -27,7 +27,7 @@ def isoB(indat):
         bill_path = 'processing/bills'
         bill, peep, cache, modata, modlink, fdata, adata, cdat, pb, passdata, vdata, caldays, daylist, weeksum, nweeks = init_billing_zero()
         filesel, docref, search11, search12, search13, search14, search21, search22, bType, bClass = init_billing_blank()
-        expdata, addjobselect, jobdata, modal, viewck, acceptthese = 0, 0, 0, 0, 0, 0
+        expdata, addjobselect, jobdata, modal, viewck, acceptthese, assdata = 0, 0, 0, 0, 0, 0, 0
 
         hv = [0]*24
         hv[21] = 1 #default check style
@@ -38,7 +38,8 @@ def isoB(indat):
         monsvec = ['Jan', 'Feb', 'Mar', 'Apr', 'May',
                    'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
         err = []
-        today = datetime.datetime.today().strftime('%Y-%m-%d')
+        todaydt = datetime.datetime.today()
+        today = todaydt.strftime('%Y-%m-%d')
         docref = ' '
         doctxt = ' '
         if indat == 'stay' or indat == 0:
@@ -308,6 +309,7 @@ def isoB(indat):
                 if modlink == 7:
                     vendor = request.values.get('thiscomp')
                     vdat = People.query.filter((People.Ptype == 'Vendor') & (People.Company == vendor)).first()
+                    ptype = request.values.get('thistype')
 
                     co = request.values.get('ctype')
                     print(co,vendor)
@@ -326,6 +328,7 @@ def isoB(indat):
                     modata.Company = vendor
                     modata.bAccount = defexp
                     modata.Co = co
+                    modata.Code2 = ptype
                     db.session.commit()
                     modata = Bills.query.get(bill)
 
@@ -402,7 +405,7 @@ def isoB(indat):
                     else:
 
                         vals = ['bdesc', 'bamt', 'bdate', 'pamt', 'pdate', 'account',
-                                'bref', 'ckmemo', 'ctype', 'thiscomp', 'ddate', 'billacct']
+                                'bref', 'ckmemo', 'ctype', 'thiscomp', 'ddate', 'billacct', 'thistype']
                         a = list(range(len(vals)))
                         i = 0
                         for v in vals:
@@ -435,6 +438,7 @@ def isoB(indat):
                         modata.pDate = a[4]
                         modata.pAccount = a[5]
                         modata.Ref = a[6]
+                        modata.Code2 = a[12]
                         if modata.Status == 'Paying':
                             if float(bdol) == float(pdol):
                                 modata.Status = 'Paid'
@@ -652,6 +656,8 @@ def isoB(indat):
 
                 vdat = People.query.filter((People.Ptype == 'Vendor') & (People.Company == vendor)).first()
 
+                ptype = request.values.get('thistype')
+
                 co = request.values.get('ctype')
                 if co is None:
                     co = modata.Co
@@ -669,6 +675,7 @@ def isoB(indat):
                 modata.Company = vendor
                 modata.bAccount = defexp
                 modata.Co = co
+                modata.Code2 = ptype
                 db.session.commit()
 
                 duedate = modata.dDate
@@ -937,6 +944,7 @@ def isoB(indat):
                 thiscompany = request.values.get('thiscomp')
                 form_co = request.values.get('ctype')
                 form_exp = request.values.get('billacct')
+                form_type = request.values.get('thistype')
                 if thiscompany != '0':
                     cdat = People.query.filter((People.Company == thiscompany) & (
                         (People.Ptype == 'Vendor') | (People.Ptype == 'TowCo')) ).first()
@@ -949,6 +957,8 @@ def isoB(indat):
                 else:
                     default_co = None
                     default_exp = None
+
+                hv[22] = form_type
 
                 if form_co == '0':
                     comp = default_co
@@ -993,9 +1003,14 @@ def isoB(indat):
                 if ddat is not None:
                     cdat.Idtype = ddat.Co
                     ccode = ddat.Co
+                print('expdata coming from above', form_type)
                 expdata = Accounts.query.filter( ((Accounts.Type == 'Expense') & (Accounts.Co == ccode)) | ((Accounts.Type == 'Credit Card') & (Accounts.Co == ccode)) ).order_by(Accounts.Name).all()
+                if form_type == 'asset1':
+                    assdata = Accounts.query.filter( (Accounts.Type == 'Fixed Asset') & (Accounts.Co == ccode) ).order_by(Accounts.Name).all()
+                elif form_type == 'asset2':
+                    assdata = Accounts.query.filter((Accounts.Type == 'Current Asset') & (Accounts.Co == ccode)).order_by(Accounts.Name).all()
 
-            # Get information from previous bill paid by the vendor
+                # Get information from previous bill paid by the vendor
 
                 ldata = Bills.query.filter(Bills.Company == cdat.Company).all()
                 if ldata:
@@ -1033,7 +1048,12 @@ def isoB(indat):
                     vdata = [bdate, ddate, bamt, bdesc]
             else:
                 ccode = hv[8]
+                print('expdata coming from below', form_type)
                 expdata = Accounts.query.filter( ((Accounts.Type == 'Expense') & (Accounts.Co == ccode)) | ((Accounts.Type == 'Credit Card') & (Accounts.Co == ccode)) ).order_by(Accounts.Name).all()
+                if form_type == 'asset1':
+                    assdata = Accounts.query.filter( (Accounts.Type == 'Fixed Asset') & (Accounts.Co == ccode) ).order_by(Accounts.Name).all()
+                elif form_type == 'asset2':
+                    assdata = Accounts.query.filter((Accounts.Type == 'Current Asset') & (Accounts.Co == ccode)).order_by(Accounts.Name).all()
                 vdata = [bdate, ddate, bamt, bdesc]
 
         if thisbill is not None:
@@ -1045,6 +1065,7 @@ def isoB(indat):
                 sdate = today
 
             thiscompany = request.values.get('thiscomp')
+            thistype = request.values.get('thistype')
             cdat = People.query.filter((People.Company == thiscompany) & (
                 (People.Ptype == 'Vendor') | (People.Ptype == 'TowCo'))).first()
             if cdat is not None:
@@ -1097,16 +1118,45 @@ def isoB(indat):
             else:
                 nextjo = newjo(cco+'B', today)
             account = request.values.get('crataccount')
-            baccount = request.values.get('billacct')
+            if thistype == 'bill':
+                baccount = request.values.get('billacct')
+                code2 = None
+            else:
+                baccount = request.values.get('assacct')
+                code2 = request.values.get('billacct')
+                acdat = Accounts.query.filter(Accounts.Name == baccount).first()
+                if acdat is not None:
+                    baccount = acdat.Name
+                    category = acdat.Category
+                    subcat = acdat.Subcategory
+                    descript = acdat.Description
+                    btype = acdat.Type
+
 
             input = Bills(Jo=nextjo, Pid=aid, Company=acomp, Memo='', Description=bdesc, bAmount=bamt, Status='Unpaid', Cache=0, Original=None,
                              Ref='', bDate=sdate, pDate=today, pAmount='0.00', pMulti=None, pAccount=account, bAccount=baccount, bType=btype,
                              bCat=category, bSubcat=subcat, Link=None, User=username, Co=cco, Temp1=None, Temp2=None, Recurring=0, dDate=today,
-                             pAmount2='0.00', pDate2=None, Code1 = None, Code2=None, CkCache=0, QBi=0)
+                             pAmount2='0.00', pDate2=None, Code1 = None, Code2=code2, CkCache=0, QBi=0)
 
             db.session.add(input)
             db.session.commit()
-            if cc_check != 'Credit Card': err = gledger_write('newbill',nextjo,baccount,account)
+            if cc_check != 'Credit Card':
+                if thistype == 'bill':
+                    err = gledger_write('newbill',nextjo,baccount,account)
+                elif thistype == 'asset1':
+                    err = gledger_write('purchase', nextjo, baccount, account)
+                elif thistype == 'asset2':
+                    err = gledger_write('purchase', nextjo, baccount, account)
+                    adat = Adjusting.query.filter( (Adjusting.Asset == baccount) & (Adjusting.Status == 0) ).first()
+                    adjamt = float(bamt)/12.
+                    adjamt = d2s(adjamt)
+                    if adat is None:
+                        mop = todaydt.month
+                        input = Adjusting(Jo = nextjo, Date = todaydt ,Mop=mop,Moa=0,Asset=baccount,Expense=code2,Amtp=bamt,Amta=adjamt,Status=0)
+                        db.session.add(input)
+                        db.session.commit()
+                    else:
+                        err.append('This adjusting account exist.  Must delete it.')
 
             # Check if shared account:
             adat = Accounts.query.filter(Accounts.Name == baccount).first()
@@ -1450,6 +1500,7 @@ def isoB(indat):
         jobdata = 0
         modal = 0
         expdata = 0
+        assdata = 0
         divdat = Divisions.query.all()
 
         err.append('All is well')
@@ -1458,6 +1509,7 @@ def isoB(indat):
     today = datetime.date.today()
     critday = datetime.date.today()+datetime.timedelta(days=7)
     bdata, cdata = dataget_B(hv[1],hv[0],hv[3])
+    hv[23] = assdata
     acdata = Accounts.query.filter((Accounts.Type != 'Expense') & (Accounts.Type != 'Income') & (~Accounts.Type.contains('Accounts'))).order_by(Accounts.Name).all()
     err = erud(err)
 

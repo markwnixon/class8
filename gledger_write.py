@@ -141,6 +141,7 @@ def gledger_write(bus,jo,acctdb,acctcr):
         dt = datetime.datetime.now()
         cc=jo[0] # this is the company we will be working on
         fd=jo[1]
+
         if bus=='invoice':
             acctdb='Accounts Receivable'
             acctcr = check_revenue_acct(fd)
@@ -259,7 +260,6 @@ def gledger_write(bus,jo,acctdb,acctcr):
                 db.session.add(input2)
             db.session.commit()
 
-        print('bus=',bus)
         if bus=='newbill':
             bdat=Bills.query.filter(Bills.Jo==jo).first()
             amt=int(float(bdat.bAmount)*100)
@@ -372,11 +372,7 @@ def gledger_write(bus,jo,acctdb,acctcr):
                     db.session.add(input2)
                 db.session.commit()
 
-
-
             else:
-
-
 
                 gdat = Gledger.query.filter((Gledger.Tcode==jo) & (Gledger.Aid==adb.id) & (Gledger.Type=='PD')).first()
                 if gdat is not None:
@@ -457,4 +453,42 @@ def gledger_write(bus,jo,acctdb,acctcr):
                 db.session.add(input2)
             db.session.commit()
 
+        if bus == 'purchase':
+            bdat=Bills.query.filter(Bills.Jo==jo).first()
+            amt=int(float(bdat.bAmount)*100)
+            pid=bdat.Pid
+            bdate = bdat.bDate
+            co = get_company(pid)
+
+            acctcr = 'Accounts Payable'
+            print(acctdb,cc)
+
+            adb=Accounts.query.filter((Accounts.Name==acctdb) & (Accounts.Co ==cc)).first() #the expense account
+            acr=Accounts.query.filter((Accounts.Name==acctcr) & (Accounts.Co ==cc)).first() #the asset account
+
+            if bdat is not None and adb is not None and acr is not None:
+
+                gdat = Gledger.query.filter((Gledger.Tcode==jo) & (Gledger.Type=='AD')).first()
+                if gdat is not None:
+                    gdat.Debit=amt
+                    gdat.Recorded=dt
+                    gdat.Date=bdate
+                    gdat.Account=acctdb
+                    gdat.Sid = pid
+                else:
+                    input1 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=co,Sid=pid,Type='AD',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=bdate,Ref=bdat.Ref)
+                    db.session.add(input1)
+                db.session.commit()
+
+                gdat = Gledger.query.filter((Gledger.Tcode==jo) &  (Gledger.Type=='AC')).first()
+                if gdat is not None:
+                    gdat.Credit=amt
+                    gdat.Recorded=dt
+                    gdat.Date=bdate
+                else:
+                    input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=co,Sid=pid,Type='AC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=bdate,Ref=bdat.Ref)
+                    db.session.add(input2)
+                db.session.commit()
+
+        #This return for all bus options
         return err
