@@ -21,6 +21,7 @@ def isoB(indat):
 
         from viewfuncs import tabdata, tabdataR, popjo, jovec, timedata, nonone, nononef, nons, numcheck, newjo, init_billing_zero, init_billing_blank
         from viewfuncs import sdiff, calendar7_weeks, txtfile, numcheckvec, d2s, erud, dataget_B, hv_capture, docuploader, get_def_bank, next_check, vendorlist, stripper
+        from viewfuncs import run_adjustments
         from gledger_write import gledger_write, gledger_app_write
 
         username = session['username'].capitalize()
@@ -131,7 +132,7 @@ def isoB(indat):
         if thisbox2 == '3':
             acceptthese = 1
         if thisbox2 == '4':
-            loadc = 1
+            run_adjustments()
 
         thisbox3 = request.values.get('invobox')
         if thisbox3 == '1':
@@ -1481,7 +1482,7 @@ def isoB(indat):
             leftsize = 10
     else:
         err = []
-        hv = [0]*20
+        hv = [0]*25
         hv[0] = 'X'
         hv[1] = '1'
         username = session['username'].capitalize()
@@ -1500,7 +1501,7 @@ def isoB(indat):
         jobdata = 0
         modal = 0
         expdata = 0
-        assdata = 0
+        assdata = [0]
         divdat = Divisions.query.all()
 
         err.append('All is well')

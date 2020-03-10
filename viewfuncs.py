@@ -1,6 +1,6 @@
 from runmain import db
 from models import Trucklog, DriverAssign, Invoices, JO, Income, Bills, Accounts, Bookings, OverSeas, Autos, People, Interchange, Drivers, ChalkBoard, Orders, Drops, Services, Quotes, Divisions
-from models import Taxmap, QBaccounts, Accttypes, IEroll, Broll, StreetTurns, Gledger
+from models import Taxmap, QBaccounts, Accttypes, IEroll, Broll, StreetTurns, Gledger, Adjusting
 from flask import session, logging, request
 import datetime
 import calendar
@@ -2747,3 +2747,38 @@ def check_inputs(bill_list):
         if pid != billfrom: err.append(f'Payee for transaction {bidat.Jo} does not match {bdat.Jo}')
     if err == []: err.append('All is Well')
     return err
+
+def run_adjustments():
+    from datetime import date
+    adata = Adjusting.query.filter(Adjusting.Status == 0).all()
+    for adat in adata:
+        date_from = adat.Date
+        year_from = date_from.year
+        year_this = year_from
+        month_from = date_from.month
+        month_now = today.month
+        jo = adat.Jo
+        mop = adat.Mop
+        total_remain = float(adat.Amtp)
+        aamt = float(adat.Amta)
+        for ix in range (13):
+            jx = month_from + ix
+            if jx > 12:
+                jx = jx - 12
+                year_this = year_from + 1
+
+            adj_date = date(year_this,jx,1)
+            print(year_this,jx,adj_date, today)
+            if adj_date < today:
+                total_remain = total_remain - aamt
+                kdat = Adjusting.query.filter( (Adjusting.Jo == jo) & (Adjusting.Moa == jx) ).first()
+                if kdat is None:
+                    input = Adjusting(Jo=jo,Date=adj_date,Mop=mop,Moa=jx,Asset=adat.Asset,Expense=adat.Expense,Amtp=d2s(total_remain),Amta=adat.Amta,Status=1)
+                    db.session.add(input)
+                    db.session.commit()
+
+    from gledger_write import gledger_write
+    gledger_write('adjusting',jo,adat.Expense,adat.Asset)
+
+
+

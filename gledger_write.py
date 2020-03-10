@@ -1,5 +1,5 @@
 from runmain import db
-from models import Gledger, Invoices, JO, Income, Bills, Accounts, People, Focusareas, Deposits
+from models import Gledger, Invoices, JO, Income, Bills, Accounts, People, Focusareas, Deposits, Adjusting
 import datetime
 from viewfuncs import stripper
 import json
@@ -489,6 +489,44 @@ def gledger_write(bus,jo,acctdb,acctcr):
                     input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=co,Sid=pid,Type='AC',Tcode=jo,Com=cc,Recorded=dt,Reconciled=0,Date=bdate,Ref=bdat.Ref)
                     db.session.add(input2)
                 db.session.commit()
+
+
+        if bus == 'adjusting':
+            bdat=Bills.query.filter(Bills.Jo==jo).first()
+            pid = bdat.Pid
+            co = get_company(pid)
+            adb = Accounts.query.filter((Accounts.Name == acctdb) & (Accounts.Co == cc)).first()  # the expense account
+            acr = Accounts.query.filter((Accounts.Name == acctcr) & (Accounts.Co == cc)).first()  # the asset account
+
+            adata=Adjusting.query.filter( (Adjusting.Jo.contains(jo)) & (Adjusting.Moa != 0) ).all()
+            for adat in adata:
+                amt=int(float(adat.Amta)*100)
+                tcode = f'{jo}-{str(adat.Moa)}'
+                bdate = adat.Date
+
+                if bdat is not None and adb is not None and acr is not None:
+
+                    gdat = Gledger.query.filter((Gledger.Tcode==tcode) & (Gledger.Type=='ED')).first()
+                    if gdat is not None:
+                        gdat.Debit=amt
+                        gdat.Recorded=dt
+                        gdat.Date=bdate
+                        gdat.Account=acctdb
+                        gdat.Sid = pid
+                    else:
+                        input1 = Gledger(Debit=amt,Credit=0,Account=acctdb,Aid=adb.id,Source=co,Sid=pid,Type='ED',Tcode=tcode,Com=cc,Recorded=dt,Reconciled=0,Date=bdate,Ref=bdat.Ref)
+                        db.session.add(input1)
+                    db.session.commit()
+
+                    gdat = Gledger.query.filter((Gledger.Tcode==tcode) & (Gledger.Type=='EC')).first()
+                    if gdat is not None:
+                        gdat.Credit=amt
+                        gdat.Recorded=dt
+                        gdat.Date=bdate
+                    else:
+                        input2 = Gledger(Debit=0,Credit=amt,Account=acctcr,Aid=acr.id,Source=co,Sid=pid,Type='EC',Tcode=tcode,Com=cc,Recorded=dt,Reconciled=0,Date=bdate,Ref=bdat.Ref)
+                        db.session.add(input2)
+                    db.session.commit()
 
         #This return for all bus options
         return err
