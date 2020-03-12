@@ -1460,7 +1460,8 @@ def make_new_bill():
     input = Bills(Jo=nextjo, Pid=aid, Company=acomp, Memo='', Description=bdesc, bAmount=bamt, Status='Unpaid',
                   Cache=0, Original=None,Ref='', bDate=sdate, pDate=today, pAmount='0.00', pMulti=None, pAccount=account, bAccount=baccount,
                   bType=btype,bCat=category, bSubcat=subcat, Link=None, User=None, Co=cco, Temp1=None, Temp2=None, Recurring=0,
-                  dDate=ddate, pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0)
+                  dDate=ddate, pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0, iflag = 0, PmtList=None,
+                             PacctList=None, RefList=None, MemoList=None, PdateList=None, CheckList=None)
 
     db.session.add(input)
     db.session.commit()
@@ -2523,7 +2524,8 @@ def enter_bk_charges(acct,bkch,date,username):
                       bType='Expense',
                       bCat='G-A', bSubcat="Bank Charges", Link=None, User=username, Co=co, Temp1=None, Temp2=None, Recurring=0,
                       dDate=today,
-                      pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0)
+                      pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0, iflag = 0, PmtList=None,
+                             PacctList=None, RefList=None, MemoList=None, PdateList=None, CheckList=None)
         db.session.add(input)
         db.session.commit()
         gledger_write('dircharge',nextjo,bacct,acct)
@@ -2781,4 +2783,144 @@ def run_adjustments():
     gledger_write('adjusting',jo,adat.Expense,adat.Asset)
 
 
+def regular_payment(a,bill,hv,username):
+    modata = Bills.query.get(bill)
+    if a[4] is None: a[4] = today
+    bdol = d2s(a[1])
+    pdol = d2s(a[3])
+    modata.Company = a[9]
+    cdat = People.query.filter((People.Company == a[9]) & ((People.Ptype == 'Vendor') | (
+            People.Ptype == 'TowCo') | (People.Ptype == 'Overseas'))).first()
+    if cdat is not None:
+        modata.Pid = cdat.id
+        if cdat.Ptype == 'TowCo': hv[3] = '2'
+    else:
+        cdat = People.query.filter(People.Company == modata.Company).first()
+        if cdat is not None:
+            modata.Pid = cdat.id
+            if cdat.Ptype == 'TowCo': hv[3] = '2'
+        else:
+            modata.Pid = 0
+    modata.Memo = a[7]
+    modata.Description = a[0]
+    modata.bAmount = bdol
+    modata.bDate = a[2]
+    modata.dDate = a[10]
+    modata.pAmount = pdol
+    modata.pDate = a[4]
+    modata.pAccount = a[5]
+    modata.Ref = a[6]
+    modata.Code2 = a[12]
+    if modata.Status == 'Paying':
+        if float(bdol) == float(pdol):
+            modata.Status = 'Paid'
+        else:
+            modata.Status = 'PartPaid'
+
+    modata.User = username
+    modata.Co = a[8]
+    cache = modata.Cache
+    base = modata.Jo
+    filename2 = f'Source_{base}_c{str(cache)}.pdf'
+    docref = f'tmp/{scac}/data/vbills/{filename2}'
+    modata.Original = filename2
+    acctname = a[11]
+    acctco = a[8]
+    modata.bAccount = acctname
+    acdat1 = Accounts.query.filter((Accounts.Name == acctname) & (Accounts.Co == acctco)).first()
+    if acdat1 is not None:
+        modata.bType = acdat1.Type
+        modata.bCat = acdat1.Category
+        modata.bSubcat = acdat1.Subcategory
+        modata.Recurring = acdat1.id
+    db.session.commit()
+
+    return hv, docref
+
+
+def installment(a,bill,hv,username):
+    modata = Bills.query.get(bill)
+    if a[4] is None: a[4] = today
+    bdol = d2s(a[1])
+    pdol = d2s(a[3])
+    iflag = modata.iflag
+
+    #If this is first payment of installments can still change bill information
+    if iflag == 0 or iflag is None:
+        modata.iflag = 1
+        modata.Company = a[9]
+        cdat = People.query.filter((People.Company == a[9]) & ((People.Ptype == 'Vendor') | (
+            People.Ptype == 'TowCo') | (People.Ptype == 'Overseas'))).first()
+        if cdat is not None:
+            modata.Pid = cdat.id
+            if cdat.Ptype == 'TowCo': hv[3] = '2'
+        else:
+            cdat = People.query.filter(People.Company == modata.Company).first()
+            if cdat is not None:
+                modata.Pid = cdat.id
+                if cdat.Ptype == 'TowCo': hv[3] = '2'
+            else:
+                modata.Pid = 0
+        modata.Memo = a[7]
+        modata.Description = a[0]
+        modata.bAmount = bdol
+        modata.bDate = a[2]
+        modata.dDate = a[10]
+        modata.pAmount = pdol
+        modata.pDate = a[4]
+        modata.pAccount = a[5]
+        modata.Ref = a[6]
+        modata.Code2 = a[12]
+        if modata.Status == 'Paying':
+            if float(bdol) == float(pdol):
+                modata.Status = 'Paid'
+            else:
+                modata.Status = 'PartPaid'
+        modata.User = username
+        modata.Co = a[8]
+        cache = modata.Cache
+        base = modata.Jo
+        filename2 = f'Source_{base}_c{str(cache)}.pdf'
+        docref = f'tmp/{scac}/data/vbills/{filename2}'
+        modata.Original = filename2
+        acctname = a[11]
+        acctco = a[8]
+        modata.bAccount = acctname
+        acdat1 = Accounts.query.filter((Accounts.Name == acctname) & (Accounts.Co == acctco)).first()
+        if acdat1 is not None:
+            modata.bType = acdat1.Type
+            modata.bCat = acdat1.Category
+            modata.bSubcat = acdat1.Subcategory
+            modata.Recurring = acdat1.id
+        pmtlist, paclist, reflist, memolist, pdatelist, checklist = [],[],[],[],[],[]
+    else:
+        pmtlist = json.loads(modata.PmtList)
+        paclist = json.loads(modata.PacctList)
+        reflist = json.loads(modata.RefList)
+        memolist = json.loads(modata.MemoList)
+        pdatelist = json.loads(modata.PdateList)
+        checklist = json.loads(modata.CheckList)
+
+        total = float(pdol)
+        for pmt in pmtlist:
+            total = total + float(pmt)
+        modata.pAmount = d2s(total)
+
+    pmtlist.append(pdol)
+    paclist.append(a[5])
+    reflist.append(a[6])
+    memolist.append(a[7])
+    pdatelist.append(a[4])
+    checklist.append(filename2)
+
+    modata.PmtList = json.dumps(pmtlist)
+    modata.PacctList = json.dumps(paclist)
+    modata.RefList = json.dumps(reflist)
+    modata.MemoList = json.dumps(memolist)
+    modata.PdateList = json.dumps(pdatelist)
+    modata.CheckList = json.dumps(checklist)
+
+    db.session.commit()
+
+    return hv, docref
 

@@ -21,7 +21,7 @@ def isoB(indat):
 
         from viewfuncs import tabdata, tabdataR, popjo, jovec, timedata, nonone, nononef, nons, numcheck, newjo, init_billing_zero, init_billing_blank
         from viewfuncs import sdiff, calendar7_weeks, txtfile, numcheckvec, d2s, erud, dataget_B, hv_capture, docuploader, get_def_bank, next_check, vendorlist, stripper
-        from viewfuncs import run_adjustments
+        from viewfuncs import run_adjustments, regular_payment, installment
         from gledger_write import gledger_write, gledger_app_write
 
         username = session['username'].capitalize()
@@ -258,7 +258,8 @@ def isoB(indat):
             input = Bills(Jo=nextjo, Pid=aid, Company=cdat.Company, Memo=ckmemo, Description=bdesc, bAmount=bamt, Status='Paid', Cache=0, Original='',
                              Ref=bref, bDate=sdate, pDate=today, pAmount=bamt, pMulti=None, pAccount=account, bAccount=baccount, bType=btype,
                              bCat=bcat, bSubcat=bsubcat, Link=pufrom, User=username, Co=compdata[10], Temp1=None, Temp2=str(towid), Recurring=0, dDate=today,
-                             pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0)
+                             pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0, iflag = 0, PmtList=None,
+                             PacctList=None, RefList=None, MemoList=None, PdateList=None, CheckList=None)
 
             db.session.add(input)
             db.session.commit()
@@ -294,10 +295,10 @@ def isoB(indat):
             modlink = 0
 # ____________________________________________________________________________________________________________________B.UpdateDatabasesSection
         if (update is not None and modlink == 1) or modlink == 9 or modlink == 8 or modlink == 7 or modlink == 6:
-            print('Yes Here')
+            success = 1
             if bill > 0:
                 modata = Bills.query.get(bill)
-                # if paying a bill there could be multiple linke items to capture
+                # if paying a bill there could be multiple link items to capture
                 if modlink == 6:
                     try:
                         links = json.loads(modata.Link)
@@ -311,6 +312,14 @@ def isoB(indat):
                     vendor = request.values.get('thiscomp')
                     vdat = People.query.filter((People.Ptype == 'Vendor') & (People.Company == vendor)).first()
                     ptype = request.values.get('thistype')
+                    jo = modata.Jo
+                    ccode = jo[0]
+                    if ptype == 'asset1':
+                        assdata = Accounts.query.filter(
+                            (Accounts.Type == 'Fixed Asset') & (Accounts.Co == ccode)).order_by(Accounts.Name).all()
+                    elif ptype == 'asset2':
+                        assdata = Accounts.query.filter(
+                            (Accounts.Type == 'Current Asset') & (Accounts.Co == ccode)).order_by(Accounts.Name).all()
 
                     co = request.values.get('ctype')
                     print(co,vendor)
@@ -378,15 +387,13 @@ def isoB(indat):
 
                 else:
                     # This section means the transaction is not a transfer
-                    leftsize = 8
-                    leftscreen = 0
-
+                    expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co.contains(co))).order_by(
+                        Accounts.Name).all()
                     if update is None:
 
                         pbill = request.values.get('pbill')
                         pb = nonone(pbill)
                         co = modata.Co
-                        expdata = Accounts.query.filter((Accounts.Type == 'Expense') & (Accounts.Co.contains(co))).order_by(Accounts.Name).all()
                         pacct = request.values.get('account')
                         print(pacct)
                         pcheck = next_check(pacct,modata.id)
@@ -408,67 +415,43 @@ def isoB(indat):
                         vals = ['bdesc', 'bamt', 'bdate', 'pamt', 'pdate', 'account',
                                 'bref', 'ckmemo', 'ctype', 'thiscomp', 'ddate', 'billacct', 'thistype']
                         a = list(range(len(vals)))
-                        i = 0
-                        for v in vals:
-                            a[i] = request.values.get(v)
-                            i = i+1
+                        for ix, v in enumerate(vals): a[ix] = request.values.get(v)
+                        try: ba = float(a[1])
+                        except:
+                            success = 0
+                            err.append('Bill amount not a valid number')
+                        try: pa = float(a[3])
+                        except:
+                            success = 0
+                            err.append('Paid amount not a valid number')
 
-                        if a[4] is None:
-                            a[4] = today
-                        bdol = d2s(a[1])
-                        pdol = d2s(a[3])
-                        modata.Company = a[9]
-                        cdat = People.query.filter((People.Company == a[9]) & ((People.Ptype == 'Vendor') | (
-                            People.Ptype == 'TowCo') | (People.Ptype == 'Overseas'))).first()
-                        if cdat is not None:
-                            modata.Pid = cdat.id
-                            if cdat.Ptype == 'TowCo': hv[3] = '2'
-                        else:
-                            cdat = People.query.filter(People.Company == modata.Company).first()
-                            if cdat is not None:
-                                modata.Pid = cdat.id
-                                if cdat.Ptype == 'TowCo': hv[3] = '2'
-                            else:
-                                modata.Pid = 0
-                        modata.Memo = a[7]
-                        modata.Description = a[0]
-                        modata.bAmount = bdol
-                        modata.bDate = a[2]
-                        modata.dDate = a[10]
-                        modata.pAmount = pdol
-                        modata.pDate = a[4]
-                        modata.pAccount = a[5]
-                        modata.Ref = a[6]
-                        modata.Code2 = a[12]
-                        if modata.Status == 'Paying':
-                            if float(bdol) == float(pdol):
-                                modata.Status = 'Paid'
-                            else:
-                                modata.Status = 'PartPaid'
+                        if success:
 
-                        modata.User = username
-                        modata.Co = a[8]
-                        cache = modata.Cache
-                        base = modata.Jo
-                        filename2 = f'Source_{base}_c{str(cache)}.pdf'
-                        docref = f'tmp/{scac}/data/vbills/{filename2}'
-                        modata.Original = filename2
-                        acctname = a[11]
-                        acctco = a[8]
-                        modata.bAccount = acctname
-                        acdat1 = Accounts.query.filter((Accounts.Name == acctname) & (Accounts.Co == acctco)).first()
-                        if acdat1 is not None:
-                            modata.bType = acdat1.Type
-                            modata.bCat = acdat1.Category
-                            modata.bSubcat = acdat1.Subcategory
-                            modata.Recurring = acdat1.id
-                        db.session.commit()
-                        # Check that JO still consistent with modification
-                        co=modata.Co
-                        jo=modata.Jo
+                            if pa < ba: hv, docref = installment(a, bill, hv, username)
+                            else: hv, docref = regular_payment(a, bill, hv, username)
 
-                        print('line302:',modata.Jo,modata.bAccount,modata.pAccount)
-                        err = gledger_write('newbill',modata.Jo,modata.bAccount,modata.pAccount)
+                            #Write to ledger as bill or asset
+                            modata = Bills.query.get(bill)
+                            jo, baccount, paccount, bdate = modata.Jo, modata.bAccount, modata.pAccount, modata.bDate
+
+                            if ptype == 'bill':
+                                err = gledger_write('newbill', jo, baccount, paccount)
+                            elif ptype == 'asset1':
+                                err = gledger_write('purchase', jo, baccount, paccount)
+                            elif ptype == 'asset2':
+                                err = gledger_write('purchase', jo, baccount, paccount)
+                                adat = Adjusting.query.filter(
+                                    (Adjusting.Asset == baccount) & (Adjusting.Status == 0)).first()
+                                adjamt = float(bdol) / 12.
+                                adjamt = d2s(adjamt)
+                                if adat is None:
+                                    mop = bdate.month
+                                    input = Adjusting(Jo=jo, Date=bdate, Mop=mop, Moa=0, Asset=baccount, Expense=paccount,
+                                                      Amtp=bdol, Amta=adjamt, Status=0)
+                                    db.session.add(input)
+                                    db.session.commit()
+                                else:
+                                    err.append('This adjusting account exist.  Must delete it.')
 
 
 
@@ -551,7 +534,7 @@ def isoB(indat):
                 db.session.commit()
 
             # create return status
-            if update is not None and modlink != 6 and modlink != 44:
+            if update is not None and modlink != 6 and modlink != 44 and success:
                 modlink = 0
                 leftscreen = 1
                 indat = '0'
@@ -658,6 +641,13 @@ def isoB(indat):
                 vdat = People.query.filter((People.Ptype == 'Vendor') & (People.Company == vendor)).first()
 
                 ptype = request.values.get('thistype')
+                if ptype == 'asset1':
+                    print('getting asset1')
+                    assdata = Accounts.query.filter( (Accounts.Type == 'Fixed Asset') & (Accounts.Co == ccode) ).order_by(Accounts.Name).all()
+                elif ptype == 'asset2':
+                    print('getting asset2')
+                    assdata = Accounts.query.filter((Accounts.Type == 'Current Asset') & (Accounts.Co == ccode)).order_by(Accounts.Name).all()
+
 
                 co = request.values.get('ctype')
                 if co is None:
@@ -844,7 +834,8 @@ def isoB(indat):
             input = Bills(Jo=nextjo, Pid=0, Company=toacct, Memo=None, Description=xdesc, bAmount=xamt, Status='Paid', Cache=0, Original=None,
                              Ref=None, bDate=sdate, pDate=sdate, pAmount=xamt, pMulti=None, pAccount=fromacct, bAccount=toacct, bType=btype,
                              bCat=cat, bSubcat=sub, Link=None, User=username, Co=co, Temp1=None, Temp2=None, Recurring=0, dDate=today,
-                             pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0)
+                             pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0, iflag = 0, PmtList=None,
+                             PacctList=None, RefList=None, MemoList=None, PdateList=None, CheckList=None)
 
             db.session.add(input)
             db.session.commit()
@@ -865,7 +856,8 @@ def isoB(indat):
                 nextjo = newjo(billexpcode, today)
                 input = Bills(Jo=nextjo, Pid=bdat.Pid, Company=bdat.Company, Memo=bdat.Memo, Description=bdat.Description, bAmount=bdat.bAmount, Status=bdat.Status, Cache=0, Original=bdat.Original,
                                  Ref=bdat.Ref, bDate=nextdate, pDate=None, pAmount='0.00', pMulti=None, pAccount=bdat.pAccount, bAccount=bdat.bAccount, bType=bdat.bType,
-                                 bCat=bdat.bCat, bSubcat=bdat.bSubcat, Link=None, User=username, Co=bdat.Co, Temp1=None, Temp2='Copy', Recurring=0, dDate=today, pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0)
+                                 bCat=bdat.bCat, bSubcat=bdat.bSubcat, Link=None, User=username, Co=bdat.Co, Temp1=None, Temp2='Copy', Recurring=0, dDate=today, pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0,
+                                 iflag=0, PmtList=None,PacctList=None, RefList=None, MemoList=None, PdateList=None, CheckList=None)
                 db.session.add(input)
                 db.session.commit()
 
@@ -898,7 +890,8 @@ def isoB(indat):
                     nextjo = newjo(billexptype, today)
                     input = Bills(Jo=nextjo, Pid=bdat.Pid, Company=bdat.Company, Memo=bdat.Memo, Description=bdat.Description, bAmount=bdat.bAmount, Status=bdat.Status, Cache=0, Original=bdat.Original,
                                      Ref=bdat.Ref, bDate=nextdate, pDate=None, pAmount='0.00', pMulti=None, pAccount=bdat.pAccount, bAccount=bdat.bAccount, bType=bdat.bType,
-                                     bCat=bdat.bCat, bSubcat=bdat.bSubcat, Link=None, User=username, Co=bdat.Co, Temp1=None, Temp2='Copy', Recurring=0, dDate=today, pAmount2='0.00', pDate2=None, Code1 = None, Code2=None, CkCache=0, QBi=0)
+                                     bCat=bdat.bCat, bSubcat=bdat.bSubcat, Link=None, User=username, Co=bdat.Co, Temp1=None, Temp2='Copy', Recurring=0, dDate=today, pAmount2='0.00', pDate2=None, Code1 = None, Code2=None, CkCache=0, QBi=0, iflag = 0, PmtList=None,
+                                     PacctList=None, RefList=None, MemoList=None, PdateList=None, CheckList=None)
                     db.session.add(input)
                     db.session.commit()
 
@@ -1060,10 +1053,9 @@ def isoB(indat):
         if thisbill is not None:
             modlink = 0
             # Create the new database entry for the source document
-            sdate = request.values.get('bdate')
-            print('bdate:', sdate)
-            if sdate is None or sdate == '':
-                sdate = today
+            bdate = request.values.get('bdate')
+            ddate = request.values.get('ddate')
+            print('bdate:', bdate, ddate)
 
             thiscompany = request.values.get('thiscomp')
             thistype = request.values.get('thistype')
@@ -1135,9 +1127,10 @@ def isoB(indat):
 
 
             input = Bills(Jo=nextjo, Pid=aid, Company=acomp, Memo='', Description=bdesc, bAmount=bamt, Status='Unpaid', Cache=0, Original=None,
-                             Ref='', bDate=sdate, pDate=today, pAmount='0.00', pMulti=None, pAccount=account, bAccount=baccount, bType=btype,
-                             bCat=category, bSubcat=subcat, Link=None, User=username, Co=cco, Temp1=None, Temp2=None, Recurring=0, dDate=today,
-                             pAmount2='0.00', pDate2=None, Code1 = None, Code2=code2, CkCache=0, QBi=0)
+                             Ref='', bDate=bdate, pDate=today, pAmount='0.00', pMulti=None, pAccount=account, bAccount=baccount, bType=btype,
+                             bCat=category, bSubcat=subcat, Link=None, User=username, Co=cco, Temp1=None, Temp2=None, Recurring=0, dDate=ddate,
+                             pAmount2='0.00', pDate2=None, Code1 = None, Code2=code2, CkCache=0, QBi=0, iflag = 0, PmtList=None,
+                             PacctList=None, RefList=None, MemoList=None, PdateList=None, CheckList=None)
 
             db.session.add(input)
             db.session.commit()
@@ -1153,7 +1146,7 @@ def isoB(indat):
                     adjamt = d2s(adjamt)
                     if adat is None:
                         mop = todaydt.month
-                        input = Adjusting(Jo = nextjo, Date = todaydt ,Mop=mop,Moa=0,Asset=baccount,Expense=code2,Amtp=bamt,Amta=adjamt,Status=0)
+                        input = Adjusting(Jo = nextjo, Date = bdate ,Mop=mop,Moa=0,Asset=baccount,Expense=code2,Amtp=bamt,Amta=adjamt,Status=0)
                         db.session.add(input)
                         db.session.commit()
                     else:

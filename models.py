@@ -1193,8 +1193,15 @@ class Bills(db.Model):
     Code2 = db.Column('Code2', db.String(45))
     CkCache = db.Column('CkCache', db.Integer)
     QBi = db.Column('QBi', db.Integer)
+    iflag = db.Column('iflag', db.Integer)
+    PmtList= db.Column('PmtList', db.String(45))
+    PacctList = db.Column('PacctList', db.String(45))
+    RefList = db.Column('RefList', db.String(45))
+    MemoList = db.Column('MemoList', db.String(200))
+    PdateList = db.Column('PdateList', db.String(45))
+    CheckList = db.Column('CheckList', db.String(200))
 
-    def __init__(self, Jo, Pid, Company, Memo, Description, bAmount, Status, Cache, Original, Ref, bDate, pDate, pAmount, pMulti, pAccount, bAccount, bType, bCat, bSubcat, Link, User, Co, Temp1, Temp2, Recurring, dDate, pAmount2, pDate2, Code1, Code2, CkCache, QBi):
+    def __init__(self, Jo, Pid, Company, Memo, Description, bAmount, Status, Cache, Original, Ref, bDate, pDate, pAmount, pMulti, pAccount, bAccount, bType, bCat, bSubcat, Link, User, Co, Temp1, Temp2, Recurring, dDate, pAmount2, pDate2, Code1, Code2, CkCache, QBi, iflag, PmtList, PacctList, RefList, MemoList, PdateList, CheckList):
         self.Jo = Jo
         self.Pid = Pid
         self.Company = Company
@@ -1227,6 +1234,13 @@ class Bills(db.Model):
         self.Code2 = Code2
         self.CkCache = CkCache
         self.QBi = QBi
+        self.iflag = iflag
+        self.PmtList = PmtList
+        self.PacctList = PacctList
+        self.RefList = RefList
+        self.MemoList = MemoList
+        self.PdateList = PdateList
+        self.CheckList = CheckList
 
     def Bal(self):
         try:

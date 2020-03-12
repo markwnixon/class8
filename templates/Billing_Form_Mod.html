@@ -113,7 +113,16 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>    <div class="input-group-text">Bill for Company:</div>   </td>
+                    <td><div class="input-group-text">Payment Type:</div></td>
+                    <td>
+                        <select class="form-control" type="text" name="thistype" onchange="this.form.submit()">
+                        <option {% if modata.Code2== 'bill' or modata.Code2 == none %} selected {% endif %} value="bill" > Bill/Expense </option>
+                        <option {% if modata.Code2 == 'asset1' %} selected {% endif %} value="asset1" > Purchase Depreciating Asset </option>
+                        <option {% if modata.Code2 == 'asset2' %} selected {% endif %} value="asset2" > Purchase Prepayment Asset </option>
+                    </td>
+                </tr>
+                <tr>
+                    <td>    <div class="input-group-text">Payment from Company:</div>   </td>
                     <td>
                             <select class="form-control" type="text" name="ctype" onchange="this.form.submit()">
                                 <option value = 'Pick'>  Select Default Company/Division </option>
@@ -123,6 +132,28 @@
                             </select>
                     </td>
                 </tr>
+            {%  set explabel = 'Expense Account' %}{% set prefix = 'Bill' %}{% set explabel = 'Expense Account' %}
+            {% if modata.Code2 == 'asset2' %}{% set asslabel = 'Depreciating Asset' %}{% set explabel = 'Accumlation Account' %}{% endif %}
+            {% if modata.Code2 == 'asset1' %}{% set asslabel = 'Adjusting Asset' %}{% set explabel = 'Adjusting Expense' %}{% endif %}
+            {% if modata.Code2 %}
+                {% if 'asset' in modata.Code2 %}
+                {% set prefix = 'Purchase' %}{% set assdata = hv[23] %}
+                    <tr>
+                        <td><div class="input-group-text">{{ asslabel }}:</div></td>
+                        <td>
+                            <select class="form-control" type="text" name="assacct" >
+                            <option selected value='0'>Choose Later</option>
+                            {% if assdata %}
+                                {% for data in assdata %}
+                                <option {% if cdat.Associate1 == data.Name %} selected {% endif %} value="{{data.Name}}" > {{data.Name}} </option>
+                                {% endfor %}</select>
+                            {% else %}
+                                <option  value="0" > No accounts exist for payment option </option>
+                            {% endif %}
+                        </td>
+                    </tr>
+            {% endif %}{% endif %}
+
                 <tr>
                 <td><div class="input-group-text">{{modata.Co}} Exp Account:</div></td>
                 <td>
@@ -133,12 +164,13 @@
                 {% endfor %}</select>
                 </td>
                 </tr>
+
                 <tr>
-                <td><div class="input-group-text">Bill Amount:</div></td>
+                <td><div class="input-group-text">{{ prefix }} Amount:</div></td>
                 <td><input class="form-control" type="text" name="bamt" value="{{modata.bAmount}}"></td>
                 </tr>
                        <tr>
-                <td><div class="input-group-text">Bill Date:</div></td>
+                <td><div class="input-group-text">{{ prefix }} Date:</div></td>
                 <td><input class="form-control" type="date" name="bdate" value={{modata.bDate}}></td>
                 </tr>
                 <tr>
@@ -146,7 +178,7 @@
                 <td><input class="form-control" type="date" name="ddate" value={{modata.dDate}}></td>
                 </tr>
                 <tr>
-                <td><div class="input-group-text">Bill Description:</div></td>
+                <td><div class="input-group-text">{{ prefix }} Description:</div></td>
                 <td><textarea class="form-control" type="text" name="bdesc" rows="3">{{modata.Description}}</textarea></td>
                 </tr>
 
