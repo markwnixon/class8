@@ -97,12 +97,11 @@
             <td><div class="input-group-text">{{prefix}} Date:</div></td>
             <td><input class="form-control" type="date" name="bdate" value="{{vdata[0]}}"></td>
         </tr>
-        {% if hv[22] == 'bill' %}
+        {% if hv[22] == 'bill' %}{% set datekey = 'Due' %}{% else %}{% set datekey = 'Term Complete' %}{% endif %}
         <tr>
-            <td><div class="input-group-text">Due Date:</div></td>
+            <td><div class="input-group-text">{{ datekey }} Date:</div></td>
             <td><input class="form-control" type="date" name="ddate" value="{{vdata[1]}}"></td>
         </tr>
-        {% endif %}
         <tr>
             <td><div class="input-group-text">{{prefix}} Description:</div></td>
             <td><textarea class="form-control" type="text" name="bdesc" rows="3">{{vdata[3]}}</textarea></td>

@@ -17,6 +17,10 @@ today_str = today.strftime('%Y-%m-%d')
 cdata = companydata()
 jbcode = cdata[10]+'T'
 
+def last_day_of_month(any_day):
+    next_month = any_day.replace(day=28) + datetime.timedelta(days=4)  # this will never fail
+    return next_month - datetime.timedelta(days=next_month.day)
+
 def nodollar(infloat):
     outstr="%0.2f" % infloat
     return outstr
@@ -556,24 +560,6 @@ def timedata(subdata1):
         cm[k]=ndata
         k=k+1
     return bm, cm
-
-def init_billing_zero():
-    bill=0
-    peep=0
-    cache=0
-    modata=0
-    modlink=0
-    fdata=0
-    adata=0
-    cdat=0
-    pb=0
-    passdata=0
-    vdata=[0]*8
-    caldays=0
-    daylist=0
-    weeksum=0
-    nweeks=0
-    return bill,peep,cache,modata,modlink,fdata,adata,cdat,pb,passdata,vdata,caldays,daylist,weeksum,nweeks
 
 def init_storage_zero():
     monsel=0
@@ -2061,8 +2047,6 @@ def container_list(lbox,holdvec):
                         imlines = imlines + f'<b>{com}</b><br>'
                     imlines = imlines + f'{con}<br>'
 
-
-
     holdvec[0] = imlines
     holdvec[1] = exlines
     err.append('Unpulled Import Container Last 20 Days')
@@ -2405,19 +2389,6 @@ def get_def_bank(bdat):
     print('The Paying Acct',pacct)
     return pacct
 
-def next_check(pacct,bid):
-    bdat = Bills.query.filter( (Bills.pAccount == pacct) & (Bills.Ref != None) & (Bills.id != bid) ).order_by(Bills.id.desc()).first()
-    if bdat is not None:
-        cknum = bdat.Ref
-        print('Last Number Recorded is:',cknum)
-        try:
-            cknum = str(int(cknum)+1)
-        except:
-            cknum = '0000'
-    else:
-        cknum = '0000'
-    return cknum
-
 def vendorlist(narrow):
     vendors = []
     if narrow == 1:
@@ -2752,175 +2723,63 @@ def check_inputs(bill_list):
 
 def run_adjustments():
     from datetime import date
+    from dateutil import relativedelta
     adata = Adjusting.query.filter(Adjusting.Status == 0).all()
     for adat in adata:
         date_from = adat.Date
-        year_from = date_from.year
-        year_this = year_from
-        month_from = date_from.month
-        month_now = today.month
+        date_to = adat.DateEnd
+        testdate = adat.Date
+        mtest = testdate.month
+        ytest= testdate.year
+        nmonths = 0
+        if testdate < date_to:
+            while testdate < date_to:
+                nmonths = nmonths + 1
+                mtest = mtest + 1
+                if mtest > 12:
+                    mtest = 1
+                    ytest = ytest + 1
+                testdate = date(ytest, mtest, 1)
+
+        print('nmonths=',nmonths)
         jo = adat.Jo
         mop = adat.Mop
         total_remain = float(adat.Amtp)
-        aamt = float(adat.Amta)
-        for ix in range (13):
+        month_from = date_from.month
+        prem_per_day = float(adat.Amta)
+        year_from = date_from.year
+        year_this = date_from.year
+
+        for ix in range (nmonths):
             jx = month_from + ix
             if jx > 12:
                 jx = jx - 12
                 year_this = year_from + 1
+            if ix == 0 or ix == nmonths-1:
+                if ix == 0: adj_date = date_from
+                else: adj_date = date(year_this,jx,1)
+                if ix == 0: end_date = last_day_of_month(date_from)
+                else: end_date = date_to
+            else:
+                adj_date = date(year_this,jx,1)
+                end_date = last_day_of_month(adj_date)
 
-            adj_date = date(year_this,jx,1)
+            delta = end_date - adj_date
+            monthdays = delta.days + 1
+            #To avoid rounding errors, set last month of use to the remaining amount to guarantee zero balance
+            if ix == nmonths-1: month_amt = total_remain
+            else: month_amt = prem_per_day * monthdays
             print(year_this,jx,adj_date, today)
-            if adj_date < today:
-                total_remain = total_remain - aamt
-                kdat = Adjusting.query.filter( (Adjusting.Jo == jo) & (Adjusting.Moa == jx) ).first()
-                if kdat is None:
-                    input = Adjusting(Jo=jo,Date=adj_date,Mop=mop,Moa=jx,Asset=adat.Asset,Expense=adat.Expense,Amtp=d2s(total_remain),Amta=adat.Amta,Status=1)
-                    db.session.add(input)
-                    db.session.commit()
+            total_remain = total_remain - month_amt
+            kdat = Adjusting.query.filter( (Adjusting.Jo == jo) & (Adjusting.Moa == jx) ).first()
+            if kdat is None:
+                input = Adjusting(Jo=jo,Date=adj_date,DateEnd=end_date,Mop=mop,Moa=jx,Asset=adat.Asset,Expense=adat.Expense,Amtp=d2s(total_remain),Amta=d2s(month_amt),Status=1)
+                db.session.add(input)
+                db.session.commit()
 
     from gledger_write import gledger_write
     gledger_write('adjusting',jo,adat.Expense,adat.Asset)
 
 
-def regular_payment(a,bill,hv,username):
-    modata = Bills.query.get(bill)
-    if a[4] is None: a[4] = today
-    bdol = d2s(a[1])
-    pdol = d2s(a[3])
-    modata.Company = a[9]
-    cdat = People.query.filter((People.Company == a[9]) & ((People.Ptype == 'Vendor') | (
-            People.Ptype == 'TowCo') | (People.Ptype == 'Overseas'))).first()
-    if cdat is not None:
-        modata.Pid = cdat.id
-        if cdat.Ptype == 'TowCo': hv[3] = '2'
-    else:
-        cdat = People.query.filter(People.Company == modata.Company).first()
-        if cdat is not None:
-            modata.Pid = cdat.id
-            if cdat.Ptype == 'TowCo': hv[3] = '2'
-        else:
-            modata.Pid = 0
-    modata.Memo = a[7]
-    modata.Description = a[0]
-    modata.bAmount = bdol
-    modata.bDate = a[2]
-    modata.dDate = a[10]
-    modata.pAmount = pdol
-    modata.pDate = a[4]
-    modata.pAccount = a[5]
-    modata.Ref = a[6]
-    modata.Code2 = a[12]
-    if modata.Status == 'Paying':
-        if float(bdol) == float(pdol):
-            modata.Status = 'Paid'
-        else:
-            modata.Status = 'PartPaid'
 
-    modata.User = username
-    modata.Co = a[8]
-    cache = modata.Cache
-    base = modata.Jo
-    filename2 = f'Source_{base}_c{str(cache)}.pdf'
-    docref = f'tmp/{scac}/data/vbills/{filename2}'
-    modata.Original = filename2
-    acctname = a[11]
-    acctco = a[8]
-    modata.bAccount = acctname
-    acdat1 = Accounts.query.filter((Accounts.Name == acctname) & (Accounts.Co == acctco)).first()
-    if acdat1 is not None:
-        modata.bType = acdat1.Type
-        modata.bCat = acdat1.Category
-        modata.bSubcat = acdat1.Subcategory
-        modata.Recurring = acdat1.id
-    db.session.commit()
-
-    return hv, docref
-
-
-def installment(a,bill,hv,username):
-    modata = Bills.query.get(bill)
-    if a[4] is None: a[4] = today
-    bdol = d2s(a[1])
-    pdol = d2s(a[3])
-    iflag = modata.iflag
-
-    #If this is first payment of installments can still change bill information
-    if iflag == 0 or iflag is None:
-        modata.iflag = 1
-        modata.Company = a[9]
-        cdat = People.query.filter((People.Company == a[9]) & ((People.Ptype == 'Vendor') | (
-            People.Ptype == 'TowCo') | (People.Ptype == 'Overseas'))).first()
-        if cdat is not None:
-            modata.Pid = cdat.id
-            if cdat.Ptype == 'TowCo': hv[3] = '2'
-        else:
-            cdat = People.query.filter(People.Company == modata.Company).first()
-            if cdat is not None:
-                modata.Pid = cdat.id
-                if cdat.Ptype == 'TowCo': hv[3] = '2'
-            else:
-                modata.Pid = 0
-        modata.Memo = a[7]
-        modata.Description = a[0]
-        modata.bAmount = bdol
-        modata.bDate = a[2]
-        modata.dDate = a[10]
-        modata.pAmount = pdol
-        modata.pDate = a[4]
-        modata.pAccount = a[5]
-        modata.Ref = a[6]
-        modata.Code2 = a[12]
-        if modata.Status == 'Paying':
-            if float(bdol) == float(pdol):
-                modata.Status = 'Paid'
-            else:
-                modata.Status = 'PartPaid'
-        modata.User = username
-        modata.Co = a[8]
-        cache = modata.Cache
-        base = modata.Jo
-        filename2 = f'Source_{base}_c{str(cache)}.pdf'
-        docref = f'tmp/{scac}/data/vbills/{filename2}'
-        modata.Original = filename2
-        acctname = a[11]
-        acctco = a[8]
-        modata.bAccount = acctname
-        acdat1 = Accounts.query.filter((Accounts.Name == acctname) & (Accounts.Co == acctco)).first()
-        if acdat1 is not None:
-            modata.bType = acdat1.Type
-            modata.bCat = acdat1.Category
-            modata.bSubcat = acdat1.Subcategory
-            modata.Recurring = acdat1.id
-        pmtlist, paclist, reflist, memolist, pdatelist, checklist = [],[],[],[],[],[]
-    else:
-        pmtlist = json.loads(modata.PmtList)
-        paclist = json.loads(modata.PacctList)
-        reflist = json.loads(modata.RefList)
-        memolist = json.loads(modata.MemoList)
-        pdatelist = json.loads(modata.PdateList)
-        checklist = json.loads(modata.CheckList)
-
-        total = float(pdol)
-        for pmt in pmtlist:
-            total = total + float(pmt)
-        modata.pAmount = d2s(total)
-
-    pmtlist.append(pdol)
-    paclist.append(a[5])
-    reflist.append(a[6])
-    memolist.append(a[7])
-    pdatelist.append(a[4])
-    checklist.append(filename2)
-
-    modata.PmtList = json.dumps(pmtlist)
-    modata.PacctList = json.dumps(paclist)
-    modata.RefList = json.dumps(reflist)
-    modata.MemoList = json.dumps(memolist)
-    modata.PdateList = json.dumps(pdatelist)
-    modata.CheckList = json.dumps(checklist)
-
-    db.session.commit()
-
-    return hv, docref
 

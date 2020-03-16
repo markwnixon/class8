@@ -304,10 +304,16 @@ def gledger_write(bus,jo,acctdb,acctcr):
 
         if bus=='paybill':
             from viewfuncs import check_multi_line
-            err, amt = check_multi_line(jo)
-            amt=int(amt*100)
 
             bdat=Bills.query.filter(Bills.Jo==jo).first()
+            err, amt = check_multi_line(jo)
+            iflag = bdat.iflag
+            if iflag is not None:
+                if iflag > 0:
+                    jo = jo + f'-{iflag}'
+                    amt = float(bdat.pAmount2)
+            amt=int(amt*100)
+
             pid=bdat.Pid
             pdate = bdat.pDate
             co = get_company(pid)

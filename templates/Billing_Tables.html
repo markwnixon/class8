@@ -7,26 +7,23 @@
         <table id="dtHorizontalVerticalExample1" class="table table-striped table-bordered w-auto" cellspacing="0" width="100%">
             <thead>
             <tr class="yellow lighten-5 text-black text-center">
-                <th style="font-weight:bold" >ID</th>
-                <th style="font-weight:bold" >Co</th>
                 <th style="font-weight:bold" >Trans</th>
-                <th style="font-weight:bold" >CkNo</th>
-
-                <th style="font-weight:bold" >From Account</th>
-                <th style="font-weight:bold" >To/Vendor</th>
-
-                <th style="font-weight:bold" >Bill Date</th>
+                <th style="font-weight:bold" >Transaction Date</th>
                 <th style="font-weight:bold" >Due Date</th>
+                <th style="font-weight:bold" >To/Vendor</th>
                 <th style="font-weight:bold" >Amount</th>
+                <th style="font-weight:bold" >Debit Account</th>
+                <th style="font-weight:bold" >Type</th>
 
                 <th style="font-weight:bold" >Chk</th>
 
                 <th style="font-weight:bold" >Paid Date</th>
                 <th style="font-weight:bold" >Paid</th>
+                <th style="font-weight:bold" >CkNo</th>
+                <th style="font-weight:bold" >Credit Account</th>
                 <th style="font-weight:bold" >BalDue</th>
 
-                <th style="font-weight:bold" >ExpAcct</th>
-                <th style="font-weight:bold" >Type</th>
+
                 <th style="font-weight:bold" >Cat</th>
                 <th style="font-weight:bold" >Subcat</th>
 
@@ -61,26 +58,23 @@
                 {% set act = act + " text-center" %}
 
             <tr>
-                <td class="{{act}}" >{{ data.id }}</td>
-                <td class="{{act}}" >{{ data.Co}}</td>
                 <td class="{{act}}" >{{ data.Jo}}</td>
-                <td class="{{act}}" >{{ data.Ref}}</td>
-
-                <td class="{{act}}" >{{ data.pAccount}}</td>
-                <td class="{{alt}}" >{{ data.Company}}</td>
-
                 <td class="{{act}}" >{{ data.bDate }}</td>
                 <td class="{{act}}" >{{ data.dDate }}</td>
+                <td class="{{alt}}" >{{ data.Company}}</td>
                 <td class="{{art}}" >{{ data.bAmount}}</td>
-
+                <td class="{{alt}}" >{{ data.bAccount }}</td>
+                <td class="{{act}}" >{{ data.bType }}</td>
                 <td class="{{act}}" ><input class="align-middle" type="checkbox" name="bill{{data.id}}" value="{{data.id}}"></td>
 
                 <td class="{{act}}" >{{ data.pDate}}</td>
                 <td class="{{art}}" >{{ data.pAmount}}</td>
+                <td class="{{act}}" >{{ data.Ref}}</td>
+                <td class="{{act}}" >{{ data.pAccount}}</td>
                 <td class="{{act}}" >{{ data.Bal()}}</td>
 
-                <td class="{{alt}}" >{{ data.bAccount }}</td>
-                <td class="{{act}}" >{{ data.bType }}</td>
+
+
                 <td class="{{act}}" >{{ data.bCat }}</td>
                 <td class="{{act}}" >{{ data.bSubcat }}</td>
 

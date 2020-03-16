@@ -61,7 +61,8 @@
 
 {% else %}
 
-                {% if pb == 1 %}
+                {% if modlink == 11 or modlink == 12 or modlink == 14 %}
+                        {% if modlink == 14 %}
                             {% set ckstyle = hv[21] %}
                             <tr>
                             <td><div class="input-group-text">Check Style:</div></td>
@@ -72,6 +73,9 @@
                             </select>
                             </td>
                             </tr>
+                        {% endif %}
+                            {% if modlink == 12 %}<tr><td colspan == "2">Enter Next Installment:</td></tr>{% endif %}
+                            {% set methods = ['Check', 'Credit Card', 'Bank Debit Card', 'Online Epay', 'Vendor ACH'] %}
                             <tr>
                             <td><div class="input-group-text">Paid Amount:</div></td>
                             <td><input class="form-control" type="text" name="pamt" value="{{modata.pAmount}}"></td>
@@ -83,6 +87,16 @@
                             <option value='0'>Choose Later</option>
                             {% for data in acdata %}
                             <option value="{{data.Name}}" {% if modata.pAccount == data.Name %} selected {% endif %} > {{data.Name}} </option>
+                            {% endfor %}</select>
+                            </td>
+                            </tr>
+                            <tr>
+                            <td><div class="input-group-text">Pay Method:</div></td>
+                            <td>
+                            <select class="form-control" type="text" name="method" onchange="this.form.submit()">
+                            <option value='0'>Select Payment Method</option>
+                            {% for method in methods %}
+                            <option value="{{method}}" {% if modata.Temp2 == method %} selected {% endif %} > {{method}} </option>
                             {% endfor %}</select>
                             </td>
                             </tr>
@@ -100,11 +114,37 @@
                             </tr>
 
                 {% endif %}
+                {% if modlink == 12 %}
+                    <tr><td colspan == "2">Previous Payments:</td></tr>
+                    {% set prevp = hv[19] %}
+                    {% for prev in prevp %}
+                            <tr><td><div class="input-group-text">Paid Amount:</div></td>
+                            <td><input class="form-control" type="text" value="{{prev[0]}}"></td>
+                            </tr>
+                            <tr><td><div class="input-group-text">From Account:</div></td>
+                            <td><input class="form-control" type="text" value="{{prev[1]}}"></td>
+                            </tr>
+                            <tr><td><div class="input-group-text">Pay Method:</div></td>
+                            <td><input class="form-control" type="text" value="{{prev[2]}}"></td>
+                            </tr>
+                            <tr><td><div class="input-group-text"> Pay Ref/Check#:</div></td>
+                            <td><input class="form-control" type="text" value="{{prev[3]}}"></td>
+                            </tr>
+                            <tr><td><div class="input-group-text">Check Memo:</div></td>
+                            <td><input class="form-control" type="text" value="{{prev[4]}}"></td>
+                            </tr>
+                            <tr><td><div class="input-group-text">Paid Date:</div></td>
+                            <td><input class="form-control" type="text" value="{{prev[5]}}"></td>
+                            </tr>
+                    {% endfor %}
+
+                {% endif %}
+                {% if modlink == 11 or modlink == 12 %}{% set canchange = 'disabled' %}{% else %}{% set canchange = '' %}{% endif %}
 
                 <tr>
                     <td>    <div class="input-group-text">From Vendor:</div>    </td>
                     <td>
-                            <select class="form-control" type="text" name="thiscomp" onchange="this.form.submit()">
+                            <select {{ canchange }} class="form-control" type="text" name="thiscomp" onchange="this.form.submit()">
                                     <option selected value='1'>Choose Later</option>
                                     {% for data in data2 %}
                                         <option value="{{data.Company}}" {% if modata.Company == data.Company %} selected {% endif %}> {{data.Company}} </option>
@@ -115,7 +155,7 @@
                 <tr>
                     <td><div class="input-group-text">Payment Type:</div></td>
                     <td>
-                        <select class="form-control" type="text" name="thistype" onchange="this.form.submit()">
+                        <select {{ canchange }} class="form-control" type="text" name="thistype" onchange="this.form.submit()">
                         <option {% if modata.Code2== 'bill' or modata.Code2 == none %} selected {% endif %} value="bill" > Bill/Expense </option>
                         <option {% if modata.Code2 == 'asset1' %} selected {% endif %} value="asset1" > Purchase Depreciating Asset </option>
                         <option {% if modata.Code2 == 'asset2' %} selected {% endif %} value="asset2" > Purchase Prepayment Asset </option>
@@ -124,7 +164,7 @@
                 <tr>
                     <td>    <div class="input-group-text">Payment from Company:</div>   </td>
                     <td>
-                            <select class="form-control" type="text" name="ctype" onchange="this.form.submit()">
+                            <select {{ canchange }} class="form-control" type="text" name="ctype" onchange="this.form.submit()">
                                 <option value = 'Pick'>  Select Default Company/Division </option>
                                     {% for div in divdat %}
                                         <option {% if modata.Co== div.Co %} selected {% endif %} value='{{ div.Co }}'>  {{ div.Name }} (Code {{ div.Co }}) </option>
@@ -141,7 +181,7 @@
                     <tr>
                         <td><div class="input-group-text">{{ asslabel }}:</div></td>
                         <td>
-                            <select class="form-control" type="text" name="assacct" >
+                            <select {{ canchange }} class="form-control" type="text" name="assacct" >
                             <option selected value='0'>Choose Later</option>
                             {% if assdata %}
                                 {% for data in assdata %}
@@ -157,7 +197,7 @@
                 <tr>
                 <td><div class="input-group-text">{{modata.Co}} Exp Account:</div></td>
                 <td>
-                <select class="form-control" type="text" name="billacct">
+                <select {{ canchange }} class="form-control" type="text" name="billacct">
                 <option selected value='1'>Choose Later</option>
                 {% for data in expdata %}
                 <option {% if modata.bAccount == data.Name %} selected {% endif %} value="{{data.Name}}" > {{data.Name}} </option>
@@ -167,49 +207,22 @@
 
                 <tr>
                 <td><div class="input-group-text">{{ prefix }} Amount:</div></td>
-                <td><input class="form-control" type="text" name="bamt" value="{{modata.bAmount}}"></td>
+                <td><input {{ canchange }} class="form-control" type="text" name="bamt" value="{{modata.bAmount}}"></td>
                 </tr>
                        <tr>
                 <td><div class="input-group-text">{{ prefix }} Date:</div></td>
-                <td><input class="form-control" type="date" name="bdate" value={{modata.bDate}}></td>
+                <td><input {{ canchange }} class="form-control" type="date" name="bdate" value={{modata.bDate}}></td>
                 </tr>
                 <tr>
                 <td><div class="input-group-text">Due Date:</div></td>
-                <td><input class="form-control" type="date" name="ddate" value={{modata.dDate}}></td>
+                <td><input {{ canchange }} class="form-control" type="date" name="ddate" value={{modata.dDate}}></td>
                 </tr>
                 <tr>
                 <td><div class="input-group-text">{{ prefix }} Description:</div></td>
-                <td><textarea class="form-control" type="text" name="bdesc" rows="3">{{modata.Description}}</textarea></td>
+                <td><textarea {{ canchange }} class="form-control" type="text" name="bdesc" rows="3">{{modata.Description}}</textarea></td>
                 </tr>
 
-                {% if pb != 1 %}
-                            <tr>
-                            <td><div class="input-group-text">Paid Amount:</div></td>
-                            <td><input class="form-control" type="text" name="pamt" value="{{modata.pAmount}}"></td>
-                            </tr>
-                            <tr>
-                            <td><div class="input-group-text">From Account:</div></td>
-                            <td>
-                            <select class="form-control" type="text" name="account" onchange="this.form.submit()">
-                            <option value='0'>Choose Later</option>
-                            {% for data in acdata %}
-                            <option value="{{data.Name}}" {% if modata.pAccount == data.Name %} selected {% endif %} > {{data.Name}} </option>
-                            {% endfor %}</select>
-                            </td>
-                            </tr>
-                            <tr>
-                            <td><div class="input-group-text"> Pay Ref/Check#:</div></td>
-                            <td><input class="form-control" type="text" name="bref" value="{{modata.Ref}}"></td>
-                            </tr>
-                            <tr>
-                            <td><div class="input-group-text">Check Memo:</div></td>
-                            <td><input class="form-control" type="text" name="ckmemo" value="{{modata.Memo}}"></td>
-                            </tr>
-                            <tr>
-                            <td><div class="input-group-text">Paid Date:</div></td>
-                            <td><input class="form-control" type="date" name="pdate" value={{modata.pDate}}></td>
-                            </tr>
-                {% endif %}
+
 {% endif %}
 </tbody></table>
 </div>
