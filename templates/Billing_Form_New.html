@@ -81,7 +81,7 @@
                 <option selected value='0'>Choose Later</option>
                 {% if expdata %}
                     {% for data in expdata %}
-                    <option {% if cdat.Associate1 == data.Name %} selected {% endif %} value="{{data.Name}}" > {{data.Name}} </option>
+                    <option {% if hv[9] == data.Name %} selected {% endif %} value="{{data.Name}}" > {{data.Name}} </option>
                     {% endfor %}</select>
                 {% else %}
                     <option  value="0" > No accounts exist for payment option </option>

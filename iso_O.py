@@ -313,7 +313,7 @@ def isoO():
                                      Ref=bref, bDate=today, pDate=today, pAmount=bamt, pMulti=None, pAccount=account, bType=btype, bAccount=baccount,
                                      bCat=bcat, bSubcat=None, Link=None, User=username, Co='F', Temp1=jobcat, Temp2=str(bill), Recurring=0, dDate=today, pAmount2='0.00', pDate2=None,
                                      Code1 = None, Code2=None, CkCache=0, QBi=0, iflag = 0, PmtList=None,
-                             PacctList=None, RefList=None, MemoList=None, PdateList=None, CheckList=None)
+                             PacctList=None, RefList=None, MemoList=None, PdateList=None, CheckList=None, MethList=None)
 
                     db.session.add(input)
                     db.session.commit()

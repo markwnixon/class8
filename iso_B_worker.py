@@ -9,11 +9,13 @@ import os
 import shutil
 import json
 from CCC_system_setup import myoslist, addpath, addtxt, scac, companydata
-from viewfuncs import docuploader, d2s
+from viewfuncs import docuploader, d2s, newjo
 from utils import requester
 from gledger_write import gledger_write
 
 today=datetime.date.today()
+today_str = today.strftime('%Y-%m-%d')
+
 
 def get_def_bank(bdat):
     coo = bdat.Co
@@ -268,7 +270,7 @@ def incoming_setup():
     bsubcat = 'Overseas'
     account = compdata[9]
     baccount = 'Towing Costs'
-    nextjo = newjo(billexpcode, today)
+    nextjo = newjo(billexpcode, today_str)
     print('JO generation output', billexpdata, nextjo)
 
     input = Bills(Jo=nextjo, Pid=aid, Company=cdat.Company, Memo=ckmemo, Description=bdesc, bAmount=bamt, Status='Paid',
@@ -278,7 +280,7 @@ def incoming_setup():
                   bCat=bcat, bSubcat=bsubcat, Link=pufrom, User=username, Co=compdata[10], Temp1=None, Temp2=str(towid),
                   Recurring=0, dDate=today,
                   pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0, iflag=0, PmtList=None,
-                  PacctList=None, RefList=None, MemoList=None, PdateList=None, CheckList=None)
+                  PacctList=None, RefList=None, MemoList=None, PdateList=None, CheckList=None, MethList=None)
 
     db.session.add(input)
     db.session.commit()
@@ -424,9 +426,11 @@ def run_paybill(bill, update, err, hv, docref, username, modlink):
     else:
         modata.Ref = request.values.get('bref')
     modata.pAccount = pacct
-    modata.Temp2 = pmethod
     db.session.commit()
-    if update is not None:
+    if update is None:
+        err, modlink, leftscreen, docref, prevpayvec = install_pay_init(bill, err, modlink)
+        hv[19] = prevpayvec
+    else:
         vals = ['pamt', 'account', 'bref', 'ckmemo', 'pdate', 'method']
         a = list(range(len(vals)))
         for ix, v in enumerate(vals): a[ix] = request.values.get(v)
@@ -603,7 +607,7 @@ def installment(a, bill, username, err):
         memolist = json.loads(modata.MemoList)
         pdatelist = json.loads(modata.PdateList)
         checklist = json.loads(modata.CheckList)
-        pmethods = json.loads(modata.Temp2)
+        pmethods = json.loads(modata.MethList)
         total = pamtf
         for pmt in pmtlist:
             total = total + float(pmt)
@@ -627,7 +631,7 @@ def installment(a, bill, username, err):
     modata.MemoList = json.dumps(memolist)
     modata.PdateList = json.dumps(pdatelist)
     modata.CheckList = json.dumps(checklist)
-    modata.Temp2 = json.dumps(pmethods)
+    modata.MethList = json.dumps(pmethods)
 
     db.session.commit()
 
@@ -735,12 +739,12 @@ def install_pay_init(bill, err, modlink):
         success = 0
         leftscreen, docref, prevpayvec = 1,0,0
         err.append('Bill has been paid in full.  Use unpay to restart payment process')
-    if success == 1:
+    else:
         prevpayvec = []
         pmtlist = json.loads(modata.PmtList)
         paclist = json.loads(modata.PacctList)
         reflist = json.loads(modata.RefList)
-        pmethods = json.loads(modata.Temp2)
+        pmethods = json.loads(modata.MethList)
         memolist = json.loads(modata.MemoList)
         pdatelist = json.loads(modata.PdateList)
         checklist = json.loads(modata.CheckList)
@@ -758,19 +762,14 @@ def install_pay_init(bill, err, modlink):
         elif len(pacct) < 4:
             pacct = get_def_bank(modata)
         modata.pAccount = pacct
-        modata.Status = 'Paying'
         db.session.commit()
         modlink = 12
-        err.append(f'Paying Bill {modata.Jo}')
+        err.append(f'Paying Part of Bill {modata.Jo}')
         docref = f'tmp/{scac}/data/vbills/{modata.Original}'
         if os.path.isfile(addpath(docref)): leftscreen = 0
         else:
             leftscreen = 1
             err.append('Bill has no source document')
-    else:
-        err.append('Could not complete billpay')
-        modlink = 0
-        leftscreen = 1
 
     return err, modlink, leftscreen, docref, prevpayvec
 
@@ -818,11 +817,15 @@ def newbill_passthru(err, hv, modlink):
             comp = default_co
         else:
             comp = form_co
+        hv[8] = comp
+
         if form_exp == '0':
             thisaccount = default_exp
         else:
             thisaccount = form_exp
-        hv[8] = comp
+        hv[9] = thisaccount
+
+
 
         ccdat = Accounts.query.filter(Accounts.Name == thisaccount).first()
 
@@ -912,7 +915,9 @@ def newbill_passthru(err, hv, modlink):
 
     return err, modlink, leftscreen, hv, expdata, vdata
 
-def newbill_update(err, hv, modlink):
+
+
+def newbill_update(err, hv, modlink, username):
     modlink = 0
     # Create the new database entry for the source document
     bdate = request.values.get('bdate')
@@ -967,11 +972,11 @@ def newbill_update(err, hv, modlink):
     bamt = d2s(bamt)
     bcomp = request.values.get('bcomp')
     cco = request.values.get('ctype')
-    print(f'Getting nextjo with {cco} and {today}')
+    print(f'Getting nextjo with {cco} and {today_str}')
     if cc_check == 'Credit Card':
-        nextjo = newjo(cco + 'X', today)
+        nextjo = newjo(cco + 'X', today_str)
     else:
-        nextjo = newjo(cco + 'B', today)
+        nextjo = newjo(cco + 'B', today_str)
     account = request.values.get('crataccount')
     if thistype == 'bill':
         baccount = request.values.get('billacct')
@@ -994,7 +999,7 @@ def newbill_update(err, hv, modlink):
                   bCat=category, bSubcat=subcat, Link=None, User=username, Co=cco, Temp1=None, Temp2=None, Recurring=0,
                   dDate=ddate,
                   pAmount2='0.00', pDate2=None, Code1=None, Code2=code2, CkCache=0, QBi=0, iflag=0, PmtList=None,
-                  PacctList=None, RefList=None, MemoList=None, PdateList=None, CheckList=None)
+                  PacctList=None, RefList=None, MemoList=None, PdateList=None, CheckList=None, MethList=None)
 
     db.session.add(input)
     db.session.commit()
@@ -1042,7 +1047,7 @@ def newbill_update(err, hv, modlink):
     leftscreen = 1
     err.append('All is well')
 
-    return err, modlink, leftscreen, hv, expdata, vdata, bill
+    return err, modlink, leftscreen, bill
 
 
 def mod_init(err, bill, peep):
@@ -1100,34 +1105,46 @@ def mod_init(err, bill, peep):
 
         expdata = Accounts.query.filter(((Accounts.Type == 'Expense') & (Accounts.Co == co)) | (
                     (Accounts.Type == 'Credit Card') & (Accounts.Co == co))).order_by(Accounts.Name).all()
-        leftsize = 8
         leftscreen = 0
-        docref = f'tmp/{scac}/data/vbills/{modata.Original}'
         modlink = 7
-        if vmod is not None:
+
+        if modata.Original is not None:
+            if len(modata.Original) > 5:
+                leftscreen = 0
+                docref = f'tmp/{scac}/data/vbills/{modata.Original}'
+                doctxt = txtfile(docref)
+                err.append('All is well')
+            else:
+                err.append('There is no document available for this selection')
+                docref = ''
+        else:
             err.append('There is no document available for this selection')
-            if modata.Original is not None:
-                if len(modata.Original) > 5:
-                    leftscreen = 0
-                    docref = f'tmp/{scac}/data/vbills/{modata.Original}'
-                    doctxt = txtfile(docref)
-                    err.append('All is well')
+            docref = ''
 
     if peep > 0:
         modata = People.query.get(peep)
         modlink = 9
         co = modata.Idtype
-        if co is None:
-            co = 'F'
-            modata.Idtype = co
-            db.session.commit()
-            modata = People.query.get(peep)
-
         expdata = Accounts.query.filter(((Accounts.Type == 'Expense') & (Accounts.Co == co)) | (
                     (Accounts.Type == 'Credit Card') & (Accounts.Co == co))).order_by(Accounts.Name).all()
-        # peephold=peep
-        if vmod is not None:
-            err.append('There is no document available for this selection')
 
     return modlink, leftscreen, docref, expdata, modata
 
+def vendorlist(narrow):
+    vendors = []
+    if narrow == 1:
+        vdata = People.query.filter(People.Ptype == 'Vendor').order_by(People.Company).all()
+        for vdat in vdata:
+            vendors.append(vdat.Company)
+        ccdata = Accounts.query.filter(Accounts.Type == 'CC').order_by(Accounts.Name).all()
+        for ccdat in ccdata:
+            vendors.append(ccdat.Name + ' (Credit Card)')
+        vendors.sort()
+        return vendors, 'Exp'
+    if narrow == 2:
+        vendors = []
+        ccdata = Accounts.query.filter(Accounts.Type == 'CC').order_by(Accounts.Name).all()
+        for ccdat in ccdata:
+            vendors.append(ccdat.Name + ' (Credit Card)')
+        vendors.sort()
+        return vendors, 'CC'

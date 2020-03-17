@@ -306,7 +306,7 @@ def gledger_write(bus,jo,acctdb,acctcr):
             from viewfuncs import check_multi_line
 
             bdat=Bills.query.filter(Bills.Jo==jo).first()
-            err, amt = check_multi_line(jo)
+            err, amt, nbills = check_multi_line(jo)
             iflag = bdat.iflag
             if iflag is not None:
                 if iflag > 0:

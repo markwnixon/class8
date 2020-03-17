@@ -1202,8 +1202,9 @@ class Bills(db.Model):
     MemoList = db.Column('MemoList', db.String(200))
     PdateList = db.Column('PdateList', db.String(200))
     CheckList = db.Column('CheckList', db.String(200))
+    MethList = db.Column('MethList', db.String(200))
 
-    def __init__(self, Jo, Pid, Company, Memo, Description, bAmount, Status, Cache, Original, Ref, bDate, pDate, pAmount, pMulti, pAccount, bAccount, bType, bCat, bSubcat, Link, User, Co, Temp1, Temp2, Recurring, dDate, pAmount2, pDate2, Code1, Code2, CkCache, QBi, iflag, PmtList, PacctList, RefList, MemoList, PdateList, CheckList):
+    def __init__(self, Jo, Pid, Company, Memo, Description, bAmount, Status, Cache, Original, Ref, bDate, pDate, pAmount, pMulti, pAccount, bAccount, bType, bCat, bSubcat, Link, User, Co, Temp1, Temp2, Recurring, dDate, pAmount2, pDate2, Code1, Code2, CkCache, QBi, iflag, PmtList, PacctList, RefList, MemoList, PdateList, CheckList, MethList):
         self.Jo = Jo
         self.Pid = Pid
         self.Company = Company
@@ -1243,6 +1244,7 @@ class Bills(db.Model):
         self.MemoList = MemoList
         self.PdateList = PdateList
         self.CheckList = CheckList
+        self.MethList = MethList
 
     def Bal(self):
         try:
@@ -1253,11 +1255,7 @@ class Bills(db.Model):
             owe = float(self.bAmount)
         except:
             owe = 0.00
-        try:
-            paid2 = float(self.pAmount2)
-        except:
-            paid2 = 0.00
-        return nodollar(owe-paid-paid2)
+        return nodollar(owe-paid)
 
 
 

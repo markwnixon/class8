@@ -1447,7 +1447,7 @@ def make_new_bill():
                   Cache=0, Original=None,Ref='', bDate=sdate, pDate=today, pAmount='0.00', pMulti=None, pAccount=account, bAccount=baccount,
                   bType=btype,bCat=category, bSubcat=subcat, Link=None, User=None, Co=cco, Temp1=None, Temp2=None, Recurring=0,
                   dDate=ddate, pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0, iflag = 0, PmtList=None,
-                             PacctList=None, RefList=None, MemoList=None, PdateList=None, CheckList=None)
+                             PacctList=None, RefList=None, MemoList=None, PdateList=None, CheckList=None, MethList=None)
 
     db.session.add(input)
     db.session.commit()
@@ -2389,24 +2389,7 @@ def get_def_bank(bdat):
     print('The Paying Acct',pacct)
     return pacct
 
-def vendorlist(narrow):
-    vendors = []
-    if narrow == 1:
-        vdata = People.query.filter(People.Ptype == 'Vendor').order_by(People.Company).all()
-        for vdat in vdata:
-            vendors.append(vdat.Company)
-        ccdata = Accounts.query.filter(Accounts.Type == 'CC').order_by(Accounts.Name).all()
-        for ccdat in ccdata:
-            vendors.append(ccdat.Name + ' (Credit Card)')
-        vendors.sort()
-        return vendors, 'Exp'
-    if narrow == 2:
-        vendors = []
-        ccdata = Accounts.query.filter(Accounts.Type == 'CC').order_by(Accounts.Name).all()
-        for ccdat in ccdata:
-            vendors.append(ccdat.Name + ' (Credit Card)')
-        vendors.sort()
-        return vendors, 'CC'
+
 
 def get_tmap(atype, btype):
     print('atype is', atype)
@@ -2496,7 +2479,7 @@ def enter_bk_charges(acct,bkch,date,username):
                       bCat='G-A', bSubcat="Bank Charges", Link=None, User=username, Co=co, Temp1=None, Temp2=None, Recurring=0,
                       dDate=today,
                       pAmount2='0.00', pDate2=None, Code1=None, Code2=None, CkCache=0, QBi=0, iflag = 0, PmtList=None,
-                             PacctList=None, RefList=None, MemoList=None, PdateList=None, CheckList=None)
+                             PacctList=None, RefList=None, MemoList=None, PdateList=None, CheckList=None, MethList=None)
         db.session.add(input)
         db.session.commit()
         gledger_write('dircharge',nextjo,bacct,acct)
@@ -2682,30 +2665,32 @@ def check_multi_line(jo):
         links = json.loads(bdat.Link)
     except:
         links = [bdat.id]
-    acct = bdat.bAccount
     total = 0.00
-    for bill in links:
-        bd = Bills.query.get(bill)
-        bacct = bd.bAccount
-        bjo = bd.Jo
-        co = bjo[0]
-        bd.Temp2 = None
-        bd.Status = 'Paid'
-        adat = Accounts.query.filter((Accounts.Name == bacct) & (Accounts.Co == co) ).first()
-        aid = adat.id
-        #Update the previous gledger entry for expense account if it has been modified
-        gdat = Gledger.query.filter( (Gledger.Type == 'ED') & (Gledger.Tcode == bjo) ).first()
-        if gdat is not None:
-            gdat.Account = bacct
-            gdat.Aid = aid
-        else:
-            err.append(f'Bill {bd.id} was never recorded')
-        total = total + float(bd.pAmount)
-        # Remove any previous payments to individual accounts as this check about to be paid for all
-        Gledger.query.filter( (Gledger.Tcode == bjo) & (Gledger.Type == 'PD') ).delete()
-        Gledger.query.filter( (Gledger.Tcode == bjo) & (Gledger.Type == 'PC') ).delete()
+    nbills = len(links)
+    if nbills > 1:
+        for bill in links:
+            bd = Bills.query.get(bill)
+            bacct = bd.bAccount
+            bjo = bd.Jo
+            co = bjo[0]
+            bd.Status = 'Paid'
+            adat = Accounts.query.filter((Accounts.Name == bacct) & (Accounts.Co == co) ).first()
+            aid = adat.id
+            #Update the previous gledger entry for expense account if it has been modified
+            gdat = Gledger.query.filter( (Gledger.Type == 'ED') & (Gledger.Tcode == bjo) ).first()
+            if gdat is not None:
+                gdat.Account = bacct
+                gdat.Aid = aid
+            else:
+                err.append(f'Bill {bd.id} was never recorded')
+            total = total + float(bd.pAmount)
+            # Remove any previous payments to individual accounts as this check about to be paid for all
+            Gledger.query.filter( (Gledger.Tcode == bjo) & (Gledger.Type == 'PD') ).delete()
+            Gledger.query.filter( (Gledger.Tcode == bjo) & (Gledger.Type == 'PC') ).delete()
+    else:
+        total = float(bdat.pAmount)
     db.session.commit()
-    return err, total
+    return err, total, nbills
 
 def check_inputs(bill_list):
     err = []
