@@ -10,6 +10,19 @@
 {% if taskbox == 1 or taskbox == 5%}
         <div class="col-sm-4" align="left">
             {% include 'includes/emailprep.html' %}
+
+             <div class="custom-control custom-checkbox custom-control-inline">
+              <input type="checkbox" class="custom-control-input" id="box1" {% if tbox[0]=='on' %} checked {% endif %} name="chassis-2">
+              <label class="custom-control-label" for="box1">Chassis 2-axle</label>
+            </div>
+            <div class="custom-control custom-checkbox custom-control-inline">
+              <input type="checkbox" class="custom-control-input" id="box2" {% if tbox[0]=='on' %} checked {% endif %} name="chassis-2">
+              <label class="custom-control-label" for="box2">Chassis 2-axle</label>
+            </div>
+
+
+
+            Put some buttons here for the table.
             <div class="card" align=""left">
                 <div class = "card-header">
                     Preview
