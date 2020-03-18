@@ -11,7 +11,7 @@ import json
 from CCC_system_setup import myoslist, addpath, addtxt, scac, companydata
 from iso_B_worker import var_start, var_request, get_selections, cleanup, alterations, incoming_setup, modbill, \
     run_paybill, run_xfer, uploadsource, modpeeps, pay_init, multi_pay_init, install_pay_init, mod_init, newbill_init,\
-    newbill_passthru, newbill_update
+    newbill_passthru, newbill_update, undolastpayment
 
 compdata = companydata()
 billexpcode = compdata[10]+'B'
@@ -427,7 +427,7 @@ def isoB(indat):
             err, modlink, leftscreen, hv, expdata, vdata = newbill_init(err, hv)
 
         if newbill is None and modlink == 4:
-            err, modlink, leftscreen, hv, expdata, vdata = newbill_passthru(err, hv, modlink)
+            err, modlink, leftscreen, hv, expdata, vdata, assdata = newbill_passthru(err, hv, modlink)
 
         if thisbill is not None:
             err, modlink, leftscreen, bill = newbill_update(err, hv, modlink, username)
@@ -436,15 +436,21 @@ def isoB(indat):
         if unpay == 1:
             if numchecked == 1 and bill > 0:
                 myb = Bills.query.get(bill)
-                myb.Status = 'Unpaid'
-                myb.pAmount = '0.00'
-                db.session.commit()
-                Gledger.query.filter((Gledger.Tcode == myb.Jo) & (Gledger.Type == 'PD')).delete()
-                Gledger.query.filter((Gledger.Tcode == myb.Jo) & (Gledger.Type == 'PC')).delete()
-                Gledger.query.filter((Gledger.Tcode == myb.Jo) & (Gledger.Type == 'XD')).delete()
-                Gledger.query.filter((Gledger.Tcode == myb.Jo) & (Gledger.Type == 'XC')).delete()
-                db.session.commit()
-                err.append(f'Unpay Bill {myb.Jo} and remove from register')
+                iflag = myb.iflag
+                if iflag is None: iflag = 0
+                if iflag > 0 :
+                    undolastpayment(bill)
+                    err.append(f'Unpaid Last Payment on Bill {myb.Jo} and removed from register')
+                else:
+                    myb.Status = 'Unpaid'
+                    myb.pAmount = '0.00'
+                    db.session.commit()
+                    Gledger.query.filter((Gledger.Tcode == myb.Jo) & (Gledger.Type == 'PD')).delete()
+                    Gledger.query.filter((Gledger.Tcode == myb.Jo) & (Gledger.Type == 'PC')).delete()
+                    Gledger.query.filter((Gledger.Tcode == myb.Jo) & (Gledger.Type == 'XD')).delete()
+                    Gledger.query.filter((Gledger.Tcode == myb.Jo) & (Gledger.Type == 'XC')).delete()
+                    db.session.commit()
+                    err.append(f'Unpay Bill {myb.Jo} and remove from register')
             else:
                 err.append('Must select one Bill to Unpay')
 
@@ -452,7 +458,8 @@ def isoB(indat):
 
             if numchecked == 1 and bill > 0:
                 myb = Bills.query.get(bill)
-                if myb.iflag == 1:
+                if myb.iflag is None: myb.iflag = 0
+                if myb.iflag > 0:
                     err, modlink, leftscreen, docref, prevpayvec = install_pay_init(bill, err, modlink)
                     hv[19] = prevpayvec
                 else:
@@ -654,7 +661,7 @@ def isoB(indat):
     critday = datetime.date.today()+datetime.timedelta(days=7)
     bdata, cdata = dataget_B(hv[1],hv[0],hv[3])
     hv[23] = assdata
-    acdata = Accounts.query.filter((Accounts.Type == 'Bank') | (Accounts.Type == 'Credit Card') ).order_by(Accounts.Name).all()
+    acdata = Accounts.query.filter((Accounts.Type == 'Bank') | (Accounts.Type == 'Credit Card') | (Accounts.Type == 'Current Liability') ).order_by(Accounts.Name).all()
     err = erud(err)
     if expdata == 0: expdata = Accounts.query.filter(Accounts.Type == 'Expense').order_by(Accounts.Name).all()
 

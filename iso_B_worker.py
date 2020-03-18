@@ -9,7 +9,7 @@ import os
 import shutil
 import json
 from CCC_system_setup import myoslist, addpath, addtxt, scac, companydata
-from viewfuncs import docuploader, d2s, newjo
+from viewfuncs import docuploader, d2s, newjo, run_adjustments
 from utils import requester
 from gledger_write import gledger_write
 
@@ -190,7 +190,12 @@ def cleanup():
     return modlink, leftscreen, indat
 
 def next_check(pacct,bid):
-    bdat = Bills.query.filter( (Bills.pAccount == pacct) & (Bills.Ref != None) & (Bills.id != bid) ).order_by(Bills.id.desc()).first()
+    bdata = Bills.query.filter( (Bills.pAccount == pacct) & (Bills.Temp2 == 'Check') ).all()
+    try:
+        bdat = bdata[-1]
+    except:
+        cknum = '0000'
+        bdat = None
     if bdat is not None:
         cknum = bdat.Ref
         print('Last Number Recorded is:',cknum)
@@ -419,18 +424,30 @@ def run_paybill(bill, update, err, hv, docref, username, modlink):
     modata = Bills.query.get(bill)
     success = 1
     # This section means paying the bill and the transaction is not a transfer
+    pamt = request.values.get('pamt')
     pacct = request.values.get('account')
     pmethod = request.values.get('method')
-    if pmethod == 'Check':
-        modata.Ref = next_check(pacct, modata.id)
-    else:
-        modata.Ref = request.values.get('bref')
+    pmemo = request.values.get('ckmemo')
+    pdate = request.values.get('pdate')
+    if pmethod == 'Check': modata.Ref = next_check(pacct, modata.id)
+    elif pmethod == 'Bank Debit Card': modata.Ref = f'xx{getdebit(pacct)}'
+    elif pmethod == 'Online Epay': modata.Ref = 'Epay'
+    elif pmethod == 'Vendor ACH': modata.Ref = 'ACH'
+
+    modata.pAmount = d2s(pamt)
     modata.pAccount = pacct
+    modata.Temp2 =  pmethod
+    modata.Memo = pmemo
+    modata.pDate = pdate
     db.session.commit()
-    if update is None:
+
+    # If it is an installment then need to grab the previous payment data if not an update:
+    if update is None and modlink == 12:
         err, modlink, leftscreen, docref, prevpayvec = install_pay_init(bill, err, modlink)
         hv[19] = prevpayvec
-    else:
+
+    # if updating the database:
+    elif update is not None:
         vals = ['pamt', 'account', 'bref', 'ckmemo', 'pdate', 'method']
         a = list(range(len(vals)))
         for ix, v in enumerate(vals): a[ix] = request.values.get(v)
@@ -786,6 +803,7 @@ def newbill_init(err, hv):
 
 def newbill_passthru(err, hv, modlink):
     leftscreen = 0
+    assdata = 0
     bdate = request.values.get('bdate')
     ddate = request.values.get('ddate')
     bamt = request.values.get('bamt')
@@ -913,7 +931,7 @@ def newbill_passthru(err, hv, modlink):
             assdata = Accounts.query.filter((Accounts.Type == 'Current Asset') & (Accounts.Co == ccode)).order_by(Accounts.Name).all()
         vdata = [bdate, ddate, bamt, bdesc]
 
-    return err, modlink, leftscreen, hv, expdata, vdata
+    return err, modlink, leftscreen, hv, expdata, vdata, assdata
 
 
 
@@ -1010,6 +1028,7 @@ def newbill_update(err, hv, modlink, username):
             err = gledger_write('purchase', nextjo, baccount, account)
         elif thistype == 'asset2':
             err = gledger_write('purchase', nextjo, baccount, account)
+
             adat = Adjusting.query.filter((Adjusting.Asset == baccount) & (Adjusting.Status == 0)).first()
             dt2 = datetime.datetime.strptime(ddate, "%Y-%m-%d")
             dt1 = datetime.datetime.strptime(bdate, "%Y-%m-%d")
@@ -1024,7 +1043,7 @@ def newbill_update(err, hv, modlink, username):
                 db.session.add(input)
                 db.session.commit()
             else:
-                err.append('This adjusting account exist.  Must delete it.')
+                err.append('This adjusting account exists.  Must delete it.')
 
     # Check if shared account:
     adat = Accounts.query.filter(Accounts.Name == baccount).first()
@@ -1112,7 +1131,7 @@ def mod_init(err, bill, peep):
             if len(modata.Original) > 5:
                 leftscreen = 0
                 docref = f'tmp/{scac}/data/vbills/{modata.Original}'
-                doctxt = txtfile(docref)
+                #doctxt = txtfile(docref)
                 err.append('All is well')
             else:
                 err.append('There is no document available for this selection')
@@ -1148,3 +1167,50 @@ def vendorlist(narrow):
             vendors.append(ccdat.Name + ' (Credit Card)')
         vendors.sort()
         return vendors, 'CC'
+
+def getdebit(pacct):
+    adat = Accounts.query.filter(Accounts.Name==pacct).first()
+    dbl4 = 'xxxx'
+    if adat is not None:
+        debit = adat.Shared
+        if debit is not None:
+            if len(debit) >= 4:
+                dbl4 = debit[-4:]
+    return dbl4
+
+def undolastpayment(bill):
+    myb = Bills.query.get(bill)
+    ix = myb.iflag - 1
+    pmtlist = json.loads(myb.PmtList)
+    paclist = json.loads(myb.PacctList)
+    reflist = json.loads(myb.RefList)
+    pmethods = json.loads(myb.MethList)
+    memolist = json.loads(myb.MemoList)
+    pdatelist = json.loads(myb.PdateList)
+    checklist = json.loads(myb.CheckList)
+
+    pmtlist = pmtlist[:ix]
+    total = 0.00
+    for pmt in pmtlist:
+        total = total + float(pmt)
+    myb.pAmount = d2s(total)
+    myb.pAmount2 = pmtlist[-1:]
+
+    myb.PmtList = json.dumps(pmtlist)
+    myb.PacctList = json.dumps(paclist[:ix])
+    myb.RefList = json.dumps(reflist[:ix])
+    myb.MemoList = json.dumps(memolist[:ix])
+    myb.PdateList = json.dumps(pdatelist[:ix])
+    myb.CheckList = json.dumps(checklist[:ix])
+    myb.MethList = json.dumps(pmethods[:ix])
+    myb.Status = 'PartPaid'
+
+    db.session.commit()
+
+    jo = myb.Jo + f'-{myb.iflag}'
+    Gledger.query.filter((Gledger.Tcode == jo) & (Gledger.Type == 'PD')).delete()
+    Gledger.query.filter((Gledger.Tcode == jo) & (Gledger.Type == 'PC')).delete()
+    Gledger.query.filter((Gledger.Tcode == jo) & (Gledger.Type == 'XD')).delete()
+    Gledger.query.filter((Gledger.Tcode == jo) & (Gledger.Type == 'XC')).delete()
+    db.session.commit()
+

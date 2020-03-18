@@ -115,32 +115,32 @@
 
                 {% endif %}
                 {% if modlink == 12 %}
-                    <tr><td colspan == "2">Previous Payments:</td></tr>
                     {% set prevp = hv[19] %}
                     {% for prev in prevp %}
+                        <tr><td colspan == "2">Previous Payment {{ loop.index }} of {{ prevp|length }}</td></tr>
                             <tr><td><div class="input-group-text">Paid Amount:</div></td>
-                            <td><input class="form-control" type="text" value="{{prev[0]}}"></td>
+                            <td><input disabled class="form-control" type="text" value="{{prev[0]}}"></td>
                             </tr>
                             <tr><td><div class="input-group-text">From Account:</div></td>
-                            <td><input class="form-control" type="text" value="{{prev[1]}}"></td>
+                            <td><input disabled class="form-control" type="text" value="{{prev[1]}}"></td>
                             </tr>
                             <tr><td><div class="input-group-text">Pay Method:</div></td>
-                            <td><input class="form-control" type="text" value="{{prev[2]}}"></td>
+                            <td><input disabled class="form-control" type="text" value="{{prev[2]}}"></td>
                             </tr>
                             <tr><td><div class="input-group-text"> Pay Ref/Check#:</div></td>
-                            <td><input class="form-control" type="text" value="{{prev[3]}}"></td>
+                            <td><input disabled class="form-control" type="text" value="{{prev[3]}}"></td>
                             </tr>
                             <tr><td><div class="input-group-text">Check Memo:</div></td>
-                            <td><input class="form-control" type="text" value="{{prev[4]}}"></td>
+                            <td><input disabled class="form-control" type="text" value="{{prev[4]}}"></td>
                             </tr>
                             <tr><td><div class="input-group-text">Paid Date:</div></td>
-                            <td><input class="form-control" type="text" value="{{prev[5]}}"></td>
+                            <td><input disabled class="form-control" type="text" value="{{prev[5]}}"></td>
                             </tr>
                     {% endfor %}
 
                 {% endif %}
                 {% if modlink == 11 or modlink == 12 %}{% set canchange = 'disabled' %}{% else %}{% set canchange = '' %}{% endif %}
-
+                <tr><td colspan == "2">Vendor and Payment Information</td></tr>
                 <tr>
                     <td>    <div class="input-group-text">From Vendor:</div>    </td>
                     <td>
