@@ -115,7 +115,7 @@ def isoR():
 
 
     else:
-        from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero, erud
+        from viewfuncs import popjo, jovec, timedata, nonone, nononef, init_truck_zero, erud
         today = datetime.date.today()
         err=[]
         hv = ['0'] * 12

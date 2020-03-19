@@ -10,7 +10,7 @@ def isoH():
 
     if request.method == 'POST':
         username = session['username'].capitalize()
-        from viewfuncs import d2s,tabdataR, newjo, popjo, jovec, timedata, nonone, nononef, GetCo,init_horizon_zero, numcheck, sdiff, calendar7_weeks,GetCo3
+        from viewfuncs import d2s, newjo, popjo, jovec, timedata, nonone, nononef, GetCo,init_horizon_zero, numcheck, sdiff, calendar7_weeks,GetCo3
         cars,auto,peep,invo,cache,modata,modlink,invooder,stamp,fdata,csize,invodate,inco,cdat,pb,passdata,vdata,caldays,daylist,weeksum,nweeks=init_horizon_zero()
         filesel=''
         docref=''
@@ -850,7 +850,7 @@ def isoH():
 
     #This is the else for 1st time through (not posting data from Dealer.html)
     else:
-        from viewfuncs import init_tabdata, GetCo, popjo, jovec, timedata, nonone, nononef, init_horizon_zero, GetCo3
+        from viewfuncs import GetCo, popjo, jovec, timedata, nonone, nononef, init_horizon_zero, GetCo3
         #today = datetime.date.today().strftime('%Y-%m-%d')
         #now = datetime.datetime.now().strftime('%I:%M %p')
         jobdate=datetime.date.today()

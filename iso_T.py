@@ -19,7 +19,7 @@ def isoT():
     if request.method == 'POST':
         # ____________________________________________________________________________________________________________________B.FormVariables.Trucking
 
-        from viewfuncs import parseline, tabdata, tabdataR, popjo, jovec, newjo, timedata, nonone, nononef, init_truck_zero, dropupdate, dropupdate2, dropupdate3
+        from viewfuncs import parseline, popjo, jovec, newjo, timedata, nonone, nononef, init_truck_zero, dropupdate, dropupdate2, dropupdate3
         from viewfuncs import d2s, d2sa, stat_update, numcheck, numcheckv, sdiff, calendar7_weeks, viewbuttons, get_ints, containersout, numcheckvec
         from viewfuncs import txtfile, doctransfer, getexpimp, docuploader, dataget_T, container_types
         from InterchangeFuncs import InterStrip, InterMatchThis, InterDupThis, PushJobsThis
@@ -2187,7 +2187,7 @@ def isoT():
 # ____________________________________________________________________________________________________________________E.Calendar.Trucking
     # This is the else for 1st time through (not posting data from overseas.html)
     else:
-        from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero, dataget_T, container_types
+        from viewfuncs import popjo, jovec, timedata, nonone, nononef, init_truck_zero, dataget_T, container_types
         username = session['username'].capitalize()
         try:
             edat = LastMessage.query.filter(LastMessage.User==username).first()

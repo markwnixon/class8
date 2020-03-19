@@ -13,7 +13,7 @@ def isoM():
     if request.method == 'POST':
 # ____________________________________________________________________________________________________________________B.FormVariables.Moving
 
-        from viewfuncs import parseline, tabdata, tabdataR, popjo, jovec, newjo, timedata, nonone, nononef, init_truck_zero
+        from viewfuncs import parseline, popjo, jovec, newjo, timedata, nonone, nononef, init_truck_zero
         from viewfuncs import numcheck, numcheckv, sdiff, calendar7_weeks, viewbuttons, get_ints, containersout, dropupdate
 
         #Zero and blank items for default
@@ -1007,7 +1007,7 @@ def isoM():
 # ____________________________________________________________________________________________________________________E.Calendar.Moving
     #This is the else for 1st time through (not posting data from overseas.html)
     else:
-        from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero
+        from viewfuncs import popjo, jovec, timedata, nonone, nononef, init_truck_zero
         today = datetime.date.today()
         #today = datetime.datetime.today().strftime('%Y-%m-%d')
         now = datetime.datetime.now().strftime('%I:%M %p')

@@ -262,7 +262,7 @@ def isoG():
 
     #This is the else for 1st time through (not posting data from overseas.html)
     else:
-        from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero
+        from viewfuncs import popjo, jovec, timedata, nonone, nononef, init_truck_zero
         today = datetime.date.today()
         #today = datetime.datetime.today().strftime('%Y-%m-%d')
         now = datetime.datetime.now().strftime('%I:%M %p')

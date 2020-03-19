@@ -407,7 +407,7 @@ def isoBank():
 
     #This is the else for 1st time through (not posting data from overseas.html)
     else:
-        from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero,d2s, erud
+        from viewfuncs import popjo, jovec, timedata, nonone, nononef, init_truck_zero,d2s, erud
         today = datetime.date.today()
         today_str = today.strftime('%Y-%m-%d')
         hv = [0]*9

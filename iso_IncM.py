@@ -289,7 +289,7 @@ def isoIncM():
 
     #This is the else for 1st time through (not posting data from overseas.html)
     else:
-        from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_truck_zero,erud
+        from viewfuncs import popjo, jovec, timedata, nonone, nononef, init_truck_zero,erud
         today = datetime.date.today()
         today_str = datetime.datetime.today().strftime('%Y-%m-%d')
         now = datetime.datetime.now().strftime('%I:%M %p')

@@ -13,7 +13,7 @@ import subprocess
 import shutil
 import re
 import pytz
-from viewfuncs import d2s, stat_update, tabdataR, popjo, jovec, newjo, timedata, nonone, nononef, nodollar, init_ocean_zero, numcheck, sdiff, calendar7_weeks, containersout, numcheckvec
+from viewfuncs import d2s, stat_update, popjo, jovec, newjo, timedata, nonone, nononef, nodollar, init_ocean_zero, numcheck, sdiff, calendar7_weeks, containersout, numcheckvec
 from InterchangeFuncs import InterStrip, InterMatchThis, InterDupThis, PushJobsThis, Check_Sailing
 from func_cal import calmodalupdate
 from dockmaker import dockm
@@ -1516,7 +1516,7 @@ def isoO():
 
     # This is the else for 1st time through (not posting data from overseas.html)
     else:
-        from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef, init_ocean_zero, init_ocean_blank
+        from viewfuncs import popjo, jovec, timedata, nonone, nononef, init_ocean_zero, init_ocean_blank
         my_datetime = datetime.datetime.now(pytz.timezone('US/Eastern'))
         today = my_datetime.date()
         now = my_datetime.time()

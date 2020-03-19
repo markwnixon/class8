@@ -938,7 +938,7 @@ def get_quote(msg,sequence,sessionph):
 
 
 def make_global_job(msg,sequence,sessionph):
-    from viewfuncs import parseline, tabdata, tabdataR, popjo, jovec, newjo, timedata, nonone, nononef, init_truck_zero, dropupdate
+    from viewfuncs import parseline, popjo, jovec, newjo, timedata, nonone, nononef, init_truck_zero, dropupdate
     today = datetime.today()
     sdate = today.strftime('%Y-%m-%d')
 
@@ -1002,7 +1002,7 @@ def make_global_job(msg,sequence,sessionph):
 
 def msg_analysis(msg, sessionph, medialist):
 
-    from viewfuncs import parseline, tabdata, tabdataR, popjo, jovec, newjo, timedata, nonone, nononef, init_truck_zero, dropupdate
+    from viewfuncs import parseline, popjo, jovec, newjo, timedata, nonone, nononef, init_truck_zero, dropupdate
 
     today = datetime.today()
     today = today.date()

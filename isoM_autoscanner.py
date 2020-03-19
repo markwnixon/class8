@@ -48,7 +48,7 @@ def isoMautoscanner():
 # ____________________________________________________________________________________________________________________E.Delete.General
 
     else:
-        from viewfuncs import init_tabdata, popjo, jovec, timedata, nonone, nononef
+        from viewfuncs import popjo, jovec, timedata, nonone, nononef
         today = datetime.date.today()
         #today = datetime.datetime.today().strftime('%Y-%m-%d')
         now = datetime.datetime.now().strftime('%I:%M %p')
