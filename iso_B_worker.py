@@ -57,7 +57,7 @@ def var_request():
 
     return match, vmod, modify2, viewo, addE, addE2, paybill, paybill2, unpay, printck, returnhit, deletehit, \
            update, modlink, newbill, thisbill, newxfer, thisxfer, calendar, calupdate, incoming, datatable1, \
-           datatable2,copy, copy12, qpay, bill, cache, peep, uploadS, thismuch, vendmuch, thisbox0, thisbox1, thisbox2,\
+           datatable2, copy, copy12, qpay, bill, cache, peep, uploadS, thismuch, vendmuch, thisbox0, thisbox1, thisbox2,\
            thisbox3, thisbox4, thisbox5, thisbox6
 
 
@@ -100,7 +100,7 @@ def get_selections(thismuch, vendmuch, thisbox0, thisbox1, thisbox2, thisbox3, t
     hv[21] = 1  # default check style
     err = []
     holdvec = []
-    AddE, copy, copy12, UploadS, newxfer, match, acceptthese, qpay, paybill2, viewo, viewck, deletehit, unpay, lbox = [None]*14
+    AddE, copy, copy12, UploadS, newxfer, match, acceptthese, qpay, paybill2, viewo, viewck, deletehit, unpay, lbox, viewbill = [None]*15
 
     if thismuch is not None:
         hv[1] = thismuch
@@ -150,6 +150,8 @@ def get_selections(thismuch, vendmuch, thisbox0, thisbox1, thisbox2, thisbox3, t
 
     if thisbox4 == '1':
         viewo = 1
+    elif thisbox4 == '3':
+        viewbill = 1
     elif thisbox4 == '2':
         viewck = 1
 
@@ -168,7 +170,7 @@ def get_selections(thismuch, vendmuch, thisbox0, thisbox1, thisbox2, thisbox3, t
     elif thisbox6 == '3':
         lbox = 1
 
-    return hv, newbill, AddE, copy, copy12, UploadS, newxfer, vmod, match, acceptthese, qpay, paybill, paybill2, printck, viewo, viewck, deletehit, unpay, lbox, holdvec, err
+    return hv, newbill, AddE, copy, copy12, UploadS, newxfer, vmod, match, acceptthese, qpay, paybill, paybill2, printck, viewo, viewbill, viewck, deletehit, unpay, lbox, holdvec, err
 
 def cleanup():
     modlink = 0
@@ -780,6 +782,7 @@ def install_pay_init(bill, err, modlink):
             pacct = get_def_bank(modata)
         modata.pAccount = pacct
         db.session.commit()
+
         modlink = 12
         err.append(f'Paying Part of Bill {modata.Jo}')
         docref = f'tmp/{scac}/data/vbills/{modata.Original}'
@@ -1029,7 +1032,7 @@ def newbill_update(err, hv, modlink, username):
         elif thistype == 'asset2':
             err = gledger_write('purchase', nextjo, baccount, account)
 
-            adat = Adjusting.query.filter((Adjusting.Asset == baccount) & (Adjusting.Status == 0)).first()
+            adat = Adjusting.query.filter((Adjusting.Jo == nextjo) & (Adjusting.Status == 0)).first()
             dt2 = datetime.datetime.strptime(ddate, "%Y-%m-%d")
             dt1 = datetime.datetime.strptime(bdate, "%Y-%m-%d")
             delta = dt2 - dt1

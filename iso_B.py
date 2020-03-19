@@ -52,7 +52,7 @@ def isoB(indat):
 
         # Get varibles that may be selected from the selection boxes and dont override the button pushes
         hv, newbill, AddE, copy, copy12, UploadS, newxfer, vmod, match, acceptthese, qpay, paybill, paybill2, printck, \
-        viewo, viewck, deletehit, unpay, lbox, holdvec, err \
+        viewo, viewbill, viewck, deletehit, unpay, lbox, holdvec, err \
         = get_selections(thismuch, vendmuch, thisbox0, thisbox1, thisbox2, thisbox3, thisbox4, thisbox5, thisbox6,
                          newbill, vmod, paybill, printck)
 
@@ -454,10 +454,12 @@ def isoB(indat):
             else:
                 err.append('Must select one Bill to Unpay')
 
-        if paybill is not None or paybill2 is not None:
-
+        if paybill is not None or paybill2 is not None or viewbill == 1:
+            print('paybill',numchecked,modlink,bill)
             if numchecked == 1 and bill > 0:
                 myb = Bills.query.get(bill)
+                if viewbill == 1 and myb.Status == 'Paid': modlink = 15
+
                 if myb.iflag is None: myb.iflag = 0
                 if myb.iflag > 0:
                     err, modlink, leftscreen, docref, prevpayvec = install_pay_init(bill, err, modlink)
@@ -642,7 +644,7 @@ def isoB(indat):
         hv = [0]*25
         hv[0] = 'X'
         hv[1] = '1'
-        from viewfuncs import init_tabdata, timedata, nonone, nononef, erud, dataget_B
+        from viewfuncs import nonone, erud, dataget_B
         leftscreen = 1
         leftsize = 10
         addjobselect = 0

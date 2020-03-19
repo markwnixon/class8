@@ -431,9 +431,41 @@ def emailonly(emailin):
     except:
         return emailin
 
+def bodymaker(customer,cdata,bidthis,locto,tbox):
+    sen, tbox = insert_adds(tbox)
+    ebody =  f'Hello {customer}, \n\n<br><br>{cdata[0]} is pleased to offer a quote of <b>${bidthis}</b> for this load to {locto}.\nThe quote is inclusive of tolls, fuel, and 2 hrs of load time.  {sen}Additional accessorial charges may apply as circumstances warrant, and if those are necessary they will be priced according the table below.  \n\n'
+
+    return ebody, tbox
+
+def insert_adds(tbox):
+    print('Making the inserts')
+    sen = ''
+    adds = []
+    for ix in range(4):
+        tbox[ix] = request.values.get(f'tbox{str(ix)}')
+        print(ix,tbox[ix])
+    if tbox[0] is not None:
+        adds.append('Standard 2-axle Chassis at <b>$30/day</b>')
+    if tbox[1] is not None:
+        adds.append('3-axle Chassis at <b>$70/day</b>')
+    if tbox[2] is not None:
+        adds.append('MD-only Overweight Fee at <b>$75</b>')
+    if tbox[3] is not None:
+        adds.append('Multi-State Overweight Fees at <b>$125</b>')
+    num_items = len(adds)
+    if num_items == 1: sen = 'An added charge to this quote will include '
+    elif num_items > 1: sen = 'Added charges to this price will include: '
+    for ix, add in enumerate(adds):
+        if ix == 0: sen = sen + add
+        elif ix == num_items-1: sen = sen + ', and ' + add
+        else: sen = sen + ', ' + add
+    sen = sen + '.  '
+    return sen, tbox
+
 def isoQuote():
     username = session['username'].capitalize()
     quot=0
+    tbox = [0]*4
     qdat=None
     from viewfuncs import dataget_Q, nonone, numcheck
     if request.method == 'POST':
@@ -681,7 +713,7 @@ def isoQuote():
                     qdat.Person = customer
                     bidname = customer
                     db.session.commit()
-                    ebody = f'Hello {customer}, \n\n<br><br>{cdata[0]} is pleased to offer a quote of <b>${bidthis}</b> for this load to {locto}.\nThe quote is inclusive of tolls, fuel, and 2 hrs of load time.  Additional accessorial charges may apply and are priced according the following table:\n\n'
+                    ebody, tbox = bodymaker(bidname,cdata,bidthis,locto,tbox)
                     ebody = ebody + maketable()
                     emailin1 = request.values.get('edat2')
                     if updatego is None:
@@ -694,7 +726,7 @@ def isoQuote():
                     #Set the email data:
                     if updatebid is not None or updatego is not None:
                         etitle = f'{cdata[0]} Quote to {locto} from {locfrom}'
-                        ebody = f'Hello {bidname}, \n\n<br><br>{cdata[0]} is pleased to offer a quote of <b>${bidthis}</b> for this load to {locto}.\nThe quote is inclusive of tolls, fuel, and 2 hrs of load time.  Additional accessorial charges may apply and are priced according the following table:\n\n'
+                        ebody, tbox = bodymaker(bidname,cdata,bidthis,locto,tbox)
                         ebody = ebody + maketable()
                     else:
                         etitle = request.values.get('edat0')
@@ -748,6 +780,7 @@ def isoQuote():
     else:
         print('Entering Quotes1',flush=True)
         username = session['username'].capitalize()
+        tbox = []
         qdat=None
         locto = 'Capitol Heights, MD  20743'
         locfrom = 'Baltimore Seagirt'
@@ -786,4 +819,4 @@ def isoQuote():
     print('Getting qdata',flush=True)
     qdata = dataget_Q(thismuch)
     print(quot)
-    return bidname, costdata, biddata, expdata, timedata, distdata, emaildata, locto, locfrom, newdirdata, qdata, bidthis, taskbox, thismuch, quot, qdat
+    return bidname, costdata, biddata, expdata, timedata, distdata, emaildata, locto, locfrom, newdirdata, qdata, bidthis, taskbox, thismuch, quot, qdat, tbox

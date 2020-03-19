@@ -11,18 +11,6 @@
         <div class="col-sm-4" align="left">
             {% include 'includes/emailprep.html' %}
 
-             <div class="custom-control custom-checkbox custom-control-inline">
-              <input type="checkbox" class="custom-control-input" id="box1" {% if tbox[0]=='on' %} checked {% endif %} name="chassis-2">
-              <label class="custom-control-label" for="box1">Chassis 2-axle</label>
-            </div>
-            <div class="custom-control custom-checkbox custom-control-inline">
-              <input type="checkbox" class="custom-control-input" id="box2" {% if tbox[0]=='on' %} checked {% endif %} name="chassis-2">
-              <label class="custom-control-label" for="box2">Chassis 2-axle</label>
-            </div>
-
-
-
-            Put some buttons here for the table.
             <div class="card" align=""left">
                 <div class = "card-header">
                     Preview
@@ -196,7 +184,25 @@
              </tr>
             </tbody>
         </table>
+            Check accessorial items that apply:<br>
+            <div class="custom-control custom-checkbox custom-control-inline">
+              <input type="checkbox" class="custom-control-input" id="box1" {% if tbox[0]=='on' %} checked {% endif %} name="tbox0">
+              <label class="custom-control-label" for="box1">Chassis 2-axle</label>
+            </div>
+            <div class="custom-control custom-checkbox custom-control-inline">
+              <input type="checkbox" class="custom-control-input" id="box2" {% if tbox[1]=='on' %} checked {% endif %} name="tbox1">
+              <label class="custom-control-label" for="box2">Chassis 3-axle</label>
+            </div>
+            <div class="custom-control custom-checkbox custom-control-inline">
+              <input type="checkbox" class="custom-control-input" id="box3" {% if tbox[2]=='on' %} checked {% endif %} name="tbox2">
+              <label class="custom-control-label" for="box3">MD Overweight</label>
+            </div>
+            <div class="custom-control custom-checkbox custom-control-inline">
+              <input type="checkbox" class="custom-control-input" id="box4" {% if tbox[3]=='on' %} checked {% endif %} name="tbox3">
+              <label class="custom-control-label" for="box4">Multi-State OW</label>
+            </div>
         </div></div>
+
 
         <div class="card" align="left">
             <div class = "card-header">
