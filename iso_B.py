@@ -51,7 +51,7 @@ def isoB(indat):
         oid = 0
 
         # Get varibles that may be selected from the selection boxes and dont override the button pushes
-        hv, newbill, AddE, copy, copy12, UploadS, newxfer, vmod, match, acceptthese, qpay, paybill, paybill2, printck, \
+        hv, newbill, addE, copy, copy12, UploadS, newxfer, vmod, match, acceptthese, qpay, paybill, paybill2, printck, \
         viewo, viewbill, viewck, deletehit, unpay, lbox, holdvec, err \
         = get_selections(thismuch, vendmuch, thisbox0, thisbox1, thisbox2, thisbox3, thisbox4, thisbox5, thisbox6,
                          newbill, vmod, paybill, printck)
@@ -130,7 +130,10 @@ def isoB(indat):
                 leftscreen = 1
                 indat = '0'
 
-        if modlink == 9 or modlink == 8:  err, expdata, modlink, peep = modpeeps(peep, update, err, modlink, expdata)
+        if modlink == 9 or modlink == 8:
+            err, expdata, modlink, peep = modpeeps(peep, update, err, modlink, expdata)
+            modata = People.query.get(peep)
+            print(modata.Company)
 # _____________________________________________________________________________________________________________B.UpdateDatabasesSection
 
         bdata, cdata = dataget_B(hv[1],hv[0],hv[3])

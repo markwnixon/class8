@@ -100,7 +100,7 @@ def get_selections(thismuch, vendmuch, thisbox0, thisbox1, thisbox2, thisbox3, t
     hv[21] = 1  # default check style
     err = []
     holdvec = []
-    AddE, copy, copy12, UploadS, newxfer, match, acceptthese, qpay, paybill2, viewo, viewck, deletehit, unpay, lbox, viewbill = [None]*15
+    addE, copy, copy12, UploadS, newxfer, match, acceptthese, qpay, paybill2, viewo, viewck, deletehit, unpay, lbox, viewbill = [None]*15
 
     if thismuch is not None:
         hv[1] = thismuch
@@ -170,7 +170,7 @@ def get_selections(thismuch, vendmuch, thisbox0, thisbox1, thisbox2, thisbox3, t
     elif thisbox6 == '3':
         lbox = 1
 
-    return hv, newbill, AddE, copy, copy12, UploadS, newxfer, vmod, match, acceptthese, qpay, paybill, paybill2, printck, viewo, viewbill, viewck, deletehit, unpay, lbox, holdvec, err
+    return hv, newbill, addE, copy, copy12, UploadS, newxfer, vmod, match, acceptthese, qpay, paybill, paybill2, printck, viewo, viewbill, viewck, deletehit, unpay, lbox, holdvec, err
 
 def cleanup():
     modlink = 0
