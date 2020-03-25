@@ -183,6 +183,7 @@ def cleanup():
         if company == '' or company == ' ' or company == None or company == 'None':
             People.query.filter(People.id == pg.id).delete()
             db.session.commit()
+
     # Put all bills in Paying Status back to unpaid
     pybills = Bills.query.filter(Bills.Status == 'Paying').all()
     for py in pybills:
