@@ -1083,7 +1083,7 @@ def isoT():
                 grandtotal = grandtotal+float(idat.Total)
                 # put together the file paperwork
             print('scac', scac)
-            file1 = addpath(f'tmp/{scac}/data/vpackages/P_' + 'test.pdf')
+            file1 = f'tmp/{scac}/data/vpackages/P_' + 'test.pdf'
             print('file1here=',file1)
             cache2 = int(odat.Detention)
             cache2 = cache2+1

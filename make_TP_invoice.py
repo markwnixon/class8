@@ -16,6 +16,7 @@ def main(file1, keydata, grandtotal, pdata1, date1, date2):
     from CCC_system_setup import addpath, bankdata
 
     file1 = addpath(file1)
+    print(file1)
 
     date1 = date1.strftime('%m/%d/%Y')
     date2 = date2.strftime('%m/%d/%Y')
@@ -213,18 +214,24 @@ def main(file1, keydata, grandtotal, pdata1, date1, date2):
     top = m4-dl
     for k, data in enumerate(keydata):
         dataline = keydata[k]
+        print(dataline)
         for j, i in enumerate(dataline):
             if j == 4:
                 dlen = len(i)
                 if dlen > 35:
                     pline = parseline(i, 32)
                     for myline in pline:
+                        if 'STORE' in myline: myline = 'WAREHOUSE STORAGE'
+                        if 'None' in myline: myline = ''
+                        if 'TBD' in myline: myline = ''
                         c.drawString(n3+5, top, myline)
                         top = top-.6*dl
                 else:
                     c.drawString(n3+5, top, i)
                     top = top - .6 * dl
             else:
+                if 'None' in str(i): i = ''
+                if 'TBD' in str(i): i = ''
                 c.drawCentredString(ctr[j], top, str(i))
         top = top-.6*dl
 
