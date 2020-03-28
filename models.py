@@ -946,8 +946,8 @@ class Vehicles(db.Model):
     Odometer = db.Column('Odometer', db.String(25))
     Owner = db.Column('Owner', db.String(50))
     Status = db.Column('Status', db.String(25))
-    Ezpassxponder = db.Column('Transponder', db.String(45))
-    Portxponder = db.Column('Transponder', db.String(45))
+    Ezpassxponder = db.Column('Ezpassxponder', db.String(45))
+    Portxponder = db.Column('Portxponder', db.String(45))
     ServStr = db.Column('StartedService', db.Date)
     ServStp = db.Column('StoppedService', db.Date)
 
