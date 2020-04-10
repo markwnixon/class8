@@ -1236,7 +1236,7 @@ def make_new_order():
                    Date=a[6], Driver=None, Company2=company2, Time=None, Date2=a[7], Time2=None, Seal=a[14],
                    Pickup=a[5], Delivery=None,
                    Amount=amt, Path=None, Original=None, Description=a[15], Chassis=None, Detention='0',
-                   Storage='0',
+                   Storage='0', InvoTotal=amt,
                    Release=0, Shipper=a[0], Type=a[9], Time3=None, Bid=idb, Lid=idl, Did=idd, Label='FileUpload',
                    Dropblock1=newdrop1, Dropblock2=newdrop2, Commodity=a[12], Packing=a[13], Links=None, Hstat=0, Istat=0,
                    Proof=None,Invoice=None,Gate=None,Package=None,Manifest=None,Scache=0,Pcache=0,Icache=0,Mcache=0,

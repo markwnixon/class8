@@ -80,7 +80,7 @@ def huntparse():
                                Release=0, Shipper='JB Hunt', Type=None, Time3=None, Bid=0, Lid=0, Did=0, Label=None, Dropblock1=None,Dropblock2=None,
                                Commodity=None, Packing=None, Links=None, Hstat=-1,
                                Istat=-1, Proof=None, Invoice=None, Gate=None, Package=None, Manifest=None, Scache=0,
-                               Pcache=0, Icache=0, Mcache=0, Pkcache=0, QBi=0
+                               Pcache=0, Icache=0, Mcache=0, Pkcache=0, QBi=0, InvoTotal=None
                                )
                 db.session.add(input)
                 db.session.commit()

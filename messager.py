@@ -987,7 +987,7 @@ def make_global_job(msg,sequence,sessionph):
                                Storage='0',Release=0, Shipper=pdat1.Company, Type=None, Time3=None, Bid=pdat1.id, Lid=lid, Did=did,
                                Label=None, Dropblock1=drop1, Dropblock2=drop2, Commodity=None, Packing=None,
                                Links=None, Hstat=-1,Istat=-1, Proof=None, Invoice=None, Gate=None, Package=None,
-                               Manifest=None,Scache=0,Pcache=0,Icache=0,Mcache=0,Pkcache=0, QBi=0)
+                               Manifest=None,Scache=0,Pcache=0,Icache=0,Mcache=0,Pkcache=0, QBi=0, InvoTotal='275.00')
                 db.session.add(input)
                 db.session.commit()
 
@@ -1270,7 +1270,7 @@ def msg_analysis(msg, sessionph, medialist):
                            Amount=None, Path=None, Original=None, Description=None, Chassis=None, Detention='0', Storage='0',
                            Release=0, Shipper=customer, Type=None, Time3=None, Bid=pid, Lid=None, Did=None, Label=None, Dropblock1=None, Dropblock2=None, Commodity=None, Packing=None,
                            Links=None, Hstat=-1,Istat=-1, Proof=None, Invoice=None, Gate=None, Package=None, Manifest=None, Scache=0,
-                           Pcache=0,Icache=0, Mcache=0, Pkcache=0, QBi=0)
+                           Pcache=0,Icache=0, Mcache=0, Pkcache=0, QBi=0, InvoTotal=None)
             db.session.add(input)
             db.session.commit()
 

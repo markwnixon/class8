@@ -555,6 +555,7 @@ def isoT():
             db.session.commit()
             # Create invoice code for order
             odata1.Istat = 1
+            odata1.InvoTotal = d2s(itotal)
 
             db.session.commit()
 # ____________________________________________________________________________________________________________________E.InvoiceUpdate.Trucking
@@ -1941,7 +1942,7 @@ def isoT():
 
                     myo.Invoice = os.path.basename(docref)
                     myo.Storage = cache
-                    myo.Amount = d2s(total)
+                    myo.InvoTotal = d2s(total)
                     db.session.commit()
 
                     leftscreen = 0
@@ -2048,7 +2049,7 @@ def isoT():
                                Type=myo.Type, Time3=None, Bid=myo.Bid, Lid=myo.Lid, Did=myo.Did, Label=myo.Label, Dropblock1=myo.Dropblock1,
                                Dropblock2=myo.Dropblock2, Commodity=myo.Commodity,Packing=myo.Packing, Links=myo.Links, Hstat=-1,
                                Istat=-1,Proof=None,Invoice=None,Gate=None,Package=None,Manifest=None,Scache=0,Pcache=0,
-                               Icache=0,Mcache=0,Pkcache=0, QBi=0)
+                               Icache=0,Mcache=0,Pkcache=0, QBi=0, InvoTotal=myo.Amount)
                 db.session.add(input)
                 db.session.commit()
                 err.append(f'Added new Order for {myo.Shipper} with JO {nextjo}')
