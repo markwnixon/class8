@@ -254,6 +254,17 @@ $('.dataTables_length').addClass('bs-select');
 });
 
 $(document).ready(function () {
+$('#dtTrucking').DataTable({
+"order": [[9, "desc" ]],
+"scrollX": true,
+"scrollY": 400,
+"stateSave": true,
+"paging": false // false to disable pagination (or any other option)
+});
+$('.dataTables_length').addClass('bs-select');
+});
+
+$(document).ready(function () {
 $('#dtHorizontalVerticalExample2').DataTable({
 "order": [[ 4, "desc" ]],
 "scrollX": true,
