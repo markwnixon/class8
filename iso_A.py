@@ -121,8 +121,8 @@ def chartdata():
                 lablist[ix] = f'{lab} {lastyear}'
         else:
             start = 1
-            stop = thismonth-1
-            lablist = lablist[:stop]
+            stop = thismonth
+            lablist = lablist[:stop-1]
             for ix, lab in enumerate(lablist):
                 lablist[ix] = f'{lab} {thisyear}'
 
@@ -131,7 +131,7 @@ def chartdata():
         rgb = []
         colors = [[31,105,161], [31,161,65], [161,141,31], [161,57,31], [161,31,141], [161,31,63], [31,53,161], [31,161,126]]
         for ix, plotitem in enumerate(acct):
-            datad.append(getmonths(plotitem,thismonth,thismonth+12))
+            datad.append(getmonths(plotitem,start,stop))
             labeld.append(plotitem)
             rgba.append(f'rgba({colors[ix][0]}, {colors[ix][1]}, {colors[ix][2]}, 0.3)')
             rgb.append(f'rgb({colors[ix][0]}, {colors[ix][1]}, {colors[ix][2]})')

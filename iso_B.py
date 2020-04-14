@@ -64,6 +64,7 @@ def isoB(indat):
         #modlink = 8 creating a new vendor during new bill process
 
         #modlink = 6 paying multiple bills with one check
+        #modlink = 14 paying one bill with one check
 
         #after modification is started, if it is a bill and selection boxes are updated with onchange:
         #modlink = 7 modification to a bill for continuous modification until update button is used

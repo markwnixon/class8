@@ -84,7 +84,11 @@ def isoR():
                 if b is not None:
                     fyear=2018
                 jmonth=j+1
-                enddays=[31,28,31,30,31,30,31,31,30,31,30,31]
+                leapyears=[2020,2024,2028,2032,2036]
+                if fyear in leapyears:
+                    enddays = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+                else:
+                    enddays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
                 endday=enddays[j]
                 start= datetime.date(fyear, jmonth, 1)
                 end= datetime.date(fyear, jmonth, endday)
