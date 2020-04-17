@@ -472,7 +472,10 @@ def custcalcs(thiscomp):
     itemlist=[]
     print(trucktype,oceantype,start,end)
     if trucktype=='on':
-        odata=Orders.query.filter( (Orders.Date>=start) & (Orders.Date<=end) & (Orders.Shipper==thiscomp) ).order_by(Orders.Date).all()
+        if thiscomp == 'ALLT':
+            odata = Orders.query.filter((Orders.Date >= start) & (Orders.Date <= end)).order_by(Orders.Date).all()
+        else:
+            odata=Orders.query.filter( (Orders.Date>=start) & (Orders.Date<=end) & (Orders.Shipper==thiscomp) ).order_by(Orders.Date).all()
     elif oceantype=='on':
         odata=OverSeas.query.filter( (OverSeas.PuDate>=start) & (OverSeas.PuDate<=end) & (OverSeas.BillTo==thiscomp) ).order_by(OverSeas.PuDate).all()
 
@@ -516,6 +519,10 @@ def custcalcs(thiscomp):
         if trucktype=='on':
             loc1=odat.Company
             loc2=odat.Company2
+            if thiscomp == 'ALLT':
+                loc1 = odat.Shipper
+                loc2 = odat.Company
+                if 'seagirt' in loc2.lower(): loc2 = odat.Company2
         elif oceantype=='on':
             loc1=odat.Pol
             loc2=odat.Pod
@@ -541,7 +548,10 @@ def custcalcs(thiscomp):
 
         #itemlist.append([d1.strftime('%m/%d/%Y'),order,container,loc1,loc2,nodollar(invof),nodollar(incof),nodollar(openf)])
     if openbalrequest=='on':
-        headerlist=['InvoDate']+keydataname+['From','To','Invo$','Days','Open$']
+        if thiscomp == 'ALLT':
+            headerlist = ['InvoDate'] + keydataname + ['Company', 'Key-Loc', 'Invo$', 'Days', 'Open$']
+        else:
+            headerlist=['InvoDate']+keydataname+['From','To','Invo$','Days','Open$']
     else:
         headerlist=['InvoDate']+keydataname+['From','To','Invo$','Paid$','Open$']
     print('headerlist=',headerlist)

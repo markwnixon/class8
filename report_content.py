@@ -673,6 +673,7 @@ def orderlisting(c,fsize,mtop,hvec,itemslist,justify,totals,bottomy):
     for k in range(l1):
         newlist=itemslist[k]
         for j,i in enumerate(newlist):
+            if i is None: i = ''
             if justify[j]=='l':
                 c.drawString(hvec[j]+sb,mtop,i)
             elif justify[j]=='c':
