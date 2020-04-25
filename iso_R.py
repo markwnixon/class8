@@ -33,7 +33,8 @@ def isoR():
         c4=request.values.get('dc4')
         c5=request.values.get('dc5')
         c6=request.values.get('dc6')
-        clist=[oceantype,trucktype,detailtype,c1,c2,c3,c4,c5,c6]
+        c7=request.values.get('dc7')
+        clist=[oceantype,trucktype,detailtype,c1,c2,c3,c4,c5,c6,c7]
 
         today = datetime.date.today()
         now = datetime.datetime.now().strftime('%I:%M %p')
@@ -136,8 +137,9 @@ def isoR():
         cache=nonone(cache)
         sdate=today
         fdate=today
-        fyear=2019
-        clist=['on','off']
+        fyear=2020
+        clist=['off']*12
+        clist[1] = 'on'
 
     customerlist=[]
     if clist[0]=='on':

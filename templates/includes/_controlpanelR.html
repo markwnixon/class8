@@ -35,6 +35,7 @@
     <td colspan='2'>
     <select class="form-control align-text-botton" type="text" name="thiscompany">
         <option value='1'>Choose Customer</option>
+        <option value='ALLT'>All Trucking</option>
         {% for data in customerlist %}
         <option {% if data == thiscomp %}selected{% endif %}
             value="{{data}}"> {{data}} </option>
@@ -72,9 +73,9 @@
     <td><button type="submit" class="btn btn-group-small btn-indigo my-small-btn" name="dec" onchange="this.form.submit()">Dec</button></td>
 </tr>
 <tr>
-    <td colspan='5' align='right'>Default is Current Year 2019, Check for Prior Year 2018:</td>
+    <td colspan='5' align='right'>Default is Current Year 2020, Check for Prior Year 2019:</td>
     <td colspan='1'>
-    <input class="align-middle" {% if fyear==2018 %} checked {% endif %} type="checkbox" name="focusyear" value="2018">
+    <input class="align-middle" {% if fyear==2019 %} checked {% endif %} type="checkbox" name="focusyear" value="2019">
     </td>
 </tr>
 </table>
