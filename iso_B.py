@@ -502,7 +502,6 @@ def isoB(indat):
             elif printck is not None and numchecked > 1:
                 modlink = 6
 
-
             if indat != '0':
                 bdat = Bills.query.filter(Bills.Jo == indat).first()
                 bill = bdat.id
