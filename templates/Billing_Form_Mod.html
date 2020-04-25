@@ -62,7 +62,7 @@
 {% else %}
 
                 {% if modlink == 11 or modlink == 12 or modlink == 14 or modlink == 6 %}
-                        {% if modlink == 6 %}
+                        {% if modlink == 6 or modlink == 14 %}
                             {% set ckstyle = hv[21] %}
                             <tr>
                             <td><div class="input-group-text">Check Style:</div></td>
@@ -75,6 +75,7 @@
                             </tr>
                         {% endif %}
                             {% if modlink == 12 %}<tr><td colspan == "2">Enter Next Installment:</td></tr>{% endif %}
+
                             {% set methods = ['Check', 'Credit Card', 'Bank Debit Card', 'Online Epay', 'Vendor ACH'] %}
                             <tr>
                             <td><div class="input-group-text">Paid Amount:</div></td>

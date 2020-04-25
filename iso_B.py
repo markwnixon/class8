@@ -90,7 +90,7 @@ def isoB(indat):
             modlink = 0
 # ____________________________________________________________________________________________________________________E.Uploading
 # ____________________________________________________________________________________________________________________B.UpdateDatabasesSection
-        if (update is not None and modlink == 1) or modlink == 8 or modlink == 7 or modlink == 6 or modlink == 11 or modlink == 12:
+        if (update is not None and modlink == 1) or modlink == 8 or modlink == 7 or modlink == 6 or modlink == 11 or modlink == 12 or modlink == 14:
             success = 1
             if bill > 0:
                 modata = Bills.query.get(bill)
@@ -117,7 +117,7 @@ def isoB(indat):
                 if ifxfer == 'XFER':
                     run_xfer(update, err)
 
-                if modlink == 11 or modlink == 12:
+                if modlink == 11 or modlink == 12 or modlink == 14:
                     err, hv, docref, modlink = run_paybill(bill, update, err, hv, docref, username, modlink)
 
                 if modal == 1:
@@ -497,15 +497,21 @@ def isoB(indat):
                     links = 0
                     sbdata = 0
 
+            if printck is not None and numchecked == 1:
+                modlink = 14
+            elif printck is not None and numchecked > 1:
+                modlink = 6
+
 
             if indat != '0':
                 bdat = Bills.query.filter(Bills.Jo == indat).first()
                 bill = bdat.id
                 modlink = 6
+                if numchecked == 1: modlink = 14
 
-            if (numchecked >= 1 and bill > 0) or modlink == 6 or modlink == 12:
+            if (numchecked >= 1 and bill > 0) or modlink == 6 or modlink == 12 or modlink == 14:
 
-                if modlink == 6 or modlink == 12:
+                if modlink == 6 or modlink == 12 or modlink == 14:
                     bdat = Bills.query.get(bill)
                     try:
                         bill_list = json.loads(bdat.Link)
@@ -549,7 +555,7 @@ def isoB(indat):
                     err = check_inputs(bill_list)
                     co = bdat.Co
                     expdata = Accounts.query.filter(((Accounts.Type == 'Expense') & (Accounts.Co == co)) | ((Accounts.Type == 'Credit Card') & (Accounts.Co == co))).order_by(Accounts.Name).all()
-                    modlink = 6
+                    #modlink = 6
                     leftscreen = 0
                     modata = Bills.query.get(links[0])
                     pb = 1
