@@ -78,7 +78,7 @@ def etemplate_truck(viewtype,eprof,odat):
 
     elif eprof == 'eprof4':
         etitle = f'Proof for Completed Order: {od} | {keyval} | {con}'
-        ebody = f'Dear {odat.Shipper},\n\nThe subject order has been completed, and your proof of delivery is attached.\n\nPlease do not hesitate to respond if you have any quesitons.\n\nSincerely,\n\n{signature}'
+        ebody = f'Dear {odat.Shipper},\n\nThe subject order has been completed, and your proof of delivery is attached.\n\nPlease do not hesitate to respond if you have any questions.\n\nSincerely,\n\n{signature}'
         aname = odat.Proof
         emailin1 = estatus
         emailin2 = epod
@@ -89,7 +89,7 @@ def etemplate_truck(viewtype,eprof,odat):
 
     elif eprof == 'eprof5':
         etitle = f'Invoice & Proof for Completed Order: {od} | {keyval} | {con}'
-        ebody = f'Dear {odat.Shipper},\n\nThe subject order has been completed, and your invoice with proof of delivery is attached.\n\nPlease do not hesitate to respond if you have any quesitons.\n\nSincerely,\n\n{signature}'
+        ebody = f'Dear {odat.Shipper},\n\nThe subject order has been completed, and your invoice with proof of delivery is attached.\n\nPlease do not hesitate to respond if you have any questions.\n\nSincerely,\n\n{signature}'
         aname = f'Package_{odat.Jo}.pdf'
         emailin1 = estatus
         emailin2 = eaccts
@@ -100,7 +100,7 @@ def etemplate_truck(viewtype,eprof,odat):
 
     elif eprof == 'eprof6':
         etitle = f'Invoice Package for Completed Order: {od} | {keyval} | {con}'
-        ebody = f'Dear {odat.Shipper},\n\nThe subject order has been completed, and your invoice package is attached.\n\nPlease do not hesitate to respond if you have any quesitons.\n\nSincerely,\n\n{signature}'
+        ebody = f'Dear {odat.Shipper},\n\nThe subject order has been completed, and your invoice package is attached.\n\nPlease do not hesitate to respond if you have any questions.\n\nSincerely,\n\n{signature}'
         aname = f'Package_{odat.Jo}.pdf'
         emailin1 = estatus
         emailin2 = eaccts

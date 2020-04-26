@@ -513,6 +513,9 @@ def isoQuote():
             db.session.commit()
             taskbox = 0
 
+        if taskbox == 6:
+            add_quote_emails()
+
         if taskbox == 1 or taskbox == 5:
             if quot>0 and qdat is not None:
                 locto = qdat.Location
@@ -782,7 +785,7 @@ def isoQuote():
         username = session['username'].capitalize()
         tbox = []
         qdat=None
-        locto = 'Capitol Heights, MD  20743'
+        locto = 'Upper Marlboro, MD  20772'
         locfrom = 'Baltimore Seagirt'
         etitle = f'{cdata[0]} Quote for Drayage to {locto} from {locfrom}'
         ebody = f'Regirgitation from the input'

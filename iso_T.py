@@ -156,20 +156,24 @@ def isoT():
         thisbox2 = request.values.get('editbox')
         if thisbox2 == '1':
             vmod = 1
-        if thisbox2 == '2':
+        elif thisbox2 == '2':
             match = 1
-        if thisbox2 == '3':
+        elif thisbox2 == '3':
             acceptthese = 1
-        if thisbox2 == '4':
+        elif thisbox2 == '4':
             loadc = 1
-        if thisbox2 == '5':
+        elif thisbox2 == '5':
             loadc = 2
-        if thisbox2 == '6':
+        elif thisbox2 == '6':
             loadc = 3
-        if thisbox2 == '7':
+        elif thisbox2 == '7':
             loadc = 4
-        if thisbox2 == '8':
+        elif thisbox2 == '8':
             viewtype = 'columnadd'
+        elif thisbox2 == '9':
+            loadc = 5
+        elif thisbox2 == '10':
+            loadc = 6
 
         thisbox3 = request.values.get('invobox')
         if thisbox3 == '1':
@@ -2087,19 +2091,26 @@ def isoT():
                         else:
                             hstat = hstat + 1
                             err.append(f'Hauling on {myo.Jo} increased by 1')
-                    if loadc == 2:
+                    elif loadc == 2:
                         hstat = hstat - 1
                         err.append(f'Hauling on {myo.Jo} decreased by 1')
-                    if loadc == 3:
+                    elif loadc == 3:
                         if istat < 3:
                             istat = istat + 1
                             err.append(f'Invoicing on {myo.Jo} increased by 1')
                         else:
                             err.append(f'Cannot manually set to paid, must receive payment')
 
-                    if loadc == 4:
+                    elif loadc == 4:
                         istat = istat - 1
                         err.append(f'Invoicing on {myo.Jo} decreased by 1')
+
+                    elif loadc == 5:
+                        if hstat < 4: hstat = 3
+
+                    elif loadc == 6:
+                        if istat < 4: istat = 3
+
                     if hstat < 0 : hstat = 0
                     if istat < 0 : istat = 0
 
