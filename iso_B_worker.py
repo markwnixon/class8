@@ -1146,7 +1146,9 @@ def mod_init(err, bill, peep):
 
     if peep > 0:
         modata = People.query.get(peep)
+        leftscreen = 0
         modlink = 9
+        docref = ''
         co = modata.Idtype
         expdata = Accounts.query.filter(((Accounts.Type == 'Expense') & (Accounts.Co == co)) | (
                     (Accounts.Type == 'Credit Card') & (Accounts.Co == co))).order_by(Accounts.Name).all()
