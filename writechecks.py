@@ -266,7 +266,7 @@ def writechecks(bdat, pdat, file1, sbdata, links, style):
 
 
 
-    item11 = ['Date', 'PayRef', 'Type', 'Category', 'Subcategory', 'Amount Paid']
+    item11 = ['Date', 'Ck No.| Pay Ref', 'Type', 'Category', 'Subcategory', 'Amount Paid']
     item12 = [datestr, payref, btype, bcat, bsubcat, amount_num]
     item21 = ['BillNo', 'Check Made Out To', 'From Acct']
     item22 = [billno, payee, bank]
@@ -453,16 +453,16 @@ def writechecks(bdat, pdat, file1, sbdata, links, style):
     mlevtop = mlev14+80-dl-dl
     mlevbot = mlev24+80-dl-dl
     if links != 0:
-        s1 = ltm+270
-        s2 = ltm+310
-        s3 = ltm+380
+        s1 = ltm+200
+        s2 = ltm+240
+        s3 = ltm+310
         s4 = ltm+480
         if btype == 'Expense':
             if style == 1: c.drawString(ltm+230, mlev11, 'Expensed Account Name: '+ acct + ' (' + comp + ')')
             c.drawString(ltm+230, mlev21, 'Expensed Account Name: '+ acct + ' (' + comp + ')')
             mlevtop = mlev11-2*dl
             mlevbot = mlev21-2*dl
-        c.setFont('Helvetica-Bold', 12, leading=None)
+        c.setFont('Helvetica-Bold', 10, leading=None)
 
         if style == 1:
             c.drawString(s1, mlevtop, 'ID')
@@ -474,7 +474,7 @@ def writechecks(bdat, pdat, file1, sbdata, links, style):
         c.drawString(s2, mlevbot, 'Bill No')
         c.drawString(s3, mlevbot, 'Reference/BkNo.')
         c.drawString(s4, mlevbot, 'Amount')
-        c.setFont('Helvetica', 12, leading=None)
+        c.setFont('Helvetica', 10, leading=None)
 
         for data in sbdata:
             mlevtop = mlevtop-dl
