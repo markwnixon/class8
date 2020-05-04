@@ -256,6 +256,49 @@ def InvoiceMaint():
     return render_template('Ainvoicemaint.html',cmpdata=cmpdata, scac=scac,  data1=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
                            leftsize=leftsize, rightsize=rightsize, docref=docref)
 
+@app.route('/Test', methods=['GET', 'POST'])
+def Test():
+    scac = 'FELA'
+    leftsize = 8
+    rightsize = 12-leftsize
+    leftscreen = 1
+    err = []
+    docref = ''
+    oder=0
+    modata=0
+    modlink = 0
+    today = datetime.date.today()
+    stopdate = today-datetime.timedelta(days=60)
+    odata = Orders.query.filter(Orders.Date > stopdate).all()
+    headcols = ['Jo','Order','Shipper', 'Booking','Container','Chassis','Company','Amount','Date','Company2','Commodity','Packing']
+    rowcolors1 = []
+    rowcolors2 = []
+    data1 = []
+    for odat in odata:
+        datarow = [0]*len(headcols)
+        hstat = odat.Hstat
+        istat = odat.Istat
+        print(hstat,istat)
+        if istat == 4: rowcolors2.append('green text-white font-weight-bold')
+        elif istat == 3: rowcolors2.append('amber font-weight-bold')
+        elif istat == 2: rowcolors2.append('purple text-white font-weight-bold')
+        elif istat == 1: rowcolors2.append('blue text-white font-weight-bold')
+        elif istat == -1: rowcolors2.append('yellow font-weight-bold')
+        else: rowcolors2.append('white font-weight-bold')
+        if hstat == 4: rowcolors1.append('green text-white font-weight-bold')
+        elif hstat == 3: rowcolors1.append('amber font-weight-bold')
+        elif hstat == 2: rowcolors1.append('purple text-white font-weight-bold')
+        elif hstat == 1: rowcolors1.append('blue text-white font-weight-bold')
+        elif hstat == -1: rowcolors1.append('yellow font-weight-bold')
+        else: rowcolors1.append('white font-weight-bold')
+        for jx,co in enumerate(headcols):
+            datarow[jx] = getattr(odat,co)
+        data1.append(datarow)
+    print(rowcolors1)
+    tabletitle='This is A Test'
+    return render_template('test.html',cmpdata=cmpdata, scac=scac,  data1=data1, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
+                           leftsize=leftsize, rightsize=rightsize, docref=docref,tabletitle=tabletitle,headcols=headcols,rowcolors1=rowcolors1)
+
 
 
 @app.route('/Banking', methods=['GET', 'POST'])
