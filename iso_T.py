@@ -1130,6 +1130,9 @@ def isoT():
         # With loginvo we are recording invoice in ledger, but manually taking the invoice to customer
         if loginvo is not None:
             odat = Orders.query.get(invooder)
+            odat.Links = None
+            db.session.commit()
+            print('invoorder',invooder,odat.Jo)
             loginvo_m(odat,2)
             modlink = 0
             invo = 0

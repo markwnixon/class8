@@ -146,6 +146,7 @@ def gledger_write(bus,jo,acctdb,acctcr):
             acctdb='Accounts Receivable'
             acctcr = check_revenue_acct(fd)
             #acctcr='Revenues'
+            print(jo)
             idat=Invoices.query.filter(Invoices.Jo==jo).first()
             amt=int(float(idat.Total)*100)
             pid=idat.Pid
