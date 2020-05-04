@@ -258,6 +258,14 @@ def InvoiceMaint():
 
 @app.route('/Test', methods=['GET', 'POST'])
 def Test():
+    def colorcode(incol):
+        if incol == 4: return 'green text-white font-weight-bold'
+        elif incol == 3: return'amber font-weight-bold'
+        elif incol == 2: return'purple text-white font-weight-bold'
+        elif istat == 1: return 'blue text-white font-weight-bold'
+        elif istat == -1: return 'yellow font-weight-bold'
+        else: return 'white font-weight-bold'
+
     scac = 'FELA'
     leftsize = 8
     rightsize = 12-leftsize
@@ -278,26 +286,14 @@ def Test():
         datarow = [0]*len(headcols)
         hstat = odat.Hstat
         istat = odat.Istat
-        print(hstat,istat)
-        if istat == 4: rowcolors2.append('green text-white font-weight-bold')
-        elif istat == 3: rowcolors2.append('amber font-weight-bold')
-        elif istat == 2: rowcolors2.append('purple text-white font-weight-bold')
-        elif istat == 1: rowcolors2.append('blue text-white font-weight-bold')
-        elif istat == -1: rowcolors2.append('yellow font-weight-bold')
-        else: rowcolors2.append('white font-weight-bold')
-        if hstat == 4: rowcolors1.append('green text-white font-weight-bold')
-        elif hstat == 3: rowcolors1.append('amber font-weight-bold')
-        elif hstat == 2: rowcolors1.append('purple text-white font-weight-bold')
-        elif hstat == 1: rowcolors1.append('blue text-white font-weight-bold')
-        elif hstat == -1: rowcolors1.append('yellow font-weight-bold')
-        else: rowcolors1.append('white font-weight-bold')
+        rowcolors1.append(colorcode(hstat))
         for jx,co in enumerate(headcols):
             datarow[jx] = getattr(odat,co)
         data1.append(datarow)
     print(rowcolors1)
     tabletitle='This is A Test'
     return render_template('test.html',cmpdata=cmpdata, scac=scac,  data1=data1, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
-                           leftsize=leftsize, rightsize=rightsize, docref=docref,tabletitle=tabletitle,headcols=headcols,rowcolors1=rowcolors1)
+                           leftsize=leftsize, rightsize=rightsize, docref=docref,tabletitle=tabletitle,headcols=headcols,rowcolors1=rowcolors1,rowcolors2=rowcolors2)
 
 
 
