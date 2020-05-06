@@ -262,9 +262,30 @@ def Test():
         if incol == 4: return 'green text-white font-weight-bold'
         elif incol == 3: return'amber font-weight-bold'
         elif incol == 2: return'purple text-white font-weight-bold'
-        elif istat == 1: return 'blue text-white font-weight-bold'
-        elif istat == -1: return 'yellow font-weight-bold'
+        elif incol == 1: return 'blue text-white font-weight-bold'
+        elif incol == -1: return 'yellow font-weight-bold'
         else: return 'white font-weight-bold'
+
+    def get_dbdata(table,timefilter,color_selector):
+        stopdate = timefilter[0]
+        if table == 'Orders':
+            odata = Orders.query.filter(Orders.Date > stopdate).all()
+            headcols = ['Jo', 'Order', 'Shipper', 'Booking', 'Container', 'Chassis', 'Company', 'Amount', 'Date',
+                        'Company2', 'Commodity', 'Packing']
+            rowcolors1 = []
+            rowcolors2 = []
+            data1id = []
+            data1 = []
+            for odat in odata:
+                data1id.append(odat.id)
+                datarow = [0] * len(headcols)
+                color_selector_value = getattr(odat, color_selector)
+                print(odat.id, odat.Jo, odat.Hstat, color_selector_value)
+                rowcolors1.append(colorcode(color_selector_value))
+                for jx, co in enumerate(headcols):
+                    datarow[jx] = getattr(odat, co)
+                data1.append(datarow)
+            return [data1, data1id, rowcolors1, rowcolors2, headcols]
 
     scac = 'FELA'
     leftsize = 8
@@ -277,23 +298,13 @@ def Test():
     modlink = 0
     today = datetime.date.today()
     stopdate = today-datetime.timedelta(days=60)
-    odata = Orders.query.filter(Orders.Date > stopdate).all()
-    headcols = ['Jo','Order','Shipper', 'Booking','Container','Chassis','Company','Amount','Date','Company2','Commodity','Packing']
-    rowcolors1 = []
-    rowcolors2 = []
-    data1 = []
-    for odat in odata:
-        datarow = [0]*len(headcols)
-        hstat = odat.Hstat
-        istat = odat.Istat
-        rowcolors1.append(colorcode(hstat))
-        for jx,co in enumerate(headcols):
-            datarow[jx] = getattr(odat,co)
-        data1.append(datarow)
-    print(rowcolors1)
+    timefilter = [stopdate]
+    color_selector = 'Istat'
+    db_data = get_dbdata('Orders',timefilter,color_selector)
+
     tabletitle='This is A Test'
-    return render_template('test.html',cmpdata=cmpdata, scac=scac,  data1=data1, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
-                           leftsize=leftsize, rightsize=rightsize, docref=docref,tabletitle=tabletitle,headcols=headcols,rowcolors1=rowcolors1,rowcolors2=rowcolors2)
+    return render_template('test.html',cmpdata=cmpdata, scac=scac,  db_data=db_data, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
+                           leftsize=leftsize, rightsize=rightsize, docref=docref,tabletitle=tabletitle)
 
 
 
