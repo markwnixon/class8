@@ -280,18 +280,48 @@ def Test():
                 data1id.append(odat.id)
                 datarow = [0] * len(headcols)
                 color_selector_value = getattr(odat, color_selector)
-                print(odat.id, odat.Jo, odat.Hstat, color_selector_value)
+                #print(odat.id, odat.Jo, odat.Hstat, color_selector_value)
                 rowcolors1.append(colorcode(color_selector_value))
                 for jx, co in enumerate(headcols):
                     datarow[jx] = getattr(odat, co)
                 data1.append(datarow)
-            return [data1, data1id, rowcolors1, rowcolors2, headcols]
+
+        if table == 'Interchange':
+            odata = Interchange.query.filter(Interchange.Date > stopdate).all()
+            headcols = ['Jo', 'Company', 'Date', 'Time', 'Release','Container', 'ConType', 'GrossWt', 'Chassis', 'TruckNumber', 'Driver', 'Status']
+            rowcolors1 = []
+            rowcolors2 = []
+            data1id = []
+            data1 = []
+            for odat in odata:
+                data1id.append(odat.id)
+                datarow = [0] * len(headcols)
+                status = odat.Status
+                if status == 'IO': color_selector_value = 2
+                elif status == 'BBBBBB': color_selector_value = 1
+                else: color_selector_value = 0
+                #print(odat.id, odat.Jo, odat.Hstat, color_selector_value)
+                rowcolors1.append(colorcode(color_selector_value))
+                for jx, co in enumerate(headcols):
+                    datarow[jx] = getattr(odat, co)
+                data1.append(datarow)
+
+
+        return [data1, data1id, rowcolors1, rowcolors2, headcols]
 
     scac = 'FELA'
     leftsize = 8
     rightsize = 12-leftsize
     leftscreen = 1
     err = []
+    table_data = []
+    tabletitle = []
+    genre = 'Trucking'
+    genre_tables= ['Orders','Interchange','Customers','Services']
+    genre_tables_on = ['off']*len(genre_tables)
+    genre_tables_on[0] = 'on'
+    genre_data = [genre,genre_tables,genre_tables_on]
+    print(genre_data)
     docref = ''
     oder=0
     modata=0
@@ -300,11 +330,15 @@ def Test():
     stopdate = today-datetime.timedelta(days=60)
     timefilter = [stopdate]
     color_selector = 'Istat'
-    db_data = get_dbdata('Orders',timefilter,color_selector)
 
-    tabletitle='This is A Test'
-    return render_template('test.html',cmpdata=cmpdata, scac=scac,  db_data=db_data, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
-                           leftsize=leftsize, rightsize=rightsize, docref=docref,tabletitle=tabletitle)
+    tables_on = ['Orders', 'Interchange']
+    for tableget in tables_on:
+        tabletitle.append(tableget)
+        db_data = get_dbdata(tableget, timefilter, color_selector)
+        table_data.append(db_data)
+
+    return render_template('test.html',cmpdata=cmpdata, scac=scac,  genre_data = genre_data, table_data=table_data, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
+                           leftsize=leftsize, rightsize=rightsize, docref=docref, tabletitle=tabletitle)
 
 
 
