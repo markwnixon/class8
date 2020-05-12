@@ -316,6 +316,77 @@ def uploadsource(modlink,err,bill,docref,username):
 
     return modlink, err, bill, docref
 
+def bill_update():
+    # Create the new database entry for the source document
+    bdate = request.values.get('bdate')
+    ddate = request.values.get('ddate')
+    print('bdate:', bdate, ddate)
+
+    thiscompany = request.values.get('thiscomp')
+    thistype = request.values.get('thistype')
+    cdat = People.query.filter((People.Company == thiscompany) & (
+            (People.Ptype == 'Vendor') | (People.Ptype == 'TowCo'))).first()
+    if cdat is not None:
+        acomp = cdat.Company
+        cid = cdat.Accountid
+        aid = cdat.id
+        cc_check = cdat.Associate2
+        acdat = Accounts.query.filter(Accounts.id == cid).first()
+        if acdat is not None:
+            baccount = acdat.Name
+            category = acdat.Category
+            subcat = acdat.Subcategory
+            descript = acdat.Description
+            btype = acdat.Type
+        else:
+            category = 'NAY'
+            subcat = 'NAY'
+            descript = ''
+            btype = ''
+            baccount = ''
+    else:
+        # This section for case of bill to credit card account
+        thisaccount = request.values.get('billacct')
+        ccdat = Accounts.query.filter(Accounts.Name == thisaccount).first()
+        if ccdat is not None:
+            acomp = ccdat.Name
+            aid = ccdat.id
+            category = ccdat.Category
+            subcat = ccdat.Subcategory
+            descript = ccdat.Description
+            btype = ccdat.Type
+
+        else:
+            acomp = None
+            aid = None
+            category = 'NAY'
+            subcat = 'NAY'
+            descript = ''
+            btype = ''
+            baccount = ''
+
+    bdesc = request.values.get('bdesc')
+    bamt = request.values.get('bamt')
+    bamt = d2s(bamt)
+    bcomp = request.values.get('bcomp')
+    cco = request.values.get('ctype')
+    account = request.values.get('crataccount')
+    if thistype == 'bill':
+        baccount = request.values.get('billacct')
+        code2 = 'bill'
+    else:
+        baccount = request.values.get('assacct')
+        code2 = request.values.get('billacct')
+        acdat = Accounts.query.filter(Accounts.Name == baccount).first()
+        if acdat is not None:
+            baccount = acdat.Name
+            category = acdat.Category
+            subcat = acdat.Subcategory
+            descript = acdat.Description
+            btype = acdat.Type
+
+    return aid,acomp,bdesc,bamt,bdate,account,baccount,btype,category,subcat,cco,ddate,code2,cc_check,thistype
+
 def run_xfer(update,err):
     vals = ['fromacct', 'toacct', 'pamt', 'bref',
             'pdate', 'ckmemo', 'bdesc', 'ddate']
@@ -352,62 +423,19 @@ def run_xfer(update,err):
 def modbill(bill, update, err, docref, expdata, assdata, leftscreen, modlink, hv):
     success = 1
     modata = Bills.query.get(bill)
-    # Just updating the billing section
-    vendor = request.values.get('thiscomp')
-    vdat = People.query.filter((People.Ptype == 'Vendor') & (People.Company == vendor)).first()
-    ptype = request.values.get('thistype')
-    jo = modata.Jo
-    ccode = jo[0]
-    expdata = Accounts.query.filter(((Accounts.Type == 'Expense') & (Accounts.Co == ccode)) | (
-                (Accounts.Type == 'Credit Card') & (Accounts.Co == ccode))).order_by(Accounts.Name).all()
-    if ptype == 'asset1':
-        assdata = Accounts.query.filter(
-            (Accounts.Type == 'Fixed Asset') & (Accounts.Co == ccode)).order_by(Accounts.Name).all()
-    elif ptype == 'asset2':
-        assdata = Accounts.query.filter(
-            (Accounts.Type == 'Current Asset') & (Accounts.Co == ccode)).order_by(Accounts.Name).all()
-
-    co = request.values.get('ctype')
-    if co == 'Pick':
-        if vdat is not None:
-            co = vdat.Idtype
-
-    defexp = request.values.get('billacct')
-    if defexp == '1':
-        if vdat is not None:
-            defexp = vdat.Associate1
-
-    vals = ['bamt', 'bdate', 'ddate', 'bdesc']
-    a = list(range(len(vals)))
-    for ix, v in enumerate(vals): a[ix] = request.values.get(v)
-    try:
-        ba = float(a[0])
-        ba = d2s(ba)
-    except:
-        success = 0
-        err.append('Bill amount not a valid number')
-
-    cdat = People.query.filter((People.Company == vendor) & ((People.Ptype == 'Vendor') | (
-            People.Ptype == 'TowCo') | (People.Ptype == 'Overseas'))).first()
-    if cdat is not None:
-        modata.Pid = cdat.id
-        if cdat.Ptype == 'TowCo': hv[3] = '2'
-    else:
-        modata.Pid = 0
-        err.append('Vendor not found in database')
-
-    modata.Company = vendor
-    modata.bAccount = defexp
-    modata.Co = co
-    modata.Code2 = ptype
-    if success == 1 and update is not None:
-        modata.bAmount = ba
-        modata.bDate = a[1]
-        modata.dDate = a[2]
-        modata.Description = a[3]
-        leftscreen = 1
-        modlink = 0
-
+    aid, acomp, bdesc, bamt, bdate, account, baccount, btype, category, subcat, cco, ddate, code2, cc_check, thistype = bill_update()
+    modata.Pid = aid
+    modata.Company = acomp
+    modata.Description = bdesc
+    modata.bAmount = bamt
+    modata.bDate = bdate
+    modata.pAccount = account
+    modata.bAccount = baccount
+    modata.bType = btype
+    modata.bCat = category
+    modata.bSubcat = subcat
+    modata.dDate = ddate
+    modata.Code2 = code2
     db.session.commit()
 
     docref = f'tmp/{scac}/data/vbills/{modata.Original}'
@@ -941,79 +969,12 @@ def newbill_passthru(err, hv, modlink):
 
 def newbill_update(err, hv, modlink, username):
     modlink = 0
-    # Create the new database entry for the source document
-    bdate = request.values.get('bdate')
-    ddate = request.values.get('ddate')
-    print('bdate:', bdate, ddate)
-
-    thiscompany = request.values.get('thiscomp')
-    thistype = request.values.get('thistype')
-    cdat = People.query.filter((People.Company == thiscompany) & (
-            (People.Ptype == 'Vendor') | (People.Ptype == 'TowCo'))).first()
-    if cdat is not None:
-        acomp = cdat.Company
-        cid = cdat.Accountid
-        aid = cdat.id
-        cc_check = cdat.Associate2
-        acdat = Accounts.query.filter(Accounts.id == cid).first()
-        if acdat is not None:
-            baccount = acdat.Name
-            category = acdat.Category
-            subcat = acdat.Subcategory
-            descript = acdat.Description
-            btype = acdat.Type
-        else:
-            category = 'NAY'
-            subcat = 'NAY'
-            descript = ''
-            btype = ''
-            baccount = ''
-    else:
-        # This section for case of bill to credit card account
-        thisaccount = request.values.get('billacct')
-        ccdat = Accounts.query.filter(Accounts.Name == thisaccount).first()
-        if ccdat is not None:
-            acomp = ccdat.Name
-            aid = ccdat.id
-            category = ccdat.Category
-            subcat = ccdat.Subcategory
-            descript = ccdat.Description
-            btype = ccdat.Type
-
-        else:
-            acomp = None
-            aid = None
-            category = 'NAY'
-            subcat = 'NAY'
-            descript = ''
-            btype = ''
-            baccount = ''
-
-    bdesc = request.values.get('bdesc')
-    bamt = request.values.get('bamt')
-    bamt = d2s(bamt)
-    bcomp = request.values.get('bcomp')
-    cco = request.values.get('ctype')
+    aid,acomp,bdesc,bamt,bdate,account,baccount,btype,category,subcat,cco,ddate,code2,cc_check,thistype = bill_update()
     print(f'Getting nextjo with {cco} and {today_str}')
     if cc_check == 'Credit Card':
         nextjo = newjo(cco + 'X', today_str)
     else:
         nextjo = newjo(cco + 'B', today_str)
-    account = request.values.get('crataccount')
-    if thistype == 'bill':
-        baccount = request.values.get('billacct')
-        code2 = 'bill'
-    else:
-        baccount = request.values.get('assacct')
-        code2 = request.values.get('billacct')
-        acdat = Accounts.query.filter(Accounts.Name == baccount).first()
-        if acdat is not None:
-            baccount = acdat.Name
-            category = acdat.Category
-            subcat = acdat.Subcategory
-            descript = acdat.Description
-            btype = acdat.Type
-
     input = Bills(Jo=nextjo, Pid=aid, Company=acomp, Memo='', Description=bdesc, bAmount=bamt, Status='Unpaid', Cache=0,
                   Original=None,
                   Ref='', bDate=bdate, pDate=today, pAmount='0.00', pMulti=None, pAccount=account, bAccount=baccount,
