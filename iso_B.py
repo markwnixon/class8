@@ -119,6 +119,7 @@ def isoB(indat):
 
                 if modlink == 11 or modlink == 12 or modlink == 14:
                     err, hv, docref, modlink = run_paybill(bill, update, err, hv, docref, username, modlink)
+                    print('return from run_paybill is',modlink)
 
                 if modal == 1:
                     calendar = 1
@@ -126,7 +127,8 @@ def isoB(indat):
 
 
             # create return status
-            if update is not None and modlink != 6 and success:
+            if update is not None and modlink != 6 and modlink != 14 and success:
+                print('Requested end of run')
                 modlink = 0
                 leftscreen = 1
                 indat = '0'
