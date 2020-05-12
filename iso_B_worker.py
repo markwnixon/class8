@@ -9,7 +9,7 @@ import os
 import shutil
 import json
 from CCC_system_setup import myoslist, addpath, addtxt, scac, companydata
-from viewfuncs import docuploader, d2s, newjo, run_adjustments
+from viewfuncs import docuploader, d2s, newjo, run_adjustments, hasinput
 from utils import requester
 from gledger_write import gledger_write
 
@@ -455,12 +455,14 @@ def run_paybill(bill, update, err, hv, docref, username, modlink):
     modata = Bills.query.get(bill)
     success = 1
     # This section means paying the bill and the transaction is not a transfer
+    printck = request.values.get('Prt')
     pamt = request.values.get('pamt')
     pacct = request.values.get('account')
     pmethod = request.values.get('method')
     pmemo = request.values.get('ckmemo')
     pdate = request.values.get('pdate')
-    if pmethod == 'Check': modata.Ref = next_check(pacct, modata.id)
+    if pmethod == 'Check':
+        if printck is not None: modata.Ref = next_check(pacct, modata.id)
     elif pmethod == 'Bank Debit Card': modata.Ref = f'xx{getdebit(pacct)}'
     elif pmethod == 'Online Epay': modata.Ref = 'Epay'
     elif pmethod == 'Vendor ACH': modata.Ref = 'ACH'
@@ -470,6 +472,16 @@ def run_paybill(bill, update, err, hv, docref, username, modlink):
     modata.Temp2 =  pmethod
     modata.Memo = pmemo
     modata.pDate = pdate
+
+    #Check that expense account has been set:
+    btype = modata.bType
+    baccount = modata.bAccount
+    if not hasinput(btype):
+        acdat = Accounts.query.filter(Accounts.Name == baccount).first()
+        if acdat is not None:
+            modata.bCat = acdat.Category
+            modata.bSubcat = acdat.Subcategory
+            modata.bType = acdat.Type
     db.session.commit()
 
     # If it is an installment then need to grab the previous payment data if not an update:
@@ -692,7 +704,11 @@ def pay_init(bill, err, modlink):
     if status == 'Paid':
         success = 0
         err.append('Bill has been paid in full.  Use unpay to restart payment process')
-    if success == 1:
+        err.append('Could not complete billpay')
+        modlink = 0
+        leftscreen = 1
+        docref = ''
+    else:
         myb.pDate = today
         myb.pAmount = myb.bAmount
         pacct = myb.pAccount
@@ -709,11 +725,9 @@ def pay_init(bill, err, modlink):
         if os.path.isfile(addpath(docref)): leftscreen = 0
         else:
             leftscreen = 1
+            docref = ''
             err.append('Bill has no source document')
-    else:
-        err.append('Could not complete billpay')
-        modlink = 0
-        leftscreen = 1
+
 
     return err, modlink, leftscreen, docref
 
