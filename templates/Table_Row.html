@@ -13,8 +13,22 @@
          {% endfor %}
     </div>
 </div>
+
 <div class="d-sm-flex justify-content-around align-self-baseline">
-        <div class="p-0">
+    <div class="p-0">
+    {% for dict_item in table_filters %}
+        {% for key, value in dict_item.items() %}
+
+            <select class="mdb-select md-form" name="{{ key }}" onchange="this.form.submit()">
+            <option value="" disabled selected>{{ key }}</option>
+                {% for case in value %}
+                    <option {% if tfilters[key] == case %} selected {% endif %} value='{{ case }}'>{{ case }}</option>
+                {% endfor %}
+            </select>
+
+             &nbsp; &nbsp;
+        {% endfor %}
+    {% endfor %}
 
     <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="New"
       data-toggle="tooltip" title="Add a NEW JOB from scratch here">   New<br>&nbsp &nbsp Job &nbsp &nbsp  </button>
@@ -30,108 +44,21 @@
     </div>
 </div>
 
-<div class="d-sm-flex justify-content-center small">
+<div class="d-sm-flex justify-content-around align-self-baseline">
     <div class="p-0">
-        <select class="mdb-select md-form" name="thismuch" onchange="this.form.submit()">
-            <option value="" disabled selected>Filter Table</option>
-        {% for item in time_filter %}
-            <option {% if thismuch == '1' %} selected {% endif %} value='1'>Filter: Last 60 Days</option>
-            <option {% if thismuch == '2' %} selected {% endif %} value='2'>Filter: Last 120 Days</option>
-            <option {% if thismuch == '3' %} selected {% endif %} value='3'>Filter: Uninvoiced</option>
-            <option {% if thismuch == '4' %} selected {% endif %} value='4'>Filter: Unrecorded Inv</option>
-            <option {% if thismuch == '5' %} selected {% endif %} value='5'>Filter: Unpaid Invoices</option>
-            <option {% if thismuch == '6' %} selected {% endif %} value='6'>Filter: Unpulled Containers</option>
-            <option {% if thismuch == '7' %} selected {% endif %} value='7'>Filter: Containers Out</option>
-            <option {% if thismuch == '8' %} selected {% endif %} value='8'>Filter: Show All</option>
-        </select>
-    </div>
+    {% for dict_item in task_boxes %}
+        {% for key, value in dict_item.items() %}
+            <select class="mdb-select md-form" name="{{ key }}" onchange="this.form.submit()">
+            <option value="" disabled selected>{{ key }}</option>
+                {% for case in value %}
+                    <option {% if tboxes[key] == case %} selected {% endif %} value='{{ case }}'>{{ case }}</option>
+                {% endfor %}
+            </select>
+             &nbsp; &nbsp;
+        {% endfor %}
+    {% endfor %}
     &nbsp; &nbsp;
-    <div class="p-0">
-        <select class="mdb-select md-form" name="addbox" onchange="this.form.submit()">
-            <option value="" disabled selected>Add & Upload</option>
-            <option value="1">New Job</option>
-            <option value="2">New Customer</option>
-            <option value="3">New Services</option>
-            <option value="4">New from Copy</option>
-            <option value="6">Upload Source</option>
-            <option value="7">Upload Proof</option>
-        </select>
-    </div>
-    &nbsp; &nbsp;
-    <div class="p-0">
-        <select class="mdb-select md-form" name="editbox" onchange="this.form.submit()">
-            <option value="" disabled selected>Edit & Connect</option>
-            <option value="1">Edit Item</option>
-            <option value="2">Match Items</option>
-            <option value="3">Accept Items</option>
-            <option value="4">Haul Status +1</option>
-            <option value="5">Haul Status -1</option>
-            <option value="9">Haul Complete</option>
-            <option value="6">Invoice Status +1</option>
-            <option value="7">Invoice Status -1</option>
-            <option value="10">Invoice Emailed</option>
-            <option value="8">Add Column Mark</option>
-        </select>
-    </div>
-    &nbsp; &nbsp;
-    <div class="p-0">
-        <select class="mdb-select md-form" name="invobox" onchange="this.form.submit()">
-            <option value="" disabled selected>Money In and Out</option>
-            <option value="1">Invoice Editor</option>
-            <option value="2">Quote Editor</option>
-            <option value="3">Package Editor</option>
-            <option value="5">Receive Payment</option>
-            <option value="4">Receive by Account</option>
-        </select>
-    </div>
-    &nbsp; &nbsp;
-    <div class="p-0">
-        <select class="mdb-select md-form" name="viewbox" onchange="this.form.submit()">
-            <option value="" disabled selected>View Documents</option>
-            <option value="1">Source File</option>
-            <option value="2">Proof File</option>
-            <option value="3">Manifest</option>
-            <option value="4">Gate Tickets</option>
-            <option value="5">Invoice</option>
-            <option value="6">Paid Invoice</option>
-        </select>
-    </div>
-    &nbsp; &nbsp;
-    <div class="p-0">
-        <select class="mdb-select md-form" name="xbox" onchange="this.form.submit()">
-            <option value="" disabled selected>Undo/Delete</option>
-            <option value="1">Delete Item</option>
-            <option value="2">Undo the Invoice</option>
-            <option value="3">Undo the Payment</option>
-        </select>
-    </div>
-    &nbsp; &nbsp;
-    <div class="p-0">
-        <select class="mdb-select md-form" name="dispbox" onchange="this.form.submit()">
-            <option value="" disabled selected>Dispatch</option>
-            <option value="1">Make Manifest</option>
-            <option value="5">Street Turn</option>
-            <option value="2">Unpulled Containers</option>
-            <option value="3">Assign Drivers</option>
-            <option value="4">Dispatch Center</option>
-        </select>
-    </div>
-    &nbsp; &nbsp;
-    <div class="p-0">
-        <select class="mdb-select md-form" name="launchbox" onchange="this.form.submit()">
-            <option value="" disabled selected>Trucking Tasks</option>
-            <option value="1">Assign Drivers</option>
-            <option value="2">Driver Hours</option>
-            <option value="3">Driver Payroll</option>
-            <option value="4">Truck Logs</option>
-            <option value="5">Maintenance Logs</option>
-            <option value="7">Dispatch Central</option>
-            <option value="8">Text Output</option>
-
-
-        </select>
-    </div>
-    &nbsp; &nbsp;
+</div>
 </div>
 
 

@@ -311,8 +311,15 @@ def Test():
 
     genre_tables = ['Orders', 'Interchange', 'Customers', 'Services']
     quick_buttons = ['New', 'Mod', 'Inv', 'Rec']
-    table_filters = [{'Time': ['Last 60 Days', 'Last 120 Days', 'Last 180 Days', 'Show All']}]
-    task_boxes = [{'Add': ['New Job', 'New Customer','New Services', 'New from Copy', 'Upload Source', 'Upload Proof']}]
+    table_filters = [{'Date Filter': ['Last 60 Days', 'Last 120 Days', 'Last 180 Days', 'Show All']},
+                     {'Pay Filter': ['Uninvoiced', 'Unrecorded', 'Unpaid', 'Show All']},
+                     {'Haul Filter': ['Not Started', 'In-Prgress', 'Incomplete', 'Completed', 'Show All']}]
+    task_boxes = [{'Add Items': ['New Job', 'New Customer','New Services', 'New from Copy', 'Upload Source', 'Upload Proof', 'Make Manifest']},
+                  {'Edit Items': ['Edit', 'Match', 'Accept', 'Haul+1', 'Haul-1', 'Haul Done', 'Inv+1', 'Inv-1', 'Inv Emailed', 'Set Col To' ]},
+                  {'Money Items': ['Inv Edit', 'Quote Edit', 'Package Send', 'Rec Payment', 'Rec by Acct']},
+                  {'View Docs': ['Source', 'Proof','Manifest', 'Interchange', 'Invoice', 'Paid Invoice']},
+                  {'Undo': ['Delete Item', 'Undo Invoice','Undo Payment']},
+                  {'Tasks': ['Street Turn', 'Unpulled Containers', 'Assign Drivers', 'Driver Hours', 'Driver Payroll', 'Truck Logs', 'Text Output']}]
     print(table_filters)
 
     scac = 'FELA'
@@ -322,6 +329,8 @@ def Test():
     err = []
     table_data = []
     tabletitle = []
+    tfilters = {}
+    tboxes = {}
     genre = 'Trucking'
 
     if request.method == 'POST':
@@ -330,10 +339,21 @@ def Test():
         genre_tables_on = checked_tables(genre_tables)
         tables_on = [ix for jx,ix in enumerate(genre_tables) if genre_tables_on[jx] == 'on']
 
-
-        # See if a new task has been launched from quick buttons
-        launched = next(ix for ix in quick_buttons if request.values.get(ix) is not None)
+        # See if a new task has been launched from quick buttons; set launched to New/Mod/Inv/Ret else set launched to None
+        launched = [ix for ix in quick_buttons if request.values.get(ix) is not None]
+        launched = launched[0] if launched != [] else None
         print(launched)
+
+        # See if a table filter has been selected
+        for filter in table_filters:
+            for key, value in filter.items(): tfilters[key] = request.values.get(key)
+        print(tfilters)
+
+
+        # See if a task box has been selected
+        for box in task_boxes:
+            for key, value in box.items(): tboxes[key] = request.values.get(key)
+        print(tboxes)
 
     else:
         genre_tables_on = ['off'] * len(genre_tables)
@@ -360,7 +380,7 @@ def Test():
         table_data.append(db_data)
 
     return render_template('test.html',cmpdata=cmpdata, scac=scac,  genre_data = genre_data, table_data=table_data, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
-                           leftsize=leftsize, rightsize=rightsize, docref=docref, tabletitle=tabletitle)
+                           leftsize=leftsize, rightsize=rightsize, docref=docref, tabletitle=tabletitle, table_filters = table_filters,task_boxes = task_boxes, tfilters=tfilters, tboxes=tboxes)
 
 
 
