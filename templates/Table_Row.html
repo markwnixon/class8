@@ -7,7 +7,7 @@
         <b>{{ genre }} Tables:</b>&nbsp
         {% for tt in genre_tables %}
             <div class="custom-control custom-checkbox custom-control-inline">
-                <input type="checkbox" class="custom-control-input" id="inline{{ genre_tables[loop.index - 1] }}" {% if genre_tables_on[loop.index - 1]=='on' %} checked {% endif %} name="datatable1" onchange="this.form.submit()">
+                <input type="checkbox" class="custom-control-input" id="inline{{ genre_tables[loop.index - 1] }}" {% if genre_tables_on[loop.index - 1]=='on' %} checked {% endif %} name="{{ tt }}box" onchange="this.form.submit()">
                 <label class="custom-control-label" for="inline{{ genre_tables[loop.index - 1] }}">{{ genre_tables[loop.index - 1] }}</label>
             </div>
          {% endfor %}
@@ -16,16 +16,16 @@
 <div class="d-sm-flex justify-content-around align-self-baseline">
         <div class="p-0">
 
-    <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="NewJ"
+    <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="New"
       data-toggle="tooltip" title="Add a NEW JOB from scratch here">   New<br>&nbsp &nbsp Job &nbsp &nbsp  </button>
 ->
-          <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="Vmod"
+          <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="Mod"
         data-toggle="tooltip" title="MODIFY information associated with any selected item">Modify<br>Item</button>
 ->
-              <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="MakeI"
+              <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="Inv"
         data-toggle="tooltip" title="Create and Edit an Invoice">Invoice<br>Editor</button>
 ->
-            <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="RecPay"
+            <button type="submit" class="btn btn-group-small btn-green my-small-btn" name="Rec"
         data-toggle="tooltip" title="Receive money and apply toward a selected Job/Invoice">Receive<br>Money</button>
     </div>
 </div>
@@ -34,6 +34,7 @@
     <div class="p-0">
         <select class="mdb-select md-form" name="thismuch" onchange="this.form.submit()">
             <option value="" disabled selected>Filter Table</option>
+        {% for item in time_filter %}
             <option {% if thismuch == '1' %} selected {% endif %} value='1'>Filter: Last 60 Days</option>
             <option {% if thismuch == '2' %} selected {% endif %} value='2'>Filter: Last 120 Days</option>
             <option {% if thismuch == '3' %} selected {% endif %} value='3'>Filter: Uninvoiced</option>

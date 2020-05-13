@@ -259,55 +259,61 @@ def InvoiceMaint():
 @app.route('/Test', methods=['GET', 'POST'])
 def Test():
     def colorcode(incol):
-        if incol == 4: return 'green text-white font-weight-bold'
-        elif incol == 3: return'amber font-weight-bold'
-        elif incol == 2: return'purple text-white font-weight-bold'
-        elif incol == 1: return 'blue text-white font-weight-bold'
-        elif incol == -1: return 'yellow font-weight-bold'
-        else: return 'white font-weight-bold'
+        if isinstance(incol, int):
+            if incol == 4: return 'green text-white font-weight-bold'
+            elif incol == 3: return'amber font-weight-bold'
+            elif incol == 2: return'purple text-white font-weight-bold'
+            elif incol == 1: return 'blue text-white font-weight-bold'
+            elif incol == -1: return 'yellow font-weight-bold'
+            else: return 'white font-weight-bold'
+        else:
+            if incol == 'IO': return 'blue-text font-weight-bold'
+            elif incol == 'BBBBBB': return'amber font-weight-bold'
+            else: return 'white font-weight-bold'
+
+    def checked_tables(tables):
+        cks = []
+        for table in tables:
+            cks.append(request.values.get(f'{table}box'))
+        print(cks)
+        return cks
 
     def get_dbdata(table,timefilter,color_selector):
         stopdate = timefilter[0]
+        table_query = f'{table}.query.filter({table}.Date > stopdate).all()'
+        print(table_query)
+        odata = eval(table_query)
         if table == 'Orders':
-            odata = Orders.query.filter(Orders.Date > stopdate).all()
+            #odata = Orders.query.filter(Orders.Date > stopdate).all()
             headcols = ['Jo', 'Order', 'Shipper', 'Booking', 'Container', 'Chassis', 'Company', 'Amount', 'Date',
                         'Company2', 'Commodity', 'Packing']
-            rowcolors1 = []
-            rowcolors2 = []
-            data1id = []
-            data1 = []
-            for odat in odata:
-                data1id.append(odat.id)
-                datarow = [0] * len(headcols)
-                color_selector_value = getattr(odat, color_selector)
-                #print(odat.id, odat.Jo, odat.Hstat, color_selector_value)
-                rowcolors1.append(colorcode(color_selector_value))
-                for jx, co in enumerate(headcols):
-                    datarow[jx] = getattr(odat, co)
-                data1.append(datarow)
-
-        if table == 'Interchange':
-            odata = Interchange.query.filter(Interchange.Date > stopdate).all()
+        elif table == 'Interchange':
+            #odata = Interchange.query.filter(Interchange.Date > stopdate).all()
             headcols = ['Jo', 'Company', 'Date', 'Time', 'Release','Container', 'ConType', 'GrossWt', 'Chassis', 'TruckNumber', 'Driver', 'Status']
-            rowcolors1 = []
-            rowcolors2 = []
-            data1id = []
-            data1 = []
-            for odat in odata:
-                data1id.append(odat.id)
-                datarow = [0] * len(headcols)
-                status = odat.Status
-                if status == 'IO': color_selector_value = 2
-                elif status == 'BBBBBB': color_selector_value = 1
-                else: color_selector_value = 0
-                #print(odat.id, odat.Jo, odat.Hstat, color_selector_value)
-                rowcolors1.append(colorcode(color_selector_value))
-                for jx, co in enumerate(headcols):
-                    datarow[jx] = getattr(odat, co)
-                data1.append(datarow)
 
+        rowcolors1 = []
+        rowcolors2 = []
+        data1id = []
+        data1 = []
+        for odat in odata:
+            data1id.append(odat.id)
+            datarow = [0] * len(headcols)
+            color_selector_value = getattr(odat, color_selector)
+            #print(odat.id, odat.Jo, odat.Hstat, color_selector_value)
+            rowcolors1.append(colorcode(color_selector_value))
+            for jx, co in enumerate(headcols):
+                datarow[jx] = getattr(odat, co)
+            data1.append(datarow)
 
         return [data1, data1id, rowcolors1, rowcolors2, headcols]
+
+    # Top of the routine
+
+    genre_tables = ['Orders', 'Interchange', 'Customers', 'Services']
+    quick_buttons = ['New', 'Mod', 'Inv', 'Rec']
+    table_filters = [{'Time': ['Last 60 Days', 'Last 120 Days', 'Last 180 Days', 'Show All']}]
+    task_boxes = [{'Add': ['New Job', 'New Customer','New Services', 'New from Copy', 'Upload Source', 'Upload Proof']}]
+    print(table_filters)
 
     scac = 'FELA'
     leftsize = 8
@@ -317,11 +323,27 @@ def Test():
     table_data = []
     tabletitle = []
     genre = 'Trucking'
-    genre_tables= ['Orders','Interchange','Customers','Services']
-    genre_tables_on = ['off']*len(genre_tables)
-    genre_tables_on[0] = 'on'
+
+    if request.method == 'POST':
+
+        # Get data only for tables that have been checked on
+        genre_tables_on = checked_tables(genre_tables)
+        tables_on = [ix for jx,ix in enumerate(genre_tables) if genre_tables_on[jx] == 'on']
+
+
+        # See if a new task has been launched from quick buttons
+        launched = next(ix for ix in quick_buttons if request.values.get(ix) is not None)
+        print(launched)
+
+    else:
+        genre_tables_on = ['off'] * len(genre_tables)
+        genre_tables_on[0] = 'on'
+        tables_on = ['Orders']
+
+
+
+
     genre_data = [genre,genre_tables,genre_tables_on]
-    print(genre_data)
     docref = ''
     oder=0
     modata=0
@@ -329,12 +351,12 @@ def Test():
     today = datetime.date.today()
     stopdate = today-datetime.timedelta(days=60)
     timefilter = [stopdate]
-    color_selector = 'Istat'
 
-    tables_on = ['Orders', 'Interchange']
-    for tableget in tables_on:
+
+    color_selectors = ['Istat', 'Status']
+    for jx, tableget in enumerate(tables_on):
         tabletitle.append(tableget)
-        db_data = get_dbdata(tableget, timefilter, color_selector)
+        db_data = get_dbdata(tableget, timefilter, color_selectors[jx])
         table_data.append(db_data)
 
     return render_template('test.html',cmpdata=cmpdata, scac=scac,  genre_data = genre_data, table_data=table_data, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
