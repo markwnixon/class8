@@ -278,9 +278,28 @@ def Test():
         print(cks)
         return cks
 
-    def get_dbdata(table,timefilter,color_selector):
-        stopdate = timefilter[0]
-        table_query = f'{table}.query.filter({table}.Date > stopdate).all()'
+    def get_dbdata(table, tfilters, color_selector):
+        today = datetime.date.today()
+        table_query = f'{table}.query.all()'
+
+        #Determine if time filter applies to query:
+        daysback = [int(word) for word in tfilters['Date Filter'].split() if word.isdigit()]
+        daysback = daysback[0] if daysback != [] else None
+        if daysback is not None:
+            stopdate = today - datetime.timedelta(days=daysback)
+            table_query = f'{table}.query.filter({table}.Date > stopdate).all()'
+
+        #Determine if pay filter applies to query:
+        itest = tfilters['Pay Filter']
+        if itest is not None:
+            if itest == 'Uninvoiced': pfilter = f'{table}.Istat == 0'
+            elif itest == 'Unrecorded': pfilter = f'{table}.Istat == 1'
+            elif itest == 'Unpaid': pfilter = f'{table}.Istat < 4'
+            if 'filter' in table_query:
+                table_query = f'{table}.query.filter(({table}.Date > stopdate) & ({pfilter})).all()'
+            else:
+                table_query = f'{table}.query.filter({pfilter}).all()'
+
         print(table_query)
         odata = eval(table_query)
         if table == 'Orders':
@@ -359,24 +378,26 @@ def Test():
         genre_tables_on = ['off'] * len(genre_tables)
         genre_tables_on[0] = 'on'
         tables_on = ['Orders']
+        #Default time filter on entry into table is last 60 days:
+        tfilters = {'Date Filter': 'Last 60 Days', 'Pay Filter': None, 'Haul Filter': None}
 
 
 
 
     genre_data = [genre,genre_tables,genre_tables_on]
+    dayback = [word for word in tfilters['Date Filter'].split() if word.isdigit()]
+    dayback = dayback[0] if dayback != [] else None
+    print(dayback)
+    #print(int(filter(check.isdigit, check)))
     docref = ''
     oder=0
     modata=0
     modlink = 0
-    today = datetime.date.today()
-    stopdate = today-datetime.timedelta(days=60)
-    timefilter = [stopdate]
-
 
     color_selectors = ['Istat', 'Status']
     for jx, tableget in enumerate(tables_on):
         tabletitle.append(tableget)
-        db_data = get_dbdata(tableget, timefilter, color_selectors[jx])
+        db_data = get_dbdata(tableget, tfilters, color_selectors[jx])
         table_data.append(db_data)
 
     return render_template('test.html',cmpdata=cmpdata, scac=scac,  genre_data = genre_data, table_data=table_data, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
