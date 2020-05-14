@@ -278,37 +278,60 @@ def Test():
         print(cks)
         return cks
 
-    def get_dbdata(table, tfilters, color_selector):
+    def get_dbdata(table_setup, tfilters):
         today = datetime.date.today()
-        table_query = f'{table}.query.all()'
+        query_adds = []
+        table = table_setup['table']
+        print(table)
+        highfilter = table_setup['filter']
+        print(highfilter)
+        headcols = table_setup['headcols']
+        print(headcols)
+        color_selector = table_setup['colorfilter']
+        print(color_selector)
 
         #Determine if time filter applies to query:
         daysback = [int(word) for word in tfilters['Date Filter'].split() if word.isdigit()]
         daysback = daysback[0] if daysback != [] else None
         if daysback is not None:
             stopdate = today - datetime.timedelta(days=daysback)
-            table_query = f'{table}.query.filter({table}.Date > stopdate).all()'
+            print('stopdate =', stopdate)
+            query_adds.append(f'{table}.Date > stopdate')
 
         #Determine if pay filter applies to query:
         itest = tfilters['Pay Filter']
-        if itest is not None:
+        if itest is not None and itest != 'Show All':
             if itest == 'Uninvoiced': pfilter = f'{table}.Istat == 0'
             elif itest == 'Unrecorded': pfilter = f'{table}.Istat == 1'
             elif itest == 'Unpaid': pfilter = f'{table}.Istat < 4'
-            if 'filter' in table_query:
-                table_query = f'{table}.query.filter(({table}.Date > stopdate) & ({pfilter})).all()'
-            else:
-                table_query = f'{table}.query.filter({pfilter}).all()'
+            query_adds.append(pfilter)
+
+        #Determine if haul filter applies to query:
+        htest = tfilters['Haul Filter']
+        if htest is not None and htest != 'Show All':
+            if htest == 'Not Started': hfilter = f'{table}.Hstat == 0'
+            elif htest == 'In-Progress': hfilter = f'{table}.Hstat == 1'
+            elif htest == 'Incomplete': hfilter = f'{table}.Hstat < 2'
+            elif htest == 'Completed': hfilter = f'{table}.Hstat >= 2'
+            query_adds.append(hfilter)
+
+        #Put the filters together from the 3 possible pieces: time, type1, type2
+        if query_adds == []: table_query = f'{table}.query.all()'
+        elif len(query_adds) == 1: table_query = f'{table}.query.filter({query_adds[0]}).all()'
+        elif len(query_adds) == 2: table_query = f'{table}.query.filter(({query_adds[0]}) & ({query_adds[1]})).all()'
+        else: table_query = f'{table}.query.filter(({query_adds[0]}) & ({query_adds[1]}) & ({query_adds[2]})).all()'
 
         print(table_query)
         odata = eval(table_query)
+
         if table == 'Orders':
+            print('Orders')
             #odata = Orders.query.filter(Orders.Date > stopdate).all()
-            headcols = ['Jo', 'Order', 'Shipper', 'Booking', 'Container', 'Chassis', 'Company', 'Amount', 'Date',
-                        'Company2', 'Commodity', 'Packing']
+            #headcols = ['Jo', 'Order', 'Shipper', 'Booking', 'Container', 'Chassis', 'Company', 'Amount', 'Date','Company2', 'Commodity', 'Packing']
         elif table == 'Interchange':
+            print('Interchange')
             #odata = Interchange.query.filter(Interchange.Date > stopdate).all()
-            headcols = ['Jo', 'Company', 'Date', 'Time', 'Release','Container', 'ConType', 'GrossWt', 'Chassis', 'TruckNumber', 'Driver', 'Status']
+            #headcols = ['Jo', 'Company', 'Date', 'Time', 'Release','Container', 'ConType', 'GrossWt', 'Chassis', 'TruckNumber', 'Driver', 'Status']
 
         rowcolors1 = []
         rowcolors2 = []
@@ -328,11 +351,27 @@ def Test():
 
     # Top of the routine
 
+    genre = 'Trucking'
+    gsetup = { 'table' : 'Orders',
+               'genre_tables' : ['TruckJobs', 'Interchange', 'Customers', 'Services'],
+               'quick_buttons' : ['New','Mod','Inv', 'Rec'],
+               }
+    Orders_setup = { 'table' : 'Orders',
+                     'filter' : None,
+                     'filterval' : None,
+                     'headcols' : ['Jo', 'Order', 'Shipper', 'Booking', 'Container', 'Chassis', 'Company', 'Amount', 'Date', 'Company2', 'Commodity', 'Packing'],
+                     'colorfilter' : 'Istat' }
+    Interchange_setup = { 'table' : 'Interchange',
+                     'filter' : None,
+                     'filterval' : None,
+                     'headcols' : ['Jo', 'Company', 'Date', 'Time', 'Release','Container', 'ConType', 'GrossWt', 'Chassis', 'TruckNumber', 'Driver', 'Status'],
+                     'colorfilter' : 'Status' }
+
     genre_tables = ['Orders', 'Interchange', 'Customers', 'Services']
     quick_buttons = ['New', 'Mod', 'Inv', 'Rec']
     table_filters = [{'Date Filter': ['Last 60 Days', 'Last 120 Days', 'Last 180 Days', 'Show All']},
                      {'Pay Filter': ['Uninvoiced', 'Unrecorded', 'Unpaid', 'Show All']},
-                     {'Haul Filter': ['Not Started', 'In-Prgress', 'Incomplete', 'Completed', 'Show All']}]
+                     {'Haul Filter': ['Not Started', 'In-Progress', 'Incomplete', 'Completed', 'Show All']}]
     task_boxes = [{'Add Items': ['New Job', 'New Customer','New Services', 'New from Copy', 'Upload Source', 'Upload Proof', 'Make Manifest']},
                   {'Edit Items': ['Edit', 'Match', 'Accept', 'Haul+1', 'Haul-1', 'Haul Done', 'Inv+1', 'Inv-1', 'Inv Emailed', 'Set Col To' ]},
                   {'Money Items': ['Inv Edit', 'Quote Edit', 'Package Send', 'Rec Payment', 'Rec by Acct']},
@@ -350,7 +389,7 @@ def Test():
     tabletitle = []
     tfilters = {}
     tboxes = {}
-    genre = 'Trucking'
+
 
     if request.method == 'POST':
 
@@ -368,7 +407,6 @@ def Test():
             for key, value in filter.items(): tfilters[key] = request.values.get(key)
         print(tfilters)
 
-
         # See if a task box has been selected
         for box in task_boxes:
             for key, value in box.items(): tboxes[key] = request.values.get(key)
@@ -385,19 +423,18 @@ def Test():
 
 
     genre_data = [genre,genre_tables,genre_tables_on]
-    dayback = [word for word in tfilters['Date Filter'].split() if word.isdigit()]
-    dayback = dayback[0] if dayback != [] else None
-    print(dayback)
     #print(int(filter(check.isdigit, check)))
     docref = ''
     oder=0
     modata=0
     modlink = 0
 
-    color_selectors = ['Istat', 'Status']
+    #color_selectors = ['Istat', 'Status']
     for jx, tableget in enumerate(tables_on):
         tabletitle.append(tableget)
-        db_data = get_dbdata(tableget, tfilters, color_selectors[jx])
+        table_setup = eval(f'{tableget}_setup')
+        print(table_setup)
+        db_data = get_dbdata(table_setup, tfilters)
         table_data.append(db_data)
 
     return render_template('test.html',cmpdata=cmpdata, scac=scac,  genre_data = genre_data, table_data=table_data, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
