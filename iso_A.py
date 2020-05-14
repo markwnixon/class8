@@ -324,15 +324,6 @@ def Test():
         print(table_query)
         odata = eval(table_query)
 
-        if table == 'Orders':
-            print('Orders')
-            #odata = Orders.query.filter(Orders.Date > stopdate).all()
-            #headcols = ['Jo', 'Order', 'Shipper', 'Booking', 'Container', 'Chassis', 'Company', 'Amount', 'Date','Company2', 'Commodity', 'Packing']
-        elif table == 'Interchange':
-            print('Interchange')
-            #odata = Interchange.query.filter(Interchange.Date > stopdate).all()
-            #headcols = ['Jo', 'Company', 'Date', 'Time', 'Release','Container', 'ConType', 'GrossWt', 'Chassis', 'TruckNumber', 'Driver', 'Status']
-
         rowcolors1 = []
         rowcolors2 = []
         data1id = []
@@ -362,6 +353,12 @@ def Test():
                      'headcols' : ['Jo', 'Order', 'Shipper', 'Booking', 'Container', 'Chassis', 'Company', 'Amount', 'Date', 'Company2', 'Commodity', 'Packing'],
                      'colorfilter' : 'Istat' }
     Interchange_setup = { 'table' : 'Interchange',
+                     'filter' : None,
+                     'filterval' : None,
+                     'headcols' : ['Jo', 'Company', 'Date', 'Time', 'Release','Container', 'ConType', 'GrossWt', 'Chassis', 'TruckNumber', 'Driver', 'Status'],
+                     'colorfilter' : 'Status' }
+
+    Customer_setup = { 'table' : 'Interchange',
                      'filter' : None,
                      'filterval' : None,
                      'headcols' : ['Jo', 'Company', 'Date', 'Time', 'Release','Container', 'ConType', 'GrossWt', 'Chassis', 'TruckNumber', 'Driver', 'Status'],
