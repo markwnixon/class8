@@ -19,7 +19,7 @@ import requests
 import mimetypes
 from urllib.parse import urlparse
 import img2pdf
-from viewfuncs import make_new_order, nonone, monvals, getmonths
+from viewfuncs import make_new_order, nonone, monvals, getmonths, nononestr
 
 today = datetime.datetime.today()
 year = str(today.year)
@@ -349,6 +349,18 @@ def Test():
 
         return [data1, data1id, rowcolors1, rowcolors2, headcols]
 
+    def New_task(iter):
+        print(f'Running New task with iter {iter}')
+
+    def Mod_task(iter):
+        print(f'Running Mod task with iter {iter}')
+
+    def Inv_task(iter):
+        print(f'Running Inv task with iter {iter}')
+
+    def Rec_task(iter):
+        print(f'Running Rec task with iter {iter}')
+
     # Top of the routine
 
     genre = 'Trucking'
@@ -413,6 +425,16 @@ def Test():
 
     if request.method == 'POST':
 
+        # See if a task is active and ongoing
+        taskon = request.values.get('taskon')
+        print('taskon here is',taskon)
+        taskon = nononestr(taskon)
+        print('taskon is:',taskon)
+        if taskon != 0:
+            task_iter = request.values.get('task_iter')
+            task_iter = int(task_iter)+1
+            eval(f'{taskon}_task(task_iter)')
+
         # Get data only for tables that have been checked on
         genre_tables_on = checked_tables(genre_tables)
         tables_on = [ix for jx,ix in enumerate(genre_tables) if genre_tables_on[jx] == 'on']
@@ -420,7 +442,11 @@ def Test():
         # See if a new task has been launched from quick buttons; set launched to New/Mod/Inv/Ret else set launched to None
         launched = [ix for ix in quick_buttons if request.values.get(ix) is not None]
         launched = launched[0] if launched != [] else None
-        print(launched)
+        if launched is not None:
+            task_iter = 0
+            eval(f'{launched}_task(0)')
+            taskon = launched
+            print(f'Launching {launched} with iter {task_iter}')
 
         # See if a table filter has been selected
         for filter in table_filters:
@@ -439,6 +465,7 @@ def Test():
         #Default time filter on entry into table is last 60 days:
         tfilters = {'Date Filter': 'Last 60 Days', 'Pay Filter': None, 'Haul Filter': None}
         jscripts = ['dtTrucking']
+        taskon, task_iter = None, None
 
 
 
@@ -461,7 +488,8 @@ def Test():
 
     print(jscripts)
     return render_template('test.html',cmpdata=cmpdata, scac=scac,  genre_data = genre_data, table_data=table_data, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
-                           leftsize=leftsize, rightsize=rightsize, docref=docref, tabletitle=tabletitle, table_filters = table_filters,task_boxes = task_boxes, tfilters=tfilters, tboxes=tboxes, dt1 = jscripts)
+                           leftsize=leftsize, rightsize=rightsize, docref=docref, tabletitle=tabletitle, table_filters = table_filters,task_boxes = task_boxes, tfilters=tfilters, tboxes=tboxes, dt1 = jscripts,
+                           taskon=taskon, task_iter=task_iter)
 
 
 
