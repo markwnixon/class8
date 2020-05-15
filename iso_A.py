@@ -285,35 +285,43 @@ def Test():
         print(table)
         highfilter = table_setup['filter']
         print(highfilter)
+        highfilter_value = table_setup['filterval']
         headcols = table_setup['headcols']
         print(headcols)
         color_selector = table_setup['colorfilter']
         print(color_selector)
 
-        #Determine if time filter applies to query:
-        daysback = [int(word) for word in tfilters['Date Filter'].split() if word.isdigit()]
-        daysback = daysback[0] if daysback != [] else None
-        if daysback is not None:
-            stopdate = today - datetime.timedelta(days=daysback)
-            print('stopdate =', stopdate)
-            query_adds.append(f'{table}.Date > stopdate')
+        #Apply built-in table filter:
+        if highfilter is not None:
+            query_adds.append(f"{table}.{highfilter} == '{highfilter_value}'")
 
-        #Determine if pay filter applies to query:
-        itest = tfilters['Pay Filter']
-        if itest is not None and itest != 'Show All':
-            if itest == 'Uninvoiced': pfilter = f'{table}.Istat == 0'
-            elif itest == 'Unrecorded': pfilter = f'{table}.Istat == 1'
-            elif itest == 'Unpaid': pfilter = f'{table}.Istat < 4'
-            query_adds.append(pfilter)
+        # If this table has no color capability then it cannot be filtered by date or type
+        if color_selector is not None:
 
-        #Determine if haul filter applies to query:
-        htest = tfilters['Haul Filter']
-        if htest is not None and htest != 'Show All':
-            if htest == 'Not Started': hfilter = f'{table}.Hstat == 0'
-            elif htest == 'In-Progress': hfilter = f'{table}.Hstat == 1'
-            elif htest == 'Incomplete': hfilter = f'{table}.Hstat < 2'
-            elif htest == 'Completed': hfilter = f'{table}.Hstat >= 2'
-            query_adds.append(hfilter)
+            #Determine if time filter applies to query:
+            daysback = [int(word) for word in tfilters['Date Filter'].split() if word.isdigit()]
+            daysback = daysback[0] if daysback != [] else None
+            if daysback is not None:
+                stopdate = today - datetime.timedelta(days=daysback)
+                print('stopdate =', stopdate)
+                query_adds.append(f'{table}.Date > stopdate')
+
+            #Determine if pay filter applies to query:
+            itest = tfilters['Pay Filter']
+            if itest is not None and itest != 'Show All':
+                if itest == 'Uninvoiced': pfilter = f'{table}.Istat == 0'
+                elif itest == 'Unrecorded': pfilter = f'{table}.Istat == 1'
+                elif itest == 'Unpaid': pfilter = f'{table}.Istat < 4'
+                query_adds.append(pfilter)
+
+            #Determine if haul filter applies to query:
+            htest = tfilters['Haul Filter']
+            if htest is not None and htest != 'Show All':
+                if htest == 'Not Started': hfilter = f'{table}.Hstat == 0'
+                elif htest == 'In-Progress': hfilter = f'{table}.Hstat == 1'
+                elif htest == 'Incomplete': hfilter = f'{table}.Hstat < 2'
+                elif htest == 'Completed': hfilter = f'{table}.Hstat >= 2'
+                query_adds.append(hfilter)
 
         #Put the filters together from the 3 possible pieces: time, type1, type2
         if query_adds == []: table_query = f'{table}.query.all()'
@@ -331,7 +339,8 @@ def Test():
         for odat in odata:
             data1id.append(odat.id)
             datarow = [0] * len(headcols)
-            color_selector_value = getattr(odat, color_selector)
+            if color_selector is not None: color_selector_value = getattr(odat, color_selector)
+            else: color_selector_value = 0
             #print(odat.id, odat.Jo, odat.Hstat, color_selector_value)
             rowcolors1.append(colorcode(color_selector_value))
             for jx, co in enumerate(headcols):
@@ -351,18 +360,29 @@ def Test():
                      'filter' : None,
                      'filterval' : None,
                      'headcols' : ['Jo', 'Order', 'Shipper', 'Booking', 'Container', 'Chassis', 'Company', 'Amount', 'Date', 'Company2', 'Commodity', 'Packing'],
-                     'colorfilter' : 'Istat' }
+                     'colorfilter' : 'Istat',
+                     'jscript' : 'dtTrucking'}
+
     Interchange_setup = { 'table' : 'Interchange',
                      'filter' : None,
                      'filterval' : None,
                      'headcols' : ['Jo', 'Company', 'Date', 'Time', 'Release','Container', 'ConType', 'GrossWt', 'Chassis', 'TruckNumber', 'Driver', 'Status'],
-                     'colorfilter' : 'Status' }
+                     'colorfilter' : 'Status',
+                     'jscript' : 'dtHorizontalVerticalExample2'}
 
-    Customer_setup = { 'table' : 'Interchange',
+    Customers_setup = { 'table' : 'People',
+                     'filter' : 'Ptype',
+                     'filterval' : 'Trucking',
+                     'headcols' : ['Company', 'Addr1', 'Addr2', 'Email','Telephone', 'Associate1','Associate2'],
+                     'colorfilter' : None,
+                     'jscript' : 'dtHorizontalVerticalExample3'}
+
+    Services_setup = { 'table' : 'Services',
                      'filter' : None,
                      'filterval' : None,
-                     'headcols' : ['Jo', 'Company', 'Date', 'Time', 'Release','Container', 'ConType', 'GrossWt', 'Chassis', 'TruckNumber', 'Driver', 'Status'],
-                     'colorfilter' : 'Status' }
+                     'headcols' : ['Service','Price'],
+                     'colorfilter' : None,
+                     'jscript' : 'dtHorizontalVerticalExample4'}
 
     genre_tables = ['Orders', 'Interchange', 'Customers', 'Services']
     quick_buttons = ['New', 'Mod', 'Inv', 'Rec']
@@ -384,6 +404,7 @@ def Test():
     err = []
     table_data = []
     tabletitle = []
+    jscripts = []
     tfilters = {}
     tboxes = {}
 
@@ -415,6 +436,7 @@ def Test():
         tables_on = ['Orders']
         #Default time filter on entry into table is last 60 days:
         tfilters = {'Date Filter': 'Last 60 Days', 'Pay Filter': None, 'Haul Filter': None}
+        jscripts = ['dtTrucking']
 
 
 
@@ -433,9 +455,11 @@ def Test():
         print(table_setup)
         db_data = get_dbdata(table_setup, tfilters)
         table_data.append(db_data)
+        jscripts.append(eval(f"{tableget}_setup['jscript']"))
 
+    print(jscripts)
     return render_template('test.html',cmpdata=cmpdata, scac=scac,  genre_data = genre_data, table_data=table_data, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
-                           leftsize=leftsize, rightsize=rightsize, docref=docref, tabletitle=tabletitle, table_filters = table_filters,task_boxes = task_boxes, tfilters=tfilters, tboxes=tboxes)
+                           leftsize=leftsize, rightsize=rightsize, docref=docref, tabletitle=tabletitle, table_filters = table_filters,task_boxes = task_boxes, tfilters=tfilters, tboxes=tboxes, dt1 = jscripts)
 
 
 
