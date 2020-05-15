@@ -352,9 +352,19 @@ def Test():
     # Top of the routine
 
     genre = 'Trucking'
-    gsetup = { 'table' : 'Orders',
-               'genre_tables' : ['TruckJobs', 'Interchange', 'Customers', 'Services'],
+    Trucking_genre = { 'table' : 'Orders',
+               'genre_tables' : ['Orders', 'Interchange', 'Customers', 'Services'],
                'quick_buttons' : ['New','Mod','Inv', 'Rec'],
+               'table_filters' : [{'Date Filter': ['Last 60 Days', 'Last 120 Days', 'Last 180 Days', 'Show All']},
+                     {'Pay Filter': ['Uninvoiced', 'Unrecorded', 'Unpaid', 'Show All']},
+                     {'Haul Filter': ['Not Started', 'In-Progress', 'Incomplete', 'Completed', 'Show All']}],
+               'task_boxes' : [{'Add Items': ['New Job', 'New Customer','New Services', 'New from Copy', 'Upload Source', 'Upload Proof', 'Make Manifest']},
+                  {'Edit Items': ['Edit', 'Match', 'Accept', 'Haul+1', 'Haul-1', 'Haul Done', 'Inv+1', 'Inv-1', 'Inv Emailed', 'Set Col To' ]},
+                  {'Money Items': ['Inv Edit', 'Quote Edit', 'Package Send', 'Rec Payment', 'Rec by Acct']},
+                  {'View Docs': ['Source', 'Proof','Manifest', 'Interchange', 'Invoice', 'Paid Invoice']},
+                  {'Undo': ['Delete Item', 'Undo Invoice','Undo Payment']},
+                  {'Tasks': ['Street Turn', 'Unpulled Containers', 'Assign Drivers', 'Driver Hours', 'Driver Payroll', 'Truck Logs', 'Text Output']}]
+
                }
     Orders_setup = { 'table' : 'Orders',
                      'filter' : None,
@@ -384,18 +394,10 @@ def Test():
                      'colorfilter' : None,
                      'jscript' : 'dtHorizontalVerticalExample4'}
 
-    genre_tables = ['Orders', 'Interchange', 'Customers', 'Services']
-    quick_buttons = ['New', 'Mod', 'Inv', 'Rec']
-    table_filters = [{'Date Filter': ['Last 60 Days', 'Last 120 Days', 'Last 180 Days', 'Show All']},
-                     {'Pay Filter': ['Uninvoiced', 'Unrecorded', 'Unpaid', 'Show All']},
-                     {'Haul Filter': ['Not Started', 'In-Progress', 'Incomplete', 'Completed', 'Show All']}]
-    task_boxes = [{'Add Items': ['New Job', 'New Customer','New Services', 'New from Copy', 'Upload Source', 'Upload Proof', 'Make Manifest']},
-                  {'Edit Items': ['Edit', 'Match', 'Accept', 'Haul+1', 'Haul-1', 'Haul Done', 'Inv+1', 'Inv-1', 'Inv Emailed', 'Set Col To' ]},
-                  {'Money Items': ['Inv Edit', 'Quote Edit', 'Package Send', 'Rec Payment', 'Rec by Acct']},
-                  {'View Docs': ['Source', 'Proof','Manifest', 'Interchange', 'Invoice', 'Paid Invoice']},
-                  {'Undo': ['Delete Item', 'Undo Invoice','Undo Payment']},
-                  {'Tasks': ['Street Turn', 'Unpulled Containers', 'Assign Drivers', 'Driver Hours', 'Driver Payroll', 'Truck Logs', 'Text Output']}]
-    print(table_filters)
+    genre_tables = eval(f"{genre}_genre['genre_tables']")
+    quick_buttons = eval(f"{genre}_genre['quick_buttons']")
+    table_filters = eval(f"{genre}_genre['table_filters']")
+    task_boxes = eval(f"{genre}_genre['task_boxes']")
 
     scac = 'FELA'
     leftsize = 8
