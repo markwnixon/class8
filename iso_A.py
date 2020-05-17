@@ -323,6 +323,8 @@ def Test():
                 elif htest == 'Completed': hfilter = f'{table}.Hstat >= 2'
                 query_adds.append(hfilter)
 
+
+
         #Put the filters together from the 3 possible pieces: time, type1, type2
         if query_adds == []: table_query = f'{table}.query.all()'
         elif len(query_adds) == 1: table_query = f'{table}.query.filter({query_adds[0]}).all()'
@@ -332,6 +334,9 @@ def Test():
         print(table_query)
         odata = eval(table_query)
 
+        # Determine color pallette to apply to table
+
+
         rowcolors1 = []
         rowcolors2 = []
         data1id = []
@@ -339,13 +344,23 @@ def Test():
         for odat in odata:
             data1id.append(odat.id)
             datarow = [0] * len(headcols)
-            if color_selector is not None: color_selector_value = getattr(odat, color_selector)
-            else: color_selector_value = 0
-            #print(odat.id, odat.Jo, odat.Hstat, color_selector_value)
-            rowcolors1.append(colorcode(color_selector_value))
+            if color_selector is not None:
+                for kx, selector in enumerate(color_selector):
+                    color_selector_value = getattr(odat, selector)
+                    if kx == 0: rowcolors1.append(colorcode(color_selector_value))
+                    if kx == 1: rowcolors2.append(colorcode(color_selector_value))
+            else:
+                color_selector_value = 0
+                rowcolors1.append(colorcode(color_selector_value))
+                rowcolors2.append(colorcode(color_selector_value))
+
+
             for jx, co in enumerate(headcols):
                 datarow[jx] = getattr(odat, co)
             data1.append(datarow)
+
+        if color_selector is not None:
+            if len(color_selector) == 1 : rowcolors2 = rowcolors1
 
         return [data1, data1id, rowcolors1, rowcolors2, headcols]
 
@@ -369,7 +384,8 @@ def Test():
                'quick_buttons' : ['New','Mod','Inv', 'Rec'],
                'table_filters' : [{'Date Filter': ['Last 60 Days', 'Last 120 Days', 'Last 180 Days', 'Show All']},
                      {'Pay Filter': ['Uninvoiced', 'Unrecorded', 'Unpaid', 'Show All']},
-                     {'Haul Filter': ['Not Started', 'In-Progress', 'Incomplete', 'Completed', 'Show All']}],
+                     {'Haul Filter': ['Not Started', 'In-Progress', 'Incomplete', 'Completed', 'Show All']},
+                     {'Color Filter': ['Haul', 'Invoice', 'Both']}],
                'task_boxes' : [{'Add Items': ['New Job', 'New Customer','New Services', 'New from Copy', 'Upload Source', 'Upload Proof', 'Make Manifest']},
                   {'Edit Items': ['Edit', 'Match', 'Accept', 'Haul+1', 'Haul-1', 'Haul Done', 'Inv+1', 'Inv-1', 'Inv Emailed', 'Set Col To' ]},
                   {'Money Items': ['Inv Edit', 'Quote Edit', 'Package Send', 'Rec Payment', 'Rec by Acct']},
@@ -382,14 +398,14 @@ def Test():
                      'filter' : None,
                      'filterval' : None,
                      'headcols' : ['Jo', 'Order', 'Shipper', 'Booking', 'Container', 'Chassis', 'Company', 'Amount', 'Date', 'Company2', 'Commodity', 'Packing'],
-                     'colorfilter' : 'Istat',
+                     'colorfilter' : ['Hstat'],
                      'jscript' : 'dtTrucking'}
 
     Interchange_setup = { 'table' : 'Interchange',
                      'filter' : None,
                      'filterval' : None,
                      'headcols' : ['Jo', 'Company', 'Date', 'Time', 'Release','Container', 'ConType', 'GrossWt', 'Chassis', 'TruckNumber', 'Driver', 'Status'],
-                     'colorfilter' : 'Status',
+                     'colorfilter' : ['Status'],
                      'jscript' : 'dtHorizontalVerticalExample2'}
 
     Customers_setup = { 'table' : 'People',
@@ -427,11 +443,11 @@ def Test():
 
         # See if a task is active and ongoing
         taskon = request.values.get('taskon')
+        task_iter = request.values.get('task_iter')
         print('taskon here is',taskon)
         taskon = nononestr(taskon)
         print('taskon is:',taskon)
-        if taskon != 0:
-            task_iter = request.values.get('task_iter')
+        if taskon != '':
             task_iter = int(task_iter)+1
             eval(f'{taskon}_task(task_iter)')
 
@@ -458,12 +474,19 @@ def Test():
             for key, value in box.items(): tboxes[key] = request.values.get(key)
         print(tboxes)
 
+        #Reset colors for color filter in primary table:
+        #eval(f"{genre}_genre['table_filters']['Color filters")
+        if tfilters['Color Filter'] == 'Haul': Orders_setup['colorfilter'] = ['Hstat']
+        elif tfilters['Color Filter'] == 'Invoice': Orders_setup['colorfilter'] = ['Istat']
+        elif tfilters['Color Filter'] == 'Both':  Orders_setup['colorfilter'] = ['Hstat', 'Istat']
+
+
     else:
         genre_tables_on = ['off'] * len(genre_tables)
         genre_tables_on[0] = 'on'
         tables_on = ['Orders']
         #Default time filter on entry into table is last 60 days:
-        tfilters = {'Date Filter': 'Last 60 Days', 'Pay Filter': None, 'Haul Filter': None}
+        tfilters = {'Date Filter': 'Last 60 Days', 'Pay Filter': None, 'Haul Filter': None, 'Color Filter': 'Haul'}
         jscripts = ['dtTrucking']
         taskon, task_iter = None, None
 

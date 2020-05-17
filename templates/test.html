@@ -60,7 +60,8 @@
                                 <tr>
                                 <td align="center" ><input class="align-middle" type="checkbox" name="{{ thistable }}{{data1id[outer_loop.index-1]}}" value="{{data1id[outer_loop.index-1]}}">{{ data1id[outer_loop.index-1] }}</td>
                                     {% for tabcol in tabrow %}
-                                        <td class="{{rowcolors1[outer_loop.index-1]}}">{{ tabcol }}</td>
+                                        {% if loop.index < 5 %} {%  set thiscolor = rowcolors1[outer_loop.index-1] %} {% else %} {%  set thiscolor = rowcolors2[outer_loop.index-1] %}{% endif %}
+                                        <td class="{{thiscolor}}">{{ tabcol }}</td>
                                     {% endfor %}
                                 </tr>
                         {% endfor %}
