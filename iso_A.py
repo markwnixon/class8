@@ -286,8 +286,8 @@ def Test():
         highfilter = table_setup['filter']
         print(highfilter)
         highfilter_value = table_setup['filterval']
-        headcols = table_setup['headcols']
-        print(headcols)
+        entrydata = table_setup['entry data']
+        print(entrydata)
         color_selector = table_setup['colorfilter']
         print(color_selector)
 
@@ -341,7 +341,7 @@ def Test():
         data1 = []
         for odat in odata:
             data1id.append(odat.id)
-            datarow = [0] * len(headcols)
+            datarow = [0] * len(entrydata)
             if color_selector is not None:
                 for kx, selector in enumerate(color_selector):
                     color_selector_value = getattr(odat, selector)
@@ -352,14 +352,15 @@ def Test():
                 rowcolors1.append(colorcode(color_selector_value))
                 rowcolors2.append(colorcode(color_selector_value))
 
-            for jx, co in enumerate(headcols):
+            for jx, colist in enumerate(entrydata):
+                co = colist[0]
                 datarow[jx] = getattr(odat, co)
             data1.append(datarow)
 
         if color_selector is not None:
             if len(color_selector) == 1 : rowcolors2 = rowcolors1
 
-        return [data1, data1id, rowcolors1, rowcolors2, headcols]
+        return [data1, data1id, rowcolors1, rowcolors2, entrydata]
 
     def New_task(iter):
         print(f'Running New task with iter {iter}')
@@ -378,6 +379,7 @@ def Test():
     genre = 'Trucking'
     Trucking_genre = { 'table' : 'Orders',
                'genre_tables' : ['Orders', 'Interchange', 'Customers', 'Services'],
+               'genre_tables_on': ['on', 'off', 'off', 'off'],
                'quick_buttons' : ['New','Mod','Inv', 'Rec'],
                'table_filters' : [{'Date Filter': ['Last 60 Days', 'Last 120 Days', 'Last 180 Days', 'Show All']},
                      {'Pay Filter': ['Uninvoiced', 'Unrecorded', 'Unpaid', 'Show All']},
@@ -388,13 +390,17 @@ def Test():
                   {'Money Items': ['Inv Edit', 'Quote Edit', 'Package Send', 'Rec Payment', 'Rec by Acct']},
                   {'View Docs': ['Source', 'Proof','Manifest', 'Interchange', 'Invoice', 'Paid Invoice']},
                   {'Undo': ['Delete Item', 'Undo Invoice','Undo Payment']},
-                  {'Tasks': ['Street Turn', 'Unpulled Containers', 'Assign Drivers', 'Driver Hours', 'Driver Payroll', 'Truck Logs', 'Text Output']}]
+                  {'Tasks': ['Street Turn', 'Unpulled Containers', 'Assign Drivers', 'Driver Hours', 'Driver Payroll', 'Truck Logs', 'Text Output']}],
+                'container_types' : ['40HC', '40STD', '20ST', '53Dry']
 
                }
     Orders_setup = { 'table' : 'Orders',
                      'filter' : None,
                      'filterval' : None,
-                     'headcols' : ['Jo', 'Order', 'Shipper', 'Booking', 'Container', 'Chassis', 'Company', 'Amount', 'Date', 'Company2', 'Commodity', 'Packing'],
+                     'entry data' : [['Jo','JO', None,'text','jocheck'], ['Order','Order','Order','text','text'], ['Shipper','Shipper', 'Customer', 'select','customerdata'], ['Booking','Booking','text','text'],
+                                     ['Container','Container','text','concheck'], ['Chassis','Chassis','text','text'], ['Company','Load At','multitext','dropblock1'],
+                                     ['Amount','Amount','text','float'], ['Date','Date','date','date'], ['Company2','Deliver To','multitext','dropblock2'],
+                                     ['Commodity','Commodity','text','text'], ['Packing','Packing','text','text']],
                      'colorfilter' : ['Hstat'],
                      'jscript' : 'dtTrucking'}
 
@@ -434,6 +440,7 @@ def Test():
     jscripts = []
     tfilters = {}
     tboxes = {}
+    holdvec = [0]*30
 
 
     if request.method == 'POST':
@@ -493,7 +500,14 @@ def Test():
 
 
 
-    genre_data = [genre,genre_tables,genre_tables_on]
+    #genre_data = [genre,genre_tables,genre_tables_on,contypes]
+    genre_data = eval(f"{genre}_genre")
+    genre_data['genre_tables_on'] = genre_tables_on
+    print(genre_data['table'])
+    print(genre_data['genre_tables'])
+    print(genre_data['genre_tables_on'])
+    print(genre_data['container_types'])
+
     #print(int(filter(check.isdigit, check)))
     docref = ''
     oder=0
@@ -512,7 +526,7 @@ def Test():
     print(jscripts)
     return render_template('test.html',cmpdata=cmpdata, scac=scac,  genre_data = genre_data, table_data=table_data, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
                            leftsize=leftsize, rightsize=rightsize, docref=docref, tabletitle=tabletitle, table_filters = table_filters,task_boxes = task_boxes, tfilters=tfilters, tboxes=tboxes, dt1 = jscripts,
-                           taskon=taskon, task_iter=task_iter)
+                           taskon=taskon, task_iter=task_iter, holdvec=holdvec)
 
 
 

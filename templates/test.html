@@ -7,7 +7,10 @@
 <div class="row">
 
         <div class="col-sm-{{leftsize}}">
-
+                genre_data[table]: {{ genre_data['table'] }}<br>
+                genre_data[container_types]: {{ genre_data['container_types'] }}<br>
+                genre_data[3]: {{ genre_data['container_types'] }}<br>
+                {% set contypes = genre_data['container_types'] %}
                 {% if leftscreen == 0 %}
 
                     <div class="row">
@@ -42,15 +45,15 @@
                                         {% set data1id = db_data[1] %}
                                         {% set rowcolors1 = db_data[2] %}
                                         {% set rowcolors2 = db_data[3] %}
-                                        {% set headcols = db_data[4] %}
+                                        {% set entrydata = db_data[4] %}
                                         <div class="row">
                                           <div class="col-sm-12">
                                               <table id="{{dt1[most_outer_loop.index - 1]}}" class="table  table-striped table-bordered  table-hover w-auto"  width="100%">
                                                   <thead>
                                                     <tr align="center" style="font-weight:bold; background-color:linen" >
                                                         <th style="font-weight:bold">Chk</th>
-                                                        {% for head in headcols %}
-                                                            <th class="{{atl}}">{{ head }}</th>
+                                                        {% for entry in entrydata %}
+                                                            <th class="{{atl}}">{{ entry[1] }}</th>
                                                         {% endfor %}
                                                     </tr>
                                                     </thead>
