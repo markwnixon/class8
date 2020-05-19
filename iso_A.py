@@ -335,8 +335,6 @@ def Test():
         odata = eval(table_query)
 
         # Determine color pallette to apply to table
-
-
         rowcolors1 = []
         rowcolors2 = []
         data1id = []
@@ -353,7 +351,6 @@ def Test():
                 color_selector_value = 0
                 rowcolors1.append(colorcode(color_selector_value))
                 rowcolors2.append(colorcode(color_selector_value))
-
 
             for jx, co in enumerate(headcols):
                 datarow[jx] = getattr(odat, co)
@@ -450,6 +447,7 @@ def Test():
         if taskon != '':
             task_iter = int(task_iter)+1
             eval(f'{taskon}_task(task_iter)')
+        else: task_iter = 0
 
         # Get data only for tables that have been checked on
         genre_tables_on = checked_tables(genre_tables)
@@ -459,7 +457,6 @@ def Test():
         launched = [ix for ix in quick_buttons if request.values.get(ix) is not None]
         launched = launched[0] if launched != [] else None
         if launched is not None:
-            task_iter = 0
             eval(f'{launched}_task(0)')
             taskon = launched
             print(f'Launching {launched} with iter {task_iter}')
@@ -471,8 +468,11 @@ def Test():
 
         # See if a task box has been selected
         for box in task_boxes:
-            for key, value in box.items(): tboxes[key] = request.values.get(key)
-        print(tboxes)
+            for key, value in box.items():
+                tboxes[key] = request.values.get(key)
+                if tboxes[key] is not None: taskon = tboxes[key]
+
+        print('Tboxes:', tboxes)
 
         #Reset colors for color filter in primary table:
         #eval(f"{genre}_genre['table_filters']['Color filters")

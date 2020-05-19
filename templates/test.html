@@ -79,105 +79,22 @@
         <div class="col-sm-{{rightsize}}" align = "left">
             <div class="row">
                 <div class="col-sm-12" align=""center">
-
-                    {% if modlink==70 %}
-                        {% include 'includes/_uploadsourcedocs.html' %}
-
-                    {% elif modlink==71 %}
-                        {% include 'includes/_uploadproofdocs.html' %}
-
-                    {% elif leftscreen == 2 %}
-                       {% include 'includes/_button_cal.html' %}
-
-                    {% elif quot>0  %}
-                        {% if ldata %}
-                                {% set htype = 'Modify Quote Information on' %}
-                        {% else %}
-                                {% set htype = 'View Quote Information on' %}
-                        {% endif %}
-
-                        {% set update = 'quotUpdate'%}
-                        {% set logonly = 'logInvo'%}
-                        {% include 'includes/_inco_invo.html' %}
-                        {% if ldata %}
-                                {% include 'Trucking_Invoice_Prep.html' %}
-                        {% endif %}
-
-                    {% elif modlink==4 and peep==0 %}
-                        {% include 'Trucking_Form_New.html' %}
-
-                    {% elif mm1==1 %}
-                        {% include 'Trucking_Form_Manifest.html' %}
-                    {% elif stamp > 0 %}
-                        {% include 'Trucking_Packager.html' %}
-
-                    {% elif peep > 0 and modlink > 0 %}
-                        {% include 'Form_People_New.html' %}
-
-                    {% elif serv > 0 and modlink > 0 %}
-                        {% include 'Form_Services_New.html' %}
-
-                    {% elif invo > 0 and ldata %}
-                        {% include 'Trucking_Invoice_Prep.html' %}
-
-                    {% elif inco > 0 %}
-                        {% include 'Trucking_Receive_Pay.html' %}
-
-                    {% elif oder > 0 and modlink == 1 %}
-                        {% include 'Trucking_Form_Mod.html' %}
-
-                    {% elif (tick > 0 and modlink == 1) or modlink==20 %}
-                        {% include 'Trucking_Tickmod.html' %}
-
-                    {% elif holdvec[23] == 1 %}
-                        {% include 'Trucking_Street.html' %}
-
-                    {% elif lbox == 1 %}
-                        <br>
-                        {% include 'includes/_controlpanelheader.html' %}
-                        {% include 'Truck_Assign_Drivers.html' %}
-
-                    {% elif lbox == 3 %}
-                        <br>
-                        {% include 'includes/_controlpanelheader.html' %}
-                        {% include 'Truck_Driver_Payroll.html' %}
-
-                    {% else  %}
-                        <br>
-                        {% include 'includes/_controlpanelheader.html' %}
-                        {% if viewtype == 0 %}
-                            {% include 'includes/_truckcolorcode.html' %}
-                        {% else %}
-                            {% if viewtype == 'invoice' or viewtype == 'paidinvoice'%}
-                                {% include 'includes/_button_upd_email_ret.html' %}
-                            {% elif viewtype == 'invopackage'%}
-                                {% include 'Trucking_Multi_Invoice.html' %}
-                            {% elif viewtype == 'columnadd'%}
-                                {% include 'Trucking_Column_Add.html' %}
-                            {% elif emaildata %}
-                                {% include 'includes/_button_upd_email_ret.html' %}
-                            {% else %}
-                                {% include 'includes/_button_upd_ret.html' %}
-                            {% endif %}
-                        {% endif %}
-                        {% if lbox == 6 %}
-                            <br><b>Unpulled Import Containers</b>
-                            {{ holdvec[0] | safe }}
-                            <br><b>Unused Export Bookings</b>
-                            {{ holdvec[1] | safe }}
-                        {% endif %}
-
-                   {% endif %}
+                    {% if taskon %}
+                        {% set taskfile = taskon | replace(" ","_") %}
+                        {% include 'c8_task_'+taskfile+'.html' %}
+                    {% else %}
+                        There is not and active task.
+                    {% endif %}
                 </div>
             </div>
 
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <br><br><br><br><br><br>
-                            {% include 'Debugtable.html' %}
+            <div class="row">
+                <div class="col-sm-12">
+                    <br><br><br><br><br><br>
+                    {% include 'Debugtable.html' %}
 
-                        </div>
-                    </div>
+                </div>
+            </div>
         </div>
 
 </div>
