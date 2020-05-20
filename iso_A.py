@@ -362,8 +362,24 @@ def Test():
 
         return [data1, data1id, rowcolors1, rowcolors2, entrydata]
 
-    def New_task(iter):
+    def New_task(iter,tablesetup):
         print(f'Running New task with iter {iter}')
+
+        if iter > 0:
+            entrydata = tablesetup['entry data']
+            numitems = len(entrydata)
+            holdvec = [''] * numitems
+            test = request.values.get('Shipper')
+            print(test)
+            for jx, entry in enumerate(entrydata):
+                holdvec[jx] = request.values.get(f'{entry[0]}')
+                print(jx,entry[0],holdvec[jx])
+        else:
+            holdvec = [''] * 30
+            entrydata = []
+
+        return holdvec, entrydata
+
 
     def Mod_task(iter):
         print(f'Running Mod task with iter {iter}')
@@ -441,7 +457,6 @@ def Test():
     jscripts = []
     tfilters = {}
     tboxes = {}
-    holdvec = ['']*30
 
 
     if request.method == 'POST':
@@ -452,10 +467,6 @@ def Test():
         print('taskon here is',taskon)
         taskon = nononestr(taskon)
         print('taskon is:',taskon)
-        if taskon != '':
-            task_iter = int(task_iter)+1
-            eval(f'{taskon}_task(task_iter)')
-        else: task_iter = 0
 
         # Get data only for tables that have been checked on
         genre_tables_on = checked_tables(genre_tables)
@@ -465,7 +476,7 @@ def Test():
         launched = [ix for ix in quick_buttons if request.values.get(ix) is not None]
         launched = launched[0] if launched != [] else None
         if launched is not None:
-            eval(f'{launched}_task(0)')
+            eval(f'{launched}_task(0,0)')
             taskon = launched
             print(f'Launching {launched} with iter {task_iter}')
 
@@ -509,6 +520,16 @@ def Test():
     print(genre_data['genre_tables_on'])
     print(genre_data['container_types'])
 
+    if taskon != '' and taskon != None:
+        task_iter = int(task_iter) + 1
+        rstring = f"{taskon}_task(task_iter,{genre_data['table']}_setup)"
+        print(rstring)
+        holdvec, entrydata = eval(rstring)
+    else:
+        task_iter = 0
+        holdvec = [''] * 30
+        entrydata = []
+
     #print(int(filter(check.isdigit, check)))
     docref = ''
     oder=0
@@ -530,17 +551,18 @@ def Test():
         for side in side_data:
             for key, values in side.items():
                 print(key,values,tableget)
-                dbstat = eval(f"{values[0]}.query.filter({values[0]}.{values[1]}=='{values[2]}').order_by({values[0]}.{values[3]}).all()")
-                if dbstat is not None:
-                    keydata.update({key:[dbstat,values]})
+                dbstats = eval(f"{values[0]}.query.filter({values[0]}.{values[1]}=='{values[2]}').order_by({values[0]}.{values[3]}).all()")
+                if dbstats is not None:
+                    dblist = []
+                    for dbstat in dbstats:
+                        dblist.append(eval(f'dbstat.{values[3]}'))
+                    keydata.update({key:dblist})
+                    print(keydata)
 
-                for customer in keydata['customerdata'][0]:
-                    print(customer.Company)
-
-    print(jscripts)
+    print(jscripts, holdvec)
     return render_template('test.html',cmpdata=cmpdata, scac=scac,  genre_data = genre_data, table_data=table_data, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
                            leftsize=leftsize, rightsize=rightsize, docref=docref, tabletitle=tabletitle, table_filters = table_filters,task_boxes = task_boxes, tfilters=tfilters, tboxes=tboxes, dt1 = jscripts,
-                           taskon=taskon, task_iter=task_iter, holdvec=holdvec, keydata = keydata)
+                           taskon=taskon, task_iter=task_iter, holdvec=holdvec, keydata = keydata, entrydata = entrydata)
 
 
 
