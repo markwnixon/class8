@@ -391,17 +391,18 @@ def Test():
                   {'View Docs': ['Source', 'Proof','Manifest', 'Interchange', 'Invoice', 'Paid Invoice']},
                   {'Undo': ['Delete Item', 'Undo Invoice','Undo Payment']},
                   {'Tasks': ['Street Turn', 'Unpulled Containers', 'Assign Drivers', 'Driver Hours', 'Driver Payroll', 'Truck Logs', 'Text Output']}],
-                'container_types' : ['40HC', '40STD', '20ST', '53Dry']
-
+               'container_types' : ['40HC', '40STD', '20ST', '53Dry']
                }
+
     Orders_setup = { 'table' : 'Orders',
                      'filter' : None,
                      'filterval' : None,
-                     'entry data' : [['Jo','JO', None,'text','jocheck'], ['Order','Order','Order','text','text'], ['Shipper','Shipper', 'Customer', 'select','customerdata'], ['Booking','Booking','text','text'],
-                                     ['Container','Container','text','concheck'], ['Chassis','Chassis','text','text'], ['Company','Load At','multitext','dropblock1'],
-                                     ['Amount','Amount','text','float'], ['Date','Date','date','date'], ['Company2','Deliver To','multitext','dropblock2'],
-                                     ['Commodity','Commodity','text','text'], ['Packing','Packing','text','text']],
+                     'entry data' : [['Jo','JO', None,'text','jocheck'], ['Order','Order','Customer Ref No.','text','text'], ['Shipper','Shipper', 'Select Customer', 'select', 'customerdata'], ['Booking','Release','Release', 'text','text'],
+                                     ['Container','Container', 'Container', 'text','concheck'], ['Chassis','Chassis', None, 'text','text'], ['Company','Load At','Load At','multitext','dropblock1'],
+                                     ['Amount','Amount','Base Charge', 'text','float'], ['Date','Load Date','Load Date','date','date'], ['Company2','Deliver To','multitext','dropblock2'], ['Date2','Del Date','Del Date', 'date','date'],
+                                     ['Commodity','Commodity','Commodity','text','text'], ['Packing','Packing', 'Packing', 'text','text']],
                      'colorfilter' : ['Hstat'],
+                     'side data' : [{'customerdata' : ['People','Ptype', 'Trucking','Company']}],
                      'jscript' : 'dtTrucking'}
 
     Interchange_setup = { 'table' : 'Interchange',
@@ -440,7 +441,7 @@ def Test():
     jscripts = []
     tfilters = {}
     tboxes = {}
-    holdvec = [0]*30
+    holdvec = ['']*30
 
 
     if request.method == 'POST':
@@ -523,10 +524,23 @@ def Test():
         table_data.append(db_data)
         jscripts.append(eval(f"{tableget}_setup['jscript']"))
 
+        #For tables that are on get side data required for tasks:
+        side_data = eval(f"{tableget}_setup['side data']")
+        keydata = {}
+        for side in side_data:
+            for key, values in side.items():
+                print(key,values,tableget)
+                dbstat = eval(f"{values[0]}.query.filter({values[0]}.{values[1]}=='{values[2]}').order_by({values[0]}.{values[3]}).all()")
+                if dbstat is not None:
+                    keydata.update({key:[dbstat,values]})
+
+                for customer in keydata['customerdata'][0]:
+                    print(customer.Company)
+
     print(jscripts)
     return render_template('test.html',cmpdata=cmpdata, scac=scac,  genre_data = genre_data, table_data=table_data, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
                            leftsize=leftsize, rightsize=rightsize, docref=docref, tabletitle=tabletitle, table_filters = table_filters,task_boxes = task_boxes, tfilters=tfilters, tboxes=tboxes, dt1 = jscripts,
-                           taskon=taskon, task_iter=task_iter, holdvec=holdvec)
+                           taskon=taskon, task_iter=task_iter, holdvec=holdvec, keydata = keydata)
 
 
 
