@@ -13,6 +13,42 @@
 <div class="card-body">
 <table class="table table-condensed table-hover">
 <tbody>
+{% for entry in entrydata %}
+    {% if entry[3] == 'select' %}
+            <tr>
+                <td><div class="input-group-text">{{  entry[2] }}</div></td>
+
+                <td>
+                    <select class="form-control" type="text" name="{{ entry[0] }}" onchange="this.form.submit()">
+                    <option value='Choose Later'>Choose Later</option>
+
+                        {% if entry[4] == 'customerdata' %}{% set klist = keydata.customerdata %}{% endif %}
+                        {% set htest = holdvec[loop.index-1] %}
+                        {% for kdata in klist %}
+                            <option value="{{kdata}}" {% if kdata == htest %} selected {% endif %}> {{ kdata }} </option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+
+    {%  elif entry[3] == 'multitext' %}
+            <tr>
+                <td> <div class="input-group-text"> {{ entry[2] }} </div></td>
+                <td colspan="2"><textarea class="form-control" type="text" name="{{ entry[0] }}" rows="4">{% if holdvec[loop.index - 1] != 0 %}{{ holdvec[loop.index-1]}}{% endif %}</textarea></td>
+            </tr>
+
+    {% elif entry[3] == 'text' or entry[3] == 'date'  %}
+
+            <tr>
+                <td><div class="input-group-text">{{  entry[2] }}</div></td>
+                <td><input class="form-control" type="{{ entry[3] }}" name="{{ entry[0] }}" value="{{ holdvec[loop.index-1] }}"></td>
+            </tr>
+
+    {% endif %}
+
+{% endfor %}
+
+</tbody></table>
 
 <table class="table table-condensed table-hover">
 <tbody>
