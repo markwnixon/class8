@@ -16,10 +16,10 @@
 {% for entry in entrydata %}
     {% if entry[3] == 'select' %}
             <tr>
-                <td><div class="input-group-text">{{  entry[2] }}</div></td>
+                <td><div class="input-group-text red text-white font-weight-bold">{{  entry[2] }}</div></td>
 
                 <td>
-                    <select class="form-control" type="text" name="{{ entry[0] }}" onchange="this.form.submit()">
+                    <select class="form-control red text-white font-weight-bold" type="text" name="{{ entry[0] }}" onchange="this.form.submit()">
                     <option value='Choose Later'>Choose Later</option>
 
                         {% if entry[4] == 'customerdata' %}{% set klist = keydata.customerdata %}{% endif %}

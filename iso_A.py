@@ -19,7 +19,7 @@ import requests
 import mimetypes
 from urllib.parse import urlparse
 import img2pdf
-from viewfuncs import make_new_order, nonone, monvals, getmonths, nononestr
+from viewfuncs import make_new_order, nonone, monvals, getmonths, nononestr, hasinput
 
 today = datetime.datetime.today()
 year = str(today.year)
@@ -373,6 +373,7 @@ def Test():
             print(test)
             for jx, entry in enumerate(entrydata):
                 holdvec[jx] = request.values.get(f'{entry[0]}')
+                if not hasinput(holdvec[jx]): holdvec[jx] = ''
                 print(jx,entry[0],holdvec[jx])
         else:
             holdvec = [''] * 30
@@ -416,7 +417,7 @@ def Test():
                      'entry data' : [['Jo','JO', '', '','jocheck'], ['Order','Order','Customer Ref No.','text','text'], ['Shipper','Shipper', 'Select Customer', 'select', 'customerdata'], ['Booking','Release','Release', 'text','text'],
                                      ['Container','Container', 'Container', 'text','concheck'], ['Type','ConType', 'Container Type', 'select','container_types'],['Chassis','Chassis', '', '','text'], ['Company','Load At','Load At','multitext','dropblock1'],
                                      ['Amount','Amount','Base Charge', 'text','float'], ['Date','Load Date','Load Date','date','date'], ['Company2','Deliver To','Deliver To','multitext','dropblock2'], ['Date2','Del Date','Del Date', 'date','date'],
-                                     ['Commodity','Commodity','Commodity','text','text'], ['Packing','Packing', 'Packing', 'text','text']],
+                                     ['Commodity','Commodity','Commodity','text','text'], ['Packing','Packing', 'Packing', 'text','text'],['Seal','Seal', 'Seal', 'text','text'], ['Pickup','Pickup', 'Pickup No.', 'text','text'], ['Description', 'Description', 'Special Instructions', 'multitext','text']],
                      'colorfilter' : ['Hstat'],
                      'side data' : [{'customerdata' : ['People','Ptype', 'Trucking','Company']}],
                      'jscript' : 'dtTrucking'}
