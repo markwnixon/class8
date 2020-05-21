@@ -407,14 +407,14 @@ def Test():
                   {'View Docs': ['Source', 'Proof','Manifest', 'Interchange', 'Invoice', 'Paid Invoice']},
                   {'Undo': ['Delete Item', 'Undo Invoice','Undo Payment']},
                   {'Tasks': ['Street Turn', 'Unpulled Containers', 'Assign Drivers', 'Driver Hours', 'Driver Payroll', 'Truck Logs', 'Text Output']}],
-               'container_types' : ['40HC', '40STD', '20ST', '53Dry']
+               'container_types' : ['40\' GP 9\'6\"', '40\' RS 9\'6\"', '40\' GP 8\'6\"', '40\' RS 8\'6\"','20\' GP 8\'6\"', '20\' VH 8\'6\"', '45\' GP 9\'6\"', '45\' VH 9\'6\"', '53\' Dry', 'LCL', 'RORO']
                }
 
     Orders_setup = { 'table' : 'Orders',
                      'filter' : None,
                      'filterval' : None,
                      'entry data' : [['Jo','JO', '', '','jocheck'], ['Order','Order','Customer Ref No.','text','text'], ['Shipper','Shipper', 'Select Customer', 'select', 'customerdata'], ['Booking','Release','Release', 'text','text'],
-                                     ['Container','Container', 'Container', 'text','concheck'], ['Chassis','Chassis', '', '','text'], ['Company','Load At','Load At','multitext','dropblock1'],
+                                     ['Container','Container', 'Container', 'text','concheck'], ['Type','ConType', 'Container Type', 'select','container_types'],['Chassis','Chassis', '', '','text'], ['Company','Load At','Load At','multitext','dropblock1'],
                                      ['Amount','Amount','Base Charge', 'text','float'], ['Date','Load Date','Load Date','date','date'], ['Company2','Deliver To','Deliver To','multitext','dropblock2'], ['Date2','Del Date','Del Date', 'date','date'],
                                      ['Commodity','Commodity','Commodity','text','text'], ['Packing','Packing', 'Packing', 'text','text']],
                      'colorfilter' : ['Hstat'],
