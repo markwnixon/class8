@@ -19,7 +19,7 @@ import requests
 import mimetypes
 from urllib.parse import urlparse
 import img2pdf
-from viewfuncs import make_new_order, nonone, monvals, getmonths, nononestr, hasinput
+from viewfuncs import make_new_order, nonone, monvals, getmonths, nononestr, hasinput, d2s
 
 today = datetime.datetime.today()
 year = str(today.year)
@@ -373,7 +373,45 @@ def Test():
             print(test)
             for jx, entry in enumerate(entrydata):
                 holdvec[jx] = request.values.get(f'{entry[0]}')
-                if not hasinput(holdvec[jx]): holdvec[jx] = ''
+
+                if entry[4] == 'text':
+                    if not hasinput(holdvec[jx]):
+                        holdvec[jx] = ''
+                        entry[5] = 1
+                        entry[6] = 'Warning: This text data has no value'
+                    else:
+                        entry[5] = 0
+                        entry[6] = 'Ok'
+
+                if entry[4] == 'multitext':
+                    if not hasinput(holdvec[jx]):
+                        holdvec[jx] = ''
+                        entry[5] = 1
+                        entry[6] = 'Warning: This text data has no value'
+                    else:
+                        entry[5] = 0
+                        entry[6] = 'Ok'
+
+                elif entry[4] == 'date':
+                    try:
+                        dt = datetime.datetime.strptime(holdvec[jx],'%Y-%m-%d')
+                        entry[5] = 0
+                        entry[6] = 'ok'
+                    except:
+                        holdvec[jx] = today.strftime('%Y-%m-%d')
+                        entry[5] = 1
+                        entry[6] = 'Warning: No date time entered so date set to today'
+
+                elif entry[4] == 'float':
+                    try:
+                        dt = float(holdvec[jx])
+                        holdvec[jx] = d2s(dt)
+                        entry[5] = 0
+                        entry[6] = 'ok'
+                    except:
+                        entry[5] = 2
+                        entry[6] = 'Error: must set a numerical value for this charge'
+
                 print(jx,entry[0],holdvec[jx])
         else:
             holdvec = [''] * 30
@@ -414,10 +452,10 @@ def Test():
     Orders_setup = { 'table' : 'Orders',
                      'filter' : None,
                      'filterval' : None,
-                     'entry data' : [['Jo','JO', '', '','jocheck'], ['Order','Order','Customer Ref No.','text','text'], ['Shipper','Shipper', 'Select Customer', 'select', 'customerdata'], ['Booking','Release','Release', 'text','text'],
-                                     ['Container','Container', 'Container', 'text','concheck'], ['Type','ConType', 'Container Type', 'select','container_types'],['Chassis','Chassis', '', '','text'], ['Company','Load At','Load At','multitext','dropblock1'],
-                                     ['Amount','Amount','Base Charge', 'text','float'], ['Date','Load Date','Load Date','date','date'], ['Company2','Deliver To','Deliver To','multitext','dropblock2'], ['Date2','Del Date','Del Date', 'date','date'],
-                                     ['Commodity','Commodity','Commodity','text','text'], ['Packing','Packing', 'Packing', 'text','text'],['Seal','Seal', 'Seal', 'text','text'], ['Pickup','Pickup', 'Pickup No.', 'text','text'], ['Description', 'Description', 'Special Instructions', 'multitext','text']],
+                     'entry data' : [['Jo','JO', '', '','jocheck',0,'ok'], ['Order','Order','Customer Ref No.','text','text',0,'ok'], ['Shipper','Shipper', 'Select Customer', 'select', 'customerdata',0,'ok'], ['Booking','Release','Release', 'text','text',0,'ok'],
+                                     ['Container','Container', 'Container', 'text','concheck',0,'ok'], ['Type','ConType', 'Container Type', 'select','container_types',0,'ok'],['Chassis','Chassis', '', '','text',0,'ok'], ['Company','Load At','Load At','multitext','dropblock1',0,'ok'],
+                                     ['Amount','Amount','Base Charge', 'text','float',0,'ok'], ['Date','Load Date','Load Date','date','date',0,'ok'], ['Company2','Deliver To','Deliver To','multitext','dropblock2',0,'ok'], ['Date2','Del Date','Del Date', 'date','date',0,'ok'],
+                                     ['Commodity','Commodity','Commodity','text','text',1,'This is a long error message'], ['Packing','Packing', 'Packing', 'text','text',0,'ok'],['Seal','Seal', 'Seal', 'text','text',0,'ok'], ['Pickup','Pickup', 'Pickup No.', 'text','text',0,'ok'], ['Description', 'Description', 'Special Instructions', 'multitext','text',0,'ok']],
                      'colorfilter' : ['Hstat'],
                      'side data' : [{'customerdata' : ['People','Ptype', 'Trucking','Company']}],
                      'jscript' : 'dtTrucking'}
