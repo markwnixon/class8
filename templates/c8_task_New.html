@@ -4,8 +4,8 @@
     <div class="d-flex justify-content-around align-items-center">
         <div class="p-0">Enter New Job Information</div>
         <div class="p-0">
-            <button type="submit" class="btn btn-md btn-green" name="ThisJob">Create Job</button>
-            <button type="submit" class="btn btn-md btn-elegant" name="Return">&nbsp; Cancel &nbsp;</button>
+            <button type="submit" class="btn btn-md btn-green" name="Create Job">Create Job</button>
+            <button type="submit" class="btn btn-md btn-elegant" name="Cancel">&nbsp; Cancel &nbsp;</button>
         </div>
     </div>
 </div>
@@ -40,6 +40,23 @@
             </tr>
 
     {%  elif entry[3] == 'multitext' %}
+        {% if entry[4] != 'text' %}
+            {% if entry[4] == 'dropblock1' %}{% set klist = keydata.dropblock1 %}{% endif %}
+            {% if entry[4] == 'dropblock2' %}{% set klist = keydata.dropblock2 %}{% endif %}
+            {% if klist %}
+            <tr>
+                <td><div class="input-group-text">Previous {{ entry[2] }}</div></td>
+                <td>
+                    <select class="form-control" type="text" name="{{ entry[4] }}" onchange="this.form.submit()">
+                    <option value="">Optional Choose from Previous</option>
+                    {% for du in klist %}
+                    <option {% if du == thisdu %} selected {% endif %} value='{{du}}'>{{du}}</option>
+                    {% endfor %}
+                    </select>
+                </td>
+            </tr>
+        {%  endif  %}
+        {% endif %}
             <tr>
                 <td> <div class="input-group-text {{ colortext }}" data-toggle="tooltip" title="{{ entry[6] }}"> {{ entry[2] }} </div></td>
                 <td colspan="2"><textarea class="form-control {{ colortext }}" type="text" name="{{ entry[0] }}" rows="4">{% if holdvec[loop.index - 1] != 0 %}{{ holdvec[loop.index-1]}}{% endif %}</textarea></td>

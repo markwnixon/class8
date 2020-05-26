@@ -8,8 +8,6 @@
 
         <div class="col-sm-{{leftsize}}">
                 genre_data[table]: {{ genre_data['table'] }}<br>
-                genre_data[container_types]: {{ genre_data['container_types'] }}<br>
-                genre_data[3]: {{ genre_data['container_types'] }}<br>
                 {% set contypes = genre_data['container_types'] %}
                 {% if leftscreen == 0 %}
 
@@ -84,9 +82,11 @@
                 <div class="col-sm-12" align=""center">
                     {% if taskon %}
                         {% set taskfile = taskon | replace(" ","_") %}
+                        {% include 'includes/_controlpanelheader.html' %}
                         {% include 'c8_task_'+taskfile+'.html' %}
                     {% else %}
-                        There is not and active task.
+                        {% include 'includes/_controlpanelheader.html' %}
+                        {% include 'includes/_truckcolorcode.html' %}
                     {% endif %}
                 </div>
             </div>

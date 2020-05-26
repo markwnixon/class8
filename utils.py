@@ -129,6 +129,23 @@ def hasvalue(input):
     else:
         return 1
 
+def hasinput(input):
+    if input is None:
+        return 0
+    elif isinstance(input,str):
+        input = input.strip()
+        if input == '' or input == 'None' or input == 'none':
+            return 0
+        else:
+            return 1
+    elif isinstance(input,int):
+        if input == 0:
+            return 0
+        else:
+            return 1
+    else:
+        return 1
+
 def txtfile(infile):
     base=os.path.splitext(infile)[0]
     tf=base+'.txt'
