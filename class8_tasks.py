@@ -44,6 +44,7 @@ def Table_maker(genre):
 
         # See if a task is active and ongoing
         taskon = nononestr(request.values.get('taskon'))
+        focus = nononestr(request.values.get('focus'))
         task_iter = nonone(request.values.get('task_iter'))
 
         cancel = request.values.get('Cancel')
@@ -63,12 +64,20 @@ def Table_maker(genre):
             # See if a new task has been launched from quick buttons; set launched to New/Mod/Inv/Ret else set launched to None
             launched = [ix for ix in quick_buttons if request.values.get(ix) is not None]
             taskon = launched[0] if launched != [] else None
+            focus = eval(f"{genre}_genre['table']")
 
+        if not hasinput(taskon):
             # See if a task box has been selected
             for box in task_boxes:
                 for key, value in box.items():
                     tboxes[key] = request.values.get(key)
-                    if tboxes[key] is not None: taskon = tboxes[key]
+                    if tboxes[key] is not None:
+                        taskon_list = tboxes[key].split()
+                        taskon = taskon_list[0]
+                        remainder = tboxes[key].replace(taskon,'')
+                        remainder = remainder.strip()
+                        focus = eval(f"{genre}_genre['task_mapping']['{remainder}']")
+
 
             print('Tboxes:', tboxes)
 
@@ -94,7 +103,7 @@ def Table_maker(genre):
         # Default time filter on entry into table is last 60 days:
         tfilters = {'Date Filter': 'Last 60 Days', 'Pay Filter': None, 'Haul Filter': None, 'Color Filter': 'Haul'}
         jscripts = ['dtTrucking']
-        taskon, task_iter = None, None
+        taskon, task_iter, focus = None, None, None
 
     # genre_data = [genre,genre_tables,genre_tables_on,contypes]
     genre_data = eval(f"{genre}_genre")
@@ -104,8 +113,9 @@ def Table_maker(genre):
     print(genre_data['genre_tables_on'])
     print(genre_data['container_types'])
 
+    # Execute the task here if a task is on...,,,,
     if taskon != '' and taskon != None:
-        rstring = f"{taskon}_task(task_iter,{genre_data['table']}_setup)"
+        rstring = f"{taskon}_task(task_iter,{focus}_setup)"
         print(rstring)
         holdvec, entrydata, err = eval(rstring)
         task_iter = int(task_iter) + 1
@@ -167,7 +177,7 @@ def Table_maker(genre):
     print(jscripts, holdvec)
     err = erud(err)
     return genre_data, table_data, err, oder, leftscreen,leftsize,docref, tabletitle, table_filters, task_boxes, tfilters, tboxes, jscripts,\
-    taskon, task_iter, holdvec, keydata, entrydata, username, modata
+    taskon, task_iter, holdvec, keydata, entrydata, username, modata, focus
 
 def get_dbdata(table_setup, tfilters):
     today = datetime.date.today()
@@ -265,7 +275,7 @@ def get_dbdata(table_setup, tfilters):
 def make_new_entry(table,data,entrydata):
     err = 'No Jo Created'
     from sqlalchemy import inspect
-    inst = inspect(Orders)
+    inst = eval(f"inspect({table})")
     attr_names = [c_attr.key for c_attr in inst.mapper.column_attrs]
 
     for jx,entry in enumerate(entrydata):

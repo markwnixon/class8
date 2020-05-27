@@ -266,12 +266,12 @@ def Test():
     from class8_tasks import Table_maker
     genre = 'Trucking'
     genre_data, table_data, err, oder, leftscreen, leftsize, docref, tabletitle, table_filters, task_boxes, tfilters, tboxes, jscripts,\
-    taskon, task_iter, holdvec, keydata, entrydata, username, modata = Table_maker(genre)
+    taskon, task_iter, holdvec, keydata, entrydata, username, modata, focus = Table_maker(genre)
     rightsize = 12 - leftsize
 
     return render_template('test.html',cmpdata=cmpdata, scac=scac,  genre_data = genre_data, table_data=table_data, err=err, oder=oder, modata=modata, leftscreen=leftscreen,
                            leftsize=leftsize, rightsize=rightsize, docref=docref, tabletitle=tabletitle, table_filters = table_filters,task_boxes = task_boxes, tfilters=tfilters, tboxes=tboxes, dt1 = jscripts,
-                           taskon=taskon, task_iter=task_iter, holdvec=holdvec, keydata = keydata, entrydata = entrydata, username=username)
+                           taskon=taskon, task_iter=task_iter, holdvec=holdvec, keydata = keydata, entrydata = entrydata, username=username, focus = focus)
 
 
 
