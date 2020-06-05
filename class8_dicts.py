@@ -78,6 +78,9 @@ Interchange_setup = {'table': 'Interchange',
                                     ['Description', 'Description', 'Special Instructions', 'multitext', 'text', 0,
                                      'ok']],
                      'colorfilter': ['Status'],
+                     'side data': [{'customerdata': ['People', 'Ptype', 'Trucking', 'Company']},
+                                   {'dropblock1': ['Orders', 'Shipper', 'get_Shipper', 'Company']},
+                                   {'dropblock2': ['Orders', 'Shipper', 'get_Shipper', 'Company2']}],
                      'jscript': 'dtHorizontalVerticalExample2'}
 
 Customers_setup = {'table': 'People',
@@ -92,6 +95,9 @@ Customers_setup = {'table': 'People',
                                   ['Associate2', 'Email AP', 'Email AP', 'text', 'text', 0, 'ok'],
                                   ['Date1', 'Date', 'Load Date', 'date', 'date', 0, 'ok']],
                    'colorfilter': None,
+                   'side data': [{'customerdata': ['People', 'Ptype', 'Trucking', 'Company']},
+                                 {'dropblock1': ['Orders', 'Shipper', 'get_Shipper', 'Company']},
+                                 {'dropblock2': ['Orders', 'Shipper', 'get_Shipper', 'Company2']}],
                    'jscript': 'dtHorizontalVerticalExample3'}
 
 Services_setup = {'table': 'Services',
