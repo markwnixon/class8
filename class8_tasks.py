@@ -278,12 +278,14 @@ def make_new_entry(table,data,entrydata):
     inst = eval(f"inspect({table})")
     attr_names = [c_attr.key for c_attr in inst.mapper.column_attrs]
 
+    creation = '0'
     for jx,entry in enumerate(entrydata):
-        if entry[0] == 'Jo':
+        if entry[2] == 'Create':
+            creation = entry[0]
             sdate = today.strftime('%Y-%m-%d')
             nextjo = newjo(entry[3], sdate)
             data[jx] = nextjo
-            err = f'New JO {nextjo} created'
+            err = f'New {creation} {nextjo} created'
 
     print(attr_names)
     for c_attr in inst.mapper.column_attrs:
@@ -292,16 +294,16 @@ def make_new_entry(table,data,entrydata):
     dbnew = f'{table}('
     for col in attr_names:
         if col != 'id':
-            if col == 'Jo': dbnew = dbnew + f", {col}='{nextjo}'"
+            if col == creation: dbnew = dbnew + f", {col}='{nextjo}'"
             else: dbnew = dbnew + f', {col}=None'
     dbnew = dbnew + ')'
     dbnew = dbnew.replace('(, ', '(')
-    print(dbnew)
+    print('The dbnew phrase is:',dbnew)
     input = eval(dbnew)
     db.session.add(input)
     db.session.commit()
 
-    newquery = f"{table}.query.filter({table}.Jo == '{nextjo}').first()"
+    newquery = f"{table}.query.filter({table}.{creation} == '{nextjo}').first()"
     print(newquery)
     dat = eval(newquery)
     if dat is not None:
