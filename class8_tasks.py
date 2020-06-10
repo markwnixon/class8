@@ -272,7 +272,12 @@ def get_dbdata(table_setup, tfilters):
 
     return [data1, data1id, rowcolors1, rowcolors2, entrydata]
 
-def make_new_entry(table,data,entrydata):
+def make_new_entry(tablesetup,data):
+    table = tablesetup['table']
+    entrydata = tablesetup['entry data']
+    filter = tablesetup['filter']
+    filterval = tablesetup['filterval']
+
     err = 'No Jo Created'
     from sqlalchemy import inspect
     inst = eval(f"inspect({table})")
@@ -280,21 +285,25 @@ def make_new_entry(table,data,entrydata):
 
     creation = '0'
     for jx,entry in enumerate(entrydata):
-        if entry[2] == 'Create':
+        if 'Creator' in entry[2]:
             creation = entry[0]
-            sdate = today.strftime('%Y-%m-%d')
-            nextjo = newjo(entry[3], sdate)
-            data[jx] = nextjo
+            if creation == 'Jo':
+                sdate = today.strftime('%Y-%m-%d')
+                nextjo = newjo(entry[3], sdate)
+                data[jx] = nextjo
+            else:
+                nextjo = 'NewEntry'
             err = f'New {creation} {nextjo} created'
 
-    print(attr_names)
+    print('The attr_names are:',attr_names)
     for c_attr in inst.mapper.column_attrs:
-        print(c_attr)
+        print('Attrloop:',c_attr)
 
     dbnew = f'{table}('
     for col in attr_names:
         if col != 'id':
             if col == creation: dbnew = dbnew + f", {col}='{nextjo}'"
+            elif col == filter: dbnew = dbnew + f", {col}='{filterval}'"
             else: dbnew = dbnew + f', {col}=None'
     dbnew = dbnew + ')'
     dbnew = dbnew.replace('(, ', '(')
@@ -337,7 +346,7 @@ def New_task(iter,tablesetup):
         create_job = request.values.get('Create Job')
         if create_job is not None:
             if failed == 0:
-                err.append(make_new_entry(tablesetup['table'],holdvec,entrydata))
+                err.append(make_new_entry(tablesetup,holdvec))
                 err.append(f"Created new entry in {tablesetup['table']}")
             else:
                 err.append(f'Cannot create entry until input errors shown in red below are resolved')
