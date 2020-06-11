@@ -15,6 +15,7 @@ import json
 from class8_utils import *
 from utils import *
 from viewfuncs import newjo
+import uuid
 
 def Table_maker(genre):
     username = session['username'].capitalize()
@@ -112,6 +113,7 @@ def Table_maker(genre):
     print(genre_data['genre_tables'])
     print(genre_data['genre_tables_on'])
     print(genre_data['container_types'])
+    print(genre_data['load_types'])
 
     # Execute the task here if a task is on...,,,,
     if taskon != '' and taskon != None:
@@ -272,28 +274,29 @@ def get_dbdata(table_setup, tfilters):
 
     return [data1, data1id, rowcolors1, rowcolors2, entrydata]
 
+def get_new_Jo(input):
+    sdate = today.strftime('%Y-%m-%d')
+    return newjo(input, sdate)
+
+
 def make_new_entry(tablesetup,data):
     table = tablesetup['table']
     entrydata = tablesetup['entry data']
     filter = tablesetup['filter']
     filterval = tablesetup['filterval']
+    creators = tablesetup['creators']
+    ukey = tablesetup['ukey']
 
     err = 'No Jo Created'
     from sqlalchemy import inspect
     inst = eval(f"inspect({table})")
     attr_names = [c_attr.key for c_attr in inst.mapper.column_attrs]
 
-    creation = '0'
     for jx,entry in enumerate(entrydata):
-        if 'Creator' in entry[2]:
-            creation = entry[0]
-            if creation == 'Jo':
-                sdate = today.strftime('%Y-%m-%d')
-                nextjo = newjo(entry[3], sdate)
-                data[jx] = nextjo
-            else:
-                nextjo = 'NewEntry'
-            err = f'New {creation} {nextjo} created'
+        if entry[0] in creators:
+            creation = [ix for ix in creators if ix == entry[0]][0]
+            data[jx] = eval(f"get_new_{creation}('{entry[3]}')")
+            err = f'New {creation} {data[jx]} created'
 
     print('The attr_names are:',attr_names)
     for c_attr in inst.mapper.column_attrs:
@@ -302,7 +305,9 @@ def make_new_entry(tablesetup,data):
     dbnew = f'{table}('
     for col in attr_names:
         if col != 'id':
-            if col == creation: dbnew = dbnew + f", {col}='{nextjo}'"
+            if col == ukey:
+                uidtemp = uuid.uuid1().node
+                dbnew = dbnew + f", {col}='{uidtemp}'"
             elif col == filter: dbnew = dbnew + f", {col}='{filterval}'"
             else: dbnew = dbnew + f', {col}=None'
     dbnew = dbnew + ')'
@@ -312,16 +317,16 @@ def make_new_entry(tablesetup,data):
     db.session.add(input)
     db.session.commit()
 
-    newquery = f"{table}.query.filter({table}.{creation} == '{nextjo}').first()"
+    newquery = f"{table}.query.filter({table}.{ukey} == '{uidtemp}').first()"
     print(newquery)
     dat = eval(newquery)
     if dat is not None:
         for jx,entry in enumerate(entrydata):
-            print(table, data[jx], entry[0])
+            #print(table, data[jx], entry[0])
             setattr(dat,f'{entry[0]}',data[jx])
         db.session.commit()
     else:
-        print('Dat not found')
+        print('Data not found')
 
     return err
 

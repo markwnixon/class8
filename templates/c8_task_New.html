@@ -62,7 +62,7 @@
                 <td colspan="2"><textarea class="form-control {{ colortext }}" type="text" name="{{ entry[0] }}" rows="4">{% if holdvec[loop.index - 1] != 0 %}{{ holdvec[loop.index-1]}}{% endif %}</textarea></td>
             </tr>
 
-    {% elif entry[3] == 'text' or entry[3] == 'date'  %}
+    {% elif entry[3] == 'text' or entry[3] == 'date' or entry[3] == 'time' %}
 
             <tr>
                 <td><div class="input-group-text {{ colortext }}" data-toggle="tooltip" title="{{ entry[6] }}">{{  entry[2] }}</div></td>
