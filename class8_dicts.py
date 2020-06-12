@@ -96,7 +96,11 @@ Interchange_setup = {'table': 'Interchange',
                                     ['Type', 'Load Type', 'Load Type', 'select', 'load_types', 0, 'ok'],
                                     ['Chassis', 'Chassis', '', '', 'text', 0, 'ok'],
                                     ['Date', 'Load Date', 'Load Date', 'date', 'date', 0, 'ok'],
-                                    ['Time', 'Gate Time', 'Gate Time', 'time', 'time', 0, 'ok']
+                                    ['Time', 'Gate Time', 'Gate Time', 'time', 'time', 0, 'ok'],
+                                    ['GrossWt', 'Gross Weight', 'Gross Weight', 'text', 'text', 0, 'ok'],
+                                    ['TruckNumber', 'Truck Number', 'Truck Number', 'text', 'text', 0, 'ok'],
+                                    ['Driver', 'Driver', 'Driver', 'text', 'text', 0, 'ok'],
+                                    ['Status', 'Status', 'Status', 'text', 'text', 0, 'ok']
                                     ],
                      'colorfilter': ['Status'],
                      'side data': [{'customerdata': ['People', 'Ptype', 'Trucking', 'Company']},
