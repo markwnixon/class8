@@ -17,6 +17,16 @@ from utils import *
 from viewfuncs import newjo
 import uuid
 
+def get_drop(loadname):
+    dropdat = Drops.query.filter(Drops.Entity == loadname).first()
+    if dropdat is not None:
+        print('dropdat',dropdat.Entity, dropdat.Addr1, dropdat.Addr2, dropdat.Phone, dropdat.Email)
+        dline = f'{dropdat.Entity}\n{dropdat.Addr1}\n{dropdat.Addr2}\n{dropdat.Phone}\n{dropdat.Email}'
+        dline = dline.replace('None','')
+        return dline
+    else:
+        return ''
+
 def Table_maker(genre):
     username = session['username'].capitalize()
     # Gather information about the tables inside the genre
@@ -317,13 +327,20 @@ def make_new_entry(tablesetup,data):
     db.session.add(input)
     db.session.commit()
 
+    def checksplit(entry,dat):
+        if entry == 'Company' or entry == 'Company2':
+            return dat.splitlines()[0]
+        else:
+            return dat
+
+
     newquery = f"{table}.query.filter({table}.{ukey} == '{uidtemp}').first()"
     print(newquery)
     dat = eval(newquery)
     if dat is not None:
         for jx,entry in enumerate(entrydata):
-            #print(table, data[jx], entry[0])
-            setattr(dat,f'{entry[0]}',data[jx])
+            tdat = checksplit(entry,data[jx])
+            setattr(dat,f'{entry[0]}',tdat)
         db.session.commit()
     else:
         print('Data not found')

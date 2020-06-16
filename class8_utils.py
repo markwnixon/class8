@@ -5,6 +5,8 @@ from utils import *
 import datetime
 today = datetime.datetime.today()
 
+
+
 def container_check(num):
     check1 = 0
     alphadigit = {'A': '10', 'B': '12', 'C': '13', 'D': '14', 'E': '15', 'F': '16', 'G': '17', 'H': '18', 'I': '19',
@@ -30,6 +32,8 @@ def container_check(num):
     else:
         message = f'Container {num} is NOT valid: cksum = {ckdigit} does not match last digit {theckdigit}'
         return 2, message
+
+
 
 def form_check(text,type):
     status = 0
@@ -101,18 +105,20 @@ def form_check(text,type):
             message = 'Error: must choose a customer'
 
     elif type == 'dropblock1':
+        from class8_tasks import get_drop
         if not hasinput(text):
             loadname = request.values.get('dropblock1')
             if loadname is not None:
-                text = loadname
-        print('got dropblock1')
+                text = get_drop(loadname)
+        print('got dropblock1',text)
 
     elif type == 'dropblock2':
+        from class8_tasks import get_drop
         if not hasinput(text):
             loadname = request.values.get('dropblock2')
             if loadname is not None:
-                text = loadname
-        print('got dropblock2')
+                text = get_drop(loadname)
+        print('got dropblock2',text)
 
     return text,status,message
 
