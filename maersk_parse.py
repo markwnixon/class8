@@ -24,9 +24,9 @@ def maerskparser():
             shutil.copy(s+file,u)
             shutil.move(s+file,t+file)
 
-    wk=addpath('processing/tmp/')
+    wk=addpath('processing/static/')
     data=addpath('processing/pdf_bin/')
-    viewloc=addpath('tmp/data/vbookings/')
+    viewloc=addpath('static/data/vbookings/')
 
     hitems=['booking:Booking', 'reference:ExportRef', 'vessel:Vessel', 'cy/cy:LoadPort', 'total:Amount']
 

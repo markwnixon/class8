@@ -19,8 +19,8 @@ def makemanifestT(odata, pdata1, pdata2, pdata3, tdata, drvdata, cache, jtype, c
 
 
     joborder=odata.Jo
-    #file1='tmp/vmanifest/Manifest'+joborder+'.pdf'
-    #file2='tmp/vmanifest/Manifest'+joborder+'c'+str(cache)+'.pdf'
+    #file1='static/vmanifest/Manifest'+joborder+'.pdf'
+    #file2='static/vmanifest/Manifest'+joborder+'c'+str(cache)+'.pdf'
     file1, file2 ,file3 = manfile(joborder,cache)
     today = datetime.datetime.today().strftime('%m/%d/%Y')
     type=joborder[1]

@@ -212,7 +212,7 @@ def Whatapp():
             file_extension = file_extension.replace('.jpeg', '.jpg')
             media_sid = os.path.basename(urlparse(media_url).path)
             media_files.append(media_sid+file_extension)
-            media_path = addpath('tmp/data/processing/whatsapp/')
+            media_path = addpath('static/data/processing/whatsapp/')
             with open(f"{media_path}{media_sid}{file_extension}", 'wb') as f:
                 f.write(req.content)
         print(media_files)

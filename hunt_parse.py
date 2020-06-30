@@ -25,7 +25,7 @@ def huntparse():
 
     data=addpath('processing/pdf_bin/hunt')
     done=addpath('processing/pdforder/')
-    viewloc=addpath('tmp/data/vorders/')
+    viewloc=addpath('static/data/vorders/')
 
     #Using new format here the left item is what we are looking for (keyword) and right side is the Label
     hitems=['Total Rate:Amount', 'Commodity:commodity']

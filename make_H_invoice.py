@@ -15,8 +15,8 @@ def main(odata, ldata, pdata1, cache, invodate, payment):
     from CCC_system_setup import bankdata, scac
 
     joborder = odata.Jo
-    file1 = f'tmp/{scac}/data/vinvoice/INV'+joborder+'.pdf'
-    file2 = f'tmp/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache)+'.pdf'
+    file1 = f'static/{scac}/data/vinvoice/INV'+joborder+'.pdf'
+    file2 = f'static/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache)+'.pdf'
     today = datetime.datetime.today().strftime('%m/%d/%Y')
     type = joborder[1]
     if invodate is None or invodate == 0:
@@ -154,7 +154,7 @@ def main(odata, ldata, pdata1, cache, invodate, payment):
     c = canvas.Canvas(file2, pagesize=letter)
     c.setLineWidth(1)
 
-    logo = "tmp/felpics/hm.jpg"
+    logo = "static/felpics/hm.jpg"
     c.drawImage(logo, 220, 580, mask='auto', width=180, preserveAspectRatio=True)
 
     # Date and JO boxes

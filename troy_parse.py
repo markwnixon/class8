@@ -24,9 +24,9 @@ def troyparser():
             shutil.copy(s+file,u)
             shutil.move(s+file,t+file)
 
-    wk=addpath('processing/tmp/')
+    wk=addpath('processing/static/')
     data=addpath('processing/pdf_bin/')
-    viewloc=addpath('tmp/vbookings/')
+    viewloc=addpath('static/vbookings/')
 
     hitems=['booking:Booking', 'reference:ExportRef', 'vessel:Vessel', 'load port:LoadPort',
             'disch port:Dest', 'steamship:Line', 'discharge:Destination', 'total:Amount']

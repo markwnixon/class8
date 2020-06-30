@@ -16,8 +16,8 @@ def main(odata, ldata, pdata1, invojo, involine, paidline, refline, balline, inv
     from CCC_system_setup import myoslist, addpath, bankdata, scac
 
     joborder = invojo
-    file1 = addpath(f'tmp/{scac}/data/vinvoice/INV'+joborder+'.pdf')
-    file2 = addpath(f'tmp/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache)+'.pdf')
+    file1 = addpath(f'static/{scac}/data/vinvoice/INV'+joborder+'.pdf')
+    file2 = addpath(f'static/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache)+'.pdf')
     type = joborder[1]
 
     #today = datetime.datetime.today().strftime('%m/%d/%Y')
@@ -184,7 +184,7 @@ def main(odata, ldata, pdata1, invojo, involine, paidline, refline, balline, inv
     c = canvas.Canvas(file1, pagesize=letter)
     c.setLineWidth(1)
 
-    logo = addpath("tmp/felpics/logo3.jpg")
+    logo = addpath("static/felpics/logo3.jpg")
     c.drawImage(logo, 185, 680, mask='auto')
 
     # Date and JO boxes

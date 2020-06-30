@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 import mysql.connector
 from CCC_system_setup import scac, machine, statpath, dbp
 
-app = Flask(__name__, static_folder = "tmp")
+app = Flask(__name__, static_folder = "static")
 ####################################################################
 ########## SET DATABASE STRUCTURES #################################
 ####################################################################

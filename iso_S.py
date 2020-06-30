@@ -430,10 +430,10 @@ def isoS():
                 make_S_invoice.main(odat,ldata,pdata1,invojo,involine,paidline,refline,balline,invodate,cache,payment)
 
                 if cache>1:
-                    docref=f'tmp/{scac}/data/vinvoice/INV'+invojo+'c'+str(cache)+'.pdf'
+                    docref=f'static/{scac}/data/vinvoice/INV'+invojo+'c'+str(cache)+'.pdf'
                     # Store for future use
                 else:
-                    docref=f'tmp/{scac}/data/vinvoice/INV'+invojo+'.pdf'
+                    docref=f'static/{scac}/data/vinvoice/INV'+invojo+'.pdf'
 
                 odat.Cache=cache
                 idat=Invoices.query.filter(Invoices.SubJo==invojo).first()
@@ -593,10 +593,10 @@ def isoS():
             make_S_invoice.main(odat, ldata, pdata1, invojo,involine, paidline, refline, balline, invodate, cache, 0)
 
             if cache>1:
-                docref=f'tmp/{scac}/data/vinvoice/INV'+invojo+'c'+str(cache)+'.pdf'
+                docref=f'static/{scac}/data/vinvoice/INV'+invojo+'c'+str(cache)+'.pdf'
                 # Store for future use
             else:
-                docref=f'tmp/{scac}/data/vinvoice/INV'+invojo+'.pdf'
+                docref=f'static/{scac}/data/vinvoice/INV'+invojo+'.pdf'
 
 
             odat.Path=docref
@@ -616,27 +616,27 @@ def isoS():
 # ____________________________________________________________________________________________________________________B.NewJob.Storage
         if newjob is not None:
             err=['Select Source Document from List']
-            fdata = myoslist(f'tmp/{scac}/data/vunknown')
+            fdata = myoslist(f'static/{scac}/data/vunknown')
             modlink=4
             leftsize=8
             leftscreen=0
-            docref=f'tmp/{scac}/data/vunknown/NewJob.pdf'
+            docref=f'static/{scac}/data/vunknown/NewJob.pdf'
 
         if newjob is None and modlink==4:
             filesel=request.values.get('FileSel')
             if filesel != '1':
-                fdata = myoslist(f'tmp/{scac}/data/vunknown')
+                fdata = myoslist(f'static/{scac}/data/vunknown')
                 leftsize=8
                 leftscreen=0
-                docref=f'tmp/{scac}/data/vunknown/'+filesel
+                docref=f'static/{scac}/data/vunknown/'+filesel
 
         if thisjob is not None:
             modlink=0
             #Create the new database entry for the source document
             filesel=request.values.get('FileSel')
             if filesel != '1':
-                docold=f'tmp/{scac}/data/vunknown/'+filesel
-                docref=f'tmp/{scac}/data/vorders/'+filesel
+                docold=f'static/{scac}/data/vunknown/'+filesel
+                docref=f'static/{scac}/data/vorders/'+filesel
                 shutil.move(addpath(docold),addpath(docref))
             else:
                 docref=''
@@ -703,5 +703,5 @@ def isoS():
         docref=' '
         err=['All is well', ' ', ' ', ' ',  ' ']
         bm, cm = timedata(odata)
-    docref=docref.replace('tmp/vinvoice',f'tmp/{scac}/data/vinvoice')
+    docref=docref.replace('static/vinvoice',f'static/{scac}/data/vinvoice')
     return odata,cdata,sdata,oder,peep,serv,err,modata,modlink,fdata,today,inco,leftscreen,docref,leftsize,ldata,monsel,monvec,invo,invooder,invojo,cache,filesel,bm,cm,invodate

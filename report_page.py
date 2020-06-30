@@ -21,16 +21,16 @@ def reportmake(type):
     cache =  request.values.get('cache')
     cache=nonone(cache)
 
-    file1=f'tmp/{scac}/data/vreport/pagestart.pdf'
-    file2=f'tmp/{scac}/data/vreport/background.pdf'
-    file3=f'tmp/{scac}/data/vreport/headers.pdf'
-    file4=f'tmp/{scac}/data/vreport/contents.pdf'
+    file1=f'static/{scac}/data/vreport/pagestart.pdf'
+    file2=f'static/{scac}/data/vreport/background.pdf'
+    file3=f'static/{scac}/data/vreport/headers.pdf'
+    file4=f'static/{scac}/data/vreport/contents.pdf'
     today = datetime.datetime.today().strftime('%m/%d/%Y')
     invodate = datetime.date.today().strftime('%m/%d/%Y')
 
     c=canvas.Canvas(file1, pagesize=letter)
     c.setLineWidth(1)
-    logo = "tmp/felpics/logo3.jpg"
+    logo = "static/felpics/logo3.jpg"
     c.drawImage(logo, 185, 680, mask='auto')
     c.showPage()
     c.save()
