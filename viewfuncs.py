@@ -1027,8 +1027,8 @@ def address(addr1,addr2,addr3):
     return street,cityst
 
 def nononestr(input):
-    if input is None or input =='None':
-        output=''
+    if input is None or input=='None':
+        output=' '
     else:
         output=input
     return output

@@ -22,9 +22,9 @@ def hoeghparse():
             shutil.copy(s+file,u)
             shutil.move(s+file,t+file)
 
-    wk='processing/static/'
+    wk='processing/tmp/'
     data='processing/pdf_bin/'
-    viewloc='static/data/vbookings/'
+    viewloc='tmp/data/vbookings/'
 
     hitems=['booking:Booking', 'reference:ExportRef', 'vessel:Vessel', 'loading:LoadPort',
             'discharge:Dest', 'total:Amount']

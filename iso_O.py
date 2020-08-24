@@ -715,38 +715,38 @@ def isoO():
             if ship > 0 and viewd is not None:
                 modata = OverSeas.query.get(ship)
                 if modata.Dpath is not None:
-                    docref = f'static/{scac}/data/vdockr/' + modata.Dpath
+                    docref = f'tmp/{scac}/data/vdockr/' + modata.Dpath
 
             if ship > 0 and viewi is not None:
                 modata = OverSeas.query.get(ship)
                 if modata.Ipath is not None:
                     docref = modata.Ipath
                     if 'data' not in docref:
-                        docref = docref.replace('static/', f'static/{scac}/data/')
+                        docref = docref.replace('tmp/', f'tmp/{scac}/data/')
 
             if ship > 0 and viewo is not None:
                 modata = OverSeas.query.get(ship)
                 if modata.Apath is not None:
                     docref = modata.Apath
                     if 'data' not in docref:
-                        docref = docref.replace('static/', f'static/{scac}/data/')
+                        docref = docref.replace('tmp/', f'tmp/{scac}/data/')
 
             if book > 0:
                 modata = Bookings.query.get(book)
                 if modata.Original is not None:
-                    docref = f'static/{scac}/data/vbookings/' + modata.Original
+                    docref = f'tmp/{scac}/data/vbookings/' + modata.Original
 
             if auto > 0:
                 modata = Autos.query.get(auto)
                 if modata.Original is not None:
                     docref = modata.Original
                     if 'data' not in docref:
-                        docref = docref.replace('static/', f'static/{scac}/data/')
+                        docref = docref.replace('tmp/', f'tmp/{scac}/data/')
 
             if tick > 0:
                 modata = Interchange.query.get(tick)
                 if modata.Original is not None:
-                    docref = f'static/{scac}/data/vinterchange/' + modata.Original
+                    docref = f'tmp/{scac}/data/vinterchange/' + modata.Original
 
             if (auto > 0 or book > 0 or ship > 0 or tick > 0) and docref:
                 if len(docref) > 5:
@@ -768,7 +768,7 @@ def isoO():
                     if modata.Dpath is not None:
                         if len(modata.Dpath) > 5:
                             leftscreen = 0
-                            docref = f'static/{scac}/data/vdockr/' + modata.Dpath
+                            docref = f'tmp/{scac}/data/vdockr/' + modata.Dpath
                             err = ['All is well', ' ']
 
             if book > 0:
@@ -778,7 +778,7 @@ def isoO():
                     if modata.Original is not None:
                         if len(modata.Original) > 5:
                             leftscreen = 0
-                            docref = f'static/{scac}/data/vbookings/' + modata.Original
+                            docref = f'tmp/{scac}/data/vbookings/' + modata.Original
                             err = ['All is well', ' ']
             if peep > 0:
                 modata = People.query.get(peep)
@@ -787,7 +787,7 @@ def isoO():
                     if modata.Original is not None:
                         if len(modata.Original) > 5:
                             leftscreen = 0
-                            docref = f'static/{scac}/data/vpersons/' + modata.Original
+                            docref = f'tmp/{scac}/data/vpersons/' + modata.Original
                             err = ['All is well', ' ']
             if auto > 0:
                 modata = Autos.query.get(auto)
@@ -806,7 +806,7 @@ def isoO():
                     if modata.Original is not None:
                         if len(modata.Original) > 5:
                             leftscreen = 0
-                            docref = f'static/{scac}/data/vinterchange/' + modata.Original
+                            docref = f'tmp/{scac}/data/vinterchange/' + modata.Original
                             err = ['All is well', ' ']
             doctxt = docref.split('.', 1)[0]+'.txt'
 
@@ -990,7 +990,7 @@ def isoO():
                 err = ['Dock Receipt Creation Selected', ' ']
 
                 newfile = 'DR'+bdata.Booking+'c'+str(cache)+'.pdf'
-                docref = f'static/{scac}/data/vdockr/'+newfile
+                docref = f'tmp/{scac}/data/vdockr/'+newfile
                 absfile = addpath(docref)
                 modata.Dpath = newfile
                 modata.Cache = cache
@@ -1093,10 +1093,10 @@ def isoO():
                 invo, err, leftscreen, leftsize, docref, invodate = invoiceO(invooder, payment)
 
                 if cache > 1:
-                    docref = f'static/{scac}/data/vinvoice/INV'+invojo+'c'+str(cache)+'.pdf'
+                    docref = f'tmp/{scac}/data/vinvoice/INV'+invojo+'c'+str(cache)+'.pdf'
                     # Store for future use
                 else:
-                    docref = f'static/{scac}/data/vinvoice/INV'+invojo+'.pdf'
+                    docref = f'tmp/{scac}/data/vinvoice/INV'+invojo+'.pdf'
 
                 odat.Cache = cache
                 idat = Invoices.query.filter(Invoices.Jo == invojo).first()
@@ -1211,7 +1211,7 @@ def isoO():
             modlink = 4
             leftsize = 8
             leftscreen = 0
-            docref = f'static/{scac}/data/vunknown/NewJob.pdf'
+            docref = f'tmp/{scac}/data/vunknown/NewJob.pdf'
 
         if newjob is None and modlink == 4:
             filesel = request.values.get('FileSel')
@@ -1219,7 +1219,7 @@ def isoO():
             leftsize = 8
             leftscreen = 0
             try:
-                docref = f'static/{scac}/data/vunknown/'+filesel
+                docref = f'tmp/{scac}/data/vunknown/'+filesel
             except:
                 err[0] = 'No File Found'
 
@@ -1228,8 +1228,8 @@ def isoO():
             # Create the new database entry for the source document
             filesel = request.values.get('FileSel')
             if filesel != '1' and filesel is not None:
-                docold = f'static/{scac}/data/vunknown/'+filesel
-                docref = f'static/{scac}/data/vpersons/'+filesel
+                docold = f'tmp/{scac}/data/vunknown/'+filesel
+                docref = f'tmp/{scac}/data/vpersons/'+filesel
                 # shutil.move(docold,docref)
             else:
                 docref = ''

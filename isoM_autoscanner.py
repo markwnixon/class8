@@ -24,14 +24,14 @@ def isoMautoscanner():
         now = datetime.datetime.now().strftime('%I:%M %p')
         vinlist=''
         try:
-            os.remove('/home/oslm/oslrun/static/data/processing/vins.txt')
+            os.remove('/home/oslm/oslrun/tmp/data/processing/vins.txt')
         except IOError:
             print('File already removed')
 
         vins = request.values.get('vinlist')
         if vins is not None:
             vinlist=vins.split()
-            txt_file=addpath(f'static/{scac}/data/processing/vins.txt')
+            txt_file=addpath(f'tmp/{scac}/data/processing/vins.txt')
             with open(txt_file,'a+') as f:
                 for vin in vinlist:
                     vin=vin.strip()
@@ -39,10 +39,10 @@ def isoMautoscanner():
         f.close()
         thisip = os.environ['PUBLICIP']
         vinlist = vinlist + ['Sent to', thisip]
-        tout = subprocess.check_output(['scp', '/home/oslm/oslrun/static/data/processing/vins.txt', 'mark@'+thisip+':/home/mark/flask/crontasks/incoming/vins.txt'])
+        tout = subprocess.check_output(['scp', '/home/oslm/oslrun/tmp/data/processing/vins.txt', 'mark@'+thisip+':/home/mark/flask/crontasks/incoming/vins.txt'])
 
-        #os.system('scp static/data/processing/vins.txt mark@98.231.243.208:/home/mark/flask/crontasks/incoming/vins.txt')
-        #p = subprocess.Popen(["scp", "static/data/processing/vins.txt", "mark@98.231.243.208:/home/mark/flask/crontasks/incoming/vins.txt"])
+        #os.system('scp tmp/data/processing/vins.txt mark@98.231.243.208:/home/mark/flask/crontasks/incoming/vins.txt')
+        #p = subprocess.Popen(["scp", "tmp/data/processing/vins.txt", "mark@98.231.243.208:/home/mark/flask/crontasks/incoming/vins.txt"])
         #sts = os.waitpid(p.pid, 0)
 
 # ____________________________________________________________________________________________________________________E.Delete.General

@@ -138,7 +138,7 @@ def main(file1, keydata, grandtotal, pdata1, date1, date2):
     c = canvas.Canvas(file1, pagesize=letter)
     c.setLineWidth(1)
 
-    #logo = addpath("static/pics/onestop.png")
+    #logo = addpath("tmp/pics/onestop.png")
     c.drawImage(logoi, 185, 680, mask='auto')
 
     # Date and JO boxes

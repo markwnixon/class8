@@ -19,9 +19,7 @@ import requests
 import mimetypes
 from urllib.parse import urlparse
 import img2pdf
-from viewfuncs import make_new_order, nonone, monvals, getmonths, nononestr, hasinput, d2s, erud
-
-from class8_utils import *
+from viewfuncs import make_new_order, nonone, monvals, getmonths
 
 today = datetime.datetime.today()
 year = str(today.year)
@@ -212,7 +210,7 @@ def Whatapp():
             file_extension = file_extension.replace('.jpeg', '.jpg')
             media_sid = os.path.basename(urlparse(media_url).path)
             media_files.append(media_sid+file_extension)
-            media_path = addpath('static/data/processing/whatsapp/')
+            media_path = addpath('tmp/data/processing/whatsapp/')
             with open(f"{media_path}{media_sid}{file_extension}", 'wb') as f:
                 f.write(req.content)
         print(media_files)
@@ -259,19 +257,47 @@ def InvoiceMaint():
                            leftsize=leftsize, rightsize=rightsize, docref=docref)
 
 @app.route('/Test', methods=['GET', 'POST'])
-
-
 def Test():
-
-    from class8_tasks import Table_maker
-    genre = 'Trucking'
-    genre_data, table_data, err, oder, leftscreen, leftsize, docref, tabletitle, table_filters, task_boxes, tfilters, tboxes, jscripts,\
-    taskon, task_iter, holdvec, keydata, entrydata, username, modata, focus = Table_maker(genre)
-    rightsize = 12 - leftsize
-
-    return render_template('test.html',cmpdata=cmpdata, scac=scac,  genre_data = genre_data, table_data=table_data, err=err, oder=oder, modata=modata, leftscreen=leftscreen,
-                           leftsize=leftsize, rightsize=rightsize, docref=docref, tabletitle=tabletitle, table_filters = table_filters,task_boxes = task_boxes, tfilters=tfilters, tboxes=tboxes, dt1 = jscripts,
-                           taskon=taskon, task_iter=task_iter, holdvec=holdvec, keydata = keydata, entrydata = entrydata, username=username, focus = focus)
+    scac = 'FELA'
+    leftsize = 8
+    rightsize = 12-leftsize
+    leftscreen = 1
+    err = []
+    docref = ''
+    oder=0
+    modata=0
+    modlink = 0
+    today = datetime.date.today()
+    stopdate = today-datetime.timedelta(days=60)
+    odata = Orders.query.filter(Orders.Date > stopdate).all()
+    headcols = ['Jo','Order','Shipper', 'Booking','Container','Chassis','Company','Amount','Date','Company2','Commodity','Packing']
+    rowcolors1 = []
+    rowcolors2 = []
+    data1 = []
+    for odat in odata:
+        datarow = [0]*len(headcols)
+        hstat = odat.Hstat
+        istat = odat.Istat
+        print(hstat,istat)
+        if istat == 4: rowcolors2.append('green text-white font-weight-bold')
+        elif istat == 3: rowcolors2.append('amber font-weight-bold')
+        elif istat == 2: rowcolors2.append('purple text-white font-weight-bold')
+        elif istat == 1: rowcolors2.append('blue text-white font-weight-bold')
+        elif istat == -1: rowcolors2.append('yellow font-weight-bold')
+        else: rowcolors2.append('white font-weight-bold')
+        if hstat == 4: rowcolors1.append('green text-white font-weight-bold')
+        elif hstat == 3: rowcolors1.append('amber font-weight-bold')
+        elif hstat == 2: rowcolors1.append('purple text-white font-weight-bold')
+        elif hstat == 1: rowcolors1.append('blue text-white font-weight-bold')
+        elif hstat == -1: rowcolors1.append('yellow font-weight-bold')
+        else: rowcolors1.append('white font-weight-bold')
+        for jx,co in enumerate(headcols):
+            datarow[jx] = getattr(odat,co)
+        data1.append(datarow)
+    print(rowcolors1)
+    tabletitle='This is A Test'
+    return render_template('test.html',cmpdata=cmpdata, scac=scac,  data1=data1, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
+                           leftsize=leftsize, rightsize=rightsize, docref=docref,tabletitle=tabletitle,headcols=headcols,rowcolors1=rowcolors1)
 
 
 

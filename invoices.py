@@ -112,9 +112,9 @@ def invoiceO(ship, payment):
 
 # _______________________________________________________________________________________________________________
             joborder = myo.Jo
-            file1 = addpath(f'static/{scac}/data/vinvoice/INV'+joborder+'.pdf')
-            file2 = addpath(f'static/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache)+'.pdf')
-            file3 = addpath(f'static/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache-1)+'.pdf')
+            file1 = addpath(f'tmp/{scac}/data/vinvoice/INV'+joborder+'.pdf')
+            file2 = addpath(f'tmp/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache)+'.pdf')
+            file3 = addpath(f'tmp/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache-1)+'.pdf')
             today = datetime.datetime.today().strftime('%m/%d/%Y')
             type = joborder[1]
             myb = Bookings.query.filter(myo.Booking == Bookings.Booking).first()
@@ -226,7 +226,7 @@ def invoiceO(ship, payment):
             c = canvas.Canvas(file1, pagesize=letter)
             c.setLineWidth(1)
 
-            logo = addpath("static/pics/logo3.jpg")
+            logo = addpath("tmp/pics/logo3.jpg")
             c.drawImage(logo, 185, 680, mask='auto')
 
             # Date and JO boxes
@@ -424,10 +424,10 @@ def invoiceO(ship, payment):
 
 # _______________________________________________________________________________________________________________
             if cache > 1:
-                docref = f'static/{scac}/data/vinvoice/INV'+myo.Jo+'c'+str(cache)+'.pdf'
+                docref = f'tmp/{scac}/data/vinvoice/INV'+myo.Jo+'c'+str(cache)+'.pdf'
                 # Store for future use
             else:
-                docref = f'static/{scac}/data/vinvoice/INV'+myo.Jo+'.pdf'
+                docref = f'tmp/{scac}/data/vinvoice/INV'+myo.Jo+'.pdf'
 
             if payment == 0:
                 for ldatl in ldata:
@@ -497,9 +497,9 @@ def invoiceM(oder, payment):
             pdata1 = People.query.filter(People.Company == myo.Shipper).first()
 
         joborder = myo.Jo
-        file1 = addpath(f'static/{scac}/data/vinvoice/INV'+joborder+'c0.pdf')
-        file2 = addpath(f'static/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache)+'.pdf')
-        file3 = addpath(f'static/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache-1)+'.pdf')
+        file1 = addpath(f'tmp/{scac}/data/vinvoice/INV'+joborder+'c0.pdf')
+        file2 = addpath(f'tmp/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache)+'.pdf')
+        file3 = addpath(f'tmp/{scac}/data/vinvoice/INV'+joborder+'c'+str(cache-1)+'.pdf')
         today = datetime.datetime.today().strftime('%m/%d/%Y')
         type = joborder[1]
         if invodate is None or invodate == 0:
@@ -598,7 +598,7 @@ def invoiceM(oder, payment):
         c = canvas.Canvas(file1, pagesize=letter)
         c.setLineWidth(1)
 
-        logo = addpath("static/pics/logo3.jpg")
+        logo = addpath("tmp/pics/logo3.jpg")
         c.drawImage(logo, 185, 680, mask='auto')
 
         # Date and JO boxes
@@ -792,10 +792,10 @@ def invoiceM(oder, payment):
             print('Could not find', file3, file1)
 
         if cache > 1:
-            docref = f'static/{scac}/data/vinvoice/INV'+myo.Jo+'c'+str(cache)+'.pdf'
+            docref = f'tmp/{scac}/data/vinvoice/INV'+myo.Jo+'c'+str(cache)+'.pdf'
             # Store for future use
         else:
-            docref = f'static/{scac}/data/vinvoice/INV'+myo.Jo+'c0.pdf'
+            docref = f'tmp/{scac}/data/vinvoice/INV'+myo.Jo+'c0.pdf'
 
         if payment == 0:
             for ldatl in ldata:

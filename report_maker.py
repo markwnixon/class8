@@ -32,7 +32,7 @@ def reportmaker(type,thiscomp):
 
     c=canvas.Canvas(file1, pagesize=letter)
     c.setLineWidth(1)
-    #logo = addpath("static/pics/logo3.jpg")
+    #logo = addpath("tmp/pics/logo3.jpg")
     c.drawImage(logoi, 185, 680, mask='auto')
     c.showPage()
     c.save()
