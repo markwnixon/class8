@@ -1387,6 +1387,7 @@ def docuploader(dbase):
                 scache = odat.Scache
 
         file = request.files['sourceupload']
+        print('the file is', file)
         if file.filename == '':
             err.append('No source file selected for uploading')
 
