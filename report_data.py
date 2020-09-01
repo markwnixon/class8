@@ -517,34 +517,33 @@ def custcalcs(thiscomp):
         openf=invof-incof
 
         if trucktype=='on':
-            loc1=odat.Company
-            loc2=odat.Company2
-            if thiscomp == 'ALLT':
-                loc1 = odat.Shipper
-                loc2 = odat.Company
-                if 'seagirt' in loc2.lower(): loc2 = odat.Company2
+            shi = odat.Shipper
+            loc=odat.Company
+            if shi is None: shi = 'No Shipper'
+            if loc is None: loc = 'No Location'
+            if 'seagirt' in loc.lower(): loc = odat.Company2
         elif oceantype=='on':
-            loc1=odat.Pol
-            loc2=odat.Pod
-        if 'port' in loc1.lower() or 'baltimore' in loc1.lower():
-            loc1='Seagirt'
-        if 'baltimore' in loc2.lower():
-            loc2='Seagirt'
-        if len(loc1)>tfeach:
-            loc1=loc1[0:tfeach-1]
-        if len(loc2)>tfeach:
-            loc2=loc2[0:tfeach-1]
-        loc1=loc1.title()
-        loc2=loc2.title()
+            shi=odat.Pol
+            loc=odat.Pod
+        if 'port' in loc.lower() or 'baltimore' in loc.lower():
+            loc='Seagirt'
+        if 'baltimore' in loc.lower():
+            loc='Seagirt'
+        if len(shi)>tfeach:
+            shi=shi[0:tfeach-1]
+        if len(loc)>tfeach:
+            loc=loc[0:tfeach-1]
+        shi=shi.title()
+        loc=loc.title()
         print('openbalrequest=',openbalrequest,openf)
         if d2 is not None:
             d1=d2
         if openbalrequest=='on' and openf>0.0:
             delta=thisday-d1
             ndays=delta.days
-            itemlist.append([d1.strftime('%m/%d/%Y')]+keydata+[loc1,loc2,nodollar(invof),str(ndays),nodollar(openf)])
+            itemlist.append([d1.strftime('%m/%d/%Y')]+keydata+[shi,loc,nodollar(invof),str(ndays),nodollar(openf)])
         elif openbalrequest=='off' or openbalrequest is None:
-            itemlist.append([d1.strftime('%m/%d/%Y')]+keydata+[loc1,loc2,nodollar(invof),nodollar(incof),nodollar(openf)])
+            itemlist.append([d1.strftime('%m/%d/%Y')]+keydata+[shi,loc,nodollar(invof),nodollar(incof),nodollar(openf)])
 
         #itemlist.append([d1.strftime('%m/%d/%Y'),order,container,loc1,loc2,nodollar(invof),nodollar(incof),nodollar(openf)])
     if openbalrequest=='on':
