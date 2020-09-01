@@ -65,12 +65,16 @@
                 {% else %}
                     {% set atc1="white font-weight-bold" %}
                 {% endif %}
+                {% set shipper = data.Shipper %}
+                {% if shipper %}
+                    {% set shipper = shipper[0:18] %}
+                {% endif %}
 
 
             <tr >
                 <td align="center" class="{{atc1}}">{{ data.id }}</td>
                 <td align="center" class="{{atc1}}">{{ data.Jo }}</td>
-                <td align="center" class="{{atc1}}">{{ data.Shipper[0:18] }}</td>
+                <td align="center" class="{{atc1}}">{{ shipper }}</td>
                 <td align="center" class="{{atc1}}">{{ data.Order }}</td>
                 <td align="center" class="{{atc1}}">{{ data.Booking }}</td>
                 <td align="center" class="{{atc1}}">{{ data.Container }}</td>
