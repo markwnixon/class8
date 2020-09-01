@@ -152,7 +152,7 @@ def isoR():
         odata=Orders.query.all()
         for odat in odata:
             cust=odat.Shipper
-            if cust not in customerlist:
+            if cust is not None and cust not in customerlist:
                 customerlist.append(cust)
 
     customerlist.sort()
