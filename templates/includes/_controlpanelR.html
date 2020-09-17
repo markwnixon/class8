@@ -36,6 +36,10 @@
     <select class="form-control align-text-botton" type="text" name="thiscompany">
         <option value='1'>Choose Customer</option>
         <option value='ALLT'>All Trucking</option>
+    <option value='LB'>All Load Board</option>
+    <option value='WM'>All Word of Mouth</option>
+    <option value='AF'>All African</option>
+    <option value='BP'>All Bad Plays</option>
         {% for data in customerlist %}
         <option {% if data == thiscomp %}selected{% endif %}
             value="{{data}}"> {{data}} </option>

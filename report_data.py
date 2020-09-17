@@ -474,6 +474,13 @@ def custcalcs(thiscomp):
     if trucktype=='on':
         if thiscomp == 'ALLT':
             odata = Orders.query.filter((Orders.Date >= start) & (Orders.Date <= end)).order_by(Orders.Date).all()
+        elif thiscomp == 'LB' or thiscomp == 'WM' or thiscomp == 'AF' or thiscomp == 'BP':
+            pdata = People.query.filter(People.Addr3 == thiscomp).all()
+            companies = []
+            for pdat in pdata:
+                companies.append(pdat.Company)
+            print(companies)
+            odata=Orders.query.filter( (Orders.Date>=start) & (Orders.Date<=end) & (Orders.Shipper.in_(companies)) ).order_by(Orders.Date).all()
         else:
             odata=Orders.query.filter( (Orders.Date>=start) & (Orders.Date<=end) & (Orders.Shipper==thiscomp) ).order_by(Orders.Date).all()
     elif oceantype=='on':
