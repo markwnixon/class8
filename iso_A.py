@@ -241,20 +241,24 @@ def AutoScanner():
 
 @app.route('/QuoteMaker', methods=['GET', 'POST'])
 def QuoteMaker():
-    from iso_Q import isoQuote
-    bidname, costdata, biddata, expdata, timedata, distdata, emaildata, locto, locfrom, dirdata, qdata, bidthis, taskbox, thismuch, quot, qdat, tbox = isoQuote()
-    return render_template('Aquotemaker.html', cmpdata=cmpdata, scac=scac, costdata = costdata, biddata=biddata, expdata = expdata, timedata = timedata,
-                           distdata = distdata, locto=locto, locfrom=locfrom, emaildata = emaildata, dirdata=dirdata, qdata = qdata, bidthis=bidthis, taskbox = taskbox, thismuch=thismuch, quot=quot, qdat=qdat, bidname=bidname, tbox=tbox)
-
+    if session:
+        if session['logged_in'] == True:
+            from iso_Q import isoQuote
+            bidname, costdata, biddata, expdata, timedata, distdata, emaildata, locto, locfrom, dirdata, qdata, bidthis, taskbox, thismuch, quot, qdat, tbox = isoQuote()
+            return render_template('Aquotemaker.html', cmpdata=cmpdata, scac=scac, costdata = costdata, biddata=biddata, expdata = expdata, timedata = timedata,
+                                   distdata = distdata, locto=locto, locfrom=locfrom, emaildata = emaildata, dirdata=dirdata, qdata = qdata, bidthis=bidthis, taskbox = taskbox, thismuch=thismuch, quot=quot, qdat=qdat, bidname=bidname, tbox=tbox)
+    else: return redirect(url_for('EasyStart'))
 
 @app.route('/InvoiceMaint', methods=['GET', 'POST'])
 def InvoiceMaint():
-
-    from iso_InvM import isoInvM
-    odata, oder, err, modata, modlink, leftscreen, leftsize, today, now, docref = isoInvM()
-    rightsize = 12-leftsize
-    return render_template('Ainvoicemaint.html',cmpdata=cmpdata, scac=scac,  data1=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
-                           leftsize=leftsize, rightsize=rightsize, docref=docref)
+    if session:
+        if session['logged_in'] == True:
+            from iso_InvM import isoInvM
+            odata, oder, err, modata, modlink, leftscreen, leftsize, today, now, docref = isoInvM()
+            rightsize = 12-leftsize
+            return render_template('Ainvoicemaint.html',cmpdata=cmpdata, scac=scac,  data1=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
+                                   leftsize=leftsize, rightsize=rightsize, docref=docref)
+    else: return redirect(url_for('EasyStart'))
 
 @app.route('/Test', methods=['GET', 'POST'])
 def Test():
@@ -301,80 +305,85 @@ def Test():
 
 
 
-@app.route('/Banking', methods=['GET', 'POST'])
-def Banking():
 
-    from iso_Bank import isoBank
-    odata, oder, err, modata, modlink, leftscreen, leftsize, today, now, docref, cache, acdata, thismuch, acctinfo, hv = isoBank()
-    rightsize = 12-leftsize
-    return render_template('Abanking.html', cmpdata=cmpdata, scac=scac, data1=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
-                           leftsize=leftsize, rightsize=rightsize, docref=docref, cache = cache, acdata=acdata, thismuch=thismuch, acctinfo = acctinfo, hv=hv)
 
 @app.route('/DriverMaint', methods=['GET', 'POST'])
 def DriverMaint():
-
-    from iso_Driver import isoDriver
-    odata,oder,err,modata,modlink,leftscreen,leftsize,today,now,docref,cache,thismuch = isoDriver()
-    rightsize = 12-leftsize
-    return render_template('Adriver.html', cmpdata=cmpdata, scac=scac, data1=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
-                           leftsize=leftsize, rightsize=rightsize, docref=docref, cache = cache, thismuch=thismuch)
+    if session:
+        if session['logged_in'] == True:
+            from iso_Driver import isoDriver
+            odata,oder,err,modata,modlink,leftscreen,leftsize,today,now,docref,cache,thismuch = isoDriver()
+            rightsize = 12-leftsize
+            return render_template('Adriver.html', cmpdata=cmpdata, scac=scac, data1=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
+                                   leftsize=leftsize, rightsize=rightsize, docref=docref, cache = cache, thismuch=thismuch)
+    else: return redirect(url_for('EasyStart'))
 
 @app.route('/VehicleMaint', methods=['GET', 'POST'])
 def VehicleMaint():
-
-    from iso_Vehicle import isoTruck
-    odata,oder,err,modata,modlink,leftscreen,leftsize,today,now,docref,cache,thismuch = isoTruck()
-    rightsize = 12-leftsize
-    return render_template('Avehicle.html', cmpdata=cmpdata, scac=scac, data1=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
-                           leftsize=leftsize, rightsize=rightsize, docref=docref, cache = cache, thismuch=thismuch)
+    if session:
+        if session['logged_in'] == True:
+            from iso_Vehicle import isoTruck
+            odata,oder,err,modata,modlink,leftscreen,leftsize,today,now,docref,cache,thismuch = isoTruck()
+            rightsize = 12-leftsize
+            return render_template('Avehicle.html', cmpdata=cmpdata, scac=scac, data1=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
+                                   leftsize=leftsize, rightsize=rightsize, docref=docref, cache = cache, thismuch=thismuch)
+    else: return redirect(url_for('EasyStart'))
 
 @app.route('/IncomeMaint', methods=['GET', 'POST'])
 def IncomeMaint():
-
-    from iso_IncM import isoIncM
-    odata, oder, err, modata, modlink, leftscreen, leftsize, today, now, docref, cache, acdata, thismuch, depdata = isoIncM()
-    rightsize = 12-leftsize
-    return render_template('Aincomemaint.html', cmpdata=cmpdata, scac=scac, data1=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
-                           leftsize=leftsize, rightsize=rightsize, docref=docref, cache = cache, acdata=acdata, thismuch=thismuch, depdata=depdata)
+    if session:
+        if session['logged_in'] == True:
+            from iso_IncM import isoIncM
+            odata, oder, err, modata, modlink, leftscreen, leftsize, today, now, docref, cache, acdata, thismuch, depdata = isoIncM()
+            rightsize = 12-leftsize
+            return render_template('Aincomemaint.html', cmpdata=cmpdata, scac=scac, data1=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
+                                   leftsize=leftsize, rightsize=rightsize, docref=docref, cache = cache, acdata=acdata, thismuch=thismuch, depdata=depdata)
+    else: return redirect(url_for('EasyStart'))
 
 @app.route('/Deposits', methods=['GET', 'POST'])
 def Deposits():
-
-    from iso_Deposits import isoDeposit
-    odata, gdata, oder, err, modata, modlink, leftscreen, leftsize, today, now, docref, cache, acdata, thismuch, depdata = isoDeposit()
-    rightsize = 12-leftsize
-    return render_template('Adeposits.html', cmpdata=cmpdata, scac=scac, data1=gdata, data2=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
-                           leftsize=leftsize, rightsize=rightsize, docref=docref, cache = cache, acdata=acdata, thismuch=thismuch, depdata=depdata)
-
+    if session:
+        if session['logged_in'] == True:
+            from iso_Deposits import isoDeposit
+            odata, gdata, oder, err, modata, modlink, leftscreen, leftsize, today, now, docref, cache, acdata, thismuch, depdata = isoDeposit()
+            rightsize = 12-leftsize
+            return render_template('Adeposits.html', cmpdata=cmpdata, scac=scac, data1=gdata, data2=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
+                                   leftsize=leftsize, rightsize=rightsize, docref=docref, cache = cache, acdata=acdata, thismuch=thismuch, depdata=depdata)
+    else: return redirect(url_for('EasyStart'))
 
 @app.route('/AccountMaint', methods=['GET', 'POST'])
 def AccountMaint():
-
-    from iso_AM import isoAM
-    odata, oder, err, modata, modlink, leftscreen, leftsize, today, now, scdata, companyon, divdata, atypes, tmap, fmap, qmap, gmap, colordict = isoAM()
-    rightsize = 12-leftsize
-    return render_template('Aaccountmaint.html', cmpdata=cmpdata, scac=scac, data1=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
-                           leftsize=leftsize, rightsize=rightsize, scdata=scdata, companyon=companyon, divdata = divdata, colordata = colordict,
-                           atypes=atypes, tmap=tmap, fmap=fmap, qmap=qmap, gmap=gmap)
-
+    if session:
+        if session['logged_in'] == True:
+            from iso_AM import isoAM
+            odata, oder, err, modata, modlink, leftscreen, leftsize, today, now, scdata, companyon, divdata, atypes, tmap, fmap, qmap, gmap, colordict = isoAM()
+            rightsize = 12-leftsize
+            return render_template('Aaccountmaint.html', cmpdata=cmpdata, scac=scac, data1=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
+                                   leftsize=leftsize, rightsize=rightsize, scdata=scdata, companyon=companyon, divdata = divdata, colordata = colordict,
+                                   atypes=atypes, tmap=tmap, fmap=fmap, qmap=qmap, gmap=gmap)
+    else: return redirect(url_for('EasyStart'))
 
 @app.route('/General', methods=['GET', 'POST'])
 def General():
-
-    from iso_G import isoG
-    odata, oder, err, modata, modlink, leftscreen, docref, leftsize, fdata, filesel, today, now, doctxt, longs = isoG()
-    rightsize = 12-leftsize
-    return render_template('Ageneral.html', cmpdata=cmpdata, scac=scac, data1=odata, fdata=fdata, err=err, oder=oder, modata=modata, doctxt=doctxt, modlink=modlink, filesel=filesel, leftscreen=leftscreen,
-                           docref=docref, leftsize=leftsize, rightsize=rightsize, longs=longs)
+    if session:
+        if session['logged_in'] == True:
+            from iso_G import isoG
+            odata, oder, err, modata, modlink, leftscreen, docref, leftsize, fdata, filesel, today, now, doctxt, longs = isoG()
+            rightsize = 12-leftsize
+            return render_template('Ageneral.html', cmpdata=cmpdata, scac=scac, data1=odata, fdata=fdata, err=err, oder=oder, modata=modata, doctxt=doctxt, modlink=modlink, filesel=filesel, leftscreen=leftscreen,
+                                   docref=docref, leftsize=leftsize, rightsize=rightsize, longs=longs)
+    else: return redirect(url_for('EasyStart'))
 
 @app.route('/Compliance', methods=['GET', 'POST'])
 def Compliance():
-
-    from iso_C import isoC
-    odata, oder, err, modata, modlink, leftscreen, docref, leftsize, fdata, filesel, today, now, doctxt, longs, acdata, actype = isoC()
-    rightsize = 12-leftsize
-    return render_template('Acompliance.html', cmpdata=cmpdata, scac=scac, data1=odata, fdata=fdata, err=err, oder=oder, modata=modata, doctxt=doctxt, modlink=modlink, filesel=filesel, leftscreen=leftscreen,
-                           docref=docref, leftsize=leftsize, rightsize=rightsize, longs=longs, acdata=acdata, actype = actype)
+    if session:
+        if session['logged_in'] == True:
+            from iso_C import isoC
+            odata, oder, err, modata, modlink, leftscreen, docref, leftsize, fdata, filesel, today, now, doctxt, longs, acdata, actype = isoC()
+            rightsize = 12-leftsize
+            return render_template('Acompliance.html', cmpdata=cmpdata, scac=scac, data1=odata, fdata=fdata, err=err, oder=oder, modata=modata, doctxt=doctxt, modlink=modlink, filesel=filesel, leftscreen=leftscreen,
+                                   docref=docref, leftsize=leftsize, rightsize=rightsize, longs=longs, acdata=acdata, actype = actype)
+    else: return redirect(url_for('EasyStart'))
 
 @app.route('/EasyStart', methods=['GET', 'POST'])
 def EasyStart():
@@ -388,12 +397,14 @@ def EasyStart():
 
 @app.route('/Reports', methods=['GET', 'POST'])
 def Reports():
+    if session:
+        if session['logged_in'] == True:
 
-    from iso_R import isoR
-    idata1, idata2, idata3, idata4, hv, cache, err, leftscreen, docref, leftsize, today, now, doctxt, sdate, fdate, fyear, customerlist, thiscomp, clist = isoR()
-    rightsize = 12-leftsize
-    return render_template('Areports.html', cmpdata=cmpdata, scac=scac, clist=clist, thiscomp=thiscomp, customerlist=customerlist, fyear=fyear, cache=cache, sdate=sdate, fdate=fdate, err=err, doctxt=doctxt, leftscreen=leftscreen, docref=docref, leftsize=leftsize, rightsize=rightsize, idata1 = idata1, idata2=idata2, idata3=idata3, idata4=idata4, hv=hv)
-
+            from iso_R import isoR
+            idata1, idata2, idata3, idata4, hv, cache, err, leftscreen, docref, leftsize, today, now, doctxt, sdate, fdate, fyear, customerlist, thiscomp, clist = isoR()
+            rightsize = 12-leftsize
+            return render_template('Areports.html', cmpdata=cmpdata, scac=scac, clist=clist, thiscomp=thiscomp, customerlist=customerlist, fyear=fyear, cache=cache, sdate=sdate, fdate=fdate, err=err, doctxt=doctxt, leftscreen=leftscreen, docref=docref, leftsize=leftsize, rightsize=rightsize, idata1 = idata1, idata2=idata2, idata3=idata3, idata4=idata4, hv=hv)
+    else: return redirect(url_for('EasyStart'))
 
 @app.route('/CalendarBig', methods=['GET', 'POST'])
 def CalendarBig():
@@ -539,22 +550,24 @@ def EmailView():
 
 @app.route('/MakeManifest', methods=['GET', 'POST'])
 def MakeManifest():
-    from iso_L import isoL
-    odata, jtype, cdata1, cdata2, tdata, pdata, pval, alltdata, allvdata, description, location, docref, bol, time, time2, date2, retval = isoL()
-    pval = 1
-    print('jtype=', jtype, retval)
-    if retval == 'O':
-        return redirect('/OverseasV')
-    if retval == 'T':
-        return redirect('/Trucking')
+    if session:
+        if session['logged_in'] == True:
+            from iso_L import isoL
+            odata, jtype, cdata1, cdata2, tdata, pdata, pval, alltdata, allvdata, description, location, docref, bol, time, time2, date2, retval = isoL()
+            pval = 1
+            print('jtype=', jtype, retval)
+            if retval == 'O':
+                return redirect('/OverseasV')
+            if retval == 'T':
+                return redirect('/Trucking')
 
-    if jtype == 'Trucking' or jtype == 'Moving':
-        return render_template('makemanifest.html', cmpdata=cmpdata, scac=scac, odata=odata, jtype=jtype, cdata1=cdata1, cdata2=cdata2, tdata=tdata, pdata=pdata, pval=pval,
-                               alltdata=alltdata, allvdata=allvdata, description=description, location=location, docref=docref)
-    else:
-        return render_template('makemanifestO.html', cmpdata=cmpdata, scac=scac, odata=odata, jtype=jtype, cdata1=cdata1, cdata2=cdata2, tdata=tdata, pdata=pdata, pval=pval,
-                               alltdata=alltdata, allvdata=allvdata, description=description, location=location, docref=docref, bol=bol, time=time, time2=time2, date2=date2)
-
+            if jtype == 'Trucking' or jtype == 'Moving':
+                return render_template('makemanifest.html', cmpdata=cmpdata, scac=scac, odata=odata, jtype=jtype, cdata1=cdata1, cdata2=cdata2, tdata=tdata, pdata=pdata, pval=pval,
+                                       alltdata=alltdata, allvdata=allvdata, description=description, location=location, docref=docref)
+            else:
+                return render_template('makemanifestO.html', cmpdata=cmpdata, scac=scac, odata=odata, jtype=jtype, cdata1=cdata1, cdata2=cdata2, tdata=tdata, pdata=pdata, pval=pval,
+                                       alltdata=alltdata, allvdata=allvdata, description=description, location=location, docref=docref, bol=bol, time=time, time2=time2, date2=date2)
+    else: return redirect(url_for('EasyStart'))
 # ____________________________________________________________________________________________________________________E.MANIFEST
 # ____________________________________________________________________________________________________________________E.MANIFEST
 # ____________________________________________________________________________________________________________________E.MANIFEST
@@ -623,16 +636,18 @@ def MovingV():
 
 @app.route('/Trucking', methods=['GET', 'POST'])
 def Trucking():
-    from iso_T import isoT
-    lbox, doclist, username, bklist, lastpr, thismuch, etitle, ebody, emaildata, odata, pdata, idata, sdata, cdata, oder, poof, sdata2, tick, serv, peep, err, modata, caldays, daylist, nweeks, howapp, modlink, leftscreen, docref, stayslim, leftsize, newc, tdata, drvdata,dlist, rightsize, ldata, invodate, inco, invo, quot, invooder, cache, stamp, alltdata, allvdata, stampdata, fdata, filesel, today, now, doctxt, holdvec, mm1, viewtype = isoT()
+    if session:
+        if session['logged_in'] == True:
+            from iso_T import isoT
+            lbox, doclist, username, bklist, lastpr, thismuch, etitle, ebody, emaildata, odata, pdata, idata, sdata, cdata, oder, poof, sdata2, tick, serv, peep, err, modata, caldays, daylist, nweeks, howapp, modlink, leftscreen, docref, stayslim, leftsize, newc, tdata, drvdata,dlist, rightsize, ldata, invodate, inco, invo, quot, invooder, cache, stamp, alltdata, allvdata, stampdata, fdata, filesel, today, now, doctxt, holdvec, mm1, viewtype = isoT()
 
-    return render_template('Atrucking.html', cmpdata=cmpdata, scac=scac, data1=odata, data2=pdata, data3=idata, data4=sdata, data5=cdata, oder=oder, poof=poof, sdata=sdata2,
-                           tick=tick, serv=serv, peep=peep, err=err, modata=modata, caldays=caldays, daylist=daylist, nweeks=nweeks, howapp=howapp, doclist=doclist,
-                           modlink=modlink, leftscreen=leftscreen, docref=docref, stayslim=stayslim, leftsize=leftsize, newc=newc, tdata=tdata, dlist=dlist,
-                           rightsize=rightsize, ldata=ldata, invodate=invodate, inco=inco, invo=invo, invooder=invooder, cache=cache, stamp=stamp, alltdata=alltdata,
-                           stampdata=stampdata, fdata=fdata, filesel=filesel, today=today, now=now, doctxt=doctxt, holdvec=holdvec, etitle=etitle, ebody=ebody, lbox=lbox,
-                           emaildata=emaildata, thismuch=thismuch, mm1=mm1, allvdata=allvdata,drvdata=drvdata, bklist = bklist, lastpr = lastpr, quot = quot, username = username, viewtype=viewtype)
-
+            return render_template('Atrucking.html', cmpdata=cmpdata, scac=scac, data1=odata, data2=pdata, data3=idata, data4=sdata, data5=cdata, oder=oder, poof=poof, sdata=sdata2,
+                                   tick=tick, serv=serv, peep=peep, err=err, modata=modata, caldays=caldays, daylist=daylist, nweeks=nweeks, howapp=howapp, doclist=doclist,
+                                   modlink=modlink, leftscreen=leftscreen, docref=docref, stayslim=stayslim, leftsize=leftsize, newc=newc, tdata=tdata, dlist=dlist,
+                                   rightsize=rightsize, ldata=ldata, invodate=invodate, inco=inco, invo=invo, invooder=invooder, cache=cache, stamp=stamp, alltdata=alltdata,
+                                   stampdata=stampdata, fdata=fdata, filesel=filesel, today=today, now=now, doctxt=doctxt, holdvec=holdvec, etitle=etitle, ebody=ebody, lbox=lbox,
+                                   emaildata=emaildata, thismuch=thismuch, mm1=mm1, allvdata=allvdata,drvdata=drvdata, bklist = bklist, lastpr = lastpr, quot = quot, username = username, viewtype=viewtype)
+    else: return redirect(url_for('EasyStart'))
 # ____________________________________________________________________________________________________________________B.STORAGE
 # ____________________________________________________________________________________________________________________B.STORAGE
 # ____________________________________________________________________________________________________________________B.STORAGE
@@ -736,17 +751,32 @@ def Calculator():
     return render_template('calculator.html', srcpath=srcpath,cmpdata=cmpdata, scac=scac, finalcost=finalcost, a1=a1, a2=a2, a3=a3, a4=a4, a5=a5, a6=a6, a7=a7, b1=b1, b2=b2, wtkg=wtkgstr, wtlb=wtlbstr, alldata=newalldata, finalwt=finalwt)
 
 
+@app.route('/Banking', methods=['GET', 'POST'])
+def Banking():
+    if session:
+        if session['logged_in'] == True:
+            from iso_Bank import isoBank
+            odata, oder, err, modata, modlink, leftscreen, leftsize, today, now, docref, cache, acdata, thismuch, acctinfo, hv = isoBank()
+            rightsize = 12-leftsize
+            return render_template('Abanking.html', cmpdata=cmpdata, scac=scac, data1=odata, err=err, oder=oder, modata=modata, modlink=modlink, leftscreen=leftscreen,
+                                   leftsize=leftsize, rightsize=rightsize, docref=docref, cache = cache, acdata=acdata, thismuch=thismuch, acctinfo = acctinfo, hv=hv)
+    else: return redirect(url_for('EasyStart'))
+
 # ____________________________________________________________________________________________________________________B.Billing
 @app.route('/Billing', methods=['GET', 'POST'])
 def Billing():
-    from iso_B import isoB
-    #from CCC_system_setup import klist
-    username, divdat, hv, bdata, cdata, bill, peep, err, modata, adata, acdata, expdata, modlink, caldays, daylist, weeksum, nweeks, addjobselect, jobdata, modal, dlist, fdata, today, cdat, pb, critday, vdata, leftscreen, docref, doctxt, leftsize, cache, filesel = isoB(0)
-    rightsize = 12-leftsize
-    return render_template('Abilling.html', cmpdata=cmpdata, scac=scac, data1=bdata, data2=cdata, bill=bill, peep=peep, err=err, modata=modata, acdata=acdata, modlink=modlink,
-                           caldays=caldays, daylist=daylist, weeksum=weeksum, nweeks=nweeks, cdata=cdata, addjobselect=addjobselect, jobdata=jobdata, modal=modal, dlist=dlist,
-                           fdata=fdata, today=today, cdat=cdat, pb=pb, critday=critday, vdata=vdata, expdata=expdata, hv = hv, divdat=divdat, username=username,
-                           leftscreen=leftscreen, docref=docref, doctxt=doctxt, leftsize=leftsize, rightsize=rightsize, cache=cache, filesel=filesel)
+    if session:
+        if session['logged_in'] == True:
+            from iso_B import isoB
+            #from CCC_system_setup import klist
+            username, divdat, hv, bdata, cdata, bill, peep, err, modata, adata, acdata, expdata, modlink, caldays, daylist, weeksum, nweeks, addjobselect, jobdata, modal, dlist, fdata, today, cdat, pb, critday, vdata, leftscreen, docref, doctxt, leftsize, cache, filesel = isoB(0)
+            rightsize = 12-leftsize
+            return render_template('Abilling.html', cmpdata=cmpdata, scac=scac, data1=bdata, data2=cdata, bill=bill, peep=peep, err=err, modata=modata, acdata=acdata, modlink=modlink,
+                                   caldays=caldays, daylist=daylist, weeksum=weeksum, nweeks=nweeks, cdata=cdata, addjobselect=addjobselect, jobdata=jobdata, modal=modal, dlist=dlist,
+                                   fdata=fdata, today=today, cdat=cdat, pb=pb, critday=critday, vdata=vdata, expdata=expdata, hv = hv, divdat=divdat, username=username,
+                                   leftscreen=leftscreen, docref=docref, doctxt=doctxt, leftsize=leftsize, rightsize=rightsize, cache=cache, filesel=filesel)
+    else:
+        return redirect(url_for('EasyStart'))
 # ____________________________________________________________________________________________________________________E.Billing
 
 # ____________________________________________________________________________________________________________________B.Login
